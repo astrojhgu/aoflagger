@@ -69,9 +69,13 @@ class PlotPropertiesWindow : public Gtk::Window {
 		Gtk::Label _hRangeMinLabel, _hRangeMaxLabel;
 		Gtk::Entry _hRangeMinEntry, _hRangeMaxEntry;
 		
-		Gtk::Frame _optionsFrame;
-		Gtk::VBox _optionsBox;
-		Gtk::RadioButton _normalOptionsButton, _logScaleButton, _zeroSymmetricButton;
+		Gtk::Frame _xOptionsFrame;
+		Gtk::VBox _xOptionsBox;
+		Gtk::CheckButton _xLogScaleButton;
+		
+		Gtk::Frame _yOptionsFrame;
+		Gtk::VBox _yOptionsBox;
+		Gtk::RadioButton _yNormalOptionsButton, _yLogScaleButton, _yZeroSymmetricButton;
 		
 		Gtk::Frame _axesDescriptionFrame;
 		Gtk::VBox _axesDescriptionBox;
