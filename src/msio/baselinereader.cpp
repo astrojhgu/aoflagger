@@ -105,9 +105,21 @@ void BaselineReader::initializePolarizations()
 	if(_polarizationCount == 0)
 	{
 		casacore::MeasurementSet ms(_measurementSet.Path());
+		
+		casacore::MSDataDescription ddTable = ms.dataDescription();
+		if(ddTable.nrow() == 0)
+			throw std::runtime_error("DataDescription table is empty");
+		casacore::ROScalarColumn<int> polIdColumn(ddTable, casacore::MSDataDescription::columnName(casacore::MSDataDescription::POLARIZATION_ID));
+		int polarizationId = polIdColumn(0);
+		for(size_t row=0; row!=ddTable.nrow(); ++row)
+		{
+			if(polIdColumn(row) != polarizationId)
+				throw std::runtime_error("This measurement set has different polarizations listed in the datadescription table. This is non-standard, and AOFalgger cannot handle it.");
+		}
+		
 		casacore::Table polTable = ms.polarization();
 		casacore::ROArrayColumn<int> corTypeColumn(polTable, "CORR_TYPE"); 
-		casacore::Array<int> corType = corTypeColumn(0);
+		casacore::Array<int> corType = corTypeColumn(polarizationId);
 		casacore::Array<int>::iterator iterend(corType.end());
 		int polarizationCount = 0;
 		for (casacore::Array<int>::iterator iter=corType.begin(); iter!=iterend; ++iter)
