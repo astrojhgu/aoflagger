@@ -114,7 +114,7 @@ void BaselineReader::initializePolarizations()
 		for(size_t row=0; row!=ddTable.nrow(); ++row)
 		{
 			if(polIdColumn(row) != polarizationId)
-				throw std::runtime_error("This measurement set has different polarizations listed in the datadescription table. This is non-standard, and AOFalgger cannot handle it.");
+				throw std::runtime_error("This measurement set has different polarizations listed in the datadescription table. This is non-standard, and AOFlagger cannot handle it.");
 		}
 		
 		casacore::Table polTable = ms.polarization();
