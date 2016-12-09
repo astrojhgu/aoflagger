@@ -399,7 +399,7 @@ void RFIGuiController::OpenTestSet(unsigned index, bool gaussianTestSets)
 	Mask2DPtr rfi = Mask2D::CreateSetMaskPtr<false>(width, height);
 	Image2DPtr testSetReal(MitigationTester::CreateTestSet(index, rfi, width, height, gaussianTestSets));
 	Image2DPtr testSetImaginary(MitigationTester::CreateTestSet(2, rfi, width, height, gaussianTestSets));
-	TimeFrequencyData data(SinglePolarisation, testSetReal, testSetImaginary);
+	TimeFrequencyData data(StokesIPolarisation, testSetReal, testSetImaginary);
 	data.SetGlobalMask(rfi);
 	
 	_rfiGuiWindow.GetTimeFrequencyWidget().SetNewData(data, SelectedMetaData());

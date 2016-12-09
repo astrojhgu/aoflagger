@@ -66,7 +66,7 @@ void RFIStatistics::addSingleBaseline(const TimeFrequencyData &data, TimeFrequen
 		addFeatures(_autoAmplitudes, image, mask, metaData, segmentedMask);
 		segmentedMask.reset();
 		addAmplitudes(_autoAmplitudes, image, mask, metaData, classifiedMask);
-		if(data.Polarisation() == DipolePolarisation && _polarizationAmplitudeStatistics)
+		if(data.PolarisationCount() == 4 && _polarizationAmplitudeStatistics)
 		{
 			addStokes(_autoAmplitudes, data, metaData);
 			addPolarisations(_autoAmplitudes, data, metaData);
@@ -98,7 +98,7 @@ void RFIStatistics::addSingleBaseline(const TimeFrequencyData &data, TimeFrequen
 		addFeatures(_crossAmplitudes, image, mask, metaData, segmentedMask);
 		segmentedMask.reset();
 		addAmplitudes(_crossAmplitudes, image, mask, metaData, classifiedMask);
-		if(data.Polarisation() == DipolePolarisation && _polarizationAmplitudeStatistics)
+		if(data.PolarisationCount() == 4 && _polarizationAmplitudeStatistics)
 		{
 			addStokes(_crossAmplitudes, data, metaData);
 			addPolarisations(_crossAmplitudes, data, metaData);

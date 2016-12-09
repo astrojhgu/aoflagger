@@ -81,7 +81,15 @@ typedef long double numl_t;
 
 enum DataKind { ObservedData, CorrectedData, ResidualData, ModelData, WeightData };
 
-enum PolarisationType { SinglePolarisation, DipolePolarisation, AutoDipolePolarisation, CrossDipolePolarisation, StokesIPolarisation, StokesQPolarisation, StokesUPolarisation, StokesVPolarisation, XXPolarisation, XYPolarisation, YXPolarisation, YYPolarisation };
+// SinglePolarisation, DipolePolarisation, AutoDipolePolarisation, CrossDipolePolarisation
+enum PolarisationType {
+	StokesIPolarisation, StokesQPolarisation,
+	StokesUPolarisation, StokesVPolarisation,
+	XXPolarisation, XYPolarisation,
+	YXPolarisation, YYPolarisation,
+	RRPolarisation, RLPolarisation,
+	LRPolarisation, LLPolarisation
+};
 
 class ParmTable;
 

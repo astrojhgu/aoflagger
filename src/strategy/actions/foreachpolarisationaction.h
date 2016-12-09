@@ -48,7 +48,7 @@ namespace rfiStrategy {
 					oldRevisedData = artifacts.RevisedData(),
 					oldOriginalData = artifacts.OriginalData();
 					
-				if(oldContaminatedData.Polarisation() != oldOriginalData.Polarisation())
+				if(oldContaminatedData.Polarisations() != oldOriginalData.Polarisations())
 					throw BadUsageException("Contaminated and original do not have equal polarisation, in for each polarisation block");
 
 				if(oldContaminatedData.PolarisationCount() == 1)
@@ -61,15 +61,15 @@ namespace rfiStrategy {
 					performStokesIteration(artifacts, progress);
 				}
 				else {
-					bool changeRevised = (oldRevisedData.Polarisation() == oldContaminatedData.Polarisation());
+					bool changeRevised = (oldRevisedData.Polarisations() == oldContaminatedData.Polarisations());
 					unsigned count = oldContaminatedData.PolarisationCount();
 
 					for(unsigned polarizationIndex = 0; polarizationIndex < count; ++polarizationIndex)
 					{
-						TimeFrequencyData *newContaminatedData =
-							oldContaminatedData.CreateTFDataFromPolarisationIndex(polarizationIndex);
-						if(isPolarizationSelected(newContaminatedData->Polarisation()))
+						if(isPolarizationSelected(oldContaminatedData.Polarisations()[polarizationIndex]))
 						{
+							TimeFrequencyData *newContaminatedData =
+								oldContaminatedData.CreateTFDataFromPolarisationIndex(polarizationIndex);
 							TimeFrequencyData *newOriginalData =
 								oldOriginalData.CreateTFDataFromPolarisationIndex(polarizationIndex);
 
@@ -79,6 +79,7 @@ namespace rfiStrategy {
 							progress.OnStartTask(*this, polarizationIndex, count, newContaminatedData->Description());
 			
 							delete newOriginalData;
+							delete newContaminatedData;
 							
 							if(changeRevised)
 							{
@@ -96,7 +97,6 @@ namespace rfiStrategy {
 
 							progress.OnEndTask(*this);
 						}
-						delete newContaminatedData;
 					}
 
 					artifacts.SetContaminatedData(oldContaminatedData);
@@ -194,7 +194,7 @@ namespace rfiStrategy {
 					oldRevisedData = artifacts.RevisedData(),
 					oldOriginalData = artifacts.OriginalData();
 
-				bool changeRevised = (oldRevisedData.Polarisation() == oldContaminatedData.Polarisation());
+				bool changeRevised = (oldRevisedData.Polarisations() == oldContaminatedData.Polarisations());
 
 				Mask2DPtr mask = Mask2D::CreateSetMaskPtr<false>(oldContaminatedData.ImageWidth(), oldContaminatedData.ImageHeight());
 

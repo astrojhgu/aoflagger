@@ -395,24 +395,26 @@ namespace aoflagger {
 		switch(input.ImageCount())
 		{
 			case 1:
-				inputData = TimeFrequencyData(TimeFrequencyData::AmplitudePart, SinglePolarisation, input._data->images[0]);
+				inputData = TimeFrequencyData(TimeFrequencyData::AmplitudePart, StokesIPolarisation, input._data->images[0]);
 				inputData.SetGlobalMask(mask);
-				revisedData = TimeFrequencyData(TimeFrequencyData::AmplitudePart, SinglePolarisation, zeroImage);
+				revisedData = TimeFrequencyData(TimeFrequencyData::AmplitudePart, StokesIPolarisation, zeroImage);
 				revisedData.SetGlobalMask(mask);
 				break;
 			case 2:
-				inputData = TimeFrequencyData(TimeFrequencyData::ComplexRepresentation, SinglePolarisation, input._data->images[0], input._data->images[1]);
+				inputData = TimeFrequencyData(StokesIPolarisation, input._data->images[0], input._data->images[1]);
 				inputData.SetGlobalMask(mask);
-				revisedData = TimeFrequencyData(TimeFrequencyData::ComplexRepresentation, SinglePolarisation, zeroImage, zeroImage);
+				revisedData = TimeFrequencyData(StokesIPolarisation, zeroImage, zeroImage);
 				revisedData.SetGlobalMask(mask);
 				break;
 			case 4:
-				inputData = TimeFrequencyData(AutoDipolePolarisation,
-					input._data->images[0], input._data->images[1],
-					input._data->images[2], input._data->images[3]
+				inputData = TimeFrequencyData(
+					XXPolarisation, input._data->images[0], input._data->images[1],
+					YYPolarisation, input._data->images[2], input._data->images[3]
 				);
 				inputData.SetIndividualPolarisationMasks(mask, mask);
-				revisedData = TimeFrequencyData(AutoDipolePolarisation, zeroImage, zeroImage, zeroImage, zeroImage);
+				revisedData = TimeFrequencyData(
+					XXPolarisation, zeroImage, zeroImage,
+					YYPolarisation, zeroImage, zeroImage);
 				revisedData.SetIndividualPolarisationMasks(mask, mask);
 				break;
 			case 8:

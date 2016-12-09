@@ -238,10 +238,10 @@ PolarisationType GrayScalePlotPage::getSelectedPolarization() const
 		return YXPolarisation;
 	else if(_polYYButton.get_active())
 		return YYPolarisation;
-	else if(_polIButton.get_active())
-		return AutoDipolePolarisation;
+	//else if(_polIButton.get_active())
+	//	return StokesIPolarisation;
 	else
-		return AutoDipolePolarisation;
+		return StokesIPolarisation;
 }
 
 enum TimeFrequencyData::PhaseRepresentation GrayScalePlotPage::getSelectedPhase() const
@@ -262,7 +262,7 @@ void GrayScalePlotPage::setToPolarization(TimeFrequencyData &data, PolarisationT
 {
 	try {
 		TimeFrequencyData* newData = data.CreateTFData(polarisation);
-		if(polarisation == AutoDipolePolarisation)
+		if(polarisation == StokesIPolarisation)
 			newData->MultiplyImages(0.5);
 		data = *newData;
 		delete newData;

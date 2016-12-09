@@ -135,8 +135,8 @@ class RFIGuiWindow : public Gtk::Window, private StrategyController {
 		void onShowStokesQPressed() { showPolarisation(StokesQPolarisation); }
 		void onShowStokesUPressed() { showPolarisation(StokesUPolarisation); }
 		void onShowStokesVPressed() { showPolarisation(StokesVPolarisation); }
-		void onShowAutoDipolePressed() { showPolarisation(AutoDipolePolarisation); }
-		void onShowCrossDipolePressed() { showPolarisation(CrossDipolePolarisation); }
+		//void onShowAutoDipolePressed() { showPolarisation(AutoDipolePolarisation); }
+		//void onShowCrossDipolePressed() { showPolarisation(CrossDipolePolarisation); }
 		void onShowXXPressed() { showPolarisation(XXPolarisation); }
 		void onShowXYPressed() { showPolarisation(XYPolarisation); }
 		void onShowYXPressed() { showPolarisation(YXPolarisation); }

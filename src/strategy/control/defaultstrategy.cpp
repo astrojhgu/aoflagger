@@ -1,7 +1,6 @@
 #include "defaultstrategy.h"
 #include "strategyiterator.h"
 
-#include "../actions/adapter.h"
 #include "../actions/baselineselectionaction.h"
 #include "../actions/calibratepassbandaction.h"
 #include "../actions/changeresolutionaction.h"

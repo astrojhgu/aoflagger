@@ -61,7 +61,7 @@ rfiStrategy::BaselineData* rfiStrategy::PngReader::Read()
 	}
 	
 	TimeFrequencyData tfData(TimeFrequencyData::AmplitudePart,
-		SinglePolarisation,
+		StokesIPolarisation,
 		image);
 	return new BaselineData(tfData, TimeFrequencyMetaDataCPtr());
 }

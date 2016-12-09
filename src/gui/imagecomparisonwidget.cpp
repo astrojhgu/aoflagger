@@ -33,15 +33,15 @@ void ImageComparisonWidget::updateVisualizedImage()
   switch(_visualizedImage)
 	{
 	case TFOriginalImage:
-		if(_original.ContainsData())
+		if(!_original.IsEmpty())
 			image = _original.GetSingleImage();
 		break;
 	case TFRevisedImage:
-		if(_revised.ContainsData())
+		if(!_revised.IsEmpty())
 			image = _revised.GetSingleImage();
 		break;
 	case TFContaminatedImage:
-		if(_contaminated.ContainsData())
+		if(!_contaminated.IsEmpty())
 			image = _contaminated.GetSingleImage();
 		break;
 	}

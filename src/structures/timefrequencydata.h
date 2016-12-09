@@ -18,110 +18,67 @@ class TimeFrequencyData
 	public:
 		enum PhaseRepresentation { PhasePart, AmplitudePart, RealPart, ImaginaryPart, ComplexRepresentation };
 
-		enum FlagCoverage { NoFlagCoverage, GlobalFlagCoverage, IndividualPolarisationFlagCoverage };
-		
 		TimeFrequencyData() :
-			_containsData(false),
 			_phaseRepresentation(AmplitudePart),
-			_polarisationType(StokesIPolarisation),
-			_flagCoverage(NoFlagCoverage),
-			_images(),
-			_flagging()
+			_data()
 		{ }
 
-		TimeFrequencyData(const TimeFrequencyData &source) :
-			_containsData(source._containsData),
-			_phaseRepresentation(source._phaseRepresentation),
-			_polarisationType(source._polarisationType),
-			_flagCoverage(source._flagCoverage),
-			_images(source._images),
-			_flagging(source._flagging)
-		{
-		}
-		
 		TimeFrequencyData(PhaseRepresentation phaseRepresentation,
-												 PolarisationType polarisationType,
-												 const Image2DCPtr &image) :
-				_containsData(true),
-				_phaseRepresentation(phaseRepresentation),
-				_polarisationType(polarisationType),
-				_flagCoverage(NoFlagCoverage)
+				PolarisationType polarisationType, const Image2DCPtr& image) :
+			_phaseRepresentation(phaseRepresentation)
 		{
 			if(phaseRepresentation == ComplexRepresentation)
 				throw BadUsageException("Incorrect construction of time/frequency data: trying to create complex representation from single image");
-			if(polarisationType == DipolePolarisation)
-				throw BadUsageException("Incorrect construction of time/frequency data: trying to create dipole polarised data from single image");
-			_images.push_back(image);
-		}
-
-		TimeFrequencyData(PhaseRepresentation phaseRepresentation,
-												 PolarisationType polarisationType,
-												 const Image2DCPtr &imageA,
-												 const Image2DCPtr &imageB) :
-				_containsData(true),
-				_phaseRepresentation(phaseRepresentation),
-				_polarisationType(polarisationType),
-				_flagCoverage(NoFlagCoverage)
-		{
-			if(phaseRepresentation == ComplexRepresentation)
-			{
-				if(PolarisationCount(polarisationType) != 1)
-					throw BadUsageException("Invalid initialization of time/frequency data: two images specified, but multiple polarizations and complex representation");
-			} else {
-				if(polarisationType != AutoDipolePolarisation && polarisationType != CrossDipolePolarisation)
-					throw BadUsageException("Invalid initialization of time/frequency data: two images specified but no two polarizations requested");
-			}
-			_images.push_back(imageA);
-			_images.push_back(imageB);
+			_data.emplace_back(polarisationType, image);
 		}
 
 		TimeFrequencyData(PolarisationType polarisationType,
 											const Image2DCPtr &real,
 											const Image2DCPtr &imaginary) :
-				_containsData(true),
-				_phaseRepresentation(ComplexRepresentation),
-				_polarisationType(polarisationType),
-				_flagCoverage(NoFlagCoverage)
+				_phaseRepresentation(ComplexRepresentation)
 		{
-			if(polarisationType == DipolePolarisation || polarisationType == AutoDipolePolarisation || polarisationType == CrossDipolePolarisation)
-				throw BadUsageException("Wrong constructor called");
-			_images.push_back(real);
-			_images.push_back(imaginary);
+			_data.emplace_back(polarisationType, real, imaginary);
 		}
 		
-		TimeFrequencyData(PolarisationType polarisationType,
+		TimeFrequencyData(PhaseRepresentation phase,
+											PolarisationType polarisationA,
+											const Image2DCPtr &imageA,
+											PolarisationType polarisationB,
+											const Image2DCPtr &imageB) :
+				_phaseRepresentation(phase)
+		{
+			_data.reserve(2);
+			_data.emplace_back(polarisationA, imageA);
+			_data.emplace_back(polarisationB, imageB);
+		}
+		
+		TimeFrequencyData(PolarisationType polarisationA,
 											const Image2DCPtr &realA,
 											const Image2DCPtr &imaginaryA,
+											PolarisationType polarisationB,
 											const Image2DCPtr &realB,
 											const Image2DCPtr &imaginaryB) :
-				_containsData(true),
-				_phaseRepresentation(ComplexRepresentation),
-				_polarisationType(polarisationType),
-				_flagCoverage(NoFlagCoverage)
+				_phaseRepresentation(ComplexRepresentation)
 		{
-			if(polarisationType != AutoDipolePolarisation && polarisationType != CrossDipolePolarisation)
-				throw BadUsageException("Incorrect construction of time/frequency data: trying to create non-auto/cross dipole polarised data from two images");
-			_images.push_back(realA);
-			_images.push_back(imaginaryA);
-			_images.push_back(realB);
-			_images.push_back(imaginaryB);
+			_data.reserve(2);
+			_data.emplace_back(polarisationA, realA, imaginaryA);
+			_data.emplace_back(polarisationB, realB, imaginaryB);
 		}
 		
 		TimeFrequencyData(PhaseRepresentation phaseRepresentation,
-											const Image2DCPtr &xx,
-											const Image2DCPtr &xy,
-											const Image2DCPtr &yx,
-											const Image2DCPtr &yy) :
-				_containsData(true),
-				_phaseRepresentation(phaseRepresentation),
-				_polarisationType(DipolePolarisation),
-				_flagCoverage(NoFlagCoverage)
+											const Image2DCPtr& xx,
+											const Image2DCPtr& xy,
+											const Image2DCPtr& yx,
+											const Image2DCPtr& yy) :
+				_phaseRepresentation(phaseRepresentation)
 		{
-			if(phaseRepresentation == ComplexRepresentation) throw;
-			_images.push_back(xx);
-			_images.push_back(xy);
-			_images.push_back(yx);
-			_images.push_back(yy);
+			if(phaseRepresentation == ComplexRepresentation)
+				throw BadUsageException("Incorrect construction of time/frequency data: trying to create complex full-Stokes representation from four images");
+			_data.reserve(4);
+			_data.emplace_back(XXPolarisation, xx);
+			_data.emplace_back(XYPolarisation, xy);
+			_data.emplace_back(YXPolarisation, yx);
+			_data.emplace_back(YYPolarisation, yy);
 		}
 
 		TimeFrequencyData(const Image2DCPtr &xxReal,
@@ -132,34 +89,15 @@ class TimeFrequencyData
 											const Image2DCPtr &yxImag,
 											const Image2DCPtr &yyReal,
 											const Image2DCPtr &yyImag) :
-				_containsData(true),
-				_phaseRepresentation(ComplexRepresentation),
-				_polarisationType(DipolePolarisation),
-				_flagCoverage(NoFlagCoverage)
+				_phaseRepresentation(ComplexRepresentation)
 		{
-			_images.push_back(xxReal);
-			_images.push_back(xxImag);
-			_images.push_back(xyReal);
-			_images.push_back(xyImag);
-			_images.push_back(yxReal);
-			_images.push_back(yxImag);
-			_images.push_back(yyReal);
-			_images.push_back(yyImag);
+			_data.reserve(4);
+			_data.emplace_back(XXPolarisation, xxReal, xxImag);
+			_data.emplace_back(XYPolarisation, xyReal, xyImag);
+			_data.emplace_back(YXPolarisation, yxReal, yxImag);
+			_data.emplace_back(YYPolarisation, yyReal, yyImag);
 		}
 
-		TimeFrequencyData &operator=(const TimeFrequencyData &source)
-		{
-			_containsData = source._containsData;
-			
-			_phaseRepresentation = source._phaseRepresentation;
-			_polarisationType = source._polarisationType;
-			_flagCoverage = source._flagCoverage;
-	
-			_images = source._images;
-			_flagging = source._flagging;
-			return *this;
-		}
-		
 		static TimeFrequencyData CreateComplexTFData(size_t polarisationCount, Image2DCPtr *realImages, Image2DCPtr *imagImages)
 		{
 			switch(polarisationCount)
@@ -167,7 +105,8 @@ class TimeFrequencyData
 				case 1:
 					return TimeFrequencyData(StokesIPolarisation, realImages[0], imagImages[0]);
 				case 2:
-					return TimeFrequencyData(AutoDipolePolarisation, realImages[0], imagImages[0], realImages[1], imagImages[1]);
+					return TimeFrequencyData(XXPolarisation, realImages[0], imagImages[0],
+																	 YYPolarisation, realImages[1], imagImages[1]);
 				case 4:
 					return TimeFrequencyData(realImages[0], imagImages[0], realImages[1], imagImages[1], realImages[2], imagImages[2], realImages[3], imagImages[3]);
 				default:
@@ -175,27 +114,26 @@ class TimeFrequencyData
 			}
 		}
 		
-		bool IsEmpty() const { return !_containsData; }
+		bool IsEmpty() const { return _data.empty(); }
 
-		bool HasXX() const
+		bool HasPolarisation(PolarisationType polarisation) const
 		{
-			return _polarisationType == DipolePolarisation || _polarisationType == AutoDipolePolarisation || _polarisationType == XXPolarisation;
+			for(const PolarizedTimeFrequencyData& data : _data)
+				if(data._polarisation == polarisation)
+					return true;
+			return false;
 		}
+		
+		enum PolarisationType GetPolarisation(size_t index) const
+		{ return _data[index]._polarisation; }
+		
+		bool HasXX() const { return HasPolarisation(XXPolarisation); }
 
-		bool HasXY() const
-		{
-			return _polarisationType == DipolePolarisation || _polarisationType == CrossDipolePolarisation || _polarisationType == XYPolarisation;
-		}
+		bool HasXY() const { return HasPolarisation(XYPolarisation); }
 
-		bool HasYX() const
-		{
-			return _polarisationType == DipolePolarisation || _polarisationType == CrossDipolePolarisation || _polarisationType == YXPolarisation;
-		}
+		bool HasYX() const { return HasPolarisation(YXPolarisation); }
 
-		bool HasYY() const
-		{
-			return _polarisationType == DipolePolarisation || _polarisationType == AutoDipolePolarisation || _polarisationType == YYPolarisation;
-		}
+		bool HasYY() const { return HasPolarisation(YYPolarisation); }
 		
 		/**
 		 * This function returns a new Image2D that contains
@@ -221,147 +159,73 @@ class TimeFrequencyData
 
 		Mask2DCPtr GetSingleMask() const
 		{
-			switch(_flagCoverage)
-			{
-				case NoFlagCoverage:
-					return GetSetMask<false>();
-				case GlobalFlagCoverage:
-					return _flagging[0];
-				case IndividualPolarisationFlagCoverage:
-					return GetCombinedMask();
-			}
-			throw BadUsageException("Incorrect flag coverage in GetSingleMask()");
+			return GetCombinedMask();
 		}
 
 		std::pair<Image2DCPtr,Image2DCPtr> GetSingleComplexImage() const
 		{
 			if(_phaseRepresentation != ComplexRepresentation)
 				throw BadUsageException("Trying to create single complex image, but no complex data available");
-			switch(_polarisationType)
-			{
-				case SinglePolarisation:
-				case StokesIPolarisation:
-				case StokesQPolarisation:
-				case StokesUPolarisation:
-				case StokesVPolarisation:
-				case XXPolarisation:
-				case XYPolarisation:
-				case YXPolarisation:
-				case YYPolarisation:
-					return std::pair<Image2DCPtr,Image2DCPtr>(_images[0], _images[1]);
-				case DipolePolarisation:
-				case AutoDipolePolarisation:
-				case CrossDipolePolarisation:
-				default:
-					throw BadUsageException("Not implemented");
-					//return CreateSingleComplexImageFromDipole();
-			}
+			if(_data.size() != 1)
+				throw BadUsageException("Not implemented");
+			if(_data[0]._images.first == nullptr || _data[0]._images.second == nullptr)
+				throw BadUsageException("Requesting non-existing image");
+			return _data[0]._images;
 		}
 		
 		void Set(PolarisationType polarisationType,
-								const Image2DCPtr &real,
-								const Image2DCPtr &imaginary)
+			const Image2DCPtr &real,
+			const Image2DCPtr &imaginary)
 		{
-			_containsData = true;
 			_phaseRepresentation = ComplexRepresentation;
-			_polarisationType = polarisationType;
-			if(polarisationType == DipolePolarisation) throw;
-			_images.clear();
-			_images.push_back(real);
-			_images.push_back(imaginary);
+			_data.clear();
+			_data.emplace_back(polarisationType, real, imaginary);
 		}
 
 		void SetNoMask()
 		{
-			_flagging.clear();
-			_flagCoverage = NoFlagCoverage;
+			for(PolarizedTimeFrequencyData& data : _data)
+				data._flagging = nullptr;
 		}
 
 		void SetGlobalMask(const Mask2DCPtr &mask)
 		{
-			_flagging.clear();
-			_flagging.push_back(mask);
-			_flagCoverage = GlobalFlagCoverage;
+			SetNoMask();
+			for(PolarizedTimeFrequencyData& data : _data)
+				data._flagging = mask;
 		}
 
 		Mask2DCPtr GetMask(enum PolarisationType polarisation) const
 		{
-			if(polarisation == DipolePolarisation || polarisation == AutoDipolePolarisation)
-				throw BadUsageException("Need a single polarisation for GetMask()");
-			else if(_flagCoverage == NoFlagCoverage)
-				return GetSetMask<false>();
-			else if(polarisation == _polarisationType)
-				return _flagging[0];
-			else if(_polarisationType==DipolePolarisation) {
-				if(_flagCoverage == GlobalFlagCoverage) return _flagging[0];
-				switch(polarisation)
+			for(const PolarizedTimeFrequencyData& data : _data)
+			{
+				if(data._polarisation == polarisation)
 				{
-					case XXPolarisation: return _flagging[0];
-					case XYPolarisation: return _flagging[1];
-					case YXPolarisation: return _flagging[2];
-					case YYPolarisation: return _flagging[3];
-					case StokesIPolarisation: return GetSingleMask();
-					case StokesQPolarisation: return GetSingleMask();
-					case StokesUPolarisation: return GetSingleMask();
-					case StokesVPolarisation: return GetSingleMask();
-					case SinglePolarisation: throw BadUsageException("Requesting single polarisation mask from dipole information, which polarisation to return?");
-					case DipolePolarisation:
-					case AutoDipolePolarisation:
-					case CrossDipolePolarisation:
-						break;
+					if(data._flagging == nullptr)
+						return GetSetMask<false>();
+					else
+						return data._flagging;
 				}
 			}
-			else if(_polarisationType==AutoDipolePolarisation) {
-				if(_flagCoverage == GlobalFlagCoverage) return _flagging[0];
-				if(polarisation == XXPolarisation)
-					return _flagging[0];
-				else if(polarisation == YYPolarisation)
-					return _flagging[1];
-				else if(polarisation == StokesIPolarisation || polarisation == StokesQPolarisation)
-					return GetSingleMask();
-				else if(polarisation == SinglePolarisation)
-					throw BadUsageException("Requesting single polarisation mask from auto dipole information, which polarisation to return?");
-			}
-			else if(_polarisationType==CrossDipolePolarisation) {
-				if(_flagCoverage == GlobalFlagCoverage) return _flagging[0];
-				if(polarisation == XYPolarisation)
-					return _flagging[0];
-				else if(polarisation == YXPolarisation)
-					return _flagging[1];
-				else if(polarisation == StokesIPolarisation)
-					return GetSingleMask();
-				else if(polarisation == SinglePolarisation)
-					throw BadUsageException("Requesting single polarisation mask from cross dipole information, which polarisation to return?");
-			}
-			else if((_flagCoverage==GlobalFlagCoverage || _flagCoverage==IndividualPolarisationFlagCoverage) && ( _polarisationType == SinglePolarisation || _polarisationType == StokesIPolarisation)) {
-				if(polarisation == XXPolarisation || polarisation == XYPolarisation || polarisation == YXPolarisation || polarisation == YYPolarisation || polarisation == StokesIPolarisation || polarisation == SinglePolarisation)
-				return _flagging[0];
-			}
-			else if(_flagCoverage==GlobalFlagCoverage)
-				return _flagging[0];
-			throw BadUsageException("Mask requested that was not available in the given time frequency data");
+			return GetSingleMask();
 		}
 
-		void SetIndividualPolarisationMasks(const Mask2DCPtr &xxMask, const Mask2DCPtr &yyMask)
+		void SetIndividualPolarisationMasks(const Mask2DCPtr &maskA, const Mask2DCPtr &maskB)
 		{
-			if(_polarisationType != AutoDipolePolarisation && _polarisationType != CrossDipolePolarisation)
-				throw BadUsageException("Trying to set two individual mask in non-dipole time frequency data");
-			_flagging.clear();
-			_flagging.push_back(xxMask);
-			_flagging.push_back(yyMask);
-			_flagCoverage = IndividualPolarisationFlagCoverage;
+			if(_data.size() != 2)
+				throw BadUsageException("Trying to set two individual mask in non-matching time frequency data");
+			_data[0]._flagging = maskA;
+			_data[1]._flagging = maskB;
 		}
 
-		void SetIndividualPolarisationMasks(const Mask2DCPtr &xxMask, const Mask2DCPtr &xyMask, const Mask2DCPtr &yxMask, const Mask2DCPtr &yyMask)
+		void SetIndividualPolarisationMasks(const Mask2DCPtr &maskA, const Mask2DCPtr &maskB, const Mask2DCPtr &maskC, const Mask2DCPtr &maskD)
 		{
-			if(_polarisationType != DipolePolarisation)
-				throw BadUsageException("Trying to set four individual mask in non-dipole time frequency data");
-			_flagging.clear();
-			_flagging.push_back(xxMask);
-			_flagging.push_back(xyMask);
-			_flagging.push_back(yxMask);
-			_flagging.push_back(yyMask);
-			_flagCoverage = IndividualPolarisationFlagCoverage;
+			if(_data.size() != 4)
+				throw BadUsageException("Trying to set four individual mask in non-matching time frequency data");
+			_data[0]._flagging = maskA;
+			_data[1]._flagging = maskB;
+			_data[2]._flagging = maskC;
+			_data[3]._flagging = maskD;
 		}
 
 		TimeFrequencyData *CreateTFData(PhaseRepresentation phase) const
@@ -370,13 +234,13 @@ class TimeFrequencyData
 				return new TimeFrequencyData(*this);
 			else if(_phaseRepresentation == ComplexRepresentation)
 			{
-				if(_polarisationType == DipolePolarisation)
+				if(_data.size() == 4)
 				{
 					return CreateTFDataFromDipoleComplex(phase);
-				} else if(_polarisationType == AutoDipolePolarisation) {
+				} else if(_data.size() == 2) {
 					return CreateTFDataFromAutoDipoleComplex(phase);
-				} else if(_polarisationType == CrossDipolePolarisation) {
-					return CreateTFDataFromCrossDipoleComplex(phase);
+//				} else if(_polarisationType == CrossDipolePolarisation) {
+//					return CreateTFDataFromCrossDipoleComplex(phase);
 				} else {
 					return CreateTFDataFromSingleComplex(phase);
 				}
@@ -386,193 +250,53 @@ class TimeFrequencyData
 		TimeFrequencyData *CreateTFData(PolarisationType polarisation) const
 		{
 			TimeFrequencyData *data = 0;
-			if(_polarisationType == polarisation)
-				data = new TimeFrequencyData(*this);
-			else if(_polarisationType == DipolePolarisation && _phaseRepresentation == ComplexRepresentation) {
+			for(const PolarizedTimeFrequencyData& data : _data)
+			{
+				if(data._polarisation == polarisation)
+					return new TimeFrequencyData(_phaseRepresentation, data);
+			}
+			size_t
+				xxPol = getPolarisationIndex(XXPolarisation),
+				xyPol = getPolarisationIndex(XYPolarisation),
+				yxPol = getPolarisationIndex(YXPolarisation),
+				yyPol = getPolarisationIndex(YYPolarisation);
+			bool hasLinear = xxPol < _data.size() || xyPol < _data.size();
+			if(_phaseRepresentation == ComplexRepresentation && hasLinear )
+			{
 				switch(polarisation)
 				{
-					case XXPolarisation:
-						data = new TimeFrequencyData(XXPolarisation, _images[0], _images[1]);
-						data->SetGlobalMask(GetMask(polarisation));
-						break;
-					case XYPolarisation:
-						data = new TimeFrequencyData(XYPolarisation, _images[2], _images[3]);
-						data->SetGlobalMask(GetMask(polarisation));
-						break;
-					case YXPolarisation:
-						data = new TimeFrequencyData(YXPolarisation, _images[4], _images[5]);
-						data->SetGlobalMask(GetMask(polarisation));
-						break;
-					case YYPolarisation:
-						data = new TimeFrequencyData(YYPolarisation, _images[6], _images[7]);
-						data->SetGlobalMask(GetMask(polarisation));
-						break;
-					case StokesIPolarisation:
-						data = new TimeFrequencyData(StokesIPolarisation, GetStokesIFromDipole(0, 6), GetStokesIFromDipole(1, 7));
-						data->SetGlobalMask(GetMask(polarisation));
-						break;
-					case StokesQPolarisation:
-						data = new TimeFrequencyData(StokesQPolarisation, GetStokesQFromDipole(0,6), GetStokesQFromDipole(1,7));
-						data->SetGlobalMask(GetMask(polarisation));
-						break;
-					case StokesUPolarisation:
-						data = new TimeFrequencyData(StokesUPolarisation, GetStokesUFromDipole(2, 4), GetStokesUFromDipole(3, 5));
-						data->SetGlobalMask(GetMask(polarisation));
-						break;
-					case StokesVPolarisation:
-						data = new TimeFrequencyData(StokesVPolarisation, GetRealStokesVFromDipole(3, 4), GetImaginaryStokesVFromDipole(2, 5));
-						data->SetGlobalMask(GetMask(polarisation));
-						break;
-					case AutoDipolePolarisation:
-						data = new TimeFrequencyData(AutoDipolePolarisation, _images[0], _images[1], _images[6], _images[7]);
-						if(_flagCoverage == GlobalFlagCoverage)
-							data->SetGlobalMask(_flagging[0]);
-						else if(_flagCoverage == IndividualPolarisationFlagCoverage)
-							data->SetIndividualPolarisationMasks(_flagging[0], _flagging[3]);
-						break;
-					case CrossDipolePolarisation:
-						data = new TimeFrequencyData(CrossDipolePolarisation, _images[2], _images[3], _images[4], _images[5]);
-						if(_flagCoverage == GlobalFlagCoverage)
-							data->SetGlobalMask(_flagging[0]);
-						else if(_flagCoverage == IndividualPolarisationFlagCoverage)
-							data->SetIndividualPolarisationMasks(_flagging[1], _flagging[2]);
-						break;
-					case SinglePolarisation:
-						throw BadUsageException("Single polarisation requested from dipole polarisation time frequency data: which single polarisation do you want?");
-					case DipolePolarisation:
-						break;
+				case StokesIPolarisation:
+					data = new TimeFrequencyData(StokesIPolarisation, getFirstSum(xxPol, yyPol), getSecondSum(xxPol, yyPol));
+					break;
+				case StokesQPolarisation:
+					data = new TimeFrequencyData(StokesQPolarisation, getFirstDiff(xxPol, yyPol), getSecondDiff(xxPol, yyPol));
+					break;
+				case StokesUPolarisation:
+					data = new TimeFrequencyData(StokesUPolarisation, getFirstSum(xyPol, yxPol), getSecondSum(xyPol, yxPol));
+					break;
+				case StokesVPolarisation:
+					data = new TimeFrequencyData(StokesVPolarisation, getStokesVReal(xyPol, yxPol), getStokesVImag(xyPol, yxPol));
+					break;
+				default:
+					throw BadUsageException("Polarisation not available or not implemented");
 				}
-			} else if(_polarisationType == DipolePolarisation) {
+				data->SetGlobalMask(GetMask(polarisation));
+			}
+			else if(_phaseRepresentation != ComplexRepresentation && hasLinear) {
 				switch(polarisation)
 				{
-					case XXPolarisation:
-						data = new TimeFrequencyData(_phaseRepresentation, XXPolarisation, _images[0]);
-						break;
-					case XYPolarisation:
-						data = new TimeFrequencyData(_phaseRepresentation, XYPolarisation, _images[1]);
-						break;
-					case YXPolarisation:
-						data = new TimeFrequencyData(_phaseRepresentation, YXPolarisation, _images[2]);
-						break;
-					case YYPolarisation:
-						data = new TimeFrequencyData(_phaseRepresentation, YYPolarisation, _images[3]);
-						break;
 					case StokesIPolarisation:
+						data = new TimeFrequencyData(_phaseRepresentation, StokesIPolarisation, getFirstSum(xxPol, yyPol));
+						break;
 					case StokesQPolarisation:
-					case StokesUPolarisation:
-					case StokesVPolarisation:
-					case AutoDipolePolarisation:
-					case CrossDipolePolarisation:
-					case DipolePolarisation:
-					case SinglePolarisation:
+						data = new TimeFrequencyData(_phaseRepresentation, StokesQPolarisation, getFirstDiff(xxPol, yyPol));
+						break;
+					default:
 						throw BadUsageException("Requested polarisation type not available in time frequency data");
 				}
 				data->SetGlobalMask(GetMask(polarisation));
-			} else if(_polarisationType == AutoDipolePolarisation && _phaseRepresentation == ComplexRepresentation) {
-				switch(polarisation)
-				{
-					case XXPolarisation:
-						data = new TimeFrequencyData(XXPolarisation, _images[0], _images[1]);
-						data->SetGlobalMask(GetMask(polarisation));
-						break;
-					case YYPolarisation:
-						data = new TimeFrequencyData(YYPolarisation, _images[2], _images[3]);
-						data->SetGlobalMask(GetMask(polarisation));
-						break;
-					case StokesIPolarisation:
-						data= new TimeFrequencyData(StokesIPolarisation, GetStokesIFromDipole(0, 2), GetStokesIFromDipole(1, 3));
-						data->SetGlobalMask(GetMask(polarisation));
-						break;
-					case StokesQPolarisation:
-						data= new TimeFrequencyData(StokesQPolarisation, GetStokesQFromDipole(0, 2), GetStokesQFromDipole(1, 3));
-						data->SetGlobalMask(GetMask(polarisation));
-						break;
-					case StokesUPolarisation:
-					case StokesVPolarisation:
-					case XYPolarisation:
-					case YXPolarisation:
-					case AutoDipolePolarisation:
-					case DipolePolarisation:
-					case CrossDipolePolarisation:
-						throw BadUsageException("Trying to create the time frequency data from auto dipole without the requested polarisation(s)"); 
-					case SinglePolarisation:
-						throw BadUsageException("Single polarisation requested from auto dipole polarisation time frequency data: which single polarisation do you want?");
-				}
-			} else if(_polarisationType == AutoDipolePolarisation) {
-				switch(polarisation)
-				{
-					case XXPolarisation:
-						data = new TimeFrequencyData(_phaseRepresentation, XXPolarisation, _images[0]);
-						break;
-					case YYPolarisation:
-						data = new TimeFrequencyData(_phaseRepresentation, YYPolarisation, _images[1]);
-						break;
-					case StokesIPolarisation:
-						data = new TimeFrequencyData(_phaseRepresentation, StokesQPolarisation, GetStokesIFromDipole(0, 1));
-						break;
-					case StokesQPolarisation:
-						data = new TimeFrequencyData(_phaseRepresentation, StokesQPolarisation, GetStokesQFromDipole(0, 1));
-						break;
-					case XYPolarisation:
-					case YXPolarisation:
-					case StokesUPolarisation:
-					case StokesVPolarisation:
-					case AutoDipolePolarisation:
-					case CrossDipolePolarisation:
-					case DipolePolarisation:
-					case SinglePolarisation:
-						throw BadUsageException("Requested polarisation type not available in time frequency data");
-				}
-				data->SetGlobalMask(GetMask(polarisation));
-			} else if(_polarisationType == CrossDipolePolarisation && _phaseRepresentation == ComplexRepresentation) {
-				switch(polarisation)
-				{
-					case XYPolarisation:
-						data = new TimeFrequencyData(XYPolarisation, _images[0], _images[1]);
-						data->SetGlobalMask(GetMask(polarisation));
-						break;
-					case YXPolarisation:
-						data = new TimeFrequencyData(YXPolarisation, _images[2], _images[3]);
-						data->SetGlobalMask(GetMask(polarisation));
-						break;
-					case StokesIPolarisation:
-					case StokesQPolarisation:
-					case StokesUPolarisation:
-					case StokesVPolarisation:
-					case XXPolarisation:
-					case YYPolarisation:
-					case AutoDipolePolarisation:
-					case DipolePolarisation:
-					case CrossDipolePolarisation:
-						throw BadUsageException("Trying to create the time frequency data from auto dipole without the requested polarisation(s)"); 
-					case SinglePolarisation:
-						throw BadUsageException("Single polarisation requested from auto dipole polarisation time frequency data: which single polarisation do you want?");
-				}
-			} else if(_polarisationType == CrossDipolePolarisation) {
-				switch(polarisation)
-				{
-					case XYPolarisation:
-						data = new TimeFrequencyData(_phaseRepresentation, XYPolarisation, _images[0]);
-						break;
-					case YXPolarisation:
-						data = new TimeFrequencyData(_phaseRepresentation, YXPolarisation, _images[1]);
-						break;
-					case XXPolarisation:
-					case YYPolarisation:
-					case StokesIPolarisation:
-					case StokesQPolarisation:
-					case StokesUPolarisation:
-					case StokesVPolarisation:
-					case AutoDipolePolarisation:
-					case DipolePolarisation:
-					case SinglePolarisation:
-					case CrossDipolePolarisation:
-						throw BadUsageException("Requested polarisation type not available in time frequency data");
-				}
-				data->SetGlobalMask(GetMask(polarisation));
-			} else if(polarisation == DipolePolarisation) {
-				throw BadUsageException("Requesting time frequency data with dipole polarisation, but not all polarisations are available");
-			} else {
+			}
+			else {
 				throw BadUsageException("Trying to convert the polarization in time frequency data in an invalid way");
 			}
 			return data;
@@ -580,11 +304,11 @@ class TimeFrequencyData
 
 		Image2DCPtr GetRealPart() const
 		{
-			if(_polarisationType == DipolePolarisation || _polarisationType == AutoDipolePolarisation)
+			if(_data.size() != 1)
 			{
-				throw BadUsageException("This image contains >1 polarizations; which real part should I return?");
+				throw BadUsageException("This tfdata contains !=1 polarizations; which real part should I return?");
 			} else if(_phaseRepresentation == ComplexRepresentation || _phaseRepresentation == RealPart) {
-				return _images[0];
+				return _data[0]._images.first;
 			} else {
 				throw BadUsageException("Trying to retrieve real part from time frequency data in which phase doesn't have a complex or real representation");
 			}
@@ -592,34 +316,30 @@ class TimeFrequencyData
 
 		Image2DCPtr GetImaginaryPart() const
 		{
-			if(_polarisationType == DipolePolarisation)
+			if(_data.size() != 1)
 			{
-				throw BadUsageException("This image contains 4 polarizations; which imaginary part should I return?");
+				throw BadUsageException("This tfdata contains !=1 polarizations; which imaginary part should I return?");
 			} else if(_phaseRepresentation == ComplexRepresentation) {
-				return _images[1];
+				return _data[0]._images.second;
 			} else if(_phaseRepresentation == ImaginaryPart) {
-				return _images[0];
+				return _data[0]._images.first;
 			} else {
 				throw BadUsageException("Trying to retrieve imaginary part from time frequency data in which phase doesn't have a complex or real representation");
 			}
 		}
 
-		bool ContainsData() const
-		{
-			return _containsData;
-		}
-
 		size_t ImageWidth() const
 		{
-			if(!_images.empty())
-				return _images[0]->Width();
+			if(!_data.empty() && _data[0]._images.first != nullptr)
+				return _data[0]._images.first->Width();
 			else
 				return 0;
 		}
+		
 		size_t ImageHeight() const
 		{
-			if(!_images.empty())
-				return _images[0]->Height();
+			if(!_data.empty() && _data[0]._images.first != nullptr)
+				return _data[0]._images.first->Height();
 			else
 				return 0;
 		}
@@ -628,90 +348,190 @@ class TimeFrequencyData
 		{
 			return _phaseRepresentation;
 		}
-
-		enum PolarisationType Polarisation() const
+		
+		std::vector<PolarisationType> Polarisations() const
 		{
-			return _polarisationType;
+			std::vector<PolarisationType> pols;
+			for(const PolarizedTimeFrequencyData& data : _data)
+				pols.push_back(data._polarisation);
+			return pols;
 		}
 
 		void Subtract(const TimeFrequencyData &rhs)
 		{
-			if(rhs._images.size() != _images.size())
+			if(rhs._data.size() != _data.size() || rhs._phaseRepresentation != _phaseRepresentation)
 			{
 				std::stringstream s;
 				s << "Can not subtract time-frequency data: they do not have the same number of polarisations or phase representation! ("
-					<< rhs._images.size() << " vs. " << _images.size() << ")";
+					<< rhs._data.size() << " vs. " << _data.size() << ")";
 				throw BadUsageException(s.str());
 			}
-			for(size_t i=0;i<_images.size();++i)
+			for(size_t i=0; i!=_data.size(); ++i)
 			{
-				_images[i] = Image2D::CreateFromDiff(_images[i], rhs._images[i]);
+				if(_data[i]._images.first == nullptr)
+					throw BadUsageException("Can't subtract TFs with unset image data");
+				_data[i]._images.first = Image2D::CreateFromDiff(_data[i]._images.first, rhs._data[i]._images.first);
+				if(_data[i]._images.second)
+					_data[i]._images.second = Image2D::CreateFromDiff(_data[i]._images.second, rhs._data[i]._images.second);
 			}
 		}
 
 		void SubtractAsRHS(const TimeFrequencyData &lhs)
 		{
-			if(lhs._images.size() != _images.size())
+			if(lhs._data.size() != _data.size() || lhs._phaseRepresentation != _phaseRepresentation)
 			{
 				std::stringstream s;
 				s << "Can not subtract time-frequency data: they do not have the same number of polarisations or phase representation! ("
-					<< lhs._images.size() << " vs. " << _images.size() << ")";
+					<< lhs._data.size() << " vs. " << _data.size() << ")";
 				throw BadUsageException(s.str());
 			}
-			for(size_t i=0;i<_images.size();++i)
+			for(size_t i=0; i!=_data.size(); ++i)
 			{
-				_images[i] = Image2D::CreateFromDiff(lhs._images[i], _images[i]);
+				if(_data[i]._images.first == nullptr)
+					throw BadUsageException("Can't subtract TFs with unset image data");
+				_data[i]._images.first = Image2D::CreateFromDiff(lhs._data[i]._images.first, _data[i]._images.first);
+				if(_data[i]._images.second)
+					_data[i]._images.second = Image2D::CreateFromDiff(lhs._data[i]._images.second, _data[i]._images.second);
 			}
 		}
 
 		static TimeFrequencyData *CreateTFDataFromDiff(const TimeFrequencyData &lhs, const TimeFrequencyData &rhs)
 		{
-			if(lhs._images.size() != rhs._images.size())
+			if(lhs._data.size() != rhs._data.size() || lhs._phaseRepresentation != rhs._phaseRepresentation)
 			{
 				std::stringstream s;
 				s << "Can not subtract time-frequency data: they do not have the same number of polarisations or phase representation! ("
-					<< lhs._images.size() << " vs. " << rhs._images.size() << ")";
+					<< lhs._data.size() << " vs. " << rhs._data.size() << ")";
 				throw BadUsageException(s.str());
 			}
 			TimeFrequencyData *data = new TimeFrequencyData(lhs);
-			for(size_t i=0;i<lhs._images.size();++i)
-				data->_images[i] = Image2D::CreateFromDiff(lhs._images[i], rhs._images[i]);
+			for(size_t i=0;i<lhs._data.size();++i)
+			{
+				if(lhs._data[i]._images.first == nullptr)
+					throw BadUsageException("Can't subtract TFs with unset image data");
+				data->_data[i]._images.first = Image2D::CreateFromDiff(lhs._data[i]._images.first, rhs._data[i]._images.first);
+				if(lhs._data[i]._images.second)
+					data->_data[i]._images.second = Image2D::CreateFromDiff(lhs._data[i]._images.second, rhs._data[i]._images.second);
+			}
 			return data;
 		}
 
 		static TimeFrequencyData *CreateTFDataFromSum(const TimeFrequencyData &lhs, const TimeFrequencyData &rhs)
 		{
-			if(lhs._images.size() != rhs._images.size())
+			if(lhs._data.size() != rhs._data.size() || lhs._phaseRepresentation != rhs._phaseRepresentation)
 			{
 				std::stringstream s;
 				s << "Can not add time-frequency data: they do not have the same number of polarisations or phase representation! ("
-					<< lhs._images.size() << " vs. " << rhs._images.size() << ")";
+					<< lhs._data.size() << " vs. " << rhs._data.size() << ")";
 				throw BadUsageException(s.str());
 			}
 			TimeFrequencyData *data = new TimeFrequencyData(lhs);
-			for(size_t i=0;i<lhs._images.size();++i)
-				data->_images[i] = Image2D::CreateFromSum(lhs._images[i], rhs._images[i]);
+			for(size_t i=0;i<lhs._data.size();++i)
+			{
+				if(lhs._data[i]._images.first == nullptr)
+					throw BadUsageException("Can't add TFs with unset image data");
+				data->_data[i]._images.first = Image2D::CreateFromSum(lhs._data[i]._images.first, rhs._data[i]._images.first);
+				if(lhs._data[i]._images.second)
+					data->_data[i]._images.second = Image2D::CreateFromSum(lhs._data[i]._images.second, rhs._data[i]._images.second);
+			}
 			return data;
 		}
 
-		size_t ImageCount() const { return _images.size(); }
-		size_t MaskCount() const { return _flagging.size(); }
+		size_t ImageCount() const {
+			size_t masks = 0;
+			for(const PolarizedTimeFrequencyData& data : _data)
+			{
+				if(data._images.first) ++masks;
+				if(data._images.second) ++masks;
+			}
+			return masks; 
+		}
+		
+		size_t MaskCount() const {
+			size_t masks = 0;
+			for(const PolarizedTimeFrequencyData& data : _data)
+				if(data._flagging) ++masks;
+			return masks; 
+		}
 
 		const Image2DCPtr &GetImage(size_t imageIndex) const
 		{
-			return _images[imageIndex];
+			size_t index = 0;
+			for(const PolarizedTimeFrequencyData& data : _data)
+			{
+				if(data._images.first)
+				{
+					if(index == imageIndex)
+						return data._images.first;
+					++index;
+				}
+				if(data._images.second)
+				{
+					if(index == imageIndex)
+						return data._images.second;
+					++index;
+				}
+			}
+			throw BadUsageException("Invalid image index in GetImage()");
 		}
 		const Mask2DCPtr &GetMask(size_t maskIndex) const
 		{
-			return _flagging[maskIndex];
+			size_t index = 0;
+			for(const PolarizedTimeFrequencyData& data : _data)
+			{
+				if(data._flagging)
+				{
+					if(index == maskIndex)
+						return data._flagging;
+					++index;
+				}
+			}
+			std::ostringstream msg;
+			msg << "Invalid mask index of " << maskIndex << " in GetMask(): mask count is " << MaskCount();
+			throw BadUsageException(msg.str());
 		}
 		void SetImage(size_t imageIndex, const Image2DCPtr &image)
 		{
-			_images[imageIndex] = image;
+			size_t index = 0;
+			for(PolarizedTimeFrequencyData& data : _data)
+			{
+				if(data._images.first)
+				{
+					if(index == imageIndex)
+					{
+						data._images.first = image;
+						return;
+					}
+					++index;
+				}
+				if(data._images.second)
+				{
+					if(index == imageIndex)
+					{
+						data._images.second = image;
+						return;
+					}
+					++index;
+				}
+			}
+			throw BadUsageException("Invalid image index in SetImage()");
 		}
 		void SetMask(size_t maskIndex, const Mask2DCPtr &mask)
 		{
-			_flagging[maskIndex] = mask;
+			size_t index = 0;
+			for(PolarizedTimeFrequencyData& data : _data)
+			{
+				if(data._flagging)
+				{
+					if(index == maskIndex)
+					{
+						data._flagging = mask;
+						return;
+					}
+					++index;
+				}
+			}
+			throw BadUsageException("Invalid mask index in SetMask()");
 		}
 		void SetMask(const TimeFrequencyData &source)
 		{
@@ -720,11 +540,9 @@ class TimeFrequencyData
 
 		static TimeFrequencyData *CreateTFDataFromComplexCombination(const TimeFrequencyData &real, const TimeFrequencyData &imaginary);
 
-		static TimeFrequencyData *CreateTFDataFromDipoleCombination(const TimeFrequencyData &xx, const TimeFrequencyData &xy, const TimeFrequencyData &yx, const TimeFrequencyData &yy);
+		static TimeFrequencyData *CreateTFDataFromPolarizationCombination(const TimeFrequencyData &xx, const TimeFrequencyData &xy, const TimeFrequencyData &yx, const TimeFrequencyData &yy);
 
-		static TimeFrequencyData *CreateTFDataFromAutoDipoleCombination(const TimeFrequencyData &xx, const TimeFrequencyData &yy);
-
-		static TimeFrequencyData *CreateTFDataFromCrossDipoleCombination(const TimeFrequencyData &xx, const TimeFrequencyData &yy);
+		static TimeFrequencyData *CreateTFDataFromPolarizationCombination(const TimeFrequencyData &xx, const TimeFrequencyData &yy);
 
 		void SetImagesToZero();
 		void MultiplyImages(long double factor);
@@ -732,10 +550,15 @@ class TimeFrequencyData
 
 		void Trim(unsigned timeStart, unsigned freqStart, unsigned timeEnd, unsigned freqEnd)
 		{
-			for(std::vector<Image2DCPtr>::iterator i=_images.begin();i!=_images.end();++i)
-				*i = (*i)->Trim(timeStart, freqStart, timeEnd, freqEnd);
-			for(std::vector<Mask2DCPtr>::iterator i=_flagging.begin();i!=_flagging.end();++i)
-				*i = (*i)->Trim(timeStart, freqStart, timeEnd, freqEnd);
+			for(PolarizedTimeFrequencyData& data : _data)
+			{
+				if(data._images.first)
+					data._images.first = data._images.first->Trim(timeStart, freqStart, timeEnd, freqEnd);
+				if(data._images.second)
+					data._images.second = data._images.second->Trim(timeStart, freqStart, timeEnd, freqEnd);
+				if(data._flagging)
+					data._flagging = data._flagging->Trim(timeStart, freqStart, timeEnd, freqEnd);
+			}
 		}
 		static std::string GetPolarisationName(enum PolarisationType polarization)
 		{
@@ -745,180 +568,102 @@ class TimeFrequencyData
 				case StokesQPolarisation: return "Stokes Q";
 				case StokesUPolarisation: return "Stokes U";
 				case StokesVPolarisation: return "Stokes V";
-				case DipolePolarisation: return "All polarizations"; 
-				case AutoDipolePolarisation: return "Combination of XX and YY";
-				case CrossDipolePolarisation: return "Combination of XY and YX";
 				case XXPolarisation: return "XX";
 				case XYPolarisation: return "XY";
 				case YXPolarisation: return "YX";
 				case YYPolarisation: return "YY";
-				case SinglePolarisation: return "Single polarization";
+				case RRPolarisation: return "RR";
+				case RLPolarisation: return "RL";
+				case LRPolarisation: return "LR";
+				case LLPolarisation: return "LL";
 				default: return "Unknown polarization";
 			}
 		}
 		
 		std::string Description() const
 		{
-			if(_phaseRepresentation == ComplexRepresentation)
+			std::ostringstream s;
+			switch(_phaseRepresentation)
 			{
-				return GetPolarisationName(_polarisationType);
-			} else {
-				std::ostringstream s;
-				switch(_phaseRepresentation)
-				{
-					case RealPart: s << "Real component of "; break;
-					case ImaginaryPart: s << "Imaginary component of "; break;
-					case PhasePart: s << "Phase of "; break;
-					case AmplitudePart: s << "Amplitude of "; break;
-					case ComplexRepresentation:
-						break;
-				}
-				s << GetPolarisationName(_polarisationType);
-				return s.str();
+				case RealPart: s << "Real component of "; break;
+				case ImaginaryPart: s << "Imaginary component of "; break;
+				case PhasePart: s << "Phase of "; break;
+				case AmplitudePart: s << "Amplitude of "; break;
+				case ComplexRepresentation:
+					break;
 			}
+			if(_data.empty())
+				s << "empty";
+			else
+			{
+				s << "(" << GetPolarisationName(_data[0]._polarisation);
+				for(size_t i=1; i!=_data.size(); ++i)
+					s << "," << GetPolarisationName(_data[i]._polarisation);
+				s << ")";
+			}
+			return s.str();
 		}
+		
 		size_t PolarisationCount() const
 		{
-			return PolarisationCount(_polarisationType);
+			return _data.size();
 		}
-		static size_t PolarisationCount(enum PolarisationType type)
-		{
-			switch(type)
-			{
-				case SinglePolarisation:
-				case XXPolarisation:
-				case XYPolarisation:
-				case YXPolarisation:
-				case YYPolarisation:
-				case StokesIPolarisation:
-				case StokesQPolarisation:
-				case StokesUPolarisation:
-				case StokesVPolarisation:
-					return 1;
-				case AutoDipolePolarisation:
-				case CrossDipolePolarisation:
-					return 2;
-				case DipolePolarisation:
-					return 4;
-			}
-			throw BadUsageException("Incorrect polarization");
-		}
+		
 		TimeFrequencyData *CreateTFDataFromPolarisationIndex(size_t index) const
 		{
-			switch(_polarisationType)
-			{
-				case SinglePolarisation:
-				case XXPolarisation:
-				case XYPolarisation:
-				case YXPolarisation:
-				case YYPolarisation:
-				case StokesIPolarisation:
-				case StokesQPolarisation:
-				case StokesUPolarisation:
-				case StokesVPolarisation:
-					if(index == 0)
-						return new TimeFrequencyData(*this);
-					else
-						throw BadUsageException("Index out of bounds in CreateTFDataFromPolarisationIndex(..), one polarisation");
-				case AutoDipolePolarisation:
-					if(index == 0)
-						return CreateTFData(XXPolarisation);
-					else if(index == 1)
-						return CreateTFData(YYPolarisation);
-					else
-						throw BadUsageException("Index out of bounds in CreateTFDataFromPolarisationIndex(..), two polarisations");
-				case CrossDipolePolarisation:
-					if(index == 0)
-						return CreateTFData(XYPolarisation);
-					else if(index == 1)
-						return CreateTFData(YXPolarisation);
-					else
-						throw BadUsageException("Index out of bounds in CreateTFDataFromPolarisationIndex(..), two polarisations");
-				case DipolePolarisation:
-					switch(index)
-					{
-						case 0: return CreateTFData(XXPolarisation);
-						case 1: return CreateTFData(XYPolarisation);
-						case 2: return CreateTFData(YXPolarisation);
-						case 3: return CreateTFData(YYPolarisation);
-						default: throw BadUsageException("Index out of bounds in CreateTFDataFromPolarisationIndex(..), four polarisations");
-					}
-			}
-			throw BadUsageException("Incorrect polarization");
+			return new TimeFrequencyData(_phaseRepresentation, _data[index]);
 		}
+		
 		void SetPolarizationData(size_t polarizationIndex, const TimeFrequencyData &data)
 		{
 			if(data.PolarisationCount() != 1)
 				throw BadUsageException("Trying to set multiple polarizations by single polarization index");
 			else if(data.PhaseRepresentation() != PhaseRepresentation())
 				throw BadUsageException("Trying to combine TFData's with different phase representations");
-			else {
-				if(data.PhaseRepresentation() == ComplexRepresentation)
-				{
-					_images[polarizationIndex*2] = data._images[0];
-					_images[polarizationIndex*2+1] = data._images[1];
-				} else {
-					_images[polarizationIndex] = data._images[0];
-				}
-				if(data._flagCoverage != NoFlagCoverage)
-				{
-					if(data._flagging.size() != 1)
-						throw BadUsageException("Input has several flag masks");
-
-					switch(_flagCoverage)
-					{
-						case NoFlagCoverage: {
-							Mask2DCPtr emptyMask = Mask2D::CreateSetMaskPtr<false>(ImageWidth(), ImageHeight());
-							for(size_t i=0;i<PolarisationCount();++i)
-								_flagging.push_back(emptyMask);
-							_flagCoverage = IndividualPolarisationFlagCoverage;
-							} break;
-						case GlobalFlagCoverage: {
-							for(size_t i=0;i<PolarisationCount()-1;++i)
-								_flagging.push_back(_flagging[0]);
-							_flagCoverage = IndividualPolarisationFlagCoverage;
-							} break;
-						case IndividualPolarisationFlagCoverage:
-							break;
-					}
-
-					_flagging[polarizationIndex] = data._flagging[0];
-				}
-			}
+			else
+				_data[polarizationIndex] = data._data[0];
 		}
 
 		void SetImageSize(size_t width, size_t height)
 		{
-			for(size_t i=0;i<_images.size();++i)
-				_images[i] = Image2D::CreateUnsetImagePtr(width, height);
-
-			for(size_t i=0;i<_flagging.size();++i)
-				_flagging[i] = Mask2D::CreateUnsetMaskPtr(width, height);
+			for(size_t i=0;i<_data.size();++i)
+			{
+				if(_data[i]._images.first)
+					_data[i]._images.first = Image2D::CreateUnsetImagePtr(width, height);
+				if(_data[i]._images.second)
+					_data[i]._images.second = Image2D::CreateUnsetImagePtr(width, height);
+				if(_data[i]._flagging)
+					_data[i]._flagging = Mask2D::CreateUnsetMaskPtr(width, height);
+			}
 		}
 
 		void CopyFrom(const TimeFrequencyData &source, size_t destX, size_t destY)
 		{
-			if(source._images.size() != _images.size())
+			if(source._data.size() != _data.size())
 				throw BadUsageException("CopyFrom: tf data do not match");
-			if(source._flagging.size() != _flagging.size())
-				throw BadUsageException("CopyFrom: tf masks do not match");
-			for(size_t i=0;i<_images.size();++i)
+			for(size_t i=0;i<_data.size();++i)
 			{
-				Image2DPtr image = Image2D::CreateCopy(_images[i]);
-				image->CopyFrom(source._images[i], destX, destY);
-				_images[i] = image;
-			}
-			for(size_t i=0;i<_flagging.size();++i)
-			{
-				Mask2DPtr mask = Mask2D::CreateCopy(_flagging[i]);
-				mask->CopyFrom(source._flagging[i], destX, destY);
-				_flagging[i] = mask;
+				if(_data[i]._images.first)
+				{
+					Image2DPtr image = Image2D::CreateCopy(_data[i]._images.first);
+					image->CopyFrom(source._data[i]._images.first, destX, destY);
+					_data[i]._images.first = image;
+				}
+				if(_data[i]._images.second)
+				{
+					Image2DPtr image = Image2D::CreateCopy(_data[i]._images.second);
+					image->CopyFrom(source._data[i]._images.second, destX, destY);
+					_data[i]._images.second = image;
+				}
+				if(_data[i]._flagging)
+				{
+					Mask2DPtr mask = Mask2D::CreateCopy(_data[i]._flagging);
+					mask->CopyFrom(source._data[i]._flagging, destX, destY);
+					_data[i]._flagging = mask;
+				}
 			}
 		}
-		enum FlagCoverage FlagCoverage() const
-		{
-			return _flagCoverage;
-		}
+		
 		/**
 		 * Will return true when this is the imaginary part of the visibilities. Will throw
 		 * an exception when the data is neither real nor imaginary.
@@ -935,75 +680,43 @@ class TimeFrequencyData
 	private:
 		Image2DCPtr GetSingleAbsoluteFromComplex() const
 		{
-			switch(_polarisationType)
-			{
-				case DipolePolarisation:
-					return GetSingleAbsoluteFromComplexDipole();
-				case AutoDipolePolarisation:
-					return GetSingleAbsoluteFromComplexAutoDipole();
-				case CrossDipolePolarisation:
-					return GetSingleAbsoluteFromComplexCrossDipole();
-				case SinglePolarisation:
-				case StokesIPolarisation:
-				case StokesQPolarisation:
-				case StokesUPolarisation:
-				case StokesVPolarisation:
-				case XXPolarisation:
-				case XYPolarisation:
-				case YXPolarisation:
-				case YYPolarisation:
-					return GetAbsoluteFromComplex(0, 1);
-			}
-			throw BadUsageException("Incorrect polarisation type");
+			if(_data.size() == 4)
+				return GetAbsoluteFromComplex(getFirstSum(0, 3), getSecondSum(0, 3));
+			else if(_data.size() == 2)
+				return GetAbsoluteFromComplex(getFirstSum(0, 1), getSecondSum(0, 1));
+			else
+				return getAbsoluteFromComplex(0);
 		}
 
 		Image2DCPtr GetSingleImageFromSinglePhaseImage() const
 		{
-			switch(_polarisationType)
+			if(_data.size() == 4)
 			{
-				case DipolePolarisation:
-					if(_phaseRepresentation == PhasePart)
-						return GetSinglePhaseFromDipolePhase(0, 3);
-					else
-						return GetStokesIFromDipole(0, 3);
-				case AutoDipolePolarisation:
-					if(_phaseRepresentation == PhasePart)
-						return GetSinglePhaseFromDipolePhase(0, 1);
-					else
-						return GetStokesIFromDipole(0, 1);
-				case CrossDipolePolarisation:
-					if(_phaseRepresentation == PhasePart)
-						return GetSinglePhaseFromDipolePhase(0, 1);
-					else
-						return GetStokesIFromDipole(0, 1);
-				case SinglePolarisation:
-				case StokesIPolarisation:
-				case StokesQPolarisation:
-				case StokesUPolarisation:
-				case StokesVPolarisation:
-				case XXPolarisation:
-				case XYPolarisation:
-				case YXPolarisation:
-				case YYPolarisation:
-					return _images[0];
+				if(_phaseRepresentation == PhasePart)
+					return getSinglePhaseFromTwoPolPhase(0, 3);
+				else
+					return getFirstSum(0, 3);
 			}
-			throw BadUsageException("Incorrect polarisation type");
-		}
-
-		Image2DCPtr GetAbsoluteFromComplex(size_t realImage, size_t imagImage) const
-		{
-			return GetAbsoluteFromComplex(_images[realImage], _images[imagImage]);
+			if(_data.size() == 2)
+			{
+				if(_phaseRepresentation == PhasePart)
+					return getSinglePhaseFromTwoPolPhase(0, 1);
+				else
+					return getFirstSum(0, 1);
+			}
+			else // if(_data.size() == 1)
+				return _data[0]._images.first;
 		}
 
 		Image2DCPtr GetRealPartFromDipole(enum PolarisationType polarisation) const
 		{
 			switch(polarisation)
 			{
-				case XXPolarisation: return _images[0];
-				case XYPolarisation: return _images[2];
-				case YXPolarisation: return _images[4];
-				case YYPolarisation: return _images[6];
-				default: throw BadUsageException("Could not extract real part for given polarisation");
+				default:
+				case XXPolarisation: return _data[0]._images.first;
+				case XYPolarisation: return _data[1]._images.first;
+				case YXPolarisation: return _data[2]._images.first;
+				case YYPolarisation: return _data[3]._images.first;
 			}
 		}
 
@@ -1011,9 +724,9 @@ class TimeFrequencyData
 		{
 			switch(polarisation)
 			{
-				case XXPolarisation: return _images[0];
-				case YYPolarisation: return _images[2];
-				default: throw BadUsageException("Could not extract real part for given polarisation");
+				default:
+				case XXPolarisation: return _data[0]._images.first;
+				case YYPolarisation: return _data[1]._images.first;
 			}
 		}
 
@@ -1021,8 +734,8 @@ class TimeFrequencyData
 		{
 			switch(polarisation)
 			{
-				case XYPolarisation: return _images[0];
-				case YXPolarisation: return _images[2];
+				case XYPolarisation: return _data[0]._images.first;
+				case YXPolarisation: return _data[1]._images.first;
 				default: throw BadUsageException("Could not extract real part for given polarisation");
 			}
 		}
@@ -1031,10 +744,10 @@ class TimeFrequencyData
 		{
 			switch(polarisation)
 			{
-				case XXPolarisation: return _images[1];
-				case XYPolarisation: return _images[3];
-				case YXPolarisation: return _images[5];
-				case YYPolarisation: return _images[7];
+				case XXPolarisation: return _data[0]._images.second;
+				case XYPolarisation: return _data[1]._images.second;
+				case YXPolarisation: return _data[2]._images.second;
+				case YYPolarisation: return _data[3]._images.second;
 				default: throw BadUsageException("Could not extract imaginary part for given polarisation");
 			}
 		}
@@ -1043,8 +756,8 @@ class TimeFrequencyData
 		{
 			switch(polarisation)
 			{
-				case XXPolarisation: return _images[1];
-				case YYPolarisation: return _images[3];
+				case XXPolarisation: return _data[0]._images.second;
+				case YYPolarisation: return _data[1]._images.second;
 				default: throw BadUsageException("Could not extract imaginary part for given polarisation");
 			}
 		}
@@ -1053,8 +766,8 @@ class TimeFrequencyData
 		{
 			switch(polarisation)
 			{
-				case XYPolarisation: return _images[1];
-				case YXPolarisation: return _images[3];
+				case XYPolarisation: return _data[0]._images.second;
+				case YXPolarisation: return _data[1]._images.second;
 				default: throw BadUsageException("Could not extract imaginary part for given polarisation");
 			}
 		}
@@ -1063,10 +776,10 @@ class TimeFrequencyData
 		{
 			switch(polarisation)
 			{
-				case XXPolarisation: return GetAbsoluteFromComplex(0, 1);
-				case XYPolarisation: return GetAbsoluteFromComplex(2, 3);
-				case YXPolarisation: return GetAbsoluteFromComplex(4, 5);
-				case YYPolarisation: return GetAbsoluteFromComplex(6, 7);
+				case XXPolarisation: return getAbsoluteFromComplex(0);
+				case XYPolarisation: return getAbsoluteFromComplex(1);
+				case YXPolarisation: return getAbsoluteFromComplex(2);
+				case YYPolarisation: return getAbsoluteFromComplex(3);
 				default: throw BadUsageException("Could not extract amplitude part for given polarisation");
 			}
 		}
@@ -1075,8 +788,8 @@ class TimeFrequencyData
 		{
 			switch(polarisation)
 			{
-				case XXPolarisation: return GetAbsoluteFromComplex(0, 1);
-				case YYPolarisation: return GetAbsoluteFromComplex(2, 3);
+				case XXPolarisation: return getAbsoluteFromComplex(0);
+				case YYPolarisation: return getAbsoluteFromComplex(1);
 				default: throw BadUsageException("Could not extract amplitude part for given polarisation");
 			}
 		}
@@ -1085,8 +798,8 @@ class TimeFrequencyData
 		{
 			switch(polarisation)
 			{
-				case XYPolarisation: return GetAbsoluteFromComplex(0, 1);
-				case YXPolarisation: return GetAbsoluteFromComplex(2, 3);
+				case XYPolarisation: return getAbsoluteFromComplex(0);
+				case YXPolarisation: return getAbsoluteFromComplex(1);
 				default: throw BadUsageException("Could not extract amplitude part for given polarisation");
 			}
 		}
@@ -1095,10 +808,10 @@ class TimeFrequencyData
 		{
 			switch(polarisation)
 			{
-				case XXPolarisation: return GetPhaseFromComplex(_images[0], _images[1]);
-				case XYPolarisation: return GetPhaseFromComplex(_images[2], _images[3]);
-				case YXPolarisation: return GetPhaseFromComplex(_images[4], _images[5]);
-				case YYPolarisation: return GetPhaseFromComplex(_images[6], _images[7]);
+				case XXPolarisation: return getPhaseFromComplex(0);
+				case XYPolarisation: return getPhaseFromComplex(1);
+				case YXPolarisation: return getPhaseFromComplex(2);
+				case YYPolarisation: return getPhaseFromComplex(3);
 				default: throw BadUsageException("Could not extract phase part for given polarisation");
 			}
 		}
@@ -1107,8 +820,8 @@ class TimeFrequencyData
 		{
 			switch(polarisation)
 			{
-				case XXPolarisation: return GetPhaseFromComplex(_images[0], _images[1]);
-				case YYPolarisation: return GetPhaseFromComplex(_images[2], _images[3]);
+				case XXPolarisation: return getPhaseFromComplex(0);
+				case YYPolarisation: return getPhaseFromComplex(1);
 				default: throw BadUsageException("Could not extract phase part for given polarisation");
 			}
 		}
@@ -1117,89 +830,129 @@ class TimeFrequencyData
 		{
 			switch(polarisation)
 			{
-				case XYPolarisation: return GetPhaseFromComplex(_images[0], _images[1]);
-				case YXPolarisation: return GetPhaseFromComplex(_images[2], _images[3]);
+				case XYPolarisation: return getPhaseFromComplex(0);
+				case YXPolarisation: return getPhaseFromComplex(1);
 				default: throw BadUsageException("Could not extract phase part for given polarisation");
 			}
 		}
 
 		void CopyFlaggingTo(TimeFrequencyData *data) const
 		{
-			if(_flagCoverage == NoFlagCoverage)
+			if(MaskCount() == 0)
 				data->SetNoMask();
-			else if(_flagCoverage == GlobalFlagCoverage || PolarisationCount()==1)
-				data->SetGlobalMask(_flagging[0]);
-			else if(_flagCoverage == IndividualPolarisationFlagCoverage)
-			{
-				if(Polarisation() == DipolePolarisation && data->Polarisation() == DipolePolarisation)
-					data->SetIndividualPolarisationMasks(_flagging[0], _flagging[1], _flagging[2], _flagging[3]);
-				else if((Polarisation()==AutoDipolePolarisation && data->Polarisation() == AutoDipolePolarisation)
-					|| (Polarisation()==CrossDipolePolarisation && data->Polarisation() == CrossDipolePolarisation))
-					data->SetIndividualPolarisationMasks(_flagging[0], _flagging[1]);
-				else
-					throw BadUsageException("Trying to copy flagging from dipole time frequency data to single polarisation time frequency data");
-			}
+			else if(MaskCount() == 1)
+				data->SetGlobalMask(GetMask(0));
 			else
-				throw BadUsageException("Invalid flag coverage in CopyFlaggingTo()");
+			{
+				if(_data.size() == data->_data.size())
+				{
+					for(size_t i=0; i!=_data.size(); ++i)
+						data->_data[i]._flagging = _data[i]._flagging;
+				} else
+					throw BadUsageException("Trying to copy flagging from incompatible time frequency data");
+			}
 		}
 		
 		Image2DCPtr GetSingleAbsoluteFromComplexDipole() const
 		{
-			Image2DCPtr real = GetSum(_images[0], _images[6]);
-			Image2DCPtr imag = GetSum(_images[1], _images[7]);
+			Image2DCPtr real = getFirstSum(0, 3);
+			Image2DCPtr imag = getSecondSum(0, 3);
 			return GetAbsoluteFromComplex(real, imag);
 		}
 
 		Image2DCPtr GetSingleAbsoluteFromComplexAutoDipole() const
 		{
-			Image2DCPtr real = GetSum(_images[0], _images[2]);
-			Image2DCPtr imag = GetSum(_images[1], _images[3]);
+			Image2DCPtr real = getFirstSum(0, 1);
+			Image2DCPtr imag = getSecondSum(0, 1);
 			return GetAbsoluteFromComplex(real, imag);
 		}
 
 		Image2DCPtr GetSingleAbsoluteFromComplexCrossDipole() const
 		{
-			Image2DCPtr real = GetSum(_images[0], _images[2]);
-			Image2DCPtr imag = GetSum(_images[1], _images[3]);
+			Image2DCPtr real = getFirstSum(0, 1);
+			Image2DCPtr imag = getSecondSum(0, 1);
 			return GetAbsoluteFromComplex(real, imag);
 		}
 
-		Image2DCPtr GetStokesIFromDipole(size_t xx, size_t yy) const
+		Image2DCPtr getAbsoluteFromComplex(size_t polIndex) const
 		{
-			return GetSum(_images[xx], _images[yy]);
-		}
-		Image2DCPtr GetStokesQFromDipole(size_t xx, size_t yy) const
-		{
-			return GetDifference(_images[xx], _images[yy]);
-		}
-		Image2DCPtr GetStokesUFromDipole(size_t xy, size_t yx) const
-		{
-			return GetSum(_images[xy], _images[yx]);
-		}
-		Image2DCPtr GetRealStokesVFromDipole(size_t xyImaginary, size_t yxReal) const
-		{
-			return GetNegatedSum(_images[xyImaginary], _images[yxReal]);
-		}
-		Image2DCPtr GetImaginaryStokesVFromDipole(size_t xyReal, size_t yxImaginary) const
-		{
-			return GetDifference(_images[xyReal], _images[yxImaginary]);
+			return GetAbsoluteFromComplex(_data[polIndex]._images.first, _data[polIndex]._images.second);
 		}
 
+		Image2DCPtr getPhaseFromComplex(size_t polIndex) const
+		{
+			return GetPhaseFromComplex(_data[polIndex]._images.first, _data[polIndex]._images.second);
+		}
+		
 		Image2DCPtr GetAbsoluteFromComplex(const Image2DCPtr &real, const Image2DCPtr &imag) const;
 		Image2DCPtr GetPhaseFromComplex(const Image2DCPtr &real, const Image2DCPtr &imag) const;
 
+		Image2DCPtr getFirstSum(size_t dataIndexA, size_t dataIndexB) const
+		{
+			if(dataIndexA >= _data.size())
+				throw BadUsageException("Polarisation not available");
+			if(dataIndexB >= _data.size())
+				throw BadUsageException("Polarisation not available");
+			return GetSum(_data[dataIndexA]._images.first, _data[dataIndexB]._images.first);
+		}
+		
+		Image2DCPtr getSecondSum(size_t dataIndexA, size_t dataIndexB) const
+		{
+			if(dataIndexA >= _data.size())
+				throw BadUsageException("Polarisation not available");
+			if(dataIndexB >= _data.size())
+				throw BadUsageException("Polarisation not available");
+			return GetSum(_data[dataIndexA]._images.second, _data[dataIndexB]._images.second);
+		}
+		
+		Image2DCPtr getFirstDiff(size_t dataIndexA, size_t dataIndexB) const
+		{
+			if(dataIndexA >= _data.size())
+				throw BadUsageException("Polarisation not available");
+			if(dataIndexB >= _data.size())
+				throw BadUsageException("Polarisation not available");
+			return GetDifference(_data[dataIndexA]._images.first, _data[dataIndexB]._images.first);
+		}
+		
+		Image2DCPtr getSecondDiff(size_t dataIndexA, size_t dataIndexB) const
+		{
+			if(dataIndexA >= _data.size())
+				throw BadUsageException("Polarisation not available");
+			if(dataIndexB >= _data.size())
+				throw BadUsageException("Polarisation not available");
+			return GetDifference(_data[dataIndexA]._images.second, _data[dataIndexB]._images.second);
+		}
+		
+		Image2DCPtr getStokesVReal(size_t xyIndex, size_t yxIndex) const
+		{
+			if(xyIndex >= _data.size())
+				throw BadUsageException("Polarisation not available");
+			if(yxIndex >= _data.size())
+				throw BadUsageException("Polarisation not available");
+			return GetNegatedSum(_data[xyIndex]._images.second, _data[yxIndex]._images.first);
+		}
+		
+		Image2DCPtr getStokesVImag(size_t xyIndex, size_t yxIndex) const
+		{
+			if(xyIndex >= _data.size())
+				throw BadUsageException("Polarisation not available");
+			if(yxIndex >= _data.size())
+				throw BadUsageException("Polarisation not available");
+			return GetDifference(_data[xyIndex]._images.first, _data[yxIndex]._images.second);
+		}
+		
 		Image2DCPtr GetSum(const Image2DCPtr &left, const Image2DCPtr &right) const;
 		Image2DCPtr GetNegatedSum(const Image2DCPtr &left, const Image2DCPtr &right) const;
 		Image2DCPtr GetDifference(const Image2DCPtr &left, const Image2DCPtr &right) const;
 
-		Image2DCPtr GetSinglePhaseFromDipolePhase(size_t xx, size_t yy) const;
+		Image2DCPtr getSinglePhaseFromTwoPolPhase(size_t polA, size_t polB) const;
 		Image2DCPtr GetZeroImage() const;
 		template<bool InitValue>
 		Mask2DCPtr GetSetMask() const
 		{
-			if(_images.size() == 0)
+			if(ImageWidth() == 0 || ImageHeight() == 0)
 				throw BadUsageException("Can't make a mask without an image");
-			return Mask2D::CreateSetMaskPtr<InitValue>(_images[0]->Width(), _images[0]->Height());
+			return Mask2D::CreateSetMaskPtr<InitValue>(ImageWidth(), ImageHeight());
 		}
 		Mask2DCPtr GetCombinedMask() const;
 
@@ -1207,18 +960,52 @@ class TimeFrequencyData
 		TimeFrequencyData *CreateTFDataFromDipoleComplex(enum PhaseRepresentation phase) const;
 		TimeFrequencyData *CreateTFDataFromAutoDipoleComplex(enum PhaseRepresentation phase) const;
 		TimeFrequencyData *CreateTFDataFromCrossDipoleComplex(enum PhaseRepresentation phase) const;
-
-		bool _containsData;
 		
-		enum PhaseRepresentation _phaseRepresentation;
-		enum PolarisationType _polarisationType;
-		enum FlagCoverage _flagCoverage;
+		/**
+		 * Returns the data index of the given polarisation, or _data.size() if
+		 * not found.
+		 */
+		size_t getPolarisationIndex(PolarisationType polarisation) const
+		{
+			for(size_t i=0; i!=_data.size(); ++i)
+				if(_data[i]._polarisation == polarisation)
+					return i;
+			return _data.size();
+		}
 
-		// The images that are referenced from this object
-		// From least significant to most significant index contribution:
-		// phase, polarisation
-		std::vector<Image2DCPtr> _images;
-		std::vector<Mask2DCPtr> _flagging;
+		struct PolarizedTimeFrequencyData
+		{
+			PolarizedTimeFrequencyData() :
+				_images(nullptr, nullptr),
+				_flagging(nullptr),
+				_polarisation(StokesIPolarisation)
+			{ }
+			PolarizedTimeFrequencyData(PolarisationType polarisation, const Image2DCPtr& image) :
+				_images(image, nullptr),
+				_flagging(nullptr),
+				_polarisation(polarisation)
+			{ }
+				
+			PolarizedTimeFrequencyData(PolarisationType polarisation, const Image2DCPtr& imageA, const Image2DCPtr& imageB) :
+				_images(imageA, imageB),
+				_flagging(nullptr),
+				_polarisation(polarisation)
+			{ }
+				
+			// Second image is only filled when phase representation = complex
+			std::pair<Image2DCPtr, Image2DCPtr> _images;
+			Mask2DCPtr _flagging;
+			enum PolarisationType _polarisation;
+		};
+		
+		TimeFrequencyData(enum PhaseRepresentation phase, const PolarizedTimeFrequencyData& source) :
+		_phaseRepresentation(phase), _data(1, source)
+		{
+		}
+
+		enum PhaseRepresentation _phaseRepresentation;
+		
+		std::vector<PolarizedTimeFrequencyData> _data;
 };
 
 #endif

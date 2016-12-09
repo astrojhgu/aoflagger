@@ -81,8 +81,9 @@ TimeFrequencyData BaselineReader::GetNextResult(std::vector<class UVW> &uvw)
 			_results[requestIndex]._flags[3]);
 	} else if(_polarizationCount == 2)
 	{
-		data = TimeFrequencyData(AutoDipolePolarisation,
+		data = TimeFrequencyData(XXPolarisation,
 			_results[requestIndex]._realImages[0], _results[requestIndex]._imaginaryImages[0],
+			YYPolarisation,
 			_results[requestIndex]._realImages[1], _results[requestIndex]._imaginaryImages[1]);
 		data.SetIndividualPolarisationMasks(
 			_results[requestIndex]._flags[0],

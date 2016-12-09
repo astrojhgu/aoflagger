@@ -22,7 +22,7 @@ class GrayScalePlotPage : public PlotSheet {
 		
 		void SavePdf(const std::string& filename, QualityTablesFormatter::StatisticKind kind)
 		{
-			updateImageImpl(kind, AutoDipolePolarisation, TimeFrequencyData::AmplitudePart);
+			updateImageImpl(kind, StokesIPolarisation, TimeFrequencyData::AmplitudePart);
 			_imageWidget.SavePdf(filename);
 		}
 		

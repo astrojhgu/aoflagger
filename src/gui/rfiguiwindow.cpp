@@ -804,10 +804,10 @@ void RFIGuiWindow::createToolbar()
   sigc::mem_fun(*this, &RFIGuiWindow::onShowStokesUPressed) );
 	_actionGroup->add( Gtk::Action::create("ShowStokesV", "Keep stokes_V part"),
   sigc::mem_fun(*this, &RFIGuiWindow::onShowStokesVPressed) );
-	_actionGroup->add( Gtk::Action::create("ShowAutoPol", "Keep xx+yy part"),
-  sigc::mem_fun(*this, &RFIGuiWindow::onShowAutoDipolePressed) );
-	_actionGroup->add( Gtk::Action::create("ShowCrossPol", "Keep xy+yx part"),
-  sigc::mem_fun(*this, &RFIGuiWindow::onShowCrossDipolePressed) );
+	//_actionGroup->add( Gtk::Action::create("ShowAutoPol", "Keep xx+yy part"),
+  //sigc::mem_fun(*this, &RFIGuiWindow::onShowAutoDipolePressed) );
+	//_actionGroup->add( Gtk::Action::create("ShowCrossPol", "Keep xy+yx part"),
+  //sigc::mem_fun(*this, &RFIGuiWindow::onShowCrossDipolePressed) );
 	_actionGroup->add( Gtk::Action::create("ShowXX", "Keep _xx part"),
 		Gtk::AccelKey("<control>X"),
 		sigc::mem_fun(*this, &RFIGuiWindow::onShowXXPressed) );
@@ -1155,7 +1155,7 @@ void RFIGuiWindow::onSetToOne()
 			imaginary = Image2D::CreateCopy(images.first);
 		real->SetAll(1.0);
 		imaginary->SetAll(0.0);
-		TimeFrequencyData newData(data.Polarisation(), real, imaginary);
+		TimeFrequencyData newData(data.GetPolarisation(0), real, imaginary);
 		newData.SetMask(data);
 		_timeFrequencyWidget.SetNewData(newData, _timeFrequencyWidget.GetSelectedMetaData());
 		_timeFrequencyWidget.Update();
@@ -1175,7 +1175,7 @@ void RFIGuiWindow::onSetToI()
 			imaginary = Image2D::CreateCopy(images.first);
 		real->SetAll(0.0);
 		imaginary->SetAll(1.0);
-		TimeFrequencyData newData(data.Polarisation(), real, imaginary);
+		TimeFrequencyData newData(data.GetPolarisation(0), real, imaginary);
 		newData.SetMask(data);
 		_timeFrequencyWidget.SetNewData(newData, _timeFrequencyWidget.GetSelectedMetaData());
 		_timeFrequencyWidget.Update();
@@ -1195,7 +1195,7 @@ void RFIGuiWindow::onSetToOnePlusI()
 			imaginary = Image2D::CreateCopy(images.first);
 		real->SetAll(1.0);
 		imaginary->SetAll(1.0);
-		TimeFrequencyData newData(data.Polarisation(), real, imaginary);
+		TimeFrequencyData newData(data.GetPolarisation(0), real, imaginary);
 		newData.SetMask(data);
 		_timeFrequencyWidget.SetNewData(newData, _timeFrequencyWidget.GetSelectedMetaData());
 		_timeFrequencyWidget.Update();
