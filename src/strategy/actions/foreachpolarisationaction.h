@@ -56,7 +56,7 @@ namespace rfiStrategy {
 					// There is only one polarisation in the contaminated data; just run all childs
 					ActionBlock::Perform(artifacts, progress);
 				}
-				else if(isDecompositionSelected())
+				else if(isStokesSelected())
 				{
 					performStokesIteration(artifacts, progress);
 				}
@@ -66,7 +66,7 @@ namespace rfiStrategy {
 
 					for(unsigned polarizationIndex = 0; polarizationIndex < count; ++polarizationIndex)
 					{
-						if(isPolarizationSelected(oldContaminatedData.Polarisations()[polarizationIndex]))
+						if(isPolarizationSelected(oldContaminatedData.GetPolarisation(polarizationIndex)))
 						{
 							TimeFrequencyData *newContaminatedData =
 								oldContaminatedData.CreateTFDataFromPolarisationIndex(polarizationIndex);
@@ -155,7 +155,7 @@ namespace rfiStrategy {
 				}
 			}
 			
-			bool isDecompositionSelected() const
+			bool isStokesSelected() const
 			{
 				return _onStokesI || _onStokesQ || _onStokesU || _onStokesV;
 			}
@@ -176,15 +176,7 @@ namespace rfiStrategy {
 
 			void setPolarizationData(size_t polarizationIndex, TimeFrequencyData &oldData, TimeFrequencyData &newData)
 			{
-				try {
-					oldData.SetPolarizationData(polarizationIndex, newData);
-				} catch(std::exception &e)
-				{
-					TimeFrequencyData *data = oldData.CreateTFDataFromPolarisationIndex(polarizationIndex);
-					data->SetGlobalMask(newData.GetSingleMask());
-					oldData.SetPolarizationData(polarizationIndex, *data);
-					delete data;
-				}
+				oldData.SetPolarizationData(polarizationIndex, newData);
 			}
 
 			void performStokesIteration(ArtifactSet &artifacts, ProgressListener &progress)
