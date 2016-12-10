@@ -228,24 +228,7 @@ class TimeFrequencyData
 			_data[3]._flagging = maskD;
 		}
 
-		TimeFrequencyData *CreateTFData(PhaseRepresentation phase) const
-		{
-			if(phase == _phaseRepresentation)
-				return new TimeFrequencyData(*this);
-			else if(_phaseRepresentation == ComplexRepresentation)
-			{
-				if(_data.size() == 4)
-				{
-					return CreateTFDataFromDipoleComplex(phase);
-				} else if(_data.size() == 2) {
-					return CreateTFDataFromAutoDipoleComplex(phase);
-//				} else if(_polarisationType == CrossDipolePolarisation) {
-//					return CreateTFDataFromCrossDipoleComplex(phase);
-				} else {
-					return CreateTFDataFromSingleComplex(phase);
-				}
-			} else throw BadUsageException("Request for time/frequency data with a phase representation that can not be extracted from the source (source is not complex)");
-		}
+		TimeFrequencyData *CreateTFData(PhaseRepresentation phase) const;
 
 		TimeFrequencyData *CreateTFData(PolarisationType polarisation) const
 		{
@@ -690,6 +673,7 @@ class TimeFrequencyData
 			else
 				throw std::runtime_error("Data is not real or imaginary");
 		}
+		
 	private:
 		Image2DCPtr GetSingleAbsoluteFromComplex() const
 		{
@@ -866,7 +850,7 @@ class TimeFrequencyData
 			}
 		}
 		
-		Image2DCPtr GetSingleAbsoluteFromComplexDipole() const
+		/*Image2DCPtr GetSingleAbsoluteFromComplexDipole() const
 		{
 			Image2DCPtr real = getFirstSum(0, 3);
 			Image2DCPtr imag = getSecondSum(0, 3);
@@ -885,7 +869,7 @@ class TimeFrequencyData
 			Image2DCPtr real = getFirstSum(0, 1);
 			Image2DCPtr imag = getSecondSum(0, 1);
 			return GetAbsoluteFromComplex(real, imag);
-		}
+		}*/
 
 		Image2DCPtr getAbsoluteFromComplex(size_t polIndex) const
 		{
@@ -969,10 +953,9 @@ class TimeFrequencyData
 		}
 		Mask2DCPtr GetCombinedMask() const;
 
-		TimeFrequencyData *CreateTFDataFromSingleComplex(enum PhaseRepresentation phase) const;
-		TimeFrequencyData *CreateTFDataFromDipoleComplex(enum PhaseRepresentation phase) const;
-		TimeFrequencyData *CreateTFDataFromAutoDipoleComplex(enum PhaseRepresentation phase) const;
-		TimeFrequencyData *CreateTFDataFromCrossDipoleComplex(enum PhaseRepresentation phase) const;
+		//TimeFrequencyData *CreateTFDataFromSingleComplex(enum PhaseRepresentation phase) const;
+		//TimeFrequencyData *CreateTFDataFromDipoleComplex(enum PhaseRepresentation phase) const;
+		//TimeFrequencyData *CreateTFDataFromAutoDipoleComplex(enum PhaseRepresentation phase) const;
 		
 		/**
 		 * Returns the data index of the given polarisation, or _data.size() if
