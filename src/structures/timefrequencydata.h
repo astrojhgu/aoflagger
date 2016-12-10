@@ -545,6 +545,19 @@ class TimeFrequencyData
 		static TimeFrequencyData *CreateTFDataFromPolarizationCombination(const TimeFrequencyData &xx, const TimeFrequencyData &yy);
 
 		void SetImagesToZero();
+		template<bool Value>
+		void SetMasksToValue()
+		{
+			if(!IsEmpty())
+			{
+				Mask2DPtr mask = Mask2D::CreateSetMaskPtr<Value>(ImageWidth(), ImageHeight());
+				for(PolarizedTimeFrequencyData& data : _data)
+				{
+					data._flagging = mask;
+				}
+			}
+		}
+		
 		void MultiplyImages(long double factor);
 		void JoinMask(const TimeFrequencyData &other);
 

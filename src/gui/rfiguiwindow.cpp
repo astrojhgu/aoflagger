@@ -1068,9 +1068,7 @@ void RFIGuiWindow::createToolbar()
 void RFIGuiWindow::onClearAltFlagsPressed()
 {
 	TimeFrequencyData data = GetActiveData();
-	_timeFrequencyWidget.SetAlternativeMask(
-		Mask2D::CreateSetMaskPtr<false>(data.ImageWidth(), data.ImageHeight())
-	);
+	_timeFrequencyWidget.ContaminatedData().SetMasksToValue<false>();
 	_timeFrequencyWidget.Update();
 }
 
