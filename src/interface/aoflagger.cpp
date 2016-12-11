@@ -418,14 +418,14 @@ namespace aoflagger {
 				revisedData.SetIndividualPolarisationMasks(mask, mask);
 				break;
 			case 8:
-				inputData = TimeFrequencyData(
+				inputData = TimeFrequencyData::FromLinear(
 					input._data->images[0], input._data->images[1],
 					input._data->images[2], input._data->images[3],
 					input._data->images[4], input._data->images[5],
 					input._data->images[6], input._data->images[7]
 				);
 				inputData.SetIndividualPolarisationMasks(mask, mask, mask, mask);
-				revisedData = TimeFrequencyData(
+				revisedData = TimeFrequencyData::FromLinear(
 					zeroImage, zeroImage, zeroImage, zeroImage,
 					zeroImage, zeroImage, zeroImage, zeroImage);
 				revisedData.SetIndividualPolarisationMasks(mask, mask, mask, mask);

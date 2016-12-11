@@ -52,7 +52,7 @@ void IndirectBaselineReader::PerformReadRequests()
 		const ReadRequest request = _readRequests[i];
 		_results.push_back(Result());
 		const size_t width = ObservationTimes(request.sequenceId).size();
-		for(size_t p=0;p<PolarizationCount();++p)
+		for(size_t p=0;p<Polarizations().size();++p)
 		{
 			if(ReadData()) {
 				_results[i]._realImages.push_back(Image2D::CreateZeroImagePtr(width, Set().FrequencyCount(request.spectralWindow)));
@@ -80,7 +80,7 @@ void IndirectBaselineReader::PerformReadRequests()
 		dataFile.seekg(filePos * (sizeof(float)*2), std::ios_base::beg);
 		flagFile.seekg(filePos * sizeof(bool), std::ios_base::beg);
 
-		const size_t bufferSize = Set().FrequencyCount(request.spectralWindow) * PolarizationCount();
+		const size_t bufferSize = Set().FrequencyCount(request.spectralWindow) * Polarizations().size();
 		for(size_t x=0;x<width;++x)
 		{
 			std::vector<float> dataBuffer(bufferSize*2);
@@ -90,7 +90,7 @@ void IndirectBaselineReader::PerformReadRequests()
 			flagFile.read((char *) &flagBuffer[0], bufferSize * sizeof(bool));
 			size_t flagBufferPtr = 0;
 			for(size_t f=0;f<Set().FrequencyCount(request.spectralWindow);++f) {
-				for(size_t p=0;p<PolarizationCount();++p)
+				for(size_t p=0;p<Polarizations().size();++p)
 				{
 					_results[i]._realImages[p]->SetValue(x, f, dataBuffer[dataBufferPtr]);
 					++dataBufferPtr;
@@ -151,9 +151,9 @@ void IndirectBaselineReader::reorderedMS()
 void IndirectBaselineReader::makeLookupTables(size_t &fileSize)
 {
 	std::vector<MeasurementSet::Sequence> sequences = Set().GetSequences();
-	size_t
+	const size_t
 		antennaCount = Set().AntennaCount(),
-		polarizationCount = PolarizationCount(),
+		polarizationCount = Polarizations().size(),
 		bandCount = Set().BandCount(),
 		sequencesPerBaselineCount = Set().SequenceCount();
 
@@ -271,7 +271,7 @@ void IndirectBaselineReader::reorderFull()
 			prevTime = time;
 		}
 		
-		size_t polarizationCount = PolarizationCount();
+		size_t polarizationCount = Polarizations().size();
 		size_t antenna1 = antenna1Column(rowIndex);
 		size_t antenna2 = antenna2Column(rowIndex);
 		size_t spw = dataIdToSpw[dataDescIdColumn(rowIndex)];
@@ -338,7 +338,7 @@ void IndirectBaselineReader::PerformDataWriteTask(std::vector<Image2DCPtr> _real
 
 	AOLogger::Debug << "Performing data write task with indirect baseline reader...\n";
 
-	const size_t polarizationCount = PolarizationCount();
+	const size_t polarizationCount = Polarizations().size();
 	
 	if(_realImages.size() != polarizationCount || _imaginaryImages.size() != polarizationCount)
 		throw std::runtime_error("PerformDataWriteTask: input format did not match number of polarizations in measurement set");
@@ -352,7 +352,7 @@ void IndirectBaselineReader::PerformDataWriteTask(std::vector<Image2DCPtr> _real
 	if(!_msIsReordered) reorderedMS();
 	
 	const size_t width = _realImages[0]->Width();
-	const size_t bufferSize = Set().FrequencyCount(spectralWindow) * PolarizationCount();
+	const size_t bufferSize = Set().FrequencyCount(spectralWindow) * Polarizations().size();
 	
 	std::ofstream dataFile(DataFilename(), std::ofstream::binary | std::ios_base::in | std::ios_base::out);
 	size_t index = _seqIndexTable->Value(antenna1, antenna2, spectralWindow, sequenceId);
@@ -364,7 +364,7 @@ void IndirectBaselineReader::PerformDataWriteTask(std::vector<Image2DCPtr> _real
 	{
 		size_t dataBufferPtr = 0;
 		for(size_t f=0;f<Set().FrequencyCount(spectralWindow);++f) {
-			for(size_t p=0;p<PolarizationCount();++p)
+			for(size_t p=0; p<Polarizations().size(); ++p)
 			{
 				dataBuffer[dataBufferPtr] = _realImages[p]->Value(x, f);
 				++dataBufferPtr;
@@ -387,7 +387,7 @@ void IndirectBaselineReader::performFlagWriteTask(std::vector<Mask2DCPtr> flags,
 {
 	initializeMeta();
 
-	const unsigned polarizationCount = PolarizationCount();
+	const unsigned polarizationCount = Polarizations().size();
 	
 	if(flags.size() != polarizationCount)
 		throw std::runtime_error("PerformDataWriteTask: input format did not match number of polarizations in measurement set");
@@ -401,7 +401,7 @@ void IndirectBaselineReader::performFlagWriteTask(std::vector<Mask2DCPtr> flags,
 	if(!_msIsReordered) reorderedMS();
 	
 	const size_t width = flags[0]->Width();
-	const size_t bufferSize = Set().FrequencyCount(spw) * PolarizationCount();
+	const size_t bufferSize = Set().FrequencyCount(spw) * Polarizations().size();
 	
 	std::ofstream flagFile(FlagFilename(), std::ofstream::binary | std::ios_base::in | std::ios_base::out);
 	size_t index = _seqIndexTable->Value(antenna1, antenna2, spw, sequenceId);
@@ -413,7 +413,7 @@ void IndirectBaselineReader::performFlagWriteTask(std::vector<Mask2DCPtr> flags,
 	{
 		size_t flagBufferPtr = 0;
 		for(size_t f=0;f<Set().FrequencyCount(spw);++f) {
-			for(size_t p=0;p<PolarizationCount();++p)
+			for(size_t p=0; p<polarizationCount; ++p)
 			{
 				flagBuffer[flagBufferPtr] = flags[p]->Value(x, f);
 				++flagBufferPtr;
@@ -448,7 +448,7 @@ void IndirectBaselineReader::updateOriginalMS()
 	std::vector<size_t> dataIdToSpw;
 	Set().GetDataDescToBandVector(dataIdToSpw);
 	
-	size_t polarizationCount = PolarizationCount();
+	size_t polarizationCount = Polarizations().size();
 
 	AOLogger::Debug << "Opening updated files\n";
 	UpdateInfo updateInfo;

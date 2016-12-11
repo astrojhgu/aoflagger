@@ -130,7 +130,7 @@ class RFIGuiWindow : public Gtk::Window, private StrategyController {
 		void onShowRealPressed() { showPhasePart(TimeFrequencyData::RealPart); }
 		void onShowImaginaryPressed() { showPhasePart(TimeFrequencyData::ImaginaryPart); }
 		void onShowPhasePressed() { showPhasePart(TimeFrequencyData::PhasePart); }
-		void showPolarisation(PolarisationType polarisation);
+		void showPolarisation(PolarizationEnum polarisation);
 		void onShowStokesIPressed() { showPolarisation(Polarization::StokesI); }
 		void onShowStokesQPressed() { showPolarisation(Polarization::StokesQ); }
 		void onShowStokesUPressed() { showPolarisation(Polarization::StokesU); }

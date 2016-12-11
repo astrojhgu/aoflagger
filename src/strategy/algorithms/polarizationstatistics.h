@@ -27,7 +27,7 @@ class PolarizationStatistics {
 				{
 					_flaggedCounts.push_back(0);
 					_totalCounts.push_back(0);
-					_names.push_back(TimeFrequencyData::GetPolarisationName(_polarizations[i]));
+					_names.push_back(Polarization::TypeToFullString(_polarizations[i]));
 				}
 			} else if(_polarizations != data.Polarisations())
 			{
@@ -78,7 +78,7 @@ class PolarizationStatistics {
 
 		std::vector<long unsigned> _flaggedCounts, _totalCounts;
 		std::vector<std::string> _names;
-		std::vector<PolarisationType> _polarizations;
+		std::vector<PolarizationEnum> _polarizations;
 };
 
 #endif

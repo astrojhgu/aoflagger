@@ -193,7 +193,7 @@ void GrayScalePlotPage::initPlotOptions(Gtk::Toolbar& toolbar)
 	toolbar.append(_plotPropertiesButton);
 }
 
-void GrayScalePlotPage::updateImageImpl(QualityTablesFormatter::StatisticKind statisticKind, PolarisationType polarisation, enum TimeFrequencyData::PhaseRepresentation phase)
+void GrayScalePlotPage::updateImageImpl(QualityTablesFormatter::StatisticKind statisticKind, PolarizationEnum polarisation, enum TimeFrequencyData::PhaseRepresentation phase)
 {
 	if(_ready)
 	{
@@ -228,7 +228,7 @@ void GrayScalePlotPage::updateImage()
 	updateImageImpl(getSelectedStatisticKind(), getSelectedPolarization(), getSelectedPhase());
 }
 
-PolarisationType GrayScalePlotPage::getSelectedPolarization() const
+PolarizationEnum GrayScalePlotPage::getSelectedPolarization() const
 {
 	if(_polXXButton.get_active())
 		return Polarization::XX;
@@ -258,7 +258,7 @@ enum TimeFrequencyData::PhaseRepresentation GrayScalePlotPage::getSelectedPhase(
 		return TimeFrequencyData::AmplitudePart;
 }
 
-void GrayScalePlotPage::setToPolarization(TimeFrequencyData &data, PolarisationType polarisation)
+void GrayScalePlotPage::setToPolarization(TimeFrequencyData &data, PolarizationEnum polarisation)
 {
 	try {
 		TimeFrequencyData* newData = data.CreateTFData(polarisation);

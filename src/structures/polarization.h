@@ -190,6 +190,26 @@ public:
 		}
 	}
 	
+	static std::string TypeToFullString(enum PolarizationEnum polarization)
+	{
+		switch(polarization)
+		{
+			case XX: return "XX";
+			case XY: return "XY";
+			case YX: return "YX";
+			case YY: return "YY";
+			case StokesI: return "Stokes I";
+			case StokesQ: return "Stokes Q";
+			case StokesU: return "Stokes U";
+			case StokesV: return "Stokes V";
+			case RR: return "RR";
+			case RL: return "RL";
+			case LR: return "LR";
+			case LL: return "LL";
+			default: return "Unknown polarization";
+		}
+	}
+	
 	static bool HasFullPolarization(const std::set<PolarizationEnum>& polarizations)
 	{
 		return
@@ -352,6 +372,6 @@ public:
 	}
 };
 
-typedef Polarization::PolarizationEnum PolarisationType;
+typedef Polarization::PolarizationEnum PolarizationEnum;
 
 #endif

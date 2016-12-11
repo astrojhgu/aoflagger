@@ -1377,7 +1377,7 @@ void RFIGuiWindow::showPhasePart(enum TimeFrequencyData::PhaseRepresentation pha
 	}
 }
 
-void RFIGuiWindow::showPolarisation(PolarisationType polarisation)
+void RFIGuiWindow::showPolarisation(PolarizationEnum polarisation)
 {
 	if(HasImage())
 	{

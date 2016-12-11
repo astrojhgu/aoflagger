@@ -72,7 +72,7 @@ TimeFrequencyData* TimeFrequencyData::CreateTFData(enum PhaseRepresentation phas
 		{
 			const PolarizedTimeFrequencyData& source = _data[i];
 			PolarizedTimeFrequencyData& dest = data->_data[i];
-			dest._polarisation = source._polarisation;
+			dest._polarization = source._polarization;
 			dest._flagging = source._flagging;
 			switch(phase)
 			{
@@ -108,7 +108,7 @@ TimeFrequencyData *TimeFrequencyData::CreateTFDataFromComplexCombination(const T
 	data->_phaseRepresentation = ComplexRepresentation;
 	for(size_t i=0; i!=real._data.size(); ++i)
 	{
-		data->_data[i]._polarisation = real._data[i]._polarisation;
+		data->_data[i]._polarization = real._data[i]._polarization;
 		data->_data[i]._images.first = real._data[i]._images.first;
 		data->_data[i]._images.second = imaginary._data[i]._images.first;
 		data->_data[i]._flagging = real._data[i]._flagging;

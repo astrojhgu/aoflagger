@@ -139,7 +139,7 @@ namespace rfiStrategy {
 			bool _onXX, _onXY, _onYX, _onYY, _onStokesI, _onStokesQ, _onStokesU, _onStokesV;
 			bool _changeRevised;
 			
-			bool isPolarizationSelected(PolarisationType polarization)
+			bool isPolarizationSelected(PolarizationEnum polarization)
 			{
 				switch(polarization)
 				{
@@ -220,7 +220,7 @@ namespace rfiStrategy {
 				artifacts.SetOriginalData(oldOriginalData);
 			}
 
-			void performPolarisation(ArtifactSet &artifacts, ProgressListener &progress, PolarisationType polarisation, const TimeFrequencyData &oldContaminatedData, const TimeFrequencyData &oldOriginalData, const TimeFrequencyData &oldRevisedData, bool changeRevised, size_t taskNr, size_t taskCount)
+			void performPolarisation(ArtifactSet &artifacts, ProgressListener &progress, PolarizationEnum polarisation, const TimeFrequencyData &oldContaminatedData, const TimeFrequencyData &oldOriginalData, const TimeFrequencyData &oldRevisedData, bool changeRevised, size_t taskNr, size_t taskCount)
 			{
 				TimeFrequencyData *newContaminatedData =
 					oldContaminatedData.CreateTFData(polarisation);
