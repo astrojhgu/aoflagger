@@ -75,21 +75,11 @@ typedef long double numl_t;
 #define fmodnl(X, Y) fmodl(X, Y)
 // M_PIl is not defined on some OS-X systems
 #ifndef M_PIl
-# define M_PIl          3.1415926535897932384626433832795029L  /* pi */
+#define M_PIl  3.1415926535897932384626433832795029L  /* pi */
 #endif
 #define M_PInl M_PIl
 
 enum DataKind { ObservedData, CorrectedData, ResidualData, ModelData, WeightData };
-
-// SinglePolarisation, DipolePolarisation, AutoDipolePolarisation, CrossDipolePolarisation
-enum PolarisationType {
-	StokesIPolarisation, StokesQPolarisation,
-	StokesUPolarisation, StokesVPolarisation,
-	XXPolarisation, XYPolarisation,
-	YXPolarisation, YYPolarisation,
-	RRPolarisation, RLPolarisation,
-	LRPolarisation, LLPolarisation
-};
 
 class ParmTable;
 

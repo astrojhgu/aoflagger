@@ -81,16 +81,16 @@ TimeFrequencyData BaselineReader::GetNextResult(std::vector<class UVW> &uvw)
 			_results[requestIndex]._flags[3]);
 	} else if(_polarizationCount == 2)
 	{
-		data = TimeFrequencyData(XXPolarisation,
+		data = TimeFrequencyData(Polarization::XX,
 			_results[requestIndex]._realImages[0], _results[requestIndex]._imaginaryImages[0],
-			YYPolarisation,
+			Polarization::YY,
 			_results[requestIndex]._realImages[1], _results[requestIndex]._imaginaryImages[1]);
 		data.SetIndividualPolarisationMasks(
 			_results[requestIndex]._flags[0],
 			_results[requestIndex]._flags[1]);
 	} else if(_polarizationCount == 1)
 	{
-		data = TimeFrequencyData(StokesIPolarisation,
+		data = TimeFrequencyData(Polarization::StokesI,
 			_results[requestIndex]._realImages[0], _results[requestIndex]._imaginaryImages[0]);
 		data.SetGlobalMask(_results[requestIndex]._flags[0]);
 	}

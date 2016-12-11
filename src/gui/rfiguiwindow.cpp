@@ -1377,7 +1377,7 @@ void RFIGuiWindow::showPhasePart(enum TimeFrequencyData::PhaseRepresentation pha
 	}
 }
 
-void RFIGuiWindow::showPolarisation(enum PolarisationType polarisation)
+void RFIGuiWindow::showPolarisation(PolarisationType polarisation)
 {
 	if(HasImage())
 	{
@@ -1561,7 +1561,7 @@ void RFIGuiWindow::onAddToImagePlane()
 			TimeFrequencyData activeData = GetActiveData();
 			if(activeData.PolarisationCount() != 1)
 			{
-				TimeFrequencyData *singlePolarization = activeData.CreateTFData(StokesIPolarisation);
+				TimeFrequencyData *singlePolarization = activeData.CreateTFData(Polarization::StokesI);
 				activeData = *singlePolarization;
 				delete singlePolarization;
 			}

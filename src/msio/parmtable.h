@@ -156,7 +156,7 @@ class ParmTable
 				<< "r11=" << r11Count << ", "
 				<< "i00=" << i00Count << ", "
 				<< "i11=" << i11Count << "\n";
-			return TimeFrequencyData(XXPolarisation, xxReal, xxImag, YYPolarisation, yyReal, yyImag);
+			return TimeFrequencyData(Polarization::XX, xxReal, xxImag, Polarization::YY, yyReal, yyImag);
 		}
 		
 		const GainNameEntry &FindEntry(int x, int y, enum GainNameEntry::Component c, const std::string &antenna) const

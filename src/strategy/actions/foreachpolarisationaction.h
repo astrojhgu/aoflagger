@@ -143,14 +143,14 @@ namespace rfiStrategy {
 			{
 				switch(polarization)
 				{
-					case XXPolarisation: return _onXX;
-					case XYPolarisation: return _onXY;
-					case YXPolarisation: return _onYX;
-					case YYPolarisation: return _onYY;
-					case StokesIPolarisation: return _onStokesI;
-					case StokesQPolarisation: return _onStokesQ;
-					case StokesUPolarisation: return _onStokesU;
-					case StokesVPolarisation: return _onStokesV;
+					case Polarization::XX: return _onXX;
+					case Polarization::XY: return _onXY;
+					case Polarization::YX: return _onYX;
+					case Polarization::YY: return _onYY;
+					case Polarization::StokesI: return _onStokesI;
+					case Polarization::StokesQ: return _onStokesQ;
+					case Polarization::StokesU: return _onStokesU;
+					case Polarization::StokesV: return _onStokesV;
 					default: return false;
 				}
 			}
@@ -192,25 +192,25 @@ namespace rfiStrategy {
 
 				if(_onStokesI)
 				{
-					performPolarisation(artifacts, progress, StokesIPolarisation, oldContaminatedData, oldOriginalData, oldRevisedData, changeRevised, 0, 4);
+					performPolarisation(artifacts, progress, Polarization::StokesI, oldContaminatedData, oldOriginalData, oldRevisedData, changeRevised, 0, 4);
 					mask->Join(artifacts.ContaminatedData().GetSingleMask());
 				}
 
 				if(_onStokesQ)
 				{
-					performPolarisation(artifacts, progress, StokesQPolarisation, oldContaminatedData, oldOriginalData, oldRevisedData, changeRevised, 1, 4);
+					performPolarisation(artifacts, progress, Polarization::StokesQ, oldContaminatedData, oldOriginalData, oldRevisedData, changeRevised, 1, 4);
 					mask->Join(artifacts.ContaminatedData().GetSingleMask());
 				}
 
 				if(_onStokesU)
 				{
-					performPolarisation(artifacts, progress, StokesUPolarisation, oldContaminatedData, oldOriginalData, oldRevisedData, changeRevised, 2, 4);
+					performPolarisation(artifacts, progress, Polarization::StokesU, oldContaminatedData, oldOriginalData, oldRevisedData, changeRevised, 2, 4);
 					mask->Join(artifacts.ContaminatedData().GetSingleMask());
 				}
 
 				if(_onStokesV)
 				{
-					performPolarisation(artifacts, progress, StokesVPolarisation, oldContaminatedData, oldOriginalData, oldRevisedData, changeRevised, 3, 4);
+					performPolarisation(artifacts, progress, Polarization::StokesV, oldContaminatedData, oldOriginalData, oldRevisedData, changeRevised, 3, 4);
 					mask->Join(artifacts.ContaminatedData().GetSingleMask());
 				}
 				
@@ -220,7 +220,7 @@ namespace rfiStrategy {
 				artifacts.SetOriginalData(oldOriginalData);
 			}
 
-			void performPolarisation(ArtifactSet &artifacts, ProgressListener &progress, enum PolarisationType polarisation, const TimeFrequencyData &oldContaminatedData, const TimeFrequencyData &oldOriginalData, const TimeFrequencyData &oldRevisedData, bool changeRevised, size_t taskNr, size_t taskCount)
+			void performPolarisation(ArtifactSet &artifacts, ProgressListener &progress, PolarisationType polarisation, const TimeFrequencyData &oldContaminatedData, const TimeFrequencyData &oldOriginalData, const TimeFrequencyData &oldRevisedData, bool changeRevised, size_t taskNr, size_t taskCount)
 			{
 				TimeFrequencyData *newContaminatedData =
 					oldContaminatedData.CreateTFData(polarisation);

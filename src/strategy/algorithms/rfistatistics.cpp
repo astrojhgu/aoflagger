@@ -474,9 +474,9 @@ void RFIStatistics::addStokes(std::map<double, class AmplitudeBin> &amplitudes, 
 		TimeFrequencyData *stokes;
 		switch(i)
 		{
-			case 0: stokes = data.CreateTFData(StokesQPolarisation); break;
-			case 1: stokes = data.CreateTFData(StokesUPolarisation); break;
-			case 2: stokes = data.CreateTFData(StokesVPolarisation); break;
+			case 0: stokes = data.CreateTFData(Polarization::StokesQ); break;
+			case 1: stokes = data.CreateTFData(Polarization::StokesU); break;
+			case 2: stokes = data.CreateTFData(Polarization::StokesV); break;
 			default: stokes = 0; break;
 		}
 		Image2DCPtr image = stokes->GetSingleImage();

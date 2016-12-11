@@ -22,7 +22,7 @@ class GrayScalePlotPage : public PlotSheet {
 		
 		void SavePdf(const std::string& filename, QualityTablesFormatter::StatisticKind kind)
 		{
-			updateImageImpl(kind, StokesIPolarisation, TimeFrequencyData::AmplitudePart);
+			updateImageImpl(kind, Polarization::StokesI, TimeFrequencyData::AmplitudePart);
 			_imageWidget.SavePdf(filename);
 		}
 		
@@ -46,7 +46,7 @@ class GrayScalePlotPage : public PlotSheet {
 		void initPhaseButtons(Gtk::Toolbar& toolbar);
 		void initPlotOptions(Gtk::Toolbar& toolbar);
 		
-		enum PolarisationType getSelectedPolarization() const;
+		PolarisationType getSelectedPolarization() const;
 		enum TimeFrequencyData::PhaseRepresentation getSelectedPhase() const;
 		
 		void onSelectCount() { _selectStatisticKind = QualityTablesFormatter::CountStatistic; updateImage(); }

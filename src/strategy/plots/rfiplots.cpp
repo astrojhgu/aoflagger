@@ -392,10 +392,10 @@ void RFIPlots::MakeTimeScatterPlot(class MultiPlot &plot, const TimeFrequencyDat
 		case 4:
 		{
 			TimeFrequencyData
-				*xx = data.CreateTFData(XXPolarisation),
-				*xy = data.CreateTFData(XYPolarisation),
-				*yx = data.CreateTFData(YXPolarisation),
-				*yy = data.CreateTFData(YYPolarisation);
+				*xx = data.CreateTFData(Polarization::XX),
+				*xy = data.CreateTFData(Polarization::XY),
+				*yx = data.CreateTFData(Polarization::YX),
+				*yy = data.CreateTFData(Polarization::YY);
 			MakeTimeScatterPlot(plot, startIndex+0, xx->GetSingleImage(), xx->GetSingleMask(), metaData);
 			MakeTimeScatterPlot(plot, startIndex+1, xy->GetSingleImage(), xy->GetSingleMask(), metaData);
 			MakeTimeScatterPlot(plot, startIndex+2, yx->GetSingleImage(), yx->GetSingleMask(), metaData);
@@ -413,8 +413,8 @@ void RFIPlots::MakeTimeScatterPlot(class MultiPlot &plot, const TimeFrequencyDat
 		case 2:
 		{
 			TimeFrequencyData
-				*xx = data.CreateTFData(XXPolarisation),
-				*yy = data.CreateTFData(YYPolarisation);
+				*xx = data.CreateTFData(Polarization::XX),
+				*yy = data.CreateTFData(Polarization::YY);
 			MakeTimeScatterPlot(plot, startIndex+0, xx->GetSingleImage(), xx->GetSingleMask(), metaData);
 			MakeTimeScatterPlot(plot, startIndex+1, yy->GetSingleImage(), yy->GetSingleMask(), metaData);
 			plot.SetLegend(startIndex+0, "XX");
@@ -437,10 +437,10 @@ void RFIPlots::MakeFrequencyScatterPlot(class MultiPlot &plot, const TimeFrequen
 		case 4:
 		{
 			TimeFrequencyData
-				*xx = data.CreateTFData(XXPolarisation),
-				*xy = data.CreateTFData(XYPolarisation),
-				*yx = data.CreateTFData(YXPolarisation),
-				*yy = data.CreateTFData(YYPolarisation);
+				*xx = data.CreateTFData(Polarization::XX),
+				*xy = data.CreateTFData(Polarization::XY),
+				*yx = data.CreateTFData(Polarization::YX),
+				*yy = data.CreateTFData(Polarization::YY);
 			MakeFrequencyScatterPlot(plot, startIndex+0, xx->GetSingleImage(), xx->GetSingleMask(), metaData);
 			MakeFrequencyScatterPlot(plot, startIndex+1, xy->GetSingleImage(), xy->GetSingleMask(), metaData);
 			MakeFrequencyScatterPlot(plot, startIndex+2, yx->GetSingleImage(), yx->GetSingleMask(), metaData);
@@ -458,8 +458,8 @@ void RFIPlots::MakeFrequencyScatterPlot(class MultiPlot &plot, const TimeFrequen
 		case 2:
 		{
 			TimeFrequencyData
-				*xx = data.CreateTFData(XXPolarisation),
-				*yy = data.CreateTFData(YYPolarisation);
+				*xx = data.CreateTFData(Polarization::XX),
+				*yy = data.CreateTFData(Polarization::YY);
 			MakeFrequencyScatterPlot(plot, startIndex+0, xx->GetSingleImage(), xx->GetSingleMask(), metaData);
 			MakeFrequencyScatterPlot(plot, startIndex+1, yy->GetSingleImage(), yy->GetSingleMask(), metaData);
 			plot.SetLegend(startIndex+0, "XX");

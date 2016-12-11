@@ -130,17 +130,17 @@ class RFIGuiWindow : public Gtk::Window, private StrategyController {
 		void onShowRealPressed() { showPhasePart(TimeFrequencyData::RealPart); }
 		void onShowImaginaryPressed() { showPhasePart(TimeFrequencyData::ImaginaryPart); }
 		void onShowPhasePressed() { showPhasePart(TimeFrequencyData::PhasePart); }
-		void showPolarisation(enum PolarisationType polarisation);
-		void onShowStokesIPressed() { showPolarisation(StokesIPolarisation); }
-		void onShowStokesQPressed() { showPolarisation(StokesQPolarisation); }
-		void onShowStokesUPressed() { showPolarisation(StokesUPolarisation); }
-		void onShowStokesVPressed() { showPolarisation(StokesVPolarisation); }
+		void showPolarisation(PolarisationType polarisation);
+		void onShowStokesIPressed() { showPolarisation(Polarization::StokesI); }
+		void onShowStokesQPressed() { showPolarisation(Polarization::StokesQ); }
+		void onShowStokesUPressed() { showPolarisation(Polarization::StokesU); }
+		void onShowStokesVPressed() { showPolarisation(Polarization::StokesV); }
 		//void onShowAutoDipolePressed() { showPolarisation(AutoDipolePolarisation); }
 		//void onShowCrossDipolePressed() { showPolarisation(CrossDipolePolarisation); }
-		void onShowXXPressed() { showPolarisation(XXPolarisation); }
-		void onShowXYPressed() { showPolarisation(XYPolarisation); }
-		void onShowYXPressed() { showPolarisation(YXPolarisation); }
-		void onShowYYPressed() { showPolarisation(YYPolarisation); }
+		void onShowXXPressed() { showPolarisation(Polarization::XX); }
+		void onShowXYPressed() { showPolarisation(Polarization::XY); }
+		void onShowYXPressed() { showPolarisation(Polarization::YX); }
+		void onShowYYPressed() { showPolarisation(Polarization::YY); }
 		void onImagePropertiesPressed();
 		void onOpenTestSetNoise() { openTestSet(2); }
 		void onOpenTestSetA() { openTestSet(3); }
