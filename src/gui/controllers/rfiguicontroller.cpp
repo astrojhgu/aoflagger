@@ -23,6 +23,7 @@
 #include <gtkmm/messagedialog.h>
 
 RFIGuiController::RFIGuiController(RFIGuiWindow& rfiGuiWindow, StrategyController* strategyController) :
+	_showOriginalFlags(true), _showAlternativeFlags(true),
 	_rfiGuiWindow(rfiGuiWindow), _strategyController(strategyController)
 {
 	_plotManager = new class PlotManager();
