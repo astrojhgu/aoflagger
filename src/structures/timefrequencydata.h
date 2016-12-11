@@ -299,43 +299,78 @@ class TimeFrequencyData
 				yxPol = getPolarisationIndex(Polarization::YX),
 				yyPol = getPolarisationIndex(Polarization::YY);
 			bool hasLinear = xxPol < _data.size() || xyPol < _data.size();
-			if(_phaseRepresentation == ComplexRepresentation && hasLinear )
+			if(hasLinear)
 			{
-				switch(polarisation)
+				if(_phaseRepresentation == ComplexRepresentation)
 				{
-				case Polarization::StokesI:
-					data = new TimeFrequencyData(Polarization::StokesI, getFirstSum(xxPol, yyPol), getSecondSum(xxPol, yyPol));
-					break;
-				case Polarization::StokesQ:
-					data = new TimeFrequencyData(Polarization::StokesQ, getFirstDiff(xxPol, yyPol), getSecondDiff(xxPol, yyPol));
-					break;
-				case Polarization::StokesU:
-					data = new TimeFrequencyData(Polarization::StokesU, getFirstSum(xyPol, yxPol), getSecondSum(xyPol, yxPol));
-					break;
-				case Polarization::StokesV:
-					data = new TimeFrequencyData(Polarization::StokesV, getStokesVReal(xyPol, yxPol), getStokesVImag(xyPol, yxPol));
-					break;
-				default:
-					throw BadUsageException("Polarisation not available or not implemented");
-				}
-				data->SetGlobalMask(GetMask(polarisation));
-			}
-			else if(_phaseRepresentation != ComplexRepresentation && hasLinear) {
-				switch(polarisation)
-				{
+					switch(polarisation)
+					{
 					case Polarization::StokesI:
-						data = new TimeFrequencyData(_phaseRepresentation, Polarization::StokesI, getFirstSum(xxPol, yyPol));
+						data = new TimeFrequencyData(Polarization::StokesI, getFirstSum(xxPol, yyPol), getSecondSum(xxPol, yyPol));
 						break;
 					case Polarization::StokesQ:
-						data = new TimeFrequencyData(_phaseRepresentation, Polarization::StokesQ, getFirstDiff(xxPol, yyPol));
+						data = new TimeFrequencyData(Polarization::StokesQ, getFirstDiff(xxPol, yyPol), getSecondDiff(xxPol, yyPol));
+						break;
+					case Polarization::StokesU:
+						data = new TimeFrequencyData(Polarization::StokesU, getFirstSum(xyPol, yxPol), getSecondSum(xyPol, yxPol));
+						break;
+					case Polarization::StokesV:
+						data = new TimeFrequencyData(Polarization::StokesV, getNegRealPlusImag(xyPol, yxPol), getRealMinusImag(xyPol, yxPol));
 						break;
 					default:
-						throw BadUsageException("Requested polarisation type not available in time frequency data");
+						throw BadUsageException("Polarisation not available or not implemented");
+					}
+				}
+				else // _phaseRepresentation != ComplexRepresentation
+				{
+					// TODO should be done on real or imaginary
+					switch(polarisation)
+					{
+						case Polarization::StokesI:
+							data = new TimeFrequencyData(_phaseRepresentation, Polarization::StokesI, getFirstSum(xxPol, yyPol));
+							break;
+						case Polarization::StokesQ:
+							data = new TimeFrequencyData(_phaseRepresentation, Polarization::StokesQ, getFirstDiff(xxPol, yyPol));
+							break;
+						default:
+							throw BadUsageException("Requested polarisation type not available in time frequency data");
+					}
 				}
 				data->SetGlobalMask(GetMask(polarisation));
 			}
 			else {
-				throw BadUsageException("Trying to convert the polarization in time frequency data in an invalid way");
+				size_t
+					rrPol = getPolarisationIndex(Polarization::RR),
+					rlPol = getPolarisationIndex(Polarization::RL),
+					lrPol = getPolarisationIndex(Polarization::LR),
+					llPol = getPolarisationIndex(Polarization::LL);
+				bool hasCircular = rrPol < _data.size() || rlPol < _data.size();
+				if(hasCircular)
+				{
+					if(_phaseRepresentation == ComplexRepresentation)
+					{
+						switch(polarisation)
+						{
+						case Polarization::StokesI:
+							data = new TimeFrequencyData(Polarization::StokesI, getFirstSum(rrPol, llPol), getSecondSum(rrPol, llPol));
+							break;
+						case Polarization::StokesQ: // Q = RL + LR
+							data = new TimeFrequencyData(Polarization::StokesQ, getFirstSum(rlPol, rlPol), getSecondSum(rlPol, lrPol));
+							break;
+						case Polarization::StokesU: // U_r = RL_i - LR_i, U_i = -RL_r + LR_r
+							data = new TimeFrequencyData(Polarization::StokesU, getSecondDiff(rlPol, lrPol), getFirstDiff(lrPol, rlPol));
+							break;
+						case Polarization::StokesV: // V = RR - LL
+							data = new TimeFrequencyData(Polarization::StokesV, getFirstDiff(rrPol, llPol), getSecondDiff(rrPol, llPol));
+							break;
+						default:
+							throw BadUsageException("Requested polarisation type not available in time frequency data");
+							break;
+						}
+					}
+				}
+				else
+					throw BadUsageException("Trying to convert the polarization in time frequency data in an invalid way");
 			}
 			return data;
 		}
@@ -956,7 +991,7 @@ class TimeFrequencyData
 			return GetDifference(_data[dataIndexA]._images.second, _data[dataIndexB]._images.second);
 		}
 		
-		Image2DCPtr getStokesVReal(size_t xyIndex, size_t yxIndex) const
+		Image2DCPtr getNegRealPlusImag(size_t xyIndex, size_t yxIndex) const
 		{
 			if(xyIndex >= _data.size())
 				throw BadUsageException("Polarisation not available");
@@ -965,7 +1000,7 @@ class TimeFrequencyData
 			return GetNegatedSum(_data[xyIndex]._images.second, _data[yxIndex]._images.first);
 		}
 		
-		Image2DCPtr getStokesVImag(size_t xyIndex, size_t yxIndex) const
+		Image2DCPtr getRealMinusImag(size_t xyIndex, size_t yxIndex) const
 		{
 			if(xyIndex >= _data.size())
 				throw BadUsageException("Polarisation not available");

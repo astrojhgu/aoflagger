@@ -808,6 +808,17 @@ void RFIGuiWindow::createToolbar()
   //sigc::mem_fun(*this, &RFIGuiWindow::onShowAutoDipolePressed) );
 	//_actionGroup->add( Gtk::Action::create("ShowCrossPol", "Keep xy+yx part"),
   //sigc::mem_fun(*this, &RFIGuiWindow::onShowCrossDipolePressed) );
+	_actionGroup->add( Gtk::Action::create("ShowRR", "Keep _rr part"),
+		Gtk::AccelKey("<control>R"),
+		sigc::mem_fun(*this, &RFIGuiWindow::onShowRRPressed) );
+	_actionGroup->add( Gtk::Action::create("ShowRL", "Keep rl part"),
+		sigc::mem_fun(*this, &RFIGuiWindow::onShowRLPressed) );
+	_actionGroup->add( Gtk::Action::create("ShowLR", "Keep lr part"),
+		Gtk::AccelKey("<control><alt>L"),
+		sigc::mem_fun(*this, &RFIGuiWindow::onShowLRPressed) );
+	_actionGroup->add( Gtk::Action::create("ShowLL", "Keep _ll part"),
+		Gtk::AccelKey("<control>L"),
+		sigc::mem_fun(*this, &RFIGuiWindow::onShowLLPressed) );
 	_actionGroup->add( Gtk::Action::create("ShowXX", "Keep _xx part"),
 		Gtk::AccelKey("<control>X"),
 		sigc::mem_fun(*this, &RFIGuiWindow::onShowXXPressed) );
@@ -835,7 +846,7 @@ void RFIGuiWindow::createToolbar()
 		Gtk::AccelKey("<control>M"),
   sigc::mem_fun(*this, &RFIGuiWindow::onStoreData) );
 	_actionGroup->add( Gtk::Action::create("RecallData", "Recall"),
-		Gtk::AccelKey("<control>R"),
+		Gtk::AccelKey("<control><alt>R"),
 		sigc::mem_fun(*this, &RFIGuiWindow::onRecallData) );
 	_actionGroup->add( Gtk::Action::create("SubtractDataFromMem", "Subtract from mem"),
   sigc::mem_fun(*this, &RFIGuiWindow::onSubtractDataFromMem) );
@@ -986,11 +997,17 @@ void RFIGuiWindow::createToolbar()
     "      <menuitem action='ShowReal'/>"
     "      <menuitem action='ShowImaginary'/>"
     "      <menuitem action='ShowPhase'/>"
+    "      <menuitem action='UnrollPhase'/>"
     "      <separator/>"
     "      <menuitem action='ShowStokesI'/>"
     "      <menuitem action='ShowStokesQ'/>"
     "      <menuitem action='ShowStokesU'/>"
     "      <menuitem action='ShowStokesV'/>"
+    "      <separator/>"
+    "      <menuitem action='ShowRR'/>"
+    "      <menuitem action='ShowRL'/>"
+    "      <menuitem action='ShowLR'/>"
+    "      <menuitem action='ShowLL'/>"
     "      <separator/>"
     "      <menuitem action='ShowXX'/>"
     "      <menuitem action='ShowXY'/>"
@@ -998,7 +1015,6 @@ void RFIGuiWindow::createToolbar()
     "      <menuitem action='ShowYY'/>"
 //    "      <menuitem action='ShowAutoPol'/>"
 //    "      <menuitem action='ShowCrossPol'/>"
-    "      <menuitem action='UnrollPhase'/>"
     "      <separator/>"
     "      <menuitem action='StoreData'/>"
     "      <menuitem action='RecallData'/>"
