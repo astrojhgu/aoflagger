@@ -485,10 +485,10 @@ Action *StrategyReader::parseForEachMSAction(xmlNode *node)
 Action *StrategyReader::parseForEachPolarisationBlock(xmlNode *node)
 {
 	ForEachPolarisationBlock *newAction = new ForEachPolarisationBlock();
-	newAction->SetOnXX(getBool(node, "on-xx"));
-	newAction->SetOnXY(getBool(node, "on-xy"));
-	newAction->SetOnYX(getBool(node, "on-yx"));
-	newAction->SetOnYY(getBool(node, "on-yy"));
+	newAction->SetOnPP(getBool(node, "on-xx"));
+	newAction->SetOnPQ(getBool(node, "on-xy"));
+	newAction->SetOnQP(getBool(node, "on-yx"));
+	newAction->SetOnQQ(getBool(node, "on-yy"));
 	newAction->SetOnStokesI(getBool(node, "on-stokes-i"));
 	newAction->SetOnStokesQ(getBool(node, "on-stokes-q"));
 	newAction->SetOnStokesU(getBool(node, "on-stokes-u"));

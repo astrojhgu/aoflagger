@@ -179,10 +179,10 @@ namespace rfiStrategy {
 		ForEachPolarisationBlock *fepBlock = new ForEachPolarisationBlock();
 		if(onStokesIQ)
 		{
-			fepBlock->SetOnXX(false);
-			fepBlock->SetOnXY(false);
-			fepBlock->SetOnYX(false);
-			fepBlock->SetOnYY(false);
+			fepBlock->SetOnPP(false);
+			fepBlock->SetOnPQ(false);
+			fepBlock->SetOnQP(false);
+			fepBlock->SetOnQQ(false);
 			fepBlock->SetOnStokesI(true);
 			fepBlock->SetOnStokesQ(true);
 		}

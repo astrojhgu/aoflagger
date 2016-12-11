@@ -329,10 +329,10 @@ namespace rfiStrategy {
 	void StrategyWriter::writeForEachPolarisationBlock(const ForEachPolarisationBlock &action)
 	{
 		Attribute("type", "ForEachPolarisationBlock");
-		Write<bool>("on-xx", action.OnXX());
-		Write<bool>("on-xy", action.OnXY());
-		Write<bool>("on-yx", action.OnYX());
-		Write<bool>("on-yy", action.OnYY());
+		Write<bool>("on-xx", action.OnPP());
+		Write<bool>("on-xy", action.OnPQ());
+		Write<bool>("on-yx", action.OnQP());
+		Write<bool>("on-yy", action.OnQQ());
 		Write<bool>("on-stokes-i", action.OnStokesI());
 		Write<bool>("on-stokes-q", action.OnStokesQ());
 		Write<bool>("on-stokes-u", action.OnStokesU());
