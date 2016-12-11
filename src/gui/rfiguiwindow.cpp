@@ -140,6 +140,7 @@ RFIGuiWindow::~RFIGuiWindow()
 	}
 	if(_spatialMetaData != 0)
 		delete _spatialMetaData;
+	delete _controller;
 }
 
 void RFIGuiWindow::onActionDirectoryOpen()
