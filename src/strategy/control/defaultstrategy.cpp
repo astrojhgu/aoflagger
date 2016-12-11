@@ -280,11 +280,17 @@ namespace rfiStrategy {
 			CombineFlagResults *cfr2 = new CombineFlagResults();
 			block.Add(cfr2);
 			cfr2->Add(new FrequencySelectionAction());
-			if(!keepTransients)
-				cfr2->Add(new TimeSelectionAction());
+			if(!keepTransients) {
+				TimeSelectionAction* tsAction = new TimeSelectionAction();
+				tsAction->SetThreshold(4.0);
+				cfr2->Add(tsAction);
+			}
 		} else {
-			if(!keepTransients)
-				block.Add(new TimeSelectionAction());
+			if(!keepTransients) {
+				TimeSelectionAction* tsAction = new TimeSelectionAction();
+				tsAction->SetThreshold(4.0);
+				block.Add(tsAction);
+			}
 		}
 
 		if(assembleStatistics && hasBaselines)
