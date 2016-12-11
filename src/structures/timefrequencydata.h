@@ -205,15 +205,15 @@ class TimeFrequencyData
 			return GetCombinedMask();
 		}
 
-		std::pair<Image2DCPtr,Image2DCPtr> GetSingleComplexImage() const
+		std::array<Image2DCPtr,2> GetSingleComplexImage() const
 		{
 			if(_phaseRepresentation != ComplexRepresentation)
 				throw BadUsageException("Trying to create single complex image, but no complex data available");
 			if(_data.size() != 1)
 				throw BadUsageException("Not implemented");
-			if(_data[0]._images.first == nullptr || _data[0]._images.second == nullptr)
+			if(_data[0]._images[0] == nullptr || _data[0]._images[1] == nullptr)
 				throw BadUsageException("Requesting non-existing image");
-			return _data[0]._images;
+			return { _data[0]._images[0], _data[0]._images[1] };
 		}
 		
 		void Set(PolarizationEnum polarisationType,
@@ -381,7 +381,7 @@ class TimeFrequencyData
 			{
 				throw BadUsageException("This tfdata contains !=1 polarizations; which real part should I return?");
 			} else if(_phaseRepresentation == ComplexRepresentation || _phaseRepresentation == RealPart) {
-				return _data[0]._images.first;
+				return _data[0]._images[0];
 			} else {
 				throw BadUsageException("Trying to retrieve real part from time frequency data in which phase doesn't have a complex or real representation");
 			}
@@ -393,9 +393,9 @@ class TimeFrequencyData
 			{
 				throw BadUsageException("This tfdata contains !=1 polarizations; which imaginary part should I return?");
 			} else if(_phaseRepresentation == ComplexRepresentation) {
-				return _data[0]._images.second;
+				return _data[0]._images[1];
 			} else if(_phaseRepresentation == ImaginaryPart) {
-				return _data[0]._images.first;
+				return _data[0]._images[0];
 			} else {
 				throw BadUsageException("Trying to retrieve imaginary part from time frequency data in which phase doesn't have a complex or real representation");
 			}
@@ -403,16 +403,16 @@ class TimeFrequencyData
 
 		size_t ImageWidth() const
 		{
-			if(!_data.empty() && _data[0]._images.first != nullptr)
-				return _data[0]._images.first->Width();
+			if(!_data.empty() && _data[0]._images[0] != nullptr)
+				return _data[0]._images[0]->Width();
 			else
 				return 0;
 		}
 		
 		size_t ImageHeight() const
 		{
-			if(!_data.empty() && _data[0]._images.first != nullptr)
-				return _data[0]._images.first->Height();
+			if(!_data.empty() && _data[0]._images[0] != nullptr)
+				return _data[0]._images[0]->Height();
 			else
 				return 0;
 		}
@@ -441,11 +441,11 @@ class TimeFrequencyData
 			}
 			for(size_t i=0; i!=_data.size(); ++i)
 			{
-				if(_data[i]._images.first == nullptr)
+				if(_data[i]._images[0] == nullptr)
 					throw BadUsageException("Can't subtract TFs with unset image data");
-				_data[i]._images.first = Image2D::CreateFromDiff(_data[i]._images.first, rhs._data[i]._images.first);
-				if(_data[i]._images.second)
-					_data[i]._images.second = Image2D::CreateFromDiff(_data[i]._images.second, rhs._data[i]._images.second);
+				_data[i]._images[0] = Image2D::CreateFromDiff(_data[i]._images[0], rhs._data[i]._images[0]);
+				if(_data[i]._images[1])
+					_data[i]._images[1] = Image2D::CreateFromDiff(_data[i]._images[1], rhs._data[i]._images[1]);
 			}
 		}
 
@@ -460,11 +460,11 @@ class TimeFrequencyData
 			}
 			for(size_t i=0; i!=_data.size(); ++i)
 			{
-				if(_data[i]._images.first == nullptr)
+				if(_data[i]._images[0] == nullptr)
 					throw BadUsageException("Can't subtract TFs with unset image data");
-				_data[i]._images.first = Image2D::CreateFromDiff(lhs._data[i]._images.first, _data[i]._images.first);
-				if(_data[i]._images.second)
-					_data[i]._images.second = Image2D::CreateFromDiff(lhs._data[i]._images.second, _data[i]._images.second);
+				_data[i]._images[0] = Image2D::CreateFromDiff(lhs._data[i]._images[0], _data[i]._images[0]);
+				if(_data[i]._images[1])
+					_data[i]._images[1] = Image2D::CreateFromDiff(lhs._data[i]._images[1], _data[i]._images[1]);
 			}
 		}
 
@@ -480,11 +480,11 @@ class TimeFrequencyData
 			TimeFrequencyData *data = new TimeFrequencyData(lhs);
 			for(size_t i=0;i<lhs._data.size();++i)
 			{
-				if(lhs._data[i]._images.first == nullptr)
+				if(lhs._data[i]._images[0] == nullptr)
 					throw BadUsageException("Can't subtract TFs with unset image data");
-				data->_data[i]._images.first = Image2D::CreateFromDiff(lhs._data[i]._images.first, rhs._data[i]._images.first);
-				if(lhs._data[i]._images.second)
-					data->_data[i]._images.second = Image2D::CreateFromDiff(lhs._data[i]._images.second, rhs._data[i]._images.second);
+				data->_data[i]._images[0] = Image2D::CreateFromDiff(lhs._data[i]._images[0], rhs._data[i]._images[0]);
+				if(lhs._data[i]._images[1])
+					data->_data[i]._images[1] = Image2D::CreateFromDiff(lhs._data[i]._images[1], rhs._data[i]._images[1]);
 			}
 			return data;
 		}
@@ -501,11 +501,11 @@ class TimeFrequencyData
 			TimeFrequencyData *data = new TimeFrequencyData(lhs);
 			for(size_t i=0;i<lhs._data.size();++i)
 			{
-				if(lhs._data[i]._images.first == nullptr)
+				if(lhs._data[i]._images[0] == nullptr)
 					throw BadUsageException("Can't add TFs with unset image data");
-				data->_data[i]._images.first = Image2D::CreateFromSum(lhs._data[i]._images.first, rhs._data[i]._images.first);
-				if(lhs._data[i]._images.second)
-					data->_data[i]._images.second = Image2D::CreateFromSum(lhs._data[i]._images.second, rhs._data[i]._images.second);
+				data->_data[i]._images[0] = Image2D::CreateFromSum(lhs._data[i]._images[0], rhs._data[i]._images[0]);
+				if(lhs._data[i]._images[1])
+					data->_data[i]._images[1] = Image2D::CreateFromSum(lhs._data[i]._images[1], rhs._data[i]._images[1]);
 			}
 			return data;
 		}
@@ -514,8 +514,8 @@ class TimeFrequencyData
 			size_t masks = 0;
 			for(const PolarizedTimeFrequencyData& data : _data)
 			{
-				if(data._images.first) ++masks;
-				if(data._images.second) ++masks;
+				if(data._images[0]) ++masks;
+				if(data._images[1]) ++masks;
 			}
 			return masks; 
 		}
@@ -532,16 +532,16 @@ class TimeFrequencyData
 			size_t index = 0;
 			for(const PolarizedTimeFrequencyData& data : _data)
 			{
-				if(data._images.first)
+				if(data._images[0])
 				{
 					if(index == imageIndex)
-						return data._images.first;
+						return data._images[0];
 					++index;
 				}
-				if(data._images.second)
+				if(data._images[1])
 				{
 					if(index == imageIndex)
-						return data._images.second;
+						return data._images[1];
 					++index;
 				}
 			}
@@ -568,20 +568,20 @@ class TimeFrequencyData
 			size_t index = 0;
 			for(PolarizedTimeFrequencyData& data : _data)
 			{
-				if(data._images.first)
+				if(data._images[0])
 				{
 					if(index == imageIndex)
 					{
-						data._images.first = image;
+						data._images[0] = image;
 						return;
 					}
 					++index;
 				}
-				if(data._images.second)
+				if(data._images[1])
 				{
 					if(index == imageIndex)
 					{
-						data._images.second = image;
+						data._images[1] = image;
 						return;
 					}
 					++index;
@@ -638,10 +638,10 @@ class TimeFrequencyData
 		{
 			for(PolarizedTimeFrequencyData& data : _data)
 			{
-				if(data._images.first)
-					data._images.first = data._images.first->Trim(timeStart, freqStart, timeEnd, freqEnd);
-				if(data._images.second)
-					data._images.second = data._images.second->Trim(timeStart, freqStart, timeEnd, freqEnd);
+				if(data._images[0])
+					data._images[0] = data._images[0]->Trim(timeStart, freqStart, timeEnd, freqEnd);
+				if(data._images[1])
+					data._images[1] = data._images[1]->Trim(timeStart, freqStart, timeEnd, freqEnd);
 				if(data._flagging)
 					data._flagging = data._flagging->Trim(timeStart, freqStart, timeEnd, freqEnd);
 			}
@@ -695,10 +695,10 @@ class TimeFrequencyData
 		{
 			for(size_t i=0;i<_data.size();++i)
 			{
-				if(_data[i]._images.first)
-					_data[i]._images.first = Image2D::CreateUnsetImagePtr(width, height);
-				if(_data[i]._images.second)
-					_data[i]._images.second = Image2D::CreateUnsetImagePtr(width, height);
+				if(_data[i]._images[0])
+					_data[i]._images[0] = Image2D::CreateUnsetImagePtr(width, height);
+				if(_data[i]._images[1])
+					_data[i]._images[1] = Image2D::CreateUnsetImagePtr(width, height);
 				if(_data[i]._flagging)
 					_data[i]._flagging = Mask2D::CreateUnsetMaskPtr(width, height);
 			}
@@ -710,17 +710,17 @@ class TimeFrequencyData
 				throw BadUsageException("CopyFrom: tf data do not match");
 			for(size_t i=0;i<_data.size();++i)
 			{
-				if(_data[i]._images.first)
+				if(_data[i]._images[0])
 				{
-					Image2DPtr image = Image2D::CreateCopy(_data[i]._images.first);
-					image->CopyFrom(source._data[i]._images.first, destX, destY);
-					_data[i]._images.first = image;
+					Image2DPtr image = Image2D::CreateCopy(_data[i]._images[0]);
+					image->CopyFrom(source._data[i]._images[0], destX, destY);
+					_data[i]._images[0] = image;
 				}
-				if(_data[i]._images.second)
+				if(_data[i]._images[1])
 				{
-					Image2DPtr image = Image2D::CreateCopy(_data[i]._images.second);
-					image->CopyFrom(source._data[i]._images.second, destX, destY);
-					_data[i]._images.second = image;
+					Image2DPtr image = Image2D::CreateCopy(_data[i]._images[1]);
+					image->CopyFrom(source._data[i]._images[1], destX, destY);
+					_data[i]._images[1] = image;
 				}
 				if(_data[i]._flagging)
 				{
@@ -773,7 +773,7 @@ class TimeFrequencyData
 					return getFirstSum(0, 1);
 			}
 			else // if(_data.size() == 1)
-				return _data[0]._images.first;
+				return _data[0]._images[0];
 		}
 
 		Image2DCPtr GetRealPartFromDipole(PolarizationEnum polarisation) const
@@ -781,10 +781,10 @@ class TimeFrequencyData
 			switch(polarisation)
 			{
 				default:
-				case Polarization::XX: return _data[0]._images.first;
-				case Polarization::XY: return _data[1]._images.first;
-				case Polarization::YX: return _data[2]._images.first;
-				case Polarization::YY: return _data[3]._images.first;
+				case Polarization::XX: return _data[0]._images[0];
+				case Polarization::XY: return _data[1]._images[0];
+				case Polarization::YX: return _data[2]._images[0];
+				case Polarization::YY: return _data[3]._images[0];
 			}
 		}
 
@@ -793,8 +793,8 @@ class TimeFrequencyData
 			switch(polarisation)
 			{
 				default:
-				case Polarization::XX: return _data[0]._images.first;
-				case Polarization::YY: return _data[1]._images.first;
+				case Polarization::XX: return _data[0]._images[0];
+				case Polarization::YY: return _data[1]._images[0];
 			}
 		}
 
@@ -802,8 +802,8 @@ class TimeFrequencyData
 		{
 			switch(polarisation)
 			{
-				case Polarization::XY: return _data[0]._images.first;
-				case Polarization::YX: return _data[1]._images.first;
+				case Polarization::XY: return _data[0]._images[0];
+				case Polarization::YX: return _data[1]._images[0];
 				default: throw BadUsageException("Could not extract real part for given polarisation");
 			}
 		}
@@ -812,10 +812,10 @@ class TimeFrequencyData
 		{
 			switch(polarisation)
 			{
-				case Polarization::XX: return _data[0]._images.second;
-				case Polarization::XY: return _data[1]._images.second;
-				case Polarization::YX: return _data[2]._images.second;
-				case Polarization::YY: return _data[3]._images.second;
+				case Polarization::XX: return _data[0]._images[1];
+				case Polarization::XY: return _data[1]._images[1];
+				case Polarization::YX: return _data[2]._images[1];
+				case Polarization::YY: return _data[3]._images[1];
 				default: throw BadUsageException("Could not extract imaginary part for given polarisation");
 			}
 		}
@@ -824,8 +824,8 @@ class TimeFrequencyData
 		{
 			switch(polarisation)
 			{
-				case Polarization::XX: return _data[0]._images.second;
-				case Polarization::YY: return _data[1]._images.second;
+				case Polarization::XX: return _data[0]._images[1];
+				case Polarization::YY: return _data[1]._images[1];
 				default: throw BadUsageException("Could not extract imaginary part for given polarisation");
 			}
 		}
@@ -834,8 +834,8 @@ class TimeFrequencyData
 		{
 			switch(polarisation)
 			{
-				case Polarization::XY: return _data[0]._images.second;
-				case Polarization::YX: return _data[1]._images.second;
+				case Polarization::XY: return _data[0]._images[1];
+				case Polarization::YX: return _data[1]._images[1];
 				default: throw BadUsageException("Could not extract imaginary part for given polarisation");
 			}
 		}
@@ -944,12 +944,12 @@ class TimeFrequencyData
 
 		Image2DCPtr getAbsoluteFromComplex(size_t polIndex) const
 		{
-			return GetAbsoluteFromComplex(_data[polIndex]._images.first, _data[polIndex]._images.second);
+			return GetAbsoluteFromComplex(_data[polIndex]._images[0], _data[polIndex]._images[1]);
 		}
 
 		Image2DCPtr getPhaseFromComplex(size_t polIndex) const
 		{
-			return GetPhaseFromComplex(_data[polIndex]._images.first, _data[polIndex]._images.second);
+			return GetPhaseFromComplex(_data[polIndex]._images[0], _data[polIndex]._images[1]);
 		}
 		
 		Image2DCPtr GetAbsoluteFromComplex(const Image2DCPtr &real, const Image2DCPtr &imag) const;
@@ -961,7 +961,7 @@ class TimeFrequencyData
 				throw BadUsageException("Polarisation not available");
 			if(dataIndexB >= _data.size())
 				throw BadUsageException("Polarisation not available");
-			return GetSum(_data[dataIndexA]._images.first, _data[dataIndexB]._images.first);
+			return GetSum(_data[dataIndexA]._images[0], _data[dataIndexB]._images[0]);
 		}
 		
 		Image2DCPtr getSecondSum(size_t dataIndexA, size_t dataIndexB) const
@@ -970,7 +970,7 @@ class TimeFrequencyData
 				throw BadUsageException("Polarisation not available");
 			if(dataIndexB >= _data.size())
 				throw BadUsageException("Polarisation not available");
-			return GetSum(_data[dataIndexA]._images.second, _data[dataIndexB]._images.second);
+			return GetSum(_data[dataIndexA]._images[1], _data[dataIndexB]._images[1]);
 		}
 		
 		Image2DCPtr getFirstDiff(size_t dataIndexA, size_t dataIndexB) const
@@ -979,7 +979,7 @@ class TimeFrequencyData
 				throw BadUsageException("Polarisation not available");
 			if(dataIndexB >= _data.size())
 				throw BadUsageException("Polarisation not available");
-			return GetDifference(_data[dataIndexA]._images.first, _data[dataIndexB]._images.first);
+			return GetDifference(_data[dataIndexA]._images[0], _data[dataIndexB]._images[0]);
 		}
 		
 		Image2DCPtr getSecondDiff(size_t dataIndexA, size_t dataIndexB) const
@@ -988,7 +988,7 @@ class TimeFrequencyData
 				throw BadUsageException("Polarisation not available");
 			if(dataIndexB >= _data.size())
 				throw BadUsageException("Polarisation not available");
-			return GetDifference(_data[dataIndexA]._images.second, _data[dataIndexB]._images.second);
+			return GetDifference(_data[dataIndexA]._images[1], _data[dataIndexB]._images[1]);
 		}
 		
 		Image2DCPtr getNegRealPlusImag(size_t xyIndex, size_t yxIndex) const
@@ -997,7 +997,7 @@ class TimeFrequencyData
 				throw BadUsageException("Polarisation not available");
 			if(yxIndex >= _data.size())
 				throw BadUsageException("Polarisation not available");
-			return GetNegatedSum(_data[xyIndex]._images.second, _data[yxIndex]._images.first);
+			return GetNegatedSum(_data[xyIndex]._images[1], _data[yxIndex]._images[0]);
 		}
 		
 		Image2DCPtr getRealMinusImag(size_t xyIndex, size_t yxIndex) const
@@ -1006,7 +1006,7 @@ class TimeFrequencyData
 				throw BadUsageException("Polarisation not available");
 			if(yxIndex >= _data.size())
 				throw BadUsageException("Polarisation not available");
-			return GetDifference(_data[xyIndex]._images.first, _data[yxIndex]._images.second);
+			return GetDifference(_data[xyIndex]._images[0], _data[yxIndex]._images[1]);
 		}
 		
 		Image2DCPtr GetSum(const Image2DCPtr &left, const Image2DCPtr &right) const;
@@ -1043,24 +1043,24 @@ class TimeFrequencyData
 		struct PolarizedTimeFrequencyData
 		{
 			PolarizedTimeFrequencyData() :
-				_images(nullptr, nullptr),
+				_images{nullptr, nullptr},
 				_flagging(nullptr),
 				_polarization(Polarization::StokesI)
 			{ }
 			PolarizedTimeFrequencyData(PolarizationEnum polarisation, const Image2DCPtr& image) :
-				_images(image, nullptr),
+				_images{image, nullptr},
 				_flagging(nullptr),
 				_polarization(polarisation)
 			{ }
 				
 			PolarizedTimeFrequencyData(PolarizationEnum polarisation, const Image2DCPtr& imageA, const Image2DCPtr& imageB) :
-				_images(imageA, imageB),
+				_images{imageA, imageB},
 				_flagging(nullptr),
 				_polarization(polarisation)
 			{ }
 				
 			// Second image is only filled when phase representation = complex
-			std::pair<Image2DCPtr, Image2DCPtr> _images;
+			Image2DCPtr _images[2];
 			Mask2DCPtr _flagging;
 			PolarizationEnum _polarization;
 		};

@@ -25,7 +25,7 @@ Image2DCPtr TimeFrequencyData::GetDifference(const Image2DCPtr &left, const Imag
 
 Image2DCPtr TimeFrequencyData::getSinglePhaseFromTwoPolPhase(size_t polA, size_t polB) const
 {
-	return StokesImager::CreateAvgPhase(_data[polA]._images.first, _data[polB]._images.first);
+	return StokesImager::CreateAvgPhase(_data[polA]._images[0], _data[polB]._images[0]);
 }
 
 Image2DCPtr TimeFrequencyData::GetZeroImage() const
@@ -77,16 +77,16 @@ TimeFrequencyData* TimeFrequencyData::CreateTFData(enum PhaseRepresentation phas
 			switch(phase)
 			{
 				case RealPart:
-					dest._images.first = source._images.first;
+					dest._images[0] = source._images[0];
 					break;
 				case ImaginaryPart:
-					dest._images.first = source._images.second;
+					dest._images[0] = source._images[1];
 					break;
 				case AmplitudePart:
-					dest._images.first = GetAbsoluteFromComplex(source._images.first, source._images.second);
+					dest._images[0] = GetAbsoluteFromComplex(source._images[0], source._images[1]);
 					break;
 				case PhasePart:
-					dest._images.first = StokesImager::CreateAvgPhase(source._images.first, source._images.second);
+					dest._images[0] = StokesImager::CreateAvgPhase(source._images[0], source._images[1]);
 					break;
 				case ComplexRepresentation:
 					break; // already handled above.
@@ -109,8 +109,8 @@ TimeFrequencyData *TimeFrequencyData::CreateTFDataFromComplexCombination(const T
 	for(size_t i=0; i!=real._data.size(); ++i)
 	{
 		data->_data[i]._polarization = real._data[i]._polarization;
-		data->_data[i]._images.first = real._data[i]._images.first;
-		data->_data[i]._images.second = imaginary._data[i]._images.first;
+		data->_data[i]._images[0] = real._data[i]._images[0];
+		data->_data[i]._images[1] = imaginary._data[i]._images[0];
 		data->_data[i]._flagging = real._data[i]._flagging;
 	}
 	return data;
@@ -160,9 +160,9 @@ void TimeFrequencyData::SetImagesToZero()
 		Mask2DPtr mask = Mask2D::CreateSetMaskPtr<false>(ImageWidth(), ImageHeight());
 		for(PolarizedTimeFrequencyData& data : _data)
 		{
-			data._images.first = zeroImage;
-			if(data._images.second)
-				data._images.second = zeroImage;
+			data._images[0] = zeroImage;
+			if(data._images[1])
+				data._images[1] = zeroImage;
 			data._flagging = mask;
 		}
 	}
@@ -172,17 +172,17 @@ void TimeFrequencyData::MultiplyImages(long double factor)
 {
 	for(PolarizedTimeFrequencyData& data : _data)
 	{
-		if(data._images.first)
+		if(data._images[0])
 		{
-			Image2DPtr newImage = Image2D::CreateCopy(data._images.first);
+			Image2DPtr newImage = Image2D::CreateCopy(data._images[0]);
 			newImage->MultiplyValues(factor);
-			data._images.first = newImage;
+			data._images[0] = newImage;
 		}
-		if(data._images.second)
+		if(data._images[1])
 		{
-			Image2DPtr newImage = Image2D::CreateCopy(data._images.second);
+			Image2DPtr newImage = Image2D::CreateCopy(data._images[1]);
 			newImage->MultiplyValues(factor);
-			data._images.second = newImage;
+			data._images[1] = newImage;
 		}
 	}
 }

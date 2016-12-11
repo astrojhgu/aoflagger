@@ -1164,10 +1164,10 @@ void RFIGuiWindow::onSetToOne()
 {
 	try {
 		TimeFrequencyData data(GetActiveData());
-		std::pair<Image2DCPtr, Image2DCPtr> images = data.GetSingleComplexImage();
+		std::array<Image2DCPtr, 2> images = data.GetSingleComplexImage();
 		Image2DPtr
-			real = Image2D::CreateCopy(images.first),
-			imaginary = Image2D::CreateCopy(images.first);
+			real = Image2D::CreateCopy(images[0]),
+			imaginary = Image2D::CreateCopy(images[0]);
 		real->SetAll(1.0);
 		imaginary->SetAll(0.0);
 		TimeFrequencyData newData(data.GetPolarisation(0), real, imaginary);
@@ -1184,10 +1184,10 @@ void RFIGuiWindow::onSetToI()
 {
 	try {
 		TimeFrequencyData data(GetActiveData());
-		std::pair<Image2DCPtr, Image2DCPtr> images = data.GetSingleComplexImage();
+		std::array<Image2DCPtr, 2> images = data.GetSingleComplexImage();
 		Image2DPtr
-			real = Image2D::CreateCopy(images.first),
-			imaginary = Image2D::CreateCopy(images.first);
+			real = Image2D::CreateCopy(images[0]),
+			imaginary = Image2D::CreateCopy(images[0]);
 		real->SetAll(0.0);
 		imaginary->SetAll(1.0);
 		TimeFrequencyData newData(data.GetPolarisation(0), real, imaginary);
@@ -1204,10 +1204,10 @@ void RFIGuiWindow::onSetToOnePlusI()
 {
 	try {
 		TimeFrequencyData data(GetActiveData());
-		std::pair<Image2DCPtr, Image2DCPtr> images = data.GetSingleComplexImage();
+		std::array<Image2DCPtr, 2> images = data.GetSingleComplexImage();
 		Image2DPtr
-			real = Image2D::CreateCopy(images.first),
-			imaginary = Image2D::CreateCopy(images.first);
+			real = Image2D::CreateCopy(images[0]),
+			imaginary = Image2D::CreateCopy(images[0]);
 		real->SetAll(1.0);
 		imaginary->SetAll(1.0);
 		TimeFrequencyData newData(data.GetPolarisation(0), real, imaginary);
