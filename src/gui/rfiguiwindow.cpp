@@ -745,14 +745,14 @@ void RFIGuiWindow::createToolbar()
 		sigc::mem_fun(*this, &RFIGuiWindow::onLoadShortestBaselinePressed) );
 	
   _originalFlagsButton = Gtk::ToggleAction::create("OriginalFlags", "Or flags");
-	_originalFlagsButton->set_active(true);
+	_originalFlagsButton->set_active(_controller->AreOriginalFlagsShown());
 	_originalFlagsButton->set_icon_name("showoriginalflags");
 	_originalFlagsButton->set_tooltip("Display the first flag mask on top of the visibilities. These flags are displayed in purple and indicate the flags as they originally were stored in the measurement set.");
 	_actionGroup->add(_originalFlagsButton,
 			Gtk::AccelKey("F3"),
 			sigc::mem_fun(*this, &RFIGuiWindow::onToggleFlags));
   _altFlagsButton = Gtk::ToggleAction::create("AlternativeFlags", "Alt flags");
-	_altFlagsButton->set_active(true); 
+	_altFlagsButton->set_active(_controller->AreAlternativeFlagsShown()); 
 	_altFlagsButton->set_icon_name("showalternativeflags");
 	_altFlagsButton->set_tooltip("Display the second flag mask on top of the visibilities. These flags are displayed in yellow and indicate flags found by running the strategy.");
 	_actionGroup->add(_altFlagsButton,
