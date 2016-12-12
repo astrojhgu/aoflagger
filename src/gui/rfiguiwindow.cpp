@@ -262,6 +262,14 @@ void RFIGuiWindow::onToggleFlags()
 	_controller->SetShowAlternativeFlags(_altFlagsButton->get_active());
 }
 
+void RFIGuiWindow::onTogglePolarizations()
+{
+	_controller->SetShowPP(_showPPButton->get_active());
+	_controller->SetShowPQ(_showPQButton->get_active());
+	_controller->SetShowQP(_showQPButton->get_active());
+	_controller->SetShowQQ(_showQQButton->get_active());
+}
+
 void RFIGuiWindow::loadCurrentTFData()
 {
 	if(_imageSet != 0) {
@@ -402,14 +410,12 @@ void RFIGuiWindow::onExecuteStrategyFinished()
 		bool update = false;
 		if(!artifacts->RevisedData().IsEmpty())
 		{
-			std::cout << "Updating revised data..." << std::endl;
 			_timeFrequencyWidget.SetRevisedData(artifacts->RevisedData());
 			update = true;
 		}
 
 		if(!artifacts->ContaminatedData().IsEmpty())
 		{
-			std::cout << "Updating contaminated data..." << std::endl;
 			_timeFrequencyWidget.SetContaminatedData(artifacts->ContaminatedData());
 			update = true;
 		}
@@ -749,19 +755,48 @@ void RFIGuiWindow::createToolbar()
 	_originalFlagsButton->set_active(_controller->AreOriginalFlagsShown());
 	_originalFlagsButton->set_icon_name("showoriginalflags");
 	_originalFlagsButton->set_tooltip("Display the first flag mask on top of the visibilities. These flags are displayed in purple and indicate the flags as they originally were stored in the measurement set.");
+	_toggleConnections.push_back(_originalFlagsButton->signal_activate().connect(sigc::mem_fun(*this, &RFIGuiWindow::onToggleFlags)));
 	_actionGroup->add(_originalFlagsButton,
-			Gtk::AccelKey("F3"),
-			sigc::mem_fun(*this, &RFIGuiWindow::onToggleFlags));
+			Gtk::AccelKey("F3"));
+	
   _altFlagsButton = Gtk::ToggleAction::create("AlternativeFlags", "Alt flags");
 	_altFlagsButton->set_active(_controller->AreAlternativeFlagsShown()); 
 	_altFlagsButton->set_icon_name("showalternativeflags");
 	_altFlagsButton->set_tooltip("Display the second flag mask on top of the visibilities. These flags are displayed in yellow and indicate flags found by running the strategy.");
+	_toggleConnections.push_back(_altFlagsButton->signal_activate().connect(sigc::mem_fun(*this, &RFIGuiWindow::onToggleFlags)));
 	_actionGroup->add(_altFlagsButton,
-			Gtk::AccelKey("F4"),
-			sigc::mem_fun(*this, &RFIGuiWindow::onToggleFlags));
+			Gtk::AccelKey("F4"));
 	_actionGroup->add( Gtk::Action::create("ClearAltFlags", "Clear alt flags"),
   sigc::mem_fun(*this, &RFIGuiWindow::onClearAltFlagsPressed) );
 
+  _showPPButton = Gtk::ToggleAction::create("DisplayPP", "PP");
+	_showPPButton->set_active(_controller->IsPPShown());
+	_showPPButton->set_icon_name("displaypp");
+	_showPPButton->set_tooltip("Display the PP polarization. Depending on the polarization configuration of the measurement set, this will show XX or RR");
+	_toggleConnections.push_back(_showPPButton->signal_activate().connect(sigc::mem_fun(*this, &RFIGuiWindow::onTogglePolarizations)));
+	_actionGroup->add(_showPPButton);
+	
+  _showPQButton = Gtk::ToggleAction::create("DisplayPQ", "PQ");
+	_showPQButton->set_active(_controller->IsPQShown());
+	_showPQButton->set_icon_name("displaypq");
+	_showPQButton->set_tooltip("Display the PQ polarization. Depending on the polarization configuration of the measurement set, this will show XY or RL");
+	_toggleConnections.push_back(_showPQButton->signal_activate().connect(sigc::mem_fun(*this, &RFIGuiWindow::onTogglePolarizations)));
+	_actionGroup->add(_showPQButton);
+	
+  _showQPButton = Gtk::ToggleAction::create("DisplayQP", "QP");
+	_showQPButton->set_active(_controller->IsQPShown());
+	_showQPButton->set_icon_name("displayqp");
+	_showQPButton->set_tooltip("Display the QP polarization. Depending on the polarization configuration of the measurement set, this will show YX or LR");
+	_toggleConnections.push_back(_showQPButton->signal_activate().connect(sigc::mem_fun(*this, &RFIGuiWindow::onTogglePolarizations)));
+	_actionGroup->add(_showQPButton);
+	
+  _showQQButton = Gtk::ToggleAction::create("DisplayQQ", "QQ");
+	_showQQButton->set_active(_controller->IsQQShown());
+	_showQQButton->set_icon_name("displayqq");
+	_showQQButton->set_tooltip("Display the QQ polarization. Depending on the polarization configuration of the measurement set, this will show YY or LL");
+	_toggleConnections.push_back(_showQQButton->signal_activate().connect(sigc::mem_fun(*this, &RFIGuiWindow::onTogglePolarizations)));
+	_actionGroup->add(_showQQButton);
+	
 	Gtk::RadioButtonGroup imageGroup;
 	_originalImageButton = Gtk::RadioAction::create(imageGroup, "ImageOriginal", "Original");
 	_originalImageButton->set_active(true);
@@ -1945,11 +1980,22 @@ void RFIGuiWindow::SetStrategy(rfiStrategy::Strategy* newStrategy)
 
 void RFIGuiWindow::onControllerStateChange()
 {
+	for(sigc::connection& connection : _toggleConnections)
+		connection.block();
+	
 	_originalFlagsButton->set_active(_controller->AreOriginalFlagsShown());
 	_timeFrequencyWidget.SetShowOriginalMask(_controller->AreOriginalFlagsShown());
 	
 	_altFlagsButton->set_active(_controller->AreAlternativeFlagsShown());
 	_timeFrequencyWidget.SetShowAlternativeMask(_controller->AreAlternativeFlagsShown());
+	
+	_showPPButton->set_active(_controller->IsPPShown());
+	_showPQButton->set_active(_controller->IsPQShown());
+	_showQPButton->set_active(_controller->IsQPShown());
+	_showQQButton->set_active(_controller->IsQQShown());
+	
+	for(sigc::connection& connection : _toggleConnections)
+		connection.unblock();
 	
 	_timeFrequencyWidget.Update();
 }

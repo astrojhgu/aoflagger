@@ -96,6 +96,7 @@ class RFIGuiWindow : public Gtk::Window, private StrategyController {
 		void onLoadPrevious();
 		void onLoadNext();
 		void onToggleFlags();
+		void onTogglePolarizations();
 		void onToggleImage();
 		void onQuit() { hide(); }
 		void onActionFileOpen();
@@ -254,9 +255,12 @@ class RFIGuiWindow : public Gtk::Window, private StrategyController {
 			_zoomToFitButton, _zoomInButton, _zoomOutButton;
 		Glib::RefPtr<Gtk::ToggleAction>
 			_originalFlagsButton, _altFlagsButton,
+			_showPPButton, _showPQButton,
+			_showQPButton, _showQQButton,
 			_originalImageButton, _backgroundImageButton, _diffImageButton,
 			_timeGraphButton, _simFixBandwidthButton,
 			_closeExecuteFrameButton;
+		std::vector<sigc::connection> _toggleConnections;
 		Glib::RefPtr<Gtk::RadioAction>
 			_gaussianTestSetsButton, _rayleighTestSetsButton, _zeroTestSetsButton,
 			_ncpSetButton, _b1834SetButton, _emptySetButton,
