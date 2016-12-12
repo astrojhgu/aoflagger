@@ -788,50 +788,50 @@ void RFIGuiWindow::createToolbar()
 	_actionGroup->add( Gtk::Action::create("BackToOriginal", "Background->Original"),
   sigc::mem_fun(*this, &RFIGuiWindow::onBackgroundToOriginalPressed) );
 
-	_actionGroup->add( Gtk::Action::create("ShowReal", "Keep _real part"),
+	_actionGroup->add( Gtk::Action::create("KeepReal", "Keep _real part"),
 		Gtk::AccelKey("<control>,"),
-		sigc::mem_fun(*this, &RFIGuiWindow::onShowRealPressed) );
-	_actionGroup->add( Gtk::Action::create("ShowImaginary", "Keep _imaginary part"),
+		sigc::mem_fun(*this, &RFIGuiWindow::onKeepRealPressed) );
+	_actionGroup->add( Gtk::Action::create("KeepImaginary", "Keep _imaginary part"),
 		Gtk::AccelKey("<control>."),
-		sigc::mem_fun(*this, &RFIGuiWindow::onShowImaginaryPressed) );
-	_actionGroup->add( Gtk::Action::create("ShowPhase", "Keep _phase part"),
+		sigc::mem_fun(*this, &RFIGuiWindow::onKeepImaginaryPressed) );
+	_actionGroup->add( Gtk::Action::create("KeepPhase", "Keep _phase part"),
 		Gtk::AccelKey("<control>1"),
-		sigc::mem_fun(*this, &RFIGuiWindow::onShowPhasePressed) );
-	_actionGroup->add( Gtk::Action::create("ShowStokesI", "Keep _stokesI part"),
-  sigc::mem_fun(*this, &RFIGuiWindow::onShowStokesIPressed) );
-	_actionGroup->add( Gtk::Action::create("ShowStokesQ", "Keep stokes_Q part"),
-  sigc::mem_fun(*this, &RFIGuiWindow::onShowStokesQPressed) );
-	_actionGroup->add( Gtk::Action::create("ShowStokesU", "Keep stokes_U part"),
-  sigc::mem_fun(*this, &RFIGuiWindow::onShowStokesUPressed) );
-	_actionGroup->add( Gtk::Action::create("ShowStokesV", "Keep stokes_V part"),
-  sigc::mem_fun(*this, &RFIGuiWindow::onShowStokesVPressed) );
-	//_actionGroup->add( Gtk::Action::create("ShowAutoPol", "Keep xx+yy part"),
-  //sigc::mem_fun(*this, &RFIGuiWindow::onShowAutoDipolePressed) );
-	//_actionGroup->add( Gtk::Action::create("ShowCrossPol", "Keep xy+yx part"),
-  //sigc::mem_fun(*this, &RFIGuiWindow::onShowCrossDipolePressed) );
-	_actionGroup->add( Gtk::Action::create("ShowRR", "Keep _rr part"),
+		sigc::mem_fun(*this, &RFIGuiWindow::onKeepPhasePressed) );
+	_actionGroup->add( Gtk::Action::create("KeepStokesI", "Keep _stokesI part"),
+  sigc::mem_fun(*this, &RFIGuiWindow::onKeepStokesIPressed) );
+	_actionGroup->add( Gtk::Action::create("KeepStokesQ", "Keep stokes_Q part"),
+  sigc::mem_fun(*this, &RFIGuiWindow::onKeepStokesQPressed) );
+	_actionGroup->add( Gtk::Action::create("KeepStokesU", "Keep stokes_U part"),
+  sigc::mem_fun(*this, &RFIGuiWindow::onKeepStokesUPressed) );
+	_actionGroup->add( Gtk::Action::create("KeepStokesV", "Keep stokes_V part"),
+  sigc::mem_fun(*this, &RFIGuiWindow::onKeepStokesVPressed) );
+	//_actionGroup->add( Gtk::Action::create("KeepAutoPol", "Keep xx+yy part"),
+  //sigc::mem_fun(*this, &RFIGuiWindow::onKeepAutoDipolePressed) );
+	//_actionGroup->add( Gtk::Action::create("KeepCrossPol", "Keep xy+yx part"),
+  //sigc::mem_fun(*this, &RFIGuiWindow::onKeepCrossDipolePressed) );
+	_actionGroup->add( Gtk::Action::create("KeepRR", "Keep _rr part"),
 		Gtk::AccelKey("<control>R"),
-		sigc::mem_fun(*this, &RFIGuiWindow::onShowRRPressed) );
-	_actionGroup->add( Gtk::Action::create("ShowRL", "Keep rl part"),
-		sigc::mem_fun(*this, &RFIGuiWindow::onShowRLPressed) );
-	_actionGroup->add( Gtk::Action::create("ShowLR", "Keep lr part"),
+		sigc::mem_fun(*this, &RFIGuiWindow::onKeepRRPressed) );
+	_actionGroup->add( Gtk::Action::create("KeepRL", "Keep rl part"),
+		sigc::mem_fun(*this, &RFIGuiWindow::onKeepRLPressed) );
+	_actionGroup->add( Gtk::Action::create("KeepLR", "Keep lr part"),
 		Gtk::AccelKey("<control><alt>L"),
-		sigc::mem_fun(*this, &RFIGuiWindow::onShowLRPressed) );
-	_actionGroup->add( Gtk::Action::create("ShowLL", "Keep _ll part"),
+		sigc::mem_fun(*this, &RFIGuiWindow::onKeepLRPressed) );
+	_actionGroup->add( Gtk::Action::create("KeepLL", "Keep _ll part"),
 		Gtk::AccelKey("<control>L"),
-		sigc::mem_fun(*this, &RFIGuiWindow::onShowLLPressed) );
-	_actionGroup->add( Gtk::Action::create("ShowXX", "Keep _xx part"),
+		sigc::mem_fun(*this, &RFIGuiWindow::onKeepLLPressed) );
+	_actionGroup->add( Gtk::Action::create("KeepXX", "Keep _xx part"),
 		Gtk::AccelKey("<control>X"),
-		sigc::mem_fun(*this, &RFIGuiWindow::onShowXXPressed) );
-	_actionGroup->add( Gtk::Action::create("ShowXY", "Keep xy part"),
+		sigc::mem_fun(*this, &RFIGuiWindow::onKeepXXPressed) );
+	_actionGroup->add( Gtk::Action::create("KeepXY", "Keep xy part"),
 		Gtk::AccelKey("<control><alt>X"),
-		sigc::mem_fun(*this, &RFIGuiWindow::onShowXYPressed) );
-	_actionGroup->add( Gtk::Action::create("ShowYX", "Keep yx part"),
+		sigc::mem_fun(*this, &RFIGuiWindow::onKeepXYPressed) );
+	_actionGroup->add( Gtk::Action::create("KeepYX", "Keep yx part"),
 		Gtk::AccelKey("<control><alt>Y"),
-		sigc::mem_fun(*this, &RFIGuiWindow::onShowYXPressed) );
-	_actionGroup->add( Gtk::Action::create("ShowYY", "Keep _yy part"),
+		sigc::mem_fun(*this, &RFIGuiWindow::onKeepYXPressed) );
+	_actionGroup->add( Gtk::Action::create("KeepYY", "Keep _yy part"),
 		Gtk::AccelKey("<control>Y"),
-		sigc::mem_fun(*this, &RFIGuiWindow::onShowYYPressed) );
+		sigc::mem_fun(*this, &RFIGuiWindow::onKeepYYPressed) );
 	_actionGroup->add( Gtk::Action::create("UnrollPhase", "_Unroll phase"),
 	sigc::mem_fun(*this, &RFIGuiWindow::onUnrollPhaseButtonPressed) );
 
@@ -995,25 +995,25 @@ void RFIGuiWindow::createToolbar()
     "      <menuitem action='DiffToOriginal'/>"
     "      <menuitem action='BackToOriginal'/>"
     "      <separator/>"
-    "      <menuitem action='ShowReal'/>"
-    "      <menuitem action='ShowImaginary'/>"
-    "      <menuitem action='ShowPhase'/>"
+    "      <menuitem action='KeepReal'/>"
+    "      <menuitem action='KeepImaginary'/>"
+    "      <menuitem action='KeepPhase'/>"
     "      <menuitem action='UnrollPhase'/>"
     "      <separator/>"
-    "      <menuitem action='ShowStokesI'/>"
-    "      <menuitem action='ShowStokesQ'/>"
-    "      <menuitem action='ShowStokesU'/>"
-    "      <menuitem action='ShowStokesV'/>"
+    "      <menuitem action='KeepStokesI'/>"
+    "      <menuitem action='KeepStokesQ'/>"
+    "      <menuitem action='KeepStokesU'/>"
+    "      <menuitem action='KeepStokesV'/>"
     "      <separator/>"
-    "      <menuitem action='ShowRR'/>"
-    "      <menuitem action='ShowRL'/>"
-    "      <menuitem action='ShowLR'/>"
-    "      <menuitem action='ShowLL'/>"
+    "      <menuitem action='KeepRR'/>"
+    "      <menuitem action='KeepRL'/>"
+    "      <menuitem action='KeepLR'/>"
+    "      <menuitem action='KeepLL'/>"
     "      <separator/>"
-    "      <menuitem action='ShowXX'/>"
-    "      <menuitem action='ShowXY'/>"
-    "      <menuitem action='ShowYX'/>"
-    "      <menuitem action='ShowYY'/>"
+    "      <menuitem action='KeepXX'/>"
+    "      <menuitem action='KeepXY'/>"
+    "      <menuitem action='KeepYX'/>"
+    "      <menuitem action='KeepYY'/>"
 //    "      <menuitem action='ShowAutoPol'/>"
 //    "      <menuitem action='ShowCrossPol'/>"
     "      <separator/>"
@@ -1051,13 +1051,17 @@ void RFIGuiWindow::createToolbar()
     "    <toolitem action='OriginalFlags'/>"
     "    <toolitem action='AlternativeFlags'/>"
     "    <separator/>"
-    "    <toolitem action='ZoomFit'/>"
-    "    <toolitem action='ZoomIn'/>"
-    "    <toolitem action='ZoomOut'/>"
-    "    <separator/>"
     "    <toolitem action='Previous'/>"
     "    <toolitem action='Reload'/>"
     "    <toolitem action='Next'/>"
+    "    <separator/>"
+    "    <toolitem action='ZoomFit'/>"
+    "    <toolitem action='ZoomIn'/>"
+    "    <toolitem action='ZoomOut'/>"
+    "    <toolitem action='DisplayPP'/>"
+    "    <toolitem action='DisplayPQ'/>"
+    "    <toolitem action='DisplayQP'/>"
+    "    <toolitem action='DisplayQQ'/>"
     "    <separator/>"
     "    <toolitem action='ImageOriginal'/>"
     "    <toolitem action='ImageBackground'/>"
@@ -1084,8 +1088,9 @@ void RFIGuiWindow::createToolbar()
 
 void RFIGuiWindow::onClearAltFlagsPressed()
 {
-	TimeFrequencyData data = GetActiveData();
-	_timeFrequencyWidget.ContaminatedData().SetMasksToValue<false>();
+	TimeFrequencyData& data = _timeFrequencyWidget.ContaminatedData();
+	data.SetMasksToValue<false>();
+	_timeFrequencyWidget.SetContaminatedData(data);
 	_timeFrequencyWidget.Update();
 }
 
@@ -1367,7 +1372,7 @@ void RFIGuiWindow::onPlotSumSpectrumPressed()
 	_controller->PlotSumSpectrum();
 }
 
-void RFIGuiWindow::showPhasePart(enum TimeFrequencyData::PhaseRepresentation phaseRepresentation)
+void RFIGuiWindow::keepPhasePart(enum TimeFrequencyData::PhaseRepresentation phaseRepresentation)
 {
 	if(HasImage())
 	{
@@ -1394,7 +1399,7 @@ void RFIGuiWindow::showPhasePart(enum TimeFrequencyData::PhaseRepresentation pha
 	}
 }
 
-void RFIGuiWindow::showPolarisation(PolarizationEnum polarisation)
+void RFIGuiWindow::keepPolarisation(PolarizationEnum polarisation)
 {
 	if(HasImage())
 	{

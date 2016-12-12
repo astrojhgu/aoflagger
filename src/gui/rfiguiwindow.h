@@ -126,25 +126,23 @@ class RFIGuiWindow : public Gtk::Window, private StrategyController {
 		void onDifferenceToOriginalPressed();
 		void onBackgroundToOriginalPressed();
 		void onHightlightPressed();
-		void showPhasePart(enum TimeFrequencyData::PhaseRepresentation phaseRepresentation);
-		void onShowRealPressed() { showPhasePart(TimeFrequencyData::RealPart); }
-		void onShowImaginaryPressed() { showPhasePart(TimeFrequencyData::ImaginaryPart); }
-		void onShowPhasePressed() { showPhasePart(TimeFrequencyData::PhasePart); }
-		void showPolarisation(PolarizationEnum polarisation);
-		void onShowStokesIPressed() { showPolarisation(Polarization::StokesI); }
-		void onShowStokesQPressed() { showPolarisation(Polarization::StokesQ); }
-		void onShowStokesUPressed() { showPolarisation(Polarization::StokesU); }
-		void onShowStokesVPressed() { showPolarisation(Polarization::StokesV); }
-		//void onShowAutoDipolePressed() { showPolarisation(AutoDipolePolarisation); }
-		//void onShowCrossDipolePressed() { showPolarisation(CrossDipolePolarisation); }
-		void onShowRRPressed() { showPolarisation(Polarization::RR); }
-		void onShowRLPressed() { showPolarisation(Polarization::RL); }
-		void onShowLRPressed() { showPolarisation(Polarization::LR); }
-		void onShowLLPressed() { showPolarisation(Polarization::LL); }
-		void onShowXXPressed() { showPolarisation(Polarization::XX); }
-		void onShowXYPressed() { showPolarisation(Polarization::XY); }
-		void onShowYXPressed() { showPolarisation(Polarization::YX); }
-		void onShowYYPressed() { showPolarisation(Polarization::YY); }
+		void keepPhasePart(enum TimeFrequencyData::PhaseRepresentation phaseRepresentation);
+		void onKeepRealPressed() { keepPhasePart(TimeFrequencyData::RealPart); }
+		void onKeepImaginaryPressed() { keepPhasePart(TimeFrequencyData::ImaginaryPart); }
+		void onKeepPhasePressed() { keepPhasePart(TimeFrequencyData::PhasePart); }
+		void keepPolarisation(PolarizationEnum polarisation);
+		void onKeepStokesIPressed() { keepPolarisation(Polarization::StokesI); }
+		void onKeepStokesQPressed() { keepPolarisation(Polarization::StokesQ); }
+		void onKeepStokesUPressed() { keepPolarisation(Polarization::StokesU); }
+		void onKeepStokesVPressed() { keepPolarisation(Polarization::StokesV); }
+		void onKeepRRPressed() { keepPolarisation(Polarization::RR); }
+		void onKeepRLPressed() { keepPolarisation(Polarization::RL); }
+		void onKeepLRPressed() { keepPolarisation(Polarization::LR); }
+		void onKeepLLPressed() { keepPolarisation(Polarization::LL); }
+		void onKeepXXPressed() { keepPolarisation(Polarization::XX); }
+		void onKeepXYPressed() { keepPolarisation(Polarization::XY); }
+		void onKeepYXPressed() { keepPolarisation(Polarization::YX); }
+		void onKeepYYPressed() { keepPolarisation(Polarization::YY); }
 		void onImagePropertiesPressed();
 		void onOpenTestSetNoise() { openTestSet(2); }
 		void onOpenTestSetA() { openTestSet(3); }
