@@ -1993,6 +1993,7 @@ void RFIGuiWindow::onControllerStateChange()
 	_showPQButton->set_active(_controller->IsPQShown());
 	_showQPButton->set_active(_controller->IsQPShown());
 	_showQQButton->set_active(_controller->IsQQShown());
+	_timeFrequencyWidget.SetVisualizedPolarization(_controller->IsPPShown(), _controller->IsPQShown(), _controller->IsQPShown(), _controller->IsQQShown());
 	
 	for(sigc::connection& connection : _toggleConnections)
 		connection.unblock();

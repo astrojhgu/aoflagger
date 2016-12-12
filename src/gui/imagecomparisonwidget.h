@@ -50,8 +50,22 @@ class ImageComparisonWidget : public ImageWidget {
 		} 
 		void SetVisualizedImage(TFImage visualizedImage)
 		{
-		  _visualizedImage = visualizedImage;
-		  updateVisualizedImage();
+			if(_visualizedImage != visualizedImage)
+			{
+				_visualizedImage = visualizedImage;
+				updateVisualizedImage();
+			}
+		}
+		void SetVisualizedPolarization(bool pp, bool pq, bool qp, bool qq)
+		{
+			if(_showPP != pp || _showPQ != pq || _showQP != qp || _showQQ != qq)
+			{
+				_showPP = pp;
+				_showPQ = pq;
+				_showQP = qp;
+				_showQQ = qq;
+				updateVisualizedImage();
+			}
 		}
 		void ClearBackground();
 	private:
@@ -86,6 +100,7 @@ class ImageComparisonWidget : public ImageWidget {
 				data.SetMasksToValue<false>();
 		}
 		enum TFImage _visualizedImage;
+		bool _showPP, _showPQ, _showQP, _showQQ;
 		TimeFrequencyData _original, _revised, _contaminated;
 		TimeFrequencyMetaDataCPtr _metaData;
 };

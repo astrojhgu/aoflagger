@@ -97,7 +97,7 @@ class RFIGuiController
 				}
 				_signalStateChange();
 			}
-		}		
+		}
 		sigc::signal<void> &SignalStateChange()
 		{ return _signalStateChange; }
 		

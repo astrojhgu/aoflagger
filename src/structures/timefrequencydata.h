@@ -284,15 +284,16 @@ class TimeFrequencyData
 		}
 
 		TimeFrequencyData *CreateTFData(PhaseRepresentation phase) const;
-
-		TimeFrequencyData *CreateTFData(PolarizationEnum polarisation) const
+		
+		TimeFrequencyData Make(PolarizationEnum polarisation) const
 		{
-			TimeFrequencyData *data = 0;
 			for(const PolarizedTimeFrequencyData& data : _data)
 			{
 				if(data._polarization == polarisation)
-					return new TimeFrequencyData(_phaseRepresentation, data);
+					return TimeFrequencyData(_phaseRepresentation, data);
 			}
+			
+			TimeFrequencyData newData;
 			size_t
 				xxPol = getPolarisationIndex(Polarization::XX),
 				xyPol = getPolarisationIndex(Polarization::XY),
@@ -306,16 +307,16 @@ class TimeFrequencyData
 					switch(polarisation)
 					{
 					case Polarization::StokesI:
-						data = new TimeFrequencyData(Polarization::StokesI, getFirstSum(xxPol, yyPol), getSecondSum(xxPol, yyPol));
+						newData = TimeFrequencyData(Polarization::StokesI, getFirstSum(xxPol, yyPol), getSecondSum(xxPol, yyPol));
 						break;
 					case Polarization::StokesQ:
-						data = new TimeFrequencyData(Polarization::StokesQ, getFirstDiff(xxPol, yyPol), getSecondDiff(xxPol, yyPol));
+						newData = TimeFrequencyData(Polarization::StokesQ, getFirstDiff(xxPol, yyPol), getSecondDiff(xxPol, yyPol));
 						break;
 					case Polarization::StokesU:
-						data = new TimeFrequencyData(Polarization::StokesU, getFirstSum(xyPol, yxPol), getSecondSum(xyPol, yxPol));
+						newData = TimeFrequencyData(Polarization::StokesU, getFirstSum(xyPol, yxPol), getSecondSum(xyPol, yxPol));
 						break;
 					case Polarization::StokesV:
-						data = new TimeFrequencyData(Polarization::StokesV, getNegRealPlusImag(xyPol, yxPol), getRealMinusImag(xyPol, yxPol));
+						newData = TimeFrequencyData(Polarization::StokesV, getNegRealPlusImag(xyPol, yxPol), getRealMinusImag(xyPol, yxPol));
 						break;
 					default:
 						throw BadUsageException("Polarisation not available or not implemented");
@@ -327,16 +328,15 @@ class TimeFrequencyData
 					switch(polarisation)
 					{
 						case Polarization::StokesI:
-							data = new TimeFrequencyData(_phaseRepresentation, Polarization::StokesI, getFirstSum(xxPol, yyPol));
+							newData = TimeFrequencyData(_phaseRepresentation, Polarization::StokesI, getFirstSum(xxPol, yyPol));
 							break;
 						case Polarization::StokesQ:
-							data = new TimeFrequencyData(_phaseRepresentation, Polarization::StokesQ, getFirstDiff(xxPol, yyPol));
+							newData = TimeFrequencyData(_phaseRepresentation, Polarization::StokesQ, getFirstDiff(xxPol, yyPol));
 							break;
 						default:
 							throw BadUsageException("Requested polarisation type not available in time frequency data");
 					}
 				}
-				data->SetGlobalMask(GetMask(polarisation));
 			}
 			else {
 				size_t
@@ -352,16 +352,16 @@ class TimeFrequencyData
 						switch(polarisation)
 						{
 						case Polarization::StokesI:
-							data = new TimeFrequencyData(Polarization::StokesI, getFirstSum(rrPol, llPol), getSecondSum(rrPol, llPol));
+							newData = TimeFrequencyData(Polarization::StokesI, getFirstSum(rrPol, llPol), getSecondSum(rrPol, llPol));
 							break;
 						case Polarization::StokesQ: // Q = RL + LR
-							data = new TimeFrequencyData(Polarization::StokesQ, getFirstSum(rlPol, rlPol), getSecondSum(rlPol, lrPol));
+							newData = TimeFrequencyData(Polarization::StokesQ, getFirstSum(rlPol, rlPol), getSecondSum(rlPol, lrPol));
 							break;
 						case Polarization::StokesU: // U_r = RL_i - LR_i, U_i = -RL_r + LR_r
-							data = new TimeFrequencyData(Polarization::StokesU, getSecondDiff(rlPol, lrPol), getFirstDiff(lrPol, rlPol));
+							newData = TimeFrequencyData(Polarization::StokesU, getSecondDiff(rlPol, lrPol), getFirstDiff(lrPol, rlPol));
 							break;
 						case Polarization::StokesV: // V = RR - LL
-							data = new TimeFrequencyData(Polarization::StokesV, getFirstDiff(rrPol, llPol), getSecondDiff(rrPol, llPol));
+							newData = TimeFrequencyData(Polarization::StokesV, getFirstDiff(rrPol, llPol), getSecondDiff(rrPol, llPol));
 							break;
 						default:
 							throw BadUsageException("Requested polarisation type not available in time frequency data");
@@ -372,7 +372,13 @@ class TimeFrequencyData
 				else
 					throw BadUsageException("Trying to convert the polarization in time frequency data in an invalid way");
 			}
-			return data;
+			newData.SetGlobalMask(GetMask(polarisation));
+			return newData;
+		}
+
+		TimeFrequencyData *CreateTFData(PolarizationEnum polarisation) const
+		{
+			return new TimeFrequencyData(Make(polarisation));
 		}
 
 		Image2DCPtr GetRealPart() const
@@ -1024,10 +1030,6 @@ class TimeFrequencyData
 		}
 		Mask2DCPtr GetCombinedMask() const;
 
-		//TimeFrequencyData *CreateTFDataFromSingleComplex(enum PhaseRepresentation phase) const;
-		//TimeFrequencyData *CreateTFDataFromDipoleComplex(enum PhaseRepresentation phase) const;
-		//TimeFrequencyData *CreateTFDataFromAutoDipoleComplex(enum PhaseRepresentation phase) const;
-		
 		/**
 		 * Returns the data index of the given polarisation, or _data.size() if
 		 * not found.
