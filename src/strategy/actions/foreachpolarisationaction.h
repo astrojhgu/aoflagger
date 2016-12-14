@@ -119,8 +119,13 @@ namespace rfiStrategy {
 					case Polarization::YY:
 					case Polarization::LL:
 						return _onQQ;
+					case Polarization::StokesI:
+					case Polarization::StokesQ:
+					case Polarization::StokesU:
+					case Polarization::StokesV:
+					case Polarization::Instrumental:
 					default:
-						return false;
+						return _onPP && _onPQ && _onQP && _onQQ;
 				}
 			}
 			
