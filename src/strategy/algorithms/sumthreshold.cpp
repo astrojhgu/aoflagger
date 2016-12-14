@@ -1,3 +1,9 @@
+#ifdef __SSE__
+#define USE_INTRINSICS
+#endif
+
+#ifdef USE_INTRINSICS
+
 #include <stdint.h>
 #include <xmmintrin.h>
 #include <emmintrin.h>
@@ -7,12 +13,6 @@
 #include "thresholdmitigater.h"
 
 #include "../../util/aologger.h"
-
-#ifdef __SSE__
-#define USE_INTRINSICS
-#endif
-
-#ifdef USE_INTRINSICS
 
 /**
  * The SSE version of the Vertical SumThreshold algorithm using intrinsics.
