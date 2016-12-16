@@ -193,7 +193,7 @@ void GrayScalePlotPage::initPlotOptions(Gtk::Toolbar& toolbar)
 	toolbar.append(_plotPropertiesButton);
 }
 
-void GrayScalePlotPage::updateImageImpl(QualityTablesFormatter::StatisticKind statisticKind, PolarisationType polarisation, enum TimeFrequencyData::PhaseRepresentation phase)
+void GrayScalePlotPage::updateImageImpl(QualityTablesFormatter::StatisticKind statisticKind, PolarizationEnum polarisation, enum TimeFrequencyData::PhaseRepresentation phase)
 {
 	if(_ready)
 	{
@@ -228,20 +228,20 @@ void GrayScalePlotPage::updateImage()
 	updateImageImpl(getSelectedStatisticKind(), getSelectedPolarization(), getSelectedPhase());
 }
 
-PolarisationType GrayScalePlotPage::getSelectedPolarization() const
+PolarizationEnum GrayScalePlotPage::getSelectedPolarization() const
 {
 	if(_polXXButton.get_active())
-		return XXPolarisation;
+		return Polarization::XX;
 	else if(_polXYButton.get_active())
-		return XYPolarisation;
+		return Polarization::XY;
 	else if(_polYXButton.get_active())
-		return YXPolarisation;
+		return Polarization::YX;
 	else if(_polYYButton.get_active())
-		return YYPolarisation;
-	else if(_polIButton.get_active())
-		return AutoDipolePolarisation;
+		return Polarization::YY;
+	//else if(_polIButton.get_active())
+	//	return StokesIPolarisation;
 	else
-		return AutoDipolePolarisation;
+		return Polarization::StokesI;
 }
 
 enum TimeFrequencyData::PhaseRepresentation GrayScalePlotPage::getSelectedPhase() const
@@ -258,11 +258,11 @@ enum TimeFrequencyData::PhaseRepresentation GrayScalePlotPage::getSelectedPhase(
 		return TimeFrequencyData::AmplitudePart;
 }
 
-void GrayScalePlotPage::setToPolarization(TimeFrequencyData &data, PolarisationType polarisation)
+void GrayScalePlotPage::setToPolarization(TimeFrequencyData &data, PolarizationEnum polarisation)
 {
 	try {
 		TimeFrequencyData* newData = data.CreateTFData(polarisation);
-		if(polarisation == AutoDipolePolarisation)
+		if(polarisation == Polarization::StokesI)
 			newData->MultiplyImages(0.5);
 		data = *newData;
 		delete newData;

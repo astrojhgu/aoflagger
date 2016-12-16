@@ -19,9 +19,6 @@ if(COMPILER_SUPPORTS_MARCH_NATIVE)
 	  message(STATUS "Portable build requested; a generic build will be created with slightly decreased performance")
 	endif(NOT PORTABLE)
 else()
-	# We add -msse2 because it needs the sse2 instruction set to compile some files, and
-	# this will force its inclusion in case the below -march=natve is not set.
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse2")
   message(STATUS " CXX compiler does not support -march=native : your code will not be optimized with -march=native.")
   message(STATUS " This probably means your gcc is old ( < 4.2).")
 endif(COMPILER_SUPPORTS_MARCH_NATIVE)

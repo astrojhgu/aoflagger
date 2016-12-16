@@ -23,6 +23,8 @@
 #include <gtkmm/messagedialog.h>
 
 RFIGuiController::RFIGuiController(RFIGuiWindow& rfiGuiWindow, StrategyController* strategyController) :
+	_showOriginalFlags(true), _showAlternativeFlags(true),
+	_showPP(true), _showPQ(false), _showQP(false), _showQQ(true),
 	_rfiGuiWindow(rfiGuiWindow), _strategyController(strategyController)
 {
 	_plotManager = new class PlotManager();
@@ -399,7 +401,7 @@ void RFIGuiController::OpenTestSet(unsigned index, bool gaussianTestSets)
 	Mask2DPtr rfi = Mask2D::CreateSetMaskPtr<false>(width, height);
 	Image2DPtr testSetReal(MitigationTester::CreateTestSet(index, rfi, width, height, gaussianTestSets));
 	Image2DPtr testSetImaginary(MitigationTester::CreateTestSet(2, rfi, width, height, gaussianTestSets));
-	TimeFrequencyData data(SinglePolarisation, testSetReal, testSetImaginary);
+	TimeFrequencyData data(Polarization::StokesI, testSetReal, testSetImaginary);
 	data.SetGlobalMask(rfi);
 	
 	_rfiGuiWindow.GetTimeFrequencyWidget().SetNewData(data, SelectedMetaData());
