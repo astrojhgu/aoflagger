@@ -13,6 +13,8 @@
 PlotPropertiesWindow::PlotPropertiesWindow(Plot2D &plot, const std::string &title) :
 	Gtk::Window(),
 	_plot(plot),
+	_titleEntry(),
+	
 	_applyButton("_Apply", true),
 	_exportButton("_Export", true),
 	_closeButton("_Close", true),
@@ -56,6 +58,9 @@ PlotPropertiesWindow::PlotPropertiesWindow(Plot2D &plot, const std::string &titl
 	initHRangeWidgets();
 	initOptionsWidgets();
 	initAxesDescriptionWidgets();
+	
+	_titleEntry.set_text(_plot.Title());
+	_topVBox.pack_start(_titleEntry);
 	
 	_framesHBox.pack_start(_framesRightVBox);
 	
@@ -210,6 +215,8 @@ void PlotPropertiesWindow::updateVMinMaxEntries()
 
 void PlotPropertiesWindow::onApplyClicked()
 {
+	_plot.SetTitle(_titleEntry.get_text());
+	
 	if(_minMaxVRangeButton.get_active())
 		_plot.SetVRangeDetermination(Plot2D::MinMaxRange);
 	else if(_winsorizedVRangeButton.get_active())

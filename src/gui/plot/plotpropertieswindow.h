@@ -55,6 +55,8 @@ class PlotPropertiesWindow : public Gtk::Window {
 		Gtk::HBox _framesHBox;
 		Gtk::VBox _framesRightVBox;
 		
+		Gtk::Entry _titleEntry;
+		
 		Gtk::Button _applyButton, _exportButton, _closeButton;
 		
 		Gtk::Frame _vRangeFrame;
