@@ -771,28 +771,28 @@ void RFIGuiWindow::createToolbar()
 
   _showPPButton = Gtk::ToggleAction::create("DisplayPP", "PP");
 	_showPPButton->set_active(_controller->IsPPShown());
-	_showPPButton->set_icon_name("displaypp");
+	_showPPButton->set_icon_name("showpp");
 	_showPPButton->set_tooltip("Display the PP polarization. Depending on the polarization configuration of the measurement set, this will show XX or RR");
 	_toggleConnections.push_back(_showPPButton->signal_activate().connect(sigc::mem_fun(*this, &RFIGuiWindow::onTogglePolarizations)));
 	_actionGroup->add(_showPPButton);
 	
   _showPQButton = Gtk::ToggleAction::create("DisplayPQ", "PQ");
 	_showPQButton->set_active(_controller->IsPQShown());
-	_showPQButton->set_icon_name("displaypq");
+	_showPQButton->set_icon_name("showpq");
 	_showPQButton->set_tooltip("Display the PQ polarization. Depending on the polarization configuration of the measurement set, this will show XY or RL");
 	_toggleConnections.push_back(_showPQButton->signal_activate().connect(sigc::mem_fun(*this, &RFIGuiWindow::onTogglePolarizations)));
 	_actionGroup->add(_showPQButton);
 	
   _showQPButton = Gtk::ToggleAction::create("DisplayQP", "QP");
 	_showQPButton->set_active(_controller->IsQPShown());
-	_showQPButton->set_icon_name("displayqp");
+	_showQPButton->set_icon_name("showqp");
 	_showQPButton->set_tooltip("Display the QP polarization. Depending on the polarization configuration of the measurement set, this will show YX or LR");
 	_toggleConnections.push_back(_showQPButton->signal_activate().connect(sigc::mem_fun(*this, &RFIGuiWindow::onTogglePolarizations)));
 	_actionGroup->add(_showQPButton);
 	
   _showQQButton = Gtk::ToggleAction::create("DisplayQQ", "QQ");
 	_showQQButton->set_active(_controller->IsQQShown());
-	_showQQButton->set_icon_name("displayqq");
+	_showQQButton->set_icon_name("showqq");
 	_showQQButton->set_tooltip("Display the QQ polarization. Depending on the polarization configuration of the measurement set, this will show YY or LL");
 	_toggleConnections.push_back(_showQQButton->signal_activate().connect(sigc::mem_fun(*this, &RFIGuiWindow::onTogglePolarizations)));
 	_actionGroup->add(_showQQButton);

@@ -51,7 +51,11 @@ void ImageComparisonWidget::updateVisualizedImage()
 	if(!selectedData->IsEmpty())
 	{
 		if(_showPP && _showQQ)
+		{
+			if((selectedData->HasPolarisation(Polarization::XX) && selectedData->HasPolarisation(Polarization::YY)) ||
+				(selectedData->HasPolarisation(Polarization::RR) && selectedData->HasPolarisation(Polarization::LL)))
 			image = selectedData->Make(Polarization::StokesI).GetSingleImage();
+		}
 		else if(_showQP && _showPQ)
 		{
 			if(selectedData->HasPolarisation(Polarization::XY) && selectedData->HasPolarisation(Polarization::YX))
@@ -88,7 +92,9 @@ void ImageComparisonWidget::updateVisualizedImage()
 				image = selectedData->Make(Polarization::LL).GetSingleImage();
 		}
 	}
-	if(image != 0)
+	if(image == 0)
+		Clear();
+	else
 		ImageWidget::SetImage(image);
 } 
 

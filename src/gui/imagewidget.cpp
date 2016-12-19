@@ -79,23 +79,17 @@ void ImageWidget::Clear()
 		_highlightConfig = new ThresholdConfig();
 		_highlightConfig->InitializeLengthsSingleSample();
 		_segmentedImage.reset();
+		_image.reset();
 	}
-	if(_horiScale != 0) {
-		delete _horiScale;
-		_horiScale = 0;
-	}
-	if(_vertScale != 0) {
-		delete _vertScale;
-		_vertScale = 0;
-	}
-	if(_colorScale != 0) {
-		delete _colorScale;
-		_colorScale = 0;
-	}
-	if(_plotTitle != 0) {
-		delete _plotTitle;
-		_plotTitle = 0;
-	}
+	delete _horiScale;
+	_horiScale = 0;
+	delete _vertScale;
+	_vertScale = 0;
+	delete _colorScale;
+	_colorScale = 0;
+	delete _plotTitle;
+	_plotTitle = 0;
+	_isInitialized = false;
 }
 
 bool ImageWidget::onDraw(const Cairo::RefPtr<Cairo::Context>& cr)
@@ -194,14 +188,17 @@ void ImageWidget::ZoomOut()
 
 void ImageWidget::Update()
 {
-  if(HasImage())
+	Glib::RefPtr<Gdk::Window> window = get_window();
+	if(window && get_width() > 0 && get_height() > 0)
 	{
-		Glib::RefPtr<Gdk::Window> window = get_window();
-		if(window && get_width() > 0 && get_height() > 0)
+		if(HasImage())
 		{
 			update(window->create_cairo_context(), get_width(), get_height());
 			window->invalidate(false);
 		}
+		else {
+		redrawWithoutChanges(window->create_cairo_context(), get_width(), get_height());
+		}			
 	}
 }
 
@@ -655,12 +652,12 @@ void ImageWidget::findMinMax(Image2DCPtr image, Mask2DCPtr mask, num_t &min, num
 
 void ImageWidget::redrawWithoutChanges(Cairo::RefPtr<Cairo::Context> cairo, unsigned width, unsigned height)
 {
-	if(_isInitialized) {
-		cairo->set_source_rgb(1.0, 1.0, 1.0);
-		cairo->set_line_width(1.0);
-		cairo->rectangle(0, 0, width, height);
-		cairo->fill();
+	cairo->set_source_rgb(1.0, 1.0, 1.0);
+	cairo->set_line_width(1.0);
+	cairo->rectangle(0, 0, width, height);
+	cairo->fill();
 		
+	if(_isInitialized) {
 		int
 			destWidth = width - (int) floor(_leftBorderSize + _rightBorderSize),
 			destHeight = height - (int) floor(_topBorderSize + _bottomBorderSize),
