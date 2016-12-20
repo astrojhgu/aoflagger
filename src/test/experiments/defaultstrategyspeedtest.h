@@ -364,20 +364,24 @@ inline void DefaultStrategySpeedTest::TimeSumThresholdN::operator()()
 		ThresholdMitigater::HorizontalSumThresholdLargeReference(input, maskA, length, threshold);
 		AOLogger::Info << "Horizontal, length " << length << ": " << watchA.ToString() << '\n';
 		
+#ifdef __SSE__
 		Mask2DPtr maskC = Mask2D::CreateCopy(artifacts.OriginalData().GetSingleMask());
 		Stopwatch watchC(true);
 		ThresholdMitigater::HorizontalSumThresholdLargeSSE(input, maskC, length, threshold);
 		AOLogger::Info << "Horizontal SSE, length " << length << ": " << watchC.ToString() << '\n';
+#endif
 		
 		Mask2DPtr maskB = Mask2D::CreateCopy(artifacts.OriginalData().GetSingleMask());
 		Stopwatch watchB(true);
 		ThresholdMitigater::VerticalSumThresholdLargeReference(input, maskB, length, threshold);
 		AOLogger::Info << "Vertical, length " << length << ": " << watchB.ToString() << '\n';
 		
+#ifdef __SSE__
 		Mask2DPtr maskD = Mask2D::CreateCopy(artifacts.OriginalData().GetSingleMask());
 		Stopwatch watchD(true);
 		ThresholdMitigater::VerticalSumThresholdLargeSSE(input, maskD, length, threshold);
 		AOLogger::Info << "SSE Vertical, length " << length << ": " << watchD.ToString() << '\n';
+#endif
 	}
 }
 
