@@ -47,7 +47,9 @@ class DefaultStrategySpeedTest : public UnitTest {
 			AddTest(TimeSlidingWindowFit(), "Timing sliding window fit");
 			AddTest(TimeHighPassFilter(), "Timing high-pass filter");
 			AddTest(TimeStrategy(), "Timing strategy");
+#ifdef __SSE__
 			AddTest(TimeSSEHighPassFilterStrategy(), "Timing SSE high-pass filter strategy");
+#endif
 		}
 		
 		DefaultStrategySpeedTest(const std::string &) : UnitTest("Default strategy speed test")
@@ -88,10 +90,12 @@ class DefaultStrategySpeedTest : public UnitTest {
 		{
 			void operator()();
 		};
+#ifdef __SSE__
 		struct TimeSSEHighPassFilterStrategy : public Asserter
 		{
 			void operator()();
 		};
+#endif
 		
 		static void prepareStrategy(rfiStrategy::ArtifactSet &artifacts);
 };
@@ -407,6 +411,7 @@ inline void DefaultStrategySpeedTest::TimeRankOperator::operator()()
 		<< ", " << ( operatorTime * 100.0 / totalTime) << "%\n";
 }
 
+#ifdef __SSE__
 inline void DefaultStrategySpeedTest::TimeSSEHighPassFilterStrategy::operator()()
 {
 	rfiStrategy::Strategy *strategy = new rfiStrategy::Strategy();
@@ -493,5 +498,6 @@ inline void DefaultStrategySpeedTest::TimeSSEHighPassFilterStrategy::operator()(
 	AOLogger::Info << "Default strategy took: " << watch.ToString() << '\n';
 	delete strategy;
 }
+#endif // __SSE__
 
 #endif
