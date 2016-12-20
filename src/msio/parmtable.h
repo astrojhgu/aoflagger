@@ -208,7 +208,7 @@ class ParmTable
 				if(nameId == r00)
 				{
 					const unsigned curYShape = values.shape(row)[1];
-					if(values.shape(row)[0] > curXShape)
+					if(values.shape(row)[0] > (int) curXShape)
 						curXShape = values.shape(row)[0];
 					if(startX(row) < currentX)
 						throw std::runtime_error("Table is not correctly ordered");
