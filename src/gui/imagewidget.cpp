@@ -197,8 +197,8 @@ void ImageWidget::Update()
 			window->invalidate(false);
 		}
 		else {
-		redrawWithoutChanges(window->create_cairo_context(), get_width(), get_height());
-		}			
+			redrawWithoutChanges(window->create_cairo_context(), get_width(), get_height());
+		}
 	}
 }
 
