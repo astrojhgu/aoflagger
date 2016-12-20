@@ -48,7 +48,7 @@ void SumThresholdTest::VerticalSumThresholdSSE::operator()()
 	Image2DPtr
 		real = MitigationTester::CreateTestSet(26, mask1, width, height),
 		imag = MitigationTester::CreateTestSet(26, mask2, width, height);
-	TimeFrequencyData data(XXPolarisation, real, imag);
+	TimeFrequencyData data(Polarization::XX, real, imag);
 	Image2DCPtr image = data.GetSingleImage();
 	
 	ThresholdConfig config;
@@ -91,7 +91,7 @@ void SumThresholdTest::HorizontalSumThresholdSSE::operator()()
 	real->SwapXY();
 	imag->SwapXY();
 		
-	TimeFrequencyData data(XXPolarisation, real, imag);
+	TimeFrequencyData data(Polarization::XX, real, imag);
 	Image2DCPtr image = data.GetSingleImage();
 
 	ThresholdConfig config;

@@ -111,7 +111,7 @@ inline void DefaultStrategySpeedTest::prepareStrategy(rfiStrategy::ArtifactSet &
 		yxImag = MitigationTester::CreateTestSet(26, rfi, width, height),
 		yyReal = MitigationTester::CreateTestSet(26, rfi, width, height),
 		yyImag = MitigationTester::CreateTestSet(26, rfi, width, height);
-	TimeFrequencyData data(
+	TimeFrequencyData data = TimeFrequencyData::FromLinear(
 		xxReal, xxImag, xyReal, xyImag,
 		yxReal, yxImag, yyReal, yyImag);
 	artifacts.SetOriginalData(data);
