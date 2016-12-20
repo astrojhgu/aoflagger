@@ -41,7 +41,7 @@ void HighPassFilter::applyLowPassSimple(const Image2DPtr &image)
 		const num_t kernelValue = _vKernel[i];
 		const size_t
 			yStart = (i >= vKernelMid) ? 0 : (vKernelMid-i),
-			yEnd = (i <= vKernelMid) ? image->Height() : image->Height()-i+vKernelMid;
+			yEnd = (i <= vKernelMid) ? image->Height() : ((image->Height()+vKernelMid>i) ? (image->Height()-i+vKernelMid) : 0);
 		for(unsigned y=yStart;y<yEnd;++y) {
 			for(unsigned x=0;x<image->Width();++x)
 				image->AddValue(x, y, temp->Value(x, y+i-vKernelMid)*kernelValue);
