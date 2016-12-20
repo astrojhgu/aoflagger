@@ -1,4 +1,4 @@
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -DNDEBUG -funroll-loops -O3")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -DNDEBUG -funroll-loops -O3 -std=c++11")
 
 include(CheckCXXCompilerFlag)
 include(CheckSymbolExists) 
@@ -24,9 +24,7 @@ else()
 endif(COMPILER_SUPPORTS_MARCH_NATIVE)
 
 if(COMPILER_SUPPORTS_PEDANTIC)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pedantic -Wno-long-long -Werror=vla -std=c++11")
-else(COMPILER_SUPPORTS_PEDANTIC)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pedantic -Wno-long-long -Werror=vla")
 endif(COMPILER_SUPPORTS_PEDANTIC)
 
 if(HAVE_POSIX_FALLOCATE)
