@@ -17,12 +17,15 @@ class SumThresholdTest : public UnitTest {
 	public:
 		SumThresholdTest() : UnitTest("Sumthreshold")
 		{
+#ifdef __SSE__
 			AddTest(VerticalSumThresholdSSE(), "SumThreshold optimized SSE version (vertical)");
 			AddTest(HorizontalSumThresholdSSE(), "SumThreshold optimized SSE version (horizontal)");
 			AddTest(Stability(), "SumThreshold stability");
+#endif
 		}
 		
 	private:
+#ifdef __SSE__
 		struct VerticalSumThresholdSSE : public Asserter
 		{
 			void operator()();
@@ -35,8 +38,10 @@ class SumThresholdTest : public UnitTest {
 		{
 			void operator()();
 		};
+#endif
 };
 
+#ifdef __SSE__
 void SumThresholdTest::VerticalSumThresholdSSE::operator()()
 {
 	const unsigned
@@ -144,5 +149,6 @@ void SumThresholdTest::Stability::operator()()
 		ThresholdMitigater::VerticalSumThresholdLargeSSE(realA, maskD, length, 1.0);
 	}
 }
+#endif // __SSE__
 
 #endif
