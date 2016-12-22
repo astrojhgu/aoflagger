@@ -3,7 +3,11 @@
 const double ColorScale::BAR_WIDTH = 15.0;
 
 ColorScale::ColorScale()
-: _width(0.0), _verticalPlotScale()
+: _plotWidth(0.0), _plotHeight(0.0), _topMargin(0.0),
+	_scaleWidth(0.0), _width(0.0), 
+	_min(0.0), _max(0.0),
+	_verticalPlotScale(),
+	_isLogaritmic(false)
 {
 	_verticalPlotScale.SetUnitsCaption("z");
 }

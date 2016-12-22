@@ -309,10 +309,7 @@ class SampleRow {
 			for(unsigned i=0;i<_size;++i)
 				_values[i] = source._values[i];
 		}
-		SampleRow &operator=(const SampleRow &)
-		{
-			return *this;
-		}
+		SampleRow &operator=(const SampleRow &) = delete;
 		size_t _size;
 		num_t *_values;
 		

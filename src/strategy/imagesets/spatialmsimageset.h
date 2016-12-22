@@ -20,7 +20,7 @@ namespace rfiStrategy {
 		public:
 			friend class SpatialMSImageSet;
 
-			SpatialMSImageSetIndex(ImageSet &set) : ImageSetIndex(set), _timeIndex(0), _channelIndex(0), _isValid(true)
+			explicit SpatialMSImageSetIndex(ImageSet &set) : ImageSetIndex(set), _timeIndex(0), _channelIndex(0), _isValid(true)
 			{
 			}
 			inline virtual void Previous();
@@ -52,7 +52,7 @@ namespace rfiStrategy {
 	
 	class SpatialMSImageSet : public ImageSet {
 		public:
-			SpatialMSImageSet(const std::string &location) : _set(location), _loader(_set), _cachedTimeIndex(GetTimeIndexCount())
+			explicit SpatialMSImageSet(const std::string &location) : _set(location), _loader(_set), _cachedTimeIndex(GetTimeIndexCount())
 			{
 			}
 			virtual ~SpatialMSImageSet()

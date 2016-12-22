@@ -9,7 +9,7 @@
 class DefaultStatistics : public Serializable
 {
 	public:
-		DefaultStatistics(unsigned polarizationCount) :
+		explicit DefaultStatistics(unsigned polarizationCount) :
 			_polarizationCount(polarizationCount)
 		{
 			initialize();

@@ -7,10 +7,12 @@
 Plot2D::Plot2D() :
 	_width(640),
 	_height(480),
+	_topMargin(0.0),
 	_logarithmicXAxis(false),
 	_logarithmicYAxis(false),
 	_showAxes(true),
 	_showAxisDescriptions(true),
+	_specifiedMinX(0.0), _specifiedMaxX(0.0), _specifiedMinY(0.0), _specifiedMaxY(0.0),
 	_hRangeDetermination(MinMaxRange),
 	_vRangeDetermination(MinMaxRange)
 {
@@ -85,10 +87,10 @@ void Plot2D::render(Cairo::RefPtr<Cairo::Context> cr)
 	cr->paint();
 	cr->fill();
 
-	size_t c = 0;
-	
 	if(!_pointSets.empty())
 	{
+		size_t c = 0;
+	
 		Plot2DPointSet &refPointSet = **_pointSets.begin();
 		
 		double verticalScaleWidth, horiScaleHeight;

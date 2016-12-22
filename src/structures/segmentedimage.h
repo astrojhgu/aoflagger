@@ -105,6 +105,8 @@ class SegmentedImage{
 			for(size_t y=0;y<height;++y)
 				_data[y] = new size_t[width];
 		}
+		SegmentedImage(const SegmentedImage&) = delete;
+		SegmentedImage& operator=(const SegmentedImage&) = delete;
 		
 		size_t _width, _height;
 		size_t **_data;

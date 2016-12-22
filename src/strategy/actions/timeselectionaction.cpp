@@ -7,7 +7,6 @@
 #include "../../structures/samplerow.h"
 
 #include "../algorithms/medianwindow.h"
-#include "../algorithms/rfistatistics.h"
 
 #include "../control/artifactset.h"
 

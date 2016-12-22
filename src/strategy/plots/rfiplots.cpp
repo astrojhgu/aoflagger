@@ -11,7 +11,6 @@
 
 #include "../algorithms/sinusfitter.h"
 #include "../algorithms/thresholdtools.h"
-#include "../algorithms/rfistatistics.h"
 
 #include "../../gui/plot/plot2d.h"
 
@@ -249,9 +248,9 @@ void RFIPlots::MakeFittedComplexPlot(Plot2DPointSet &pointSet, const TimeFrequen
 	Image2DCPtr real = data.GetRealPart();
 	Image2DCPtr imaginary = data.GetImaginaryPart();
 
-	num_t *xReal = new num_t[length];
-	num_t *xImag = new num_t[length];
-	num_t *t = new num_t[length];
+	std::vector<num_t> xReal(length);
+	std::vector<num_t> xImag(length);
+	std::vector<num_t> t(length);
 	size_t dataIndex = 0;
 
 	for(size_t x=xStart;x<xStart + length;++x)
@@ -287,11 +286,11 @@ void RFIPlots::MakeFittedComplexPlot(Plot2DPointSet &pointSet, const TimeFrequen
 	//fitter.FindPhaseAndAmplitude(imagPhase, imagAmplitude, xImag, t, dataIndex, frequency*twopi);
 	//realMean = fitter.FindMean(realPhase, realAmplitude, xReal, t, dataIndex, frequency*twopi);
 	//imagMean = fitter.FindMean(imagPhase, imagAmplitude, xImag, t, dataIndex, frequency*twopi);
-	fitter.FindPhaseAndAmplitudeComplex(realPhase, realAmplitude, xReal, xImag, t, dataIndex, frequency*twopi);
+	fitter.FindPhaseAndAmplitudeComplex(realPhase, realAmplitude, xReal.data(), xImag.data(), t.data(), dataIndex, frequency*twopi);
 	imagPhase = realPhase + 0.5*M_PIn;
 	imagAmplitude = realAmplitude;
-	realMean = fitter.FindMean(realPhase, realAmplitude, xReal, t, dataIndex, frequency*twopi);
-	imagMean = fitter.FindMean(imagPhase, imagAmplitude, xImag, t, dataIndex, frequency*twopi);
+	realMean = fitter.FindMean(realPhase, realAmplitude, xReal.data(), t.data(), dataIndex, frequency*twopi);
+	imagMean = fitter.FindMean(imagPhase, imagAmplitude, xImag.data(), t.data(), dataIndex, frequency*twopi);
 
 	std::cout << "Amplitude found: " << realAmplitude << " phase found: " << realPhase << std::endl;
 
@@ -308,10 +307,6 @@ void RFIPlots::MakeFittedComplexPlot(Plot2DPointSet &pointSet, const TimeFrequen
 			pointSet.PushDataPoint(x,
 				cosn(frequency*twopi*(long double) x + realPhase) * realAmplitude + realMean);
 	}
-
-	delete t;
-	delete xReal;
-	delete xImag;
 }
 
 void RFIPlots::MakeTimeScatterPlot(class MultiPlot &plot, size_t plotIndex, Image2DCPtr image, Mask2DCPtr mask, TimeFrequencyMetaDataCPtr metaData)
@@ -511,11 +506,33 @@ void RFIPlots::MakeSNRSpectrumPlot(Plot2DPointSet &plot, Image2DCPtr image, Imag
 	long double min = 1e100, max = 0.0;
 
 	for(size_t y=0;y<image->Height();++y) {
-		num_t v = RFIStatistics::FrequencySNR(image, model, mask, y);
+		num_t v = FrequencySNR(image, model, mask, y);
 
 		if(v < min) min = v;
 		if(v > max) max = v;
 		plot.PushDataPoint(y, v);
 	}
 	plot.SetYRange(min, max);
+}
+
+num_t RFIPlots::FrequencySNR(Image2DCPtr image, Image2DCPtr model, Mask2DCPtr mask, unsigned channel)
+{
+	num_t sum = 0.0;
+	size_t count = 0;
+	for(unsigned x=0;x<image->Width();++x)
+	{
+		if(!mask->Value(x, channel))
+		{
+			num_t noise = fabsn(image->Value(x, channel) - model->Value(x, channel));
+			num_t signal = fabsn(model->Value(x, channel));
+			if(std::isfinite(signal) && std::isfinite(noise))
+			{
+				num_t snr = logn(signal / noise);
+				sum += snr;
+	
+				++count;
+			}
+		}
+	}
+	return expn(sum / count);
 }

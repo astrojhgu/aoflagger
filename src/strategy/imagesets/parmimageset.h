@@ -48,7 +48,7 @@ namespace rfiStrategy {
 	
 	class ParmImageSet : public ImageSet {
 		public:
-			ParmImageSet(const std::string &path) : _path(path), _parmTable(0)
+			ParmImageSet(const std::string &path) : _path(path), _parmTable(nullptr)
 			{
 			}
 			virtual ~ParmImageSet();

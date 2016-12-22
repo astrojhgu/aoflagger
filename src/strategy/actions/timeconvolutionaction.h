@@ -506,13 +506,13 @@ private:
 						posU = iterData.rowUPositions[t],
 						posV = iterData.rowVPositions[t],
 						posFactor = posU * 2.0 * M_PInl;
-					numl_t
-						realVal = 0.0,
-						imagVal = 0.0;
-					bool residual = false;
 
 					if(posV != 0.0)
 					{
+						numl_t
+							realVal = 0.0,
+							imagVal = 0.0;
+						bool residual = false;
 						const numl_t weightSum = 1.0; //(endXf - startXf); // * fabsnl(posV / posU);
 						// compute f(x) = \\int F(xF) * exp( 2 * \\pi * i * x * xF )
 						size_t xF, loopEnd;

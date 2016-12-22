@@ -46,7 +46,6 @@ rfiStrategy::BaselineData* rfiStrategy::PngReader::Read()
 	fclose(fp);
 				
 	Image2DPtr image = Image2D::CreateZeroImagePtr(width, height);
-	std::ifstream file(_path.c_str());
 	size_t bytesPerSample = 4;
 	for(size_t f=0;f<height;++f)
 	{

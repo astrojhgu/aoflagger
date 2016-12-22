@@ -162,7 +162,6 @@ std::pair<TimeFrequencyData,TimeFrequencyMetaDataPtr> RSPReader::ReadAllBeamlets
 	std::ifstream file(_rawFile.c_str(), std::ios_base::binary | std::ios_base::in);
 	size_t frame = 0;
 	std::set<short> stations;
-	std::set<unsigned int> timestamps;
 	
 	TimeFrequencyMetaDataPtr metaData = TimeFrequencyMetaDataPtr(new TimeFrequencyMetaData());
 	BandInfo band;

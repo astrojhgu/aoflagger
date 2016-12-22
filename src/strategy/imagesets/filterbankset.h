@@ -14,7 +14,7 @@ namespace rfiStrategy {
 		public:
 			friend class FilterBankSet;
 			
-			FilterBankSetIndex(class rfiStrategy::ImageSet &set) :
+			explicit FilterBankSetIndex(class rfiStrategy::ImageSet &set) :
 				ImageSetIndex(set), _intervalIndex(0), _isValid(true)
 			{ }
 			
@@ -36,7 +36,7 @@ namespace rfiStrategy {
 	
 	class FilterBankSet : public ImageSet {
 		public:
-			FilterBankSet(const std::string &location);
+			explicit FilterBankSet(const std::string &location);
 			
 			~FilterBankSet()
 			{ }

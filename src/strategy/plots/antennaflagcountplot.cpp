@@ -76,17 +76,6 @@ void AntennaFlagCountPlot::MakePlot()
 	plot.Show();
 }
 
-void AntennaFlagCountPlot::WriteCounts()
-{
-	std::ofstream file("antenna-vs-counts.txt");
-	file << std::setprecision(14);
-	for(std::map<int, MapItem>::const_iterator i=_counts.begin();i!=_counts.end();++i)
-	{
-		file << i->second.name << "\t" << (100.0L * (long double) i->second.autoCount / (long double) i->second.autoTotal) << "\t" << (100.0L * (long double) i->second.crossCount / (long double) i->second.crossTotal) << "\n";
-	}
-	file.close();
-}
-
 void AntennaFlagCountPlot::Report()
 {
 	for(std::map<int, MapItem>::const_iterator i=_counts.begin();i!=_counts.end();++i)

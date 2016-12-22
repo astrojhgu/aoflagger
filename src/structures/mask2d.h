@@ -15,15 +15,17 @@ class Mask2D {
 		~Mask2D();
 
 		// This method assumes equal height and width.
-		void operator=(Mask2DCPtr source)
+		Mask2D& operator=(Mask2DCPtr source)
 		{
 			memcpy(_valuesConsecutive, source->_valuesConsecutive, _stride * _height * sizeof(bool));
+			return *this;
 		}
 
 		// This method assumes equal height and width.
-		void operator=(const Mask2D &source)
+		Mask2D& operator=(const Mask2D &source)
 		{
 			memcpy(_valuesConsecutive, source._valuesConsecutive, _stride * _height * sizeof(bool));
+			return *this;
 		}
 		
 		/**
@@ -330,6 +332,7 @@ class Mask2D {
 		}
 	private:
 		Mask2D(size_t width, size_t height);
+		Mask2D(const Mask2D&) = delete;
 
 		size_t _width, _height;
 		size_t _stride;

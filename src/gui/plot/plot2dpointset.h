@@ -11,7 +11,9 @@
 class Plot2DPointSet{
 	public:
 		Plot2DPointSet() :
-			_rotateUnits(false)
+			_xIsTime(false),
+			_rotateUnits(false),
+			_drawingStyle(DrawLines)
 		{ }
 		~Plot2DPointSet() { }
 		

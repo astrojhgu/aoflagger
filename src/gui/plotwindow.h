@@ -13,7 +13,7 @@
 
 class PlotWindow : public Gtk::Window {
 	public:
-		PlotWindow(class PlotManager &plotManager);
+		explicit PlotWindow(class PlotManager &plotManager);
 		
 		~PlotWindow();
 		

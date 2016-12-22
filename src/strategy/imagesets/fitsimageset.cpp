@@ -505,7 +505,7 @@ namespace rfiStrategy {
 		const int totalSize = _file->GetTableColumnArraySize(dataColumn);
 		const int rowCount = _file->GetRowCount();
 		std::vector<double> cellData(totalSize);
-		bool *flagData = new bool[totalSize];
+		std::unique_ptr<bool[]> flagData ( new bool[totalSize] );
 		std::vector<Mask2DCPtr> storedFlags = flags;
 		if(flags.size()==1)
 		{
@@ -534,7 +534,7 @@ namespace rfiStrategy {
 				AOLogger::Debug << row << "\n";
 				_file->ReadTableCell(row, dataColumn, &cellData[0], totalSize);
 				double *dataPtr = &cellData[0];
-				bool *flagPtr = flagData;
+				bool *flagPtr = flagData.get();
 				
 				for(int p=0;p<polarizationCount;++p)
 				{
@@ -553,11 +553,10 @@ namespace rfiStrategy {
 				}
 				
 				_file->WriteTableCell(row, dataColumn, &cellData[0], totalSize);
-				_file->WriteTableCell(row, flagColumn, flagData, totalSize);
+				_file->WriteTableCell(row, flagColumn, flagData.get(), totalSize);
 				++timeIndex;
 			}
 		}
-		delete[] flagData;
 	}
 	
 	void FitsImageSetIndex::Previous()

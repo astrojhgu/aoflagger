@@ -31,7 +31,7 @@ class ProgressListener
 		}
 		size_t Depth() const { return _totals.size(); }
 	public:
-		ProgressListener() { }
+		ProgressListener() : _taskProgress(0) { }
 		virtual ~ProgressListener() { }
 
 		inline virtual void OnStartTask(const rfiStrategy::Action &action, size_t taskNo, size_t taskCount, const std::string &/*description*/, size_t weight = 1);

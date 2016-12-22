@@ -227,7 +227,7 @@ class ContrastMap : public ColorMap {
 	private:
 		const ColorMap *_map;
 	public:
-		ContrastMap(const std::string type) :
+		explicit ContrastMap(const std::string& type) :
 			_map(CreateColorMap(type)) { }
 		~ContrastMap() { delete _map; }
 		unsigned char ValueToColorR(long double value) const { return _map->ValueToColorR(value>=0.0 ? sqrt(value) : -sqrt(-value)); }
@@ -244,7 +244,7 @@ class PosLogMap : public ColorMap {
 	private:
 		const ColorMap &_map;
 	public:
-		PosLogMap(const ColorMap &map) :
+		explicit PosLogMap(const ColorMap &map) :
 			_map(map) { }
 		~PosLogMap() { }
 		unsigned char ValueToColorR(long double value) const { return value >= 0.0  ? _map.ValueToColorR((log10(value*0.9999+0.0001)+2.0)/2.0) : _map.ValueToColorR(-1.0); }
@@ -268,7 +268,7 @@ class FullLogMap : public ColorMap {
 	private:
 		const ColorMap &_map;
 	public:
-		FullLogMap(const ColorMap &map) :
+		explicit FullLogMap(const ColorMap &map) :
 			_map(map) { }
 		~FullLogMap() { }
 		unsigned char ValueToColorR(long double value) const { return _map.ValueToColorR((log10(value*0.49995+0.50005)+2.0)/2.0); }

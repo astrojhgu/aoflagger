@@ -498,6 +498,9 @@ class Image2D {
 		Image2D(size_t width, size_t height);
 		Image2D(size_t width, size_t height, size_t widthCapacity);
 		
+		Image2D(const Image2D&) = delete;
+		Image2D& operator=(const Image2D&) = delete;
+		
 		size_t _width, _height;
 		size_t _stride;
 		num_t **_dataPtr, *_dataConsecutive;

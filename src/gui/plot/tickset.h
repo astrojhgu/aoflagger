@@ -252,20 +252,6 @@ class LogarithmicTickSet : public TickSet
 						base *= 10.0;
 					} while(base < _max);
 				}
-				// can we add two and five?
-				else if((_ticks.size()+1)*3 < sizeRequest)
-				{
-					double base = tickStart / 10.0;
-					do {
-						for(double i=2.0;i<6.0;i+=3.0)
-						{
-							double val = base * i;
-							if(val >= _min && val <= _max)
-								_ticks.push_back(val);
-						}
-						base *= 10.0;
-					} while(base < _max);
-				}
 				// can we add five?
 				else if((_ticks.size()+1)*2 < sizeRequest)
 				{
@@ -295,11 +281,6 @@ class LogarithmicTickSet : public TickSet
 				return number;
 			const double l = log10(number);
 			return exp10(floor(l));
-		}
-		
-		double roundUpToNiceNumber(double number, double roundUnit) const
-		{
-			return roundUnit * ceil(number / roundUnit);
 		}
 		
 		double _min, _minLog10, _max, _maxLog10;

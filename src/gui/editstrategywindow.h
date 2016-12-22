@@ -18,7 +18,7 @@
 class EditStrategyWindow : public Gtk::Window
 {
 	public:
-		EditStrategyWindow(class StrategyController &strategyController);
+		explicit EditStrategyWindow(class StrategyController &strategyController);
 		~EditStrategyWindow();
 
 		void AddAction(rfiStrategy::Action *newAction);

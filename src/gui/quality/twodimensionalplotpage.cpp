@@ -97,7 +97,7 @@ void TwoDimensionalPlotPage::updatePlotConfig()
 	_plotWidget.Update();
 }
 
-double TwoDimensionalPlotPage::getValue(enum PhaseType phase, const std::complex<long double> val)
+double TwoDimensionalPlotPage::getValue(enum PhaseType phase, const std::complex<long double>& val)
 {
 	switch(phase)
 	{

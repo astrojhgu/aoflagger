@@ -82,7 +82,6 @@ namespace rfiStrategy {
 					times.insert(times.begin(), newMetaData->ObservationTimes().begin() +_startTimeSteps, newMetaData->ObservationTimes().end()-(_startTimeSteps+_endTimeSteps));
 					newMetaData->SetObservationTimes(times);
 				}
-				return TimeFrequencyMetaDataPtr(newMetaData);
 				if(newMetaData->HasBand())
 				{
 					BandInfo band(newMetaData->Band());
@@ -90,6 +89,7 @@ namespace rfiStrategy {
 					band.channels.erase(band.channels.begin(), band.channels.begin() + _topChannels);
 					newMetaData->SetBand(band);
 				}
+				return TimeFrequencyMetaDataPtr(newMetaData);
 			}
 			void PlaceBack(class TimeFrequencyData &cuttedData, class TimeFrequencyData &oldData)
 			{

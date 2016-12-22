@@ -9,7 +9,7 @@
 
 class AddStrategyActionMenu : public Gtk::Menu {
 	public:
-		AddStrategyActionMenu(class EditStrategyWindow &editStrategyWindow) :
+		explicit AddStrategyActionMenu(class EditStrategyWindow &editStrategyWindow) :
 		_editStrategyWindow(editStrategyWindow)
 		{
 			std::vector<std::string> actions = rfiStrategy::ActionFactory::GetActionList();
@@ -32,7 +32,7 @@ class AddStrategyActionMenu : public Gtk::Menu {
 		}
 		
 	private:
-		void onActionSelected(const std::string str)
+		void onActionSelected(const std::string& str)
 		{
 			_editStrategyWindow.AddAction(rfiStrategy::ActionFactory::CreateAction(str));
 		}

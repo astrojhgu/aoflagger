@@ -15,7 +15,7 @@ namespace rfiStrategy {
 	class StrategyWriterError : public std::runtime_error
 	{
 		public:
-			StrategyWriterError(const std::string &arg) : std::runtime_error(arg) { }
+			explicit StrategyWriterError(const std::string &arg) : std::runtime_error(arg) { }
 	};
 
 	class StrategyWriter : private XmlWriter {

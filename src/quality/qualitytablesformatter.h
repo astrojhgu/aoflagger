@@ -94,7 +94,7 @@ class QualityTablesFormatter {
 			double frequency;
 		};
 		
-		QualityTablesFormatter(const std::string &measurementSetName) :
+		explicit QualityTablesFormatter(const std::string &measurementSetName) :
 			_measurementSet(0),
 			_measurementSetName(measurementSetName),
 			_kindNameTable(0),
@@ -245,8 +245,8 @@ class QualityTablesFormatter {
 		
 		unsigned GetPolarizationCount();
 	private:
-		QualityTablesFormatter(const QualityTablesFormatter &) { } // don't allow copies
-		void operator=(const QualityTablesFormatter &) { } // don't allow assignment
+		QualityTablesFormatter(const QualityTablesFormatter &) = delete; // don't allow copies
+		void operator=(const QualityTablesFormatter &) = delete; // don't allow assignment
 		
 		const static std::string _kindToNameTable[];
 		const static std::string _tableToNameTable[];

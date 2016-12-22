@@ -52,7 +52,7 @@ class DefaultStrategySpeedTest : public UnitTest {
 #endif
 		}
 		
-		DefaultStrategySpeedTest(const std::string &) : UnitTest("Default strategy speed test")
+		explicit DefaultStrategySpeedTest(const std::string &) : UnitTest("Default strategy speed test")
 		{
 			AddTest(TimeSumThresholdN(), "Timing varying SumThreshold method");
 		}

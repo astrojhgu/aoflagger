@@ -19,7 +19,7 @@ namespace rfiStrategy {
 	class	ArtifactSet
 	{
 		public:
-			ArtifactSet(boost::mutex *ioMutex) : _metaData(), _sensitivity(1.0L), _projectedDirectionRad(0.0L), _imageSet(0),
+			explicit ArtifactSet(boost::mutex *ioMutex) : _metaData(), _sensitivity(1.0L), _projectedDirectionRad(0.0L), _imageSet(0),
 			_imageSetIndex(0), _imager(0),
 			_ioMutex(ioMutex),
 			_antennaFlagCountPlot(0), _frequencyFlagCountPlot(0),

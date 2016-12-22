@@ -6,7 +6,7 @@
 class Title
 {
 	public:
-		Title() : _metricsAreInitialized(false), _fontSize(16)
+		Title() : _metricsAreInitialized(false), _plotWidth(0.0), _plotHeight(0.0), _topMargin(0.0), _fontSize(16), _height(0.0)
 		{
 		}
 		void SetPlotDimensions(double plotWidth, double plotHeight, double topMargin)

@@ -18,7 +18,21 @@ namespace rfiStrategy {
 
 	class ForEachBaselineAction : public ActionBlock {
 		public:
-			ForEachBaselineAction() : _threadCount(4), _selection(CrossCorrelations), _resultSet(0), _exceptionOccured(false),  _hasInitAntennae(false)
+			ForEachBaselineAction() :
+				_baselineCount(0),
+				_nextIndex(0),
+				_threadCount(4),
+				_selection(CrossCorrelations),
+				_loopIndex(nullptr),
+				_artifacts(nullptr),
+				_resultSet(nullptr),
+				_finishedBaselines(false),
+				_progressTaskNo(nullptr),
+				_progressTaskCount(nullptr),
+				_exceptionOccured(false),
+				_baselineProgress(0),
+				_hasInitAntennae(false),
+				_initPartIndex(0)
 			{
 			}
 			virtual ~ForEachBaselineAction()
@@ -59,7 +73,7 @@ namespace rfiStrategy {
 			
 			void SetExceptionOccured();
 			void SetFinishedBaselines();
-			void SetProgress(ProgressListener &progress, int no, int count, std::string taskName, int threadId);
+			void SetProgress(ProgressListener &progress, int no, int count, const std::string& taskName, int threadId);
 			size_t mathThreadCount() const
 			{
 				// Since IO also takes some CPU, and IO should not be
@@ -133,7 +147,7 @@ namespace rfiStrategy {
 			
 			struct ReaderFunction
 			{
-				ReaderFunction(ForEachBaselineAction &action)
+				explicit ReaderFunction(ForEachBaselineAction &action)
 				  : _action(action)
 				{
 				}

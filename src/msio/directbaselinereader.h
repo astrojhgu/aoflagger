@@ -35,12 +35,13 @@ class DirectBaselineReader : public BaselineReader {
 				spectralWindow(source.spectralWindow), sequenceId(source.sequenceId)
 			{
 			}
-			void operator=(const BaselineCacheIndex &source)
+			BaselineCacheIndex& operator=(const BaselineCacheIndex &source)
 			{
 				antenna1 = source.antenna1;
 				antenna2 = source.antenna2;
 				spectralWindow = source.spectralWindow;
 				sequenceId = source.sequenceId;
+				return *this;
 			}
 			bool operator==(const BaselineCacheIndex &rhs) const
 			{
@@ -78,9 +79,10 @@ class DirectBaselineReader : public BaselineReader {
 			{ }
 			BaselineCacheValue(const BaselineCacheValue &source) : rows(source.rows)
 			{ }
-			void operator=(const BaselineCacheValue &source)
+			BaselineCacheValue& operator=(const BaselineCacheValue &source)
 			{
 				rows = source.rows;
+				return *this;
 			}
 		};
 		

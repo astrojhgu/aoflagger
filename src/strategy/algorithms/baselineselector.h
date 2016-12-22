@@ -34,7 +34,7 @@ namespace rfiStrategy {
 					marked(source.marked)
 				{
 				}
-				void operator=(const SingleBaselineInfo &source)
+				SingleBaselineInfo& operator=(const SingleBaselineInfo &source)
 				{
 					antenna1 = source.antenna1;
 					antenna2 = source.antenna2;
@@ -46,6 +46,7 @@ namespace rfiStrategy {
 					rfiCount = source.rfiCount;
 					totalCount = source.totalCount;
 					marked = source.marked;
+					return *this;
 				}
 				bool operator<(const SingleBaselineInfo &rhs) const
 				{

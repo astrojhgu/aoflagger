@@ -32,37 +32,6 @@ class RSPReader {
 	private:
 		static const unsigned char BitReverseTable256[256];
 
-		static void readNetworkOrder(std::ifstream &stream, char *buffer, unsigned length)
-		{
-			std::vector<char> swappedBuffer(length);
-			stream.read(&swappedBuffer[0], length);
-			for(unsigned i=0,j=length-1;i<length;++i,--j)
-				buffer[j] = swappedBuffer[i];
-		}
-		static unsigned char reverse(unsigned char c)
-		{
-			return BitReverseTable256[c];
-		}
-		static unsigned short reverse(unsigned short c)
-		{
-			return
-				BitReverseTable256[c >> 8] |
-				(BitReverseTable256[c &0xFF]<<8);
-		}
-		static signed short reverse(signed short c)
-		{
-			return
-				BitReverseTable256[c >> 8] |
-				(BitReverseTable256[c &0xFF]<<8);
-		}
-		static unsigned int reverse(unsigned int c)
-		{
-			return
-				BitReverseTable256[c >> 24] |
-				(BitReverseTable256[(c >> 16)&0xFF]<<8) |
-				(BitReverseTable256[(c >> 8)&0xFF]<<16) |
-				(BitReverseTable256[c & 0xFF]<<24);
-		}
 		static signed short toShort(unsigned char c1, unsigned char c2)
 		{
 			return (c2<<8) | c1;

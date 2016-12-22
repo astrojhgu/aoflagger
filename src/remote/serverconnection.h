@@ -51,7 +51,7 @@ class ServerConnection : public boost::enable_shared_from_this<ServerConnection>
 		
 		const Hostname &GetHostname() const { return _hostname; }
 	private:
-		ServerConnection(boost::asio::io_service &ioService);
+		explicit ServerConnection(boost::asio::io_service &ioService);
 		boost::asio::ip::tcp::socket _socket;
 		Hostname _hostname;
 		

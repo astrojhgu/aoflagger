@@ -19,8 +19,16 @@ namespace rfiStrategy {
 	class Strategy : public ActionBlock
 	{
 		public:
-			Strategy() throw() : _thread(0) { }
-			virtual ~Strategy() { JoinThread(); }
+			Strategy() noexcept :
+				_threadFunc(nullptr),
+				_thread(nullptr)
+			{
+				
+			}
+			virtual ~Strategy() {
+				ArtifactSet* artifacts = JoinThread();
+				delete artifacts;
+			}
 
 			virtual std::string Description() { return "Strategy"; }
 
@@ -47,8 +55,8 @@ namespace rfiStrategy {
 		protected:
 		private:
 			/** Copying prohibited */
-			Strategy(const Strategy &) { }
-			Strategy &operator=(const Strategy &) { return *this; }
+			Strategy(const Strategy &) = delete;
+			Strategy &operator=(const Strategy &) = delete;
 			
 			struct PerformFunc {
 				PerformFunc(class Strategy *strategy, class ArtifactSet *artifacts, class ProgressListener *progress)

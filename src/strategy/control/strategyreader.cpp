@@ -4,7 +4,6 @@
 
 #include "../actions/absthresholdaction.h"
 #include "../actions/action.h"
-#include "../actions/addstatisticsaction.h"
 #include "../actions/baselineselectionaction.h"
 #include "../actions/calibratepassbandaction.h"
 #include "../actions/changeresolutionaction.h"
@@ -221,8 +220,6 @@ Action *StrategyReader::parseAction(xmlNode *node)
 	std::string typeStr((const char*) typeCh);
 	if(typeStr == "AbsThresholdAction")
 		newAction = parseAbsThresholdAction(node);
-	else if(typeStr == "AddStatisticsAction")
-		newAction = parseAddStatistics(node);
 	else if(typeStr == "BaselineSelectionAction")
 		newAction = parseBaselineSelectionAction(node);
 	else if(typeStr == "CalibratePassbandAction")
@@ -308,6 +305,7 @@ Action *StrategyReader::parseAbsThresholdAction(xmlNode *node)
 	return newAction;
 }
 
+/*
 Action *StrategyReader::parseAddStatistics(xmlNode *node)
 {
 	AddStatisticsAction *newAction = new AddStatisticsAction();
@@ -317,7 +315,7 @@ Action *StrategyReader::parseAddStatistics(xmlNode *node)
 	newAction->SetPerformClassification(getBool(node, "perform-classification"));
 	newAction->SetWriteImmediately(getBool(node, "write-immediately"));
 	return newAction;
-}
+}*/
 
 Action *StrategyReader::parseBaselineSelectionAction(xmlNode *node)
 {

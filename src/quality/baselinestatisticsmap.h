@@ -12,7 +12,7 @@
 class BaselineStatisticsMap : public Serializable
 {
 	public:
-		BaselineStatisticsMap(unsigned polarizationCount) : _polarizationCount(polarizationCount)
+		explicit BaselineStatisticsMap(unsigned polarizationCount) : _polarizationCount(polarizationCount)
 		{
 		}
 		

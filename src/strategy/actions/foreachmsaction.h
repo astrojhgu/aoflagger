@@ -45,7 +45,7 @@ namespace rfiStrategy {
 			void SetSubtractModel(bool subtractModel) { _subtractModel = subtractModel; }
 
 			std::string CommandLineForHistory() const { return _commandLineForHistory; }
-			void SetCommandLineForHistory(const std::string cmd) { _commandLineForHistory = cmd; }
+			void SetCommandLineForHistory(const std::string& cmd) { _commandLineForHistory = cmd; }
 			
 			bool SkipIfAlreadyProcessed() const { return _skipIfAlreadyProcessed; }
 			void SetSkipIfAlreadyProcessed(bool value) { _skipIfAlreadyProcessed = value; }

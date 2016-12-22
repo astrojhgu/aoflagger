@@ -58,12 +58,12 @@ class RemoteProcess
 			return _clientHostName;
 		}
 	private:
-		RemoteProcess(const RemoteProcess &source) { }
-		void operator=(const RemoteProcess &source) { }
+		RemoteProcess(const RemoteProcess &source) = delete;
+		void operator=(const RemoteProcess &source) = delete;
 		
 		struct ThreadFunctor
 		{
-			ThreadFunctor(RemoteProcess &process) : _remoteProcess(process) { }
+			explicit ThreadFunctor(RemoteProcess &process) : _remoteProcess(process) { }
 			RemoteProcess &_remoteProcess;
 			void operator()()
 			{

@@ -70,8 +70,8 @@ void Morphology::SegmentByLengthRatio(Mask2DCPtr mask, SegmentedImagePtr output)
 		for(size_t x=0;x<mask->Width();++x)
 			output->SetValue(x, y, 0);
 	}
-	StatisticalFlagger::EnlargeFlags(matrices[0], _hLineEnlarging, 0);
-	StatisticalFlagger::EnlargeFlags(matrices[2], 0, _vLineEnlarging);
+	StatisticalFlagger::DilateFlags(matrices[0], _hLineEnlarging, 0);
+	StatisticalFlagger::DilateFlags(matrices[2], 0, _vLineEnlarging);
 	StatisticalFlagger::DensityTimeFlagger(matrices[0], _hDensityEnlargeRatio);
 	StatisticalFlagger::DensityFrequencyFlagger(matrices[2], _vDensityEnlargeRatio);
 
@@ -332,7 +332,7 @@ void Morphology::floodFill(Mask2DCPtr mask, SegmentedImagePtr output, Mask2DPtr 
 		if(p.x < mask->Width()-1 && matrix->Value(p.x+1,p.y))
 		{
 			MorphologyPoint3D newP;
-			newP.x = p.x+1; newP.y = p.y; newP.z = p.z; newP.z = p.z;
+			newP.x = p.x+1; newP.y = p.y; newP.z = p.z;
 			points.push(newP);
 		}
 		if(p.y > 0 && matrix->Value(p.x,p.y-1))

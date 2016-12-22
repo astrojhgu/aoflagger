@@ -167,17 +167,13 @@ void DirectBaselineReader::PerformReadRequests()
 	casacore::ROArrayColumn<float> weightColumn(table, "WEIGHT");
 	casacore::ROArrayColumn<double> uvwColumn(table, "UVW");
 	casacore::ROArrayColumn<bool> flagColumn(table, "FLAG");
-	casacore::ROArrayColumn<casacore::Complex> *modelColumn;
-
-	casacore::ROArrayColumn<casacore::Complex> *dataColumn = 0;
+	std::unique_ptr<casacore::ROArrayColumn<casacore::Complex>> modelColumn, dataColumn;
+	
 	if(ReadData())
-		dataColumn = new casacore::ROArrayColumn<casacore::Complex>(table, DataColumnName());
+		dataColumn.reset( new casacore::ROArrayColumn<casacore::Complex>(table, DataColumnName()) );
 
-	if(SubtractModel()) {
-		modelColumn = new casacore::ROArrayColumn<casacore::Complex>(table, "MODEL_DATA");
-	} else {
-		modelColumn = 0;
-	}
+	if(SubtractModel())
+		modelColumn.reset( new casacore::ROArrayColumn<casacore::Complex>(table, "MODEL_DATA") );
 
 	for(std::vector<std::pair<size_t, size_t> >::const_iterator i=rows.begin();i!=rows.end();++i) {
 		size_t rowIndex = i->first;
@@ -214,8 +210,6 @@ void DirectBaselineReader::PerformReadRequests()
 			_results[requestIndex]._uvw[timeIndex-startIndex].w = *i;
 		}
 	}
-	if(dataColumn != 0)
-		delete dataColumn;
 	
 	AOLogger::Debug << "Time of ReadRequests(): " << stopwatch.ToString() << '\n';
 

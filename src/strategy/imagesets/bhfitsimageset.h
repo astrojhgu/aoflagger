@@ -18,7 +18,7 @@ namespace rfiStrategy {
 	class BHFitsImageSetIndex : public ImageSetIndex {
 		friend class BHFitsImageSet;
 		
-  BHFitsImageSetIndex(class rfiStrategy::ImageSet &set) : ImageSetIndex(set), _imageIndex(0), _isValid(true) { }
+  explicit BHFitsImageSetIndex(class rfiStrategy::ImageSet &set) : ImageSetIndex(set), _imageIndex(0), _isValid(true) { }
 		
 		virtual void Previous();
 		virtual void Next();
@@ -39,7 +39,7 @@ namespace rfiStrategy {
 	class BHFitsImageSet : public ImageSet
 	{
 		public:
-			BHFitsImageSet(const std::string &file);
+			explicit BHFitsImageSet(const std::string &file);
 			~BHFitsImageSet();
 			virtual void Initialize();
 
@@ -95,11 +95,12 @@ namespace rfiStrategy {
 			  {
 			  }
 
-			  void operator=(const TimeRange &source)
+			  TimeRange& operator=(const TimeRange &source)
 			  {
 			    start = source.start;
 			    end = source.end;
 			    name = source.name;
+return *this;
 			  }
 			};
 

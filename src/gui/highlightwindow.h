@@ -10,7 +10,7 @@
 
 class HighlightWindow : public Gtk::Window {
 	public:
-		HighlightWindow(class RFIGuiWindow &rfiGuiWindow);
+		explicit HighlightWindow(class RFIGuiWindow &rfiGuiWindow);
 		~HighlightWindow();
 	private:
 		void onValueChange();

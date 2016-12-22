@@ -17,7 +17,7 @@ class HistogramCollection : public Serializable
 	public:
 		typedef std::pair<unsigned, unsigned> AntennaPair;
 		
-		HistogramCollection() : _polarizationCount(0)
+		HistogramCollection() : _polarizationCount(0), _totalHistograms(nullptr), _rfiHistograms(nullptr)
 		{
 		}
 		

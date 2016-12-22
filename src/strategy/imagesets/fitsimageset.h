@@ -18,7 +18,7 @@ namespace rfiStrategy {
 	class FitsImageSetIndex : public ImageSetIndex {
 		friend class FitsImageSet;
 		
-		FitsImageSetIndex(class rfiStrategy::ImageSet &set) : ImageSetIndex(set), _baselineIndex(0), _band(0), _field(0), _isValid(true) { }
+		explicit FitsImageSetIndex(class rfiStrategy::ImageSet &set) : ImageSetIndex(set), _baselineIndex(0), _band(0), _field(0), _isValid(true) { }
 		
 		virtual void Previous();
 		virtual void Next();
@@ -41,7 +41,7 @@ namespace rfiStrategy {
 	class FitsImageSet : public ImageSet
 	{
 		public:
-			FitsImageSet(const std::string &file);
+			explicit FitsImageSet(const std::string &file);
 			~FitsImageSet();
 			virtual void Initialize();
 
@@ -84,13 +84,6 @@ namespace rfiStrategy {
 		private:
 			FitsImageSet(const FitsImageSet &source);
 			BaselineData loadData(const ImageSetIndex &index);
-			
-			size_t getAntenna1(const ImageSetIndex &index) {
-				return _baselines[static_cast<const FitsImageSetIndex&>(index)._baselineIndex].first;
-			}
-			size_t getAntenna2(const ImageSetIndex &index) {
-				return _baselines[static_cast<const FitsImageSetIndex&>(index)._baselineIndex].second;
-			}
 			
 			void ReadPrimarySingleTable(TimeFrequencyData &data, TimeFrequencyMetaData &metaData);
 			void ReadTable(TimeFrequencyData &data, TimeFrequencyMetaData &metaData, size_t bandIndex);

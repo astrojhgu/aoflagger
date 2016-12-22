@@ -17,7 +17,7 @@ namespace rfiStrategy {
 
 	class PngReader : public SingleImageSet {
 		public:
-			PngReader(const std::string &path) : SingleImageSet(), _path(path)
+			explicit PngReader(const std::string &path) : SingleImageSet(), _path(path)
 			{
 			}
 

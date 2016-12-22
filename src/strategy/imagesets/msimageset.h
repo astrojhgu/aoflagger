@@ -21,7 +21,7 @@ namespace rfiStrategy {
 		public:
 			friend class MSImageSet;
 			
-			MSImageSetIndex(class rfiStrategy::ImageSet &set) : ImageSetIndex(set), _sequenceIndex(0), _isValid(true) { }
+			explicit MSImageSetIndex(class rfiStrategy::ImageSet &set) : ImageSetIndex(set), _sequenceIndex(0), _isValid(true) { }
 			
 			virtual void Previous();
 			virtual void Next();
@@ -50,6 +50,9 @@ namespace rfiStrategy {
 				_readDipoleAutoPolarisations(true),
 				_readDipoleCrossPolarisations(true),
 				_readStokesI(false),
+				_bandCount(0),
+				_fieldCount(0),
+				_sequencesPerBaselineCount(0),
 				_scanCountPartOverlap(100),
 				_readFlags(true),
 				_readUVW(false),
@@ -131,7 +134,7 @@ namespace rfiStrategy {
 				_subtractModel = subtractModel;
 			}
 
-			void SetReadAllPolarisations() throw()
+			void SetReadAllPolarisations()
 			{
 				if(_reader != 0)
 					throw std::runtime_error("Trying to set polarization to read after creating the reader!");
@@ -139,7 +142,7 @@ namespace rfiStrategy {
 				_readDipoleCrossPolarisations = true;
 				_readStokesI = false;
 			}
-			void SetReadDipoleAutoPolarisations() throw()
+			void SetReadDipoleAutoPolarisations()
 			{
 				if(_reader != 0)
 					throw std::runtime_error("Trying to set polarization to read after creating the reader!");
@@ -147,7 +150,7 @@ namespace rfiStrategy {
 				_readDipoleCrossPolarisations = false;
 				_readStokesI = false;
 			}
-			void SetReadStokesI() throw()
+			void SetReadStokesI()
 			{
 				if(_reader != 0)
 					throw std::runtime_error("Trying to set polarization to read after creating the reader!");
@@ -196,8 +199,6 @@ namespace rfiStrategy {
 			{ }
 			size_t StartIndex(const MSImageSetIndex &index);
 			size_t EndIndex(const MSImageSetIndex &index);
-			size_t LeftBorder(const MSImageSetIndex &index);
-			size_t RightBorder(const MSImageSetIndex &index);
 			void initReader();
 			size_t FindBaselineIndex(size_t antenna1, size_t antenna2, size_t band, size_t sequenceId);
 			TimeFrequencyMetaDataCPtr createMetaData(const ImageSetIndex &index, std::vector<UVW> &uvw);

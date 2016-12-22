@@ -15,7 +15,7 @@ namespace rfiStrategy {
 	
 	class ImageSetIndex {
 		public:
-			ImageSetIndex(ImageSet &set) : _set(&set) { }
+			explicit ImageSetIndex(ImageSet &set) : _set(&set) { }
 			virtual ~ImageSetIndex() { }
 			virtual void Previous() = 0;
 			virtual void Next() = 0;
@@ -31,19 +31,19 @@ namespace rfiStrategy {
 	
 	class BaselineData {
 		public:
-			BaselineData(TimeFrequencyData data, TimeFrequencyMetaDataCPtr metaData, const ImageSetIndex &index)
+			BaselineData(const TimeFrequencyData& data, const TimeFrequencyMetaDataCPtr& metaData, const ImageSetIndex &index)
 			: _data(data), _metaData(metaData), _index(index.Copy())
 			{
 			}
-			BaselineData(const ImageSetIndex &index)
+			explicit BaselineData(const ImageSetIndex &index)
 			: _data(), _metaData(), _index(index.Copy())
 			{
 			}
-			BaselineData(TimeFrequencyData data, TimeFrequencyMetaDataCPtr metaData)
+			BaselineData(const TimeFrequencyData& data, const TimeFrequencyMetaDataCPtr& metaData)
 			: _data(data), _metaData(metaData), _index(0)
 			{
 			}
-			BaselineData(TimeFrequencyMetaDataCPtr metaData)
+			explicit BaselineData(const TimeFrequencyMetaDataCPtr& metaData)
 			: _data(), _metaData(metaData), _index(0)
 			{
 			}
@@ -51,7 +51,7 @@ namespace rfiStrategy {
 			: _data(), _metaData(), _index(0)
 			{
 			}
-			BaselineData(const BaselineData &source)
+			BaselineData(const BaselineData& source)
 			: _data(source._data), _metaData(source._metaData), _index(0)
 			{
 				if(source._index != 0) _index = source._index->Copy();
@@ -61,13 +61,14 @@ namespace rfiStrategy {
 				if(_index != 0)
 					delete _index;
 			}
-			void operator=(const BaselineData &source)
+			BaselineData& operator=(const BaselineData &source)
 			{
 				if(_index != 0)
 					delete _index;
 				_data = source._data;
 				_metaData = source._metaData;
 				_index = source._index->Copy();
+				return *this;
 			}
 			const TimeFrequencyData &Data() const { return _data; }
 			void SetData(const TimeFrequencyData &data) { _data = data; }

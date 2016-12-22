@@ -43,8 +43,9 @@ class RFIPlots{
 		 */
 		static void Bin(Image2DCPtr image, Mask2DCPtr mask, std::vector<size_t> &valuesOutput, std::vector<long double> &binsOutput, size_t binCount, long double start=0.0, long double end=0.0, long double factor=1.0, long double stretch=1.0) throw();
 
-		RFIPlots() { }
-		~RFIPlots() { }
+		static num_t FrequencySNR(Image2DCPtr image, Image2DCPtr model, Mask2DCPtr mask, unsigned channel);
+
+		RFIPlots() = delete;
 };
 
 #endif

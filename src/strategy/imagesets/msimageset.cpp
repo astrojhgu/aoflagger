@@ -82,34 +82,12 @@ namespace rfiStrategy {
 
 	size_t MSImageSet::StartIndex(const MSImageSetIndex &index)
 	{
-		//size_t startIndex =
-		//	(_timeScanCount * index._partIndex) / _partCount - LeftBorder(index);
-		//return startIndex;
 		return 0;
 	}
 
 	size_t MSImageSet::EndIndex(const MSImageSetIndex &index)
 	{
-		//size_t endIndex =
-		//	(_timeScanCount * (index._partIndex+1)) / _partCount + RightBorder(index);
-		//return endIndex;
 		return _reader->Set().GetObservationTimesSet(GetSequenceId(index)).size();
-	}
-
-	size_t MSImageSet::LeftBorder(const MSImageSetIndex &index)
-	{
-		//if(index._partIndex > 0)
-		//	return _scanCountPartOverlap/2;
-		//else
-			return 0;
-	}
-
-	size_t MSImageSet::RightBorder(const MSImageSetIndex &index)
-	{
-		//if(index._partIndex + 1 < _partCount)
-		//	return _scanCountPartOverlap/2 + _scanCountPartOverlap%2;
-		//else
-			return 0;
 	}
 
 	std::vector<double> MSImageSet::ObservationTimesVector(const ImageSetIndex &index)

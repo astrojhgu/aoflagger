@@ -179,7 +179,7 @@ class TimeFrequencyMetaData
 			_valueUnits = valueUnits;
 		}
 	private:
-		void operator=(const TimeFrequencyMetaData &) { }
+		void operator=(const TimeFrequencyMetaData &) = delete;
 		
 		AntennaInfo *_antenna1;
 		AntennaInfo *_antenna2;

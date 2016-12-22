@@ -74,7 +74,7 @@ class TwoDimensionalPlotPage : public PlotSheet {
 		void updatePlotConfig();
 		void updateDataWindow();
 		
-		inline double getValue(enum PhaseType Phase, const std::complex<long double> val);
+		inline double getValue(enum PhaseType Phase, const std::complex<long double>& val);
 		
 		std::set<QualityTablesFormatter::StatisticKind> getSelectedKinds() const;
 		std::set<std::pair<unsigned, unsigned> > getSelectedPolarizations() const;

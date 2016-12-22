@@ -579,7 +579,7 @@ void WritePolarizationForLinearPols(casacore::MeasurementSet& ms, bool flagRow =
 	flagRowCol.put(rowIndex, flagRow);
 }
 
-void actionCombine(const std::string outFilename, const std::vector<std::string> inFilenames)
+void actionCombine(const std::string& outFilename, const std::vector<std::string>& inFilenames)
 {
 	if(!inFilenames.empty())
 	{
@@ -840,7 +840,7 @@ int main(int argc, char *argv[])
 				int argi = 2;
 				bool histograms = false, timeFrequency = false;
 				const char* dataColumnName = "DATA";
-				while(argv[argi][0] == '-' && argi < argc)
+				while(argi < argc && argv[argi][0] == '-')
 				{
 					std::string p = &argv[argi][1];
 					if(p == "h")

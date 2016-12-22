@@ -10,7 +10,7 @@
 class HistogramWindow : public Gtk::Window
 {
 	public:
-		HistogramWindow(const HistogramCollection &histograms)
+		explicit HistogramWindow(const HistogramCollection &histograms)
 		{
 			_histogramPage.SetHistograms(&histograms);
 			add(_histogramPage);

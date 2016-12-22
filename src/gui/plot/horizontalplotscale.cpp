@@ -2,8 +2,14 @@
 
 #include "tickset.h"
 
-HorizontalPlotScale::HorizontalPlotScale()
-	: _plotWidth(0), _plotHeight(0), _metricsAreInitialized(false), _tickSet(0), _drawWithDescription(true), _unitsCaption("x"), _descriptionFontSize(14), _tickValuesFontSize(14), _rotateUnits(false), _isLogarithmic(false)
+HorizontalPlotScale::HorizontalPlotScale() :
+	_plotWidth(0.0), _plotHeight(0.0),
+	_topMargin(0.0), _verticalScaleWidth(0.0),
+	_metricsAreInitialized(false), _height(0.0), _rightMargin(0.0), _tickSet(nullptr),
+	_drawWithDescription(true), _unitsCaption("x"),
+	_descriptionFontSize(14),
+	_tickValuesFontSize(14),
+	_rotateUnits(false), _isLogarithmic(false)
 {
 }
 

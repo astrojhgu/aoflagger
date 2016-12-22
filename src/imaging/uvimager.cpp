@@ -388,57 +388,6 @@ void UVImager::GetUVPosition(num_t &u, num_t &v, size_t timeIndex, size_t freque
 	num_t frequency = metaData->Band().channels[frequencyIndex].frequencyHz;
 	u = metaData->UVW()[timeIndex].u * frequency / SpeedOfLight();
 	v = metaData->UVW()[timeIndex].v * frequency / SpeedOfLight();
-	return;
-	const Baseline &baseline = metaData->Baseline();
-	num_t delayDirectionRA = metaData->Field().delayDirectionRA;
-	num_t delayDirectionDec = metaData->Field().delayDirectionDec;
-	double time = metaData->ObservationTimes()[timeIndex];
-
-	num_t pointingLattitude = delayDirectionRA;
-	num_t earthLattitudeAngle = Date::JDToHourOfDay(Date::AipsMJDToJD(time))*M_PIn/12.0L;
-
-	// Rotate baseline plane towards source, first rotate around x axis, then around z axis
-	num_t raRotation = earthLattitudeAngle - pointingLattitude + M_PIn*0.5L;
-	num_t raCos = cosn(-raRotation);
-	num_t raSin = sinn(-raRotation);
-
-	num_t dx = baseline.antenna1.x - baseline.antenna2.x;
-	num_t dy = baseline.antenna1.y - baseline.antenna2.y;
-	num_t dz = baseline.antenna1.z - baseline.antenna2.z;
-
-	num_t decCos = cosn(delayDirectionDec);
-	num_t decSin = sinn(delayDirectionDec);
-
-	num_t
-		du = -dx * raCos * decSin - dy * raSin - dz * raCos * decCos,
-		dv = -dx * raSin * decSin + dy * raCos - dz * raSin * decCos;
-
-  /*
-	num_t dxProjected = tmpCos*dx - tmpSin*dy;
-	num_t tmpdy = tmpSin*dx + tmpCos*dy;
-
-	num_t dyProjected = tmpCos*tmpdy - tmpSin*dz;*/
-
-	// du = dx*cosn(ra) - dy*sinn(ra)
-	// dv = ( dx*sinn(ra) + dy*cosn(ra) ) * cosn(-dec) - dz * sinn(-dec)
-	// Now, the newly projected positive z axis of the baseline points to the field
-	num_t baselineLength = sqrtn(du*du + dv*dv);
-
-	num_t baselineAngle;
-	if(baselineLength == 0.0)
-		baselineAngle = 0.0;
-	else {
-		baselineLength *= frequency / SpeedOfLight();
-		if(du > 0.0L)
-			baselineAngle = atann(du/dv);
-		else
-			baselineAngle = M_PIn - atann(du/-dv);
-	}
-	u = cosn(baselineAngle)*baselineLength;
-	v = -sinn(baselineAngle)*baselineLength;
-
-	std::cout << "Calced: " << u << "," << v
-		<< ", ori: " << metaData->UVW()[timeIndex].u << "," << metaData->UVW()[timeIndex].v << "(," << metaData->UVW()[timeIndex].w << ")\n";
 }
 
 void UVImager::GetUVPosition(num_t &u, num_t &v, const SingleFrequencySingleBaselineData &data, const AntennaCache &cache)

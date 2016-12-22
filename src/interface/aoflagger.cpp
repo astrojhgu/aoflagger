@@ -47,7 +47,7 @@ namespace aoflagger {
 	
 	class ImageSetData {
 		public:
-			ImageSetData(size_t initialSize) : images(initialSize)
+			explicit ImageSetData(size_t initialSize) : images(initialSize)
 			{
 			}
 			
@@ -56,9 +56,10 @@ namespace aoflagger {
 			{
 			}
 			
-			void operator=(const ImageSetData &source)
+			ImageSetData& operator=(const ImageSetData &source)
 			{
 				images = source.images;
+				return* this;
 			}
 			
 			std::vector<Image2DPtr> images;
@@ -166,7 +167,7 @@ namespace aoflagger {
 	
 	class FlagMaskData {
 		public:
-			FlagMaskData(Mask2DPtr theMask) : mask(theMask)
+			explicit FlagMaskData(Mask2DPtr theMask) : mask(theMask)
 			{
 			}
 			
@@ -175,9 +176,10 @@ namespace aoflagger {
 			{
 			}
 			
-			void operator=(const FlagMaskData &source)
+			FlagMaskData& operator=(const FlagMaskData &source)
 			{
 				mask = source.mask;
+				return *this;
 			}
 			
 			Mask2DPtr mask;
@@ -240,7 +242,7 @@ namespace aoflagger {
 	
 	class StrategyData {
 		public:
-			StrategyData(rfiStrategy::Strategy *strategy)
+			explicit StrategyData(rfiStrategy::Strategy *strategy)
 			: strategyPtr(strategy)
 			{
 			}
@@ -250,9 +252,10 @@ namespace aoflagger {
 			{
 			}
 			
-			void operator=(const StrategyData& source)
+			StrategyData& operator=(const StrategyData& source)
 			{
 				strategyPtr = source.strategyPtr;
+				return *this;
 			}
 			
 			boost::shared_ptr<rfiStrategy::Strategy> strategyPtr;
@@ -314,7 +317,7 @@ namespace aoflagger {
 				_implementation(new QualityStatisticsDataImp(_scanTimes, nScans, nPolarizations, computeHistograms))
 			{
 			}
-			QualityStatisticsData(boost::shared_ptr<QualityStatisticsDataImp> implementation) :
+			explicit QualityStatisticsData(boost::shared_ptr<QualityStatisticsDataImp> implementation) :
 				_implementation(implementation)
 			{
 			}
@@ -365,7 +368,7 @@ namespace aoflagger {
 	
 	class ForwardingListener : public ProgressListener {
 	public:
-		ForwardingListener(StatusListener* destination) : _destination(destination)
+		explicit ForwardingListener(StatusListener* destination) : _destination(destination)
 		{ }
 		virtual void OnStartTask(const rfiStrategy::Action &, size_t taskNo, size_t taskCount, const std::string &description, size_t weight) {
 			_destination->OnStartTask(taskNo, taskCount, description); }

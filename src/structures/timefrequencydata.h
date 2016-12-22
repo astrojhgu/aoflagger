@@ -782,134 +782,6 @@ class TimeFrequencyData
 				return _data[0]._images[0];
 		}
 
-		Image2DCPtr GetRealPartFromDipole(PolarizationEnum polarisation) const
-		{
-			switch(polarisation)
-			{
-				default:
-				case Polarization::XX: return _data[0]._images[0];
-				case Polarization::XY: return _data[1]._images[0];
-				case Polarization::YX: return _data[2]._images[0];
-				case Polarization::YY: return _data[3]._images[0];
-			}
-		}
-
-		Image2DCPtr GetRealPartFromAutoDipole(PolarizationEnum polarisation) const
-		{
-			switch(polarisation)
-			{
-				default:
-				case Polarization::XX: return _data[0]._images[0];
-				case Polarization::YY: return _data[1]._images[0];
-			}
-		}
-
-		Image2DCPtr GetRealPartFromCrossDipole(PolarizationEnum polarisation) const
-		{
-			switch(polarisation)
-			{
-				case Polarization::XY: return _data[0]._images[0];
-				case Polarization::YX: return _data[1]._images[0];
-				default: throw BadUsageException("Could not extract real part for given polarisation");
-			}
-		}
-
-		Image2DCPtr GetImaginaryPartFromDipole(PolarizationEnum polarisation) const
-		{
-			switch(polarisation)
-			{
-				case Polarization::XX: return _data[0]._images[1];
-				case Polarization::XY: return _data[1]._images[1];
-				case Polarization::YX: return _data[2]._images[1];
-				case Polarization::YY: return _data[3]._images[1];
-				default: throw BadUsageException("Could not extract imaginary part for given polarisation");
-			}
-		}
-
-		Image2DCPtr GetImaginaryPartFromAutoDipole(PolarizationEnum polarisation) const
-		{
-			switch(polarisation)
-			{
-				case Polarization::XX: return _data[0]._images[1];
-				case Polarization::YY: return _data[1]._images[1];
-				default: throw BadUsageException("Could not extract imaginary part for given polarisation");
-			}
-		}
-
-		Image2DCPtr GetImaginaryPartFromCrossDipole(PolarizationEnum polarisation) const
-		{
-			switch(polarisation)
-			{
-				case Polarization::XY: return _data[0]._images[1];
-				case Polarization::YX: return _data[1]._images[1];
-				default: throw BadUsageException("Could not extract imaginary part for given polarisation");
-			}
-		}
-
-		Image2DCPtr GetAmplitudePartFromDipole(PolarizationEnum polarisation) const
-		{
-			switch(polarisation)
-			{
-				case Polarization::XX: return getAbsoluteFromComplex(0);
-				case Polarization::XY: return getAbsoluteFromComplex(1);
-				case Polarization::YX: return getAbsoluteFromComplex(2);
-				case Polarization::YY: return getAbsoluteFromComplex(3);
-				default: throw BadUsageException("Could not extract amplitude part for given polarisation");
-			}
-		}
-
-		Image2DCPtr GetAmplitudePartFromAutoDipole(PolarizationEnum polarisation) const
-		{
-			switch(polarisation)
-			{
-				case Polarization::XX: return getAbsoluteFromComplex(0);
-				case Polarization::YY: return getAbsoluteFromComplex(1);
-				default: throw BadUsageException("Could not extract amplitude part for given polarisation");
-			}
-		}
-
-		Image2DCPtr GetAmplitudePartFromCrossDipole(PolarizationEnum polarisation) const
-		{
-			switch(polarisation)
-			{
-				case Polarization::XY: return getAbsoluteFromComplex(0);
-				case Polarization::YX: return getAbsoluteFromComplex(1);
-				default: throw BadUsageException("Could not extract amplitude part for given polarisation");
-			}
-		}
-
-		Image2DCPtr GetPhasePartFromDipole(PolarizationEnum polarisation) const
-		{
-			switch(polarisation)
-			{
-				case Polarization::XX: return getPhaseFromComplex(0);
-				case Polarization::XY: return getPhaseFromComplex(1);
-				case Polarization::YX: return getPhaseFromComplex(2);
-				case Polarization::YY: return getPhaseFromComplex(3);
-				default: throw BadUsageException("Could not extract phase part for given polarisation");
-			}
-		}
-
-		Image2DCPtr GetPhasePartFromAutoDipole(PolarizationEnum polarisation) const
-		{
-			switch(polarisation)
-			{
-				case Polarization::XX: return getPhaseFromComplex(0);
-				case Polarization::YY: return getPhaseFromComplex(1);
-				default: throw BadUsageException("Could not extract phase part for given polarisation");
-			}
-		}
-
-		Image2DCPtr GetPhasePartFromCrossDipole(PolarizationEnum polarisation) const
-		{
-			switch(polarisation)
-			{
-				case Polarization::XY: return getPhaseFromComplex(0);
-				case Polarization::YX: return getPhaseFromComplex(1);
-				default: throw BadUsageException("Could not extract phase part for given polarisation");
-			}
-		}
-
 		void CopyFlaggingTo(TimeFrequencyData *data) const
 		{
 			if(MaskCount() == 0)
@@ -927,39 +799,12 @@ class TimeFrequencyData
 			}
 		}
 		
-		/*Image2DCPtr GetSingleAbsoluteFromComplexDipole() const
-		{
-			Image2DCPtr real = getFirstSum(0, 3);
-			Image2DCPtr imag = getSecondSum(0, 3);
-			return GetAbsoluteFromComplex(real, imag);
-		}
-
-		Image2DCPtr GetSingleAbsoluteFromComplexAutoDipole() const
-		{
-			Image2DCPtr real = getFirstSum(0, 1);
-			Image2DCPtr imag = getSecondSum(0, 1);
-			return GetAbsoluteFromComplex(real, imag);
-		}
-
-		Image2DCPtr GetSingleAbsoluteFromComplexCrossDipole() const
-		{
-			Image2DCPtr real = getFirstSum(0, 1);
-			Image2DCPtr imag = getSecondSum(0, 1);
-			return GetAbsoluteFromComplex(real, imag);
-		}*/
-
 		Image2DCPtr getAbsoluteFromComplex(size_t polIndex) const
 		{
 			return GetAbsoluteFromComplex(_data[polIndex]._images[0], _data[polIndex]._images[1]);
 		}
 
-		Image2DCPtr getPhaseFromComplex(size_t polIndex) const
-		{
-			return GetPhaseFromComplex(_data[polIndex]._images[0], _data[polIndex]._images[1]);
-		}
-		
 		Image2DCPtr GetAbsoluteFromComplex(const Image2DCPtr &real, const Image2DCPtr &imag) const;
-		Image2DCPtr GetPhaseFromComplex(const Image2DCPtr &real, const Image2DCPtr &imag) const;
 
 		Image2DCPtr getFirstSum(size_t dataIndexA, size_t dataIndexB) const
 		{
@@ -1020,7 +865,7 @@ class TimeFrequencyData
 		Image2DCPtr GetDifference(const Image2DCPtr &left, const Image2DCPtr &right) const;
 
 		Image2DCPtr getSinglePhaseFromTwoPolPhase(size_t polA, size_t polB) const;
-		Image2DCPtr GetZeroImage() const;
+		//Image2DCPtr GetZeroImage() const;
 		template<bool InitValue>
 		Mask2DCPtr GetSetMask() const
 		{

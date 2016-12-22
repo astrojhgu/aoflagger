@@ -1,7 +1,6 @@
 #include "strategywriter.h"
 
 #include "../actions/absthresholdaction.h"
-#include "../actions/addstatisticsaction.h"
 #include "../actions/baselineselectionaction.h"
 #include "../actions/calibratepassbandaction.h"
 #include "../actions/changeresolutionaction.h"
@@ -85,12 +84,6 @@ namespace rfiStrategy {
 				break;
 			case ActionBlockType:
 				throw std::runtime_error("Can not store action blocks");
-			//case AdapterType:
-			//	writeAdapter(static_cast<const Adapter&>(action));
-			//	break;
-			case AddStatisticsActionType:
-				writeAddStatisticsAction(static_cast<const AddStatisticsAction&>(action));
-				break;
 			case BaselineSelectionActionType:
 				writeBaselineSelectionAction(static_cast<const BaselineSelectionAction&>(action));
 				break;
@@ -218,16 +211,6 @@ namespace rfiStrategy {
 		Write<num_t>("threshold", action.Threshold());
 	}
 	
-	void StrategyWriter::writeAddStatisticsAction(const AddStatisticsAction &action)
-	{
-		Attribute("type", "AddStatisticsAction");
-		Write("file-prefix", action.FilePrefix().c_str());
-		Write("compare-original-and-alternative", action.CompareOriginalAndAlternative());
-		Write("separate-baseline-statistics", action.SeparateBaselineStatistics());
-		Write("perform-classification", action.PerformClassification());
-		Write("write-immediately", action.WriteImmediately());
-	}
-
 	void StrategyWriter::writeBaselineSelectionAction(const class BaselineSelectionAction &action)
 	{
 		Attribute("type", "BaselineSelectionAction");

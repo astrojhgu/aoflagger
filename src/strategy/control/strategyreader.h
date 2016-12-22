@@ -12,7 +12,7 @@ namespace rfiStrategy {
 	class StrategyReaderError : public std::runtime_error
 	{
 		public:
-			StrategyReaderError(const std::string &arg) : std::runtime_error(arg) { }
+			explicit StrategyReaderError(const std::string &arg) : std::runtime_error(arg) { }
 	};
 
 class StrategyReader {
@@ -35,7 +35,7 @@ class StrategyReader {
 		bool getBool(xmlNode *node, const char *name) const { return getInt(node,name) != 0; }
 
 		class Action *parseAbsThresholdAction(xmlNode *node);
-		class Action *parseAddStatistics(xmlNode *node);
+		//class Action *parseAddStatistics(xmlNode *node);
 		class Action *parseBaselineSelectionAction(xmlNode *node);
 		class Action *parseCalibratePassbandAction(xmlNode *node);
 		class Action *parseChangeResolutionAction(xmlNode *node);

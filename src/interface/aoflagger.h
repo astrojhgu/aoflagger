@@ -337,7 +337,7 @@ namespace aoflagger {
 		private:
 			Strategy(enum TelescopeId telescopeId, unsigned strategyFlags, double frequency=0.0, double timeRes=0.0, double frequencyRes=0.0);
 			
-			Strategy(const std::string& filename);
+			explicit Strategy(const std::string& filename);
 			
 			class StrategyData *_data;
 	};
@@ -731,11 +731,11 @@ namespace aoflagger {
 		private:
 			/** @brief It is not allowed to copy this class
 			 */
-			AOFlagger(const AOFlagger&) { }
+			AOFlagger(const AOFlagger&) = delete;
 			
 			/** @brief It is not allowed to assign to this class
 			 */
-			void operator=(const AOFlagger&) { }
+			void operator=(const AOFlagger&) = delete;
 			
 			StatusListener* _statusListener;
 	};

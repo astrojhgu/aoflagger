@@ -19,7 +19,7 @@ namespace rfiStrategy
 class QualityStatImageSet : public SingleImageSet
 {
 public:
-	QualityStatImageSet(const std::string& filename) :
+	explicit QualityStatImageSet(const std::string& filename) :
 		_filename(filename),
 		_statisticKind(QualityTablesFormatter::StandardDeviationStatistic)
 	{

@@ -10,7 +10,8 @@ namespace rfiStrategy {
 	
 	BHFitsImageSet::BHFitsImageSet(const std::string &file) :
 		ImageSet(),
-		_file(new FitsFile(file))
+		_file(new FitsFile(file)),
+		_width(0), _height(0)
 	{
 		AOLogger::Debug << "Opening bhfits file: '" << file << "'\n";
 		try {

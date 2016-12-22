@@ -28,11 +28,6 @@ Image2DCPtr TimeFrequencyData::getSinglePhaseFromTwoPolPhase(size_t polA, size_t
 	return StokesImager::CreateAvgPhase(_data[polA]._images[0], _data[polB]._images[0]);
 }
 
-Image2DCPtr TimeFrequencyData::GetZeroImage() const
-{
-	return Image2D::CreateZeroImagePtr(ImageWidth(), ImageHeight());
-}
-
 Mask2DCPtr TimeFrequencyData::GetCombinedMask() const
 {
 	if(MaskCount() == 0)
@@ -222,7 +217,3 @@ void TimeFrequencyData::JoinMask(const TimeFrequencyData &other)
 		throw BadUsageException("Joining time frequency flagging with incompatible structures");
 }
 
-Image2DCPtr TimeFrequencyData::GetPhaseFromComplex(const Image2DCPtr &real, const Image2DCPtr &imag) const
-{
-	return FFTTools::CreatePhaseImage(real, imag);
-}

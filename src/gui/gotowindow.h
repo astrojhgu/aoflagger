@@ -17,7 +17,7 @@
 
 class GoToWindow : public Gtk::Window {
 	public:
-		GoToWindow(class RFIGuiWindow &rfiGuiWindow);
+		explicit GoToWindow(class RFIGuiWindow &rfiGuiWindow);
 		~GoToWindow();
 	private:
 		void onLoadClicked();

@@ -12,7 +12,7 @@ namespace rfiStrategy {
 
 	class SingleImageSetIndex : public ImageSetIndex {
 		public:
-			SingleImageSetIndex(ImageSet &set, std::string description) : ImageSetIndex(set), _valid(true), _description(description) { }
+			SingleImageSetIndex(ImageSet &set, const std::string& description) : ImageSetIndex(set), _valid(true), _description(description) { }
 			virtual ~SingleImageSetIndex() { }
 			virtual void Previous() { _valid = false; }
 			virtual void Next() { _valid = false; }

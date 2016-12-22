@@ -2,7 +2,6 @@
 
 #include "../actions/absthresholdaction.h"
 #include "../actions/action.h"
-#include "../actions/addstatisticsaction.h"
 #include "../actions/baselineselectionaction.h"
 #include "../actions/calibratepassbandaction.h"
 #include "../actions/changeresolutionaction.h"
@@ -46,7 +45,6 @@ const std::vector<std::string> ActionFactory::GetActionList()
 {
 	std::vector<std::string> list;
 	list.push_back("Absolute threshold");
-	list.push_back("Add to statistics");
 	list.push_back("Baseline selection");
 	list.push_back("Calibrate passband");
 	list.push_back("Change resolution");
@@ -91,8 +89,6 @@ Action *ActionFactory::CreateAction(const std::string &action)
 {
 	if(action == "Absolute threshold")
 		return new AbsThresholdAction();
-	else if(action == "Add to statistics")
-		return new AddStatisticsAction();
 	else if(action == "Baseline selection")
 		return new BaselineSelectionAction();
 	else if(action == "Calibrate passband")

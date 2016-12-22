@@ -9,7 +9,7 @@
 
 class Plot {
 	public:
-		Plot(const std::string &pdfFile);
+		explicit Plot(const std::string &pdfFile);
 		~Plot();
 		void StartLine() { StartLine(""); }
 		void StartLine(const std::string &lineTitle);

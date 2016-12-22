@@ -13,7 +13,7 @@ extern "C" {
 	      integer *lwork, doublereal *rwork, integer *info);
 }
 
-SVDMitigater::SVDMitigater() : _background(0), _singularValues(0), _leftSingularVectors(0), _rightSingularVectors(0), _iteration(0), _removeCount(10),  _verbose(false)
+SVDMitigater::SVDMitigater() : _background(0), _singularValues(0), _leftSingularVectors(0), _rightSingularVectors(0), _m(0), _n(0), _iteration(0), _removeCount(10),  _verbose(false)
 {
 }
 

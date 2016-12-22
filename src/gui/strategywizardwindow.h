@@ -15,7 +15,7 @@
 class StrategyWizardWindow : public Gtk::Window
 {
 public:
-	StrategyWizardWindow(class StrategyController &controller);
+	explicit StrategyWizardWindow(class StrategyController &controller);
 private:
 	class StrategyController &_strategyController;
 	

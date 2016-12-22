@@ -22,7 +22,7 @@
 class XYSwappedMask2D
 {
 	public:
-		inline XYSwappedMask2D(Mask2D &mask) : _mask(mask)
+		explicit XYSwappedMask2D(Mask2D &mask) : _mask(mask)
 		{
 		}
 		

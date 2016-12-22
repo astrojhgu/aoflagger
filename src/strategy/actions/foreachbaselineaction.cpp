@@ -372,7 +372,7 @@ namespace rfiStrategy {
 		AOLogger::Debug << "Time spent on reading: " << watch.ToString() << '\n';
 	}
 
-	void ForEachBaselineAction::SetProgress(ProgressListener &progress, int no, int count, std::string taskName, int threadId)
+	void ForEachBaselineAction::SetProgress(ProgressListener &progress, int no, int count, const std::string& taskName, int threadId)
 	{
 	  boost::mutex::scoped_lock lock(_mutex);
 		_progressTaskNo[threadId] = no;

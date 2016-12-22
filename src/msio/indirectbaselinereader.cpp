@@ -215,7 +215,7 @@ void IndirectBaselineReader::reorderFull()
 	if(rowCount == 0)
 		throw std::runtime_error("Measurement set is empty (zero rows)");
 
-	casacore::ROArrayColumn<casacore::Complex> *dataColumn = new casacore::ROArrayColumn<casacore::Complex>(table, DataColumnName());
+	std::unique_ptr<casacore::ROArrayColumn<casacore::Complex>> dataColumn( new casacore::ROArrayColumn<casacore::Complex>(table, DataColumnName()) );
 
 	std::vector<size_t> dataIdToSpw;
 	Set().GetDataDescToBandVector(dataIdToSpw);
@@ -307,8 +307,6 @@ void IndirectBaselineReader::reorderFull()
 		filePos += sampleCount;
 	}
 	
-	delete dataColumn;
-
 	uint64_t dataSetSize = (uint64_t) fileSize * (uint64_t) (sizeof(float)*2 + sizeof(bool));
 	AOLogger::Debug << "Done reordering data set of " << dataSetSize/(1024*1024) << " MB in " << watch.Seconds() << " s (" << (long double) dataSetSize/(1024.0L*1024.0L*watch.Seconds()) << " MB/s)\n";
 	_msIsReordered = true;
@@ -408,7 +406,7 @@ void IndirectBaselineReader::performFlagWriteTask(std::vector<Mask2DCPtr> flags,
 	size_t filePos = _filePositions[index];
 	flagFile.seekp(filePos*(sizeof(bool)), std::ios_base::beg);
 	
-	bool *flagBuffer = new bool[bufferSize];
+	std::unique_ptr<bool[]> flagBuffer( new bool[bufferSize] );
 	for(size_t x=0;x<width;++x)
 	{
 		size_t flagBufferPtr = 0;
@@ -420,11 +418,10 @@ void IndirectBaselineReader::performFlagWriteTask(std::vector<Mask2DCPtr> flags,
 			}
 		}
 
-		flagFile.write(reinterpret_cast<char*>(flagBuffer), bufferSize * sizeof(bool));
+		flagFile.write(reinterpret_cast<char*>(flagBuffer.get()), bufferSize * sizeof(bool));
 		if(flagFile.bad())
 			throw std::runtime_error("Error: failed to update temporary flag files! Check access rights and free disk space.");
 	}
-	delete[] flagBuffer;
 	
 	_reorderedFlagFilesHaveChanged = true;
 }
@@ -440,7 +437,7 @@ void IndirectBaselineReader::updateOriginalMS()
 	casacore::ROScalarColumn<int> fieldIdColumn(table, "FIELD_ID");
 	casacore::ROScalarColumn<int> dataDescIdColumn(table, "DATA_DESC_ID");
 	casacore::ArrayColumn<bool> flagColumn(table, "FLAG");
-	casacore::ArrayColumn<casacore::Complex> *dataColumn = new casacore::ArrayColumn<casacore::Complex>(table, DataColumnName());
+	std::unique_ptr<casacore::ArrayColumn<casacore::Complex>> dataColumn ( new casacore::ArrayColumn<casacore::Complex>(table, DataColumnName()) );
 
 	int rowCount = table.nrow();
 
@@ -539,8 +536,6 @@ void IndirectBaselineReader::updateOriginalMS()
 	updateInfo.dataFile.reset();
 	updateInfo.flagFile.reset();
 
-	delete dataColumn;
-	
 	if(UpdateData)
 		AOLogger::Debug << "Done updating measurement set data\n";
 	if(UpdateFlags)

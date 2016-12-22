@@ -17,7 +17,7 @@
 
 class ProgressWindow : public Gtk::Window, public ProgressListener {
 	public:
-		ProgressWindow(class RFIGuiWindow &parentWindow);
+		explicit ProgressWindow(class RFIGuiWindow &parentWindow);
 		~ProgressWindow();
 
 		virtual void OnStartTask(const rfiStrategy::Action &action, size_t taskNo, size_t taskCount, const std::string &description, size_t weight=1);

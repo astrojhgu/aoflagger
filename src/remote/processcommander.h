@@ -22,7 +22,7 @@ class ObservationTimerange;
 class ProcessCommander
 {
 	public:
-		ProcessCommander(const ClusteredObservation &observation);
+		explicit ProcessCommander(const ClusteredObservation &observation);
 		~ProcessCommander();
 		
 		void Run(bool finishConnections = true);
