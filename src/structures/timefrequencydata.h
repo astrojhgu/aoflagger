@@ -1,6 +1,7 @@
 #ifndef TIMEFREQUENCYDATA_H
 #define TIMEFREQUENCYDATA_H
 
+#include <array>
 #include <string>
 #include <vector>
 #include <utility>
@@ -213,7 +214,7 @@ class TimeFrequencyData
 				throw BadUsageException("Not implemented");
 			if(_data[0]._images[0] == nullptr || _data[0]._images[1] == nullptr)
 				throw BadUsageException("Requesting non-existing image");
-			return { _data[0]._images[0], _data[0]._images[1] };
+			return std::array<Image2DCPtr,2>{ _data[0]._images[0], _data[0]._images[1] };
 		}
 		
 		void Set(PolarizationEnum polarisationType,
