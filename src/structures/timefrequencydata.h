@@ -25,45 +25,45 @@ class TimeFrequencyData
 		{ }
 
 		TimeFrequencyData(ComplexRepresentation complexRepresentation,
-				PolarizationEnum polarisationType, const Image2DCPtr& image) :
+				PolarizationEnum polarizationType, const Image2DCPtr& image) :
 			_complexRepresentation(complexRepresentation)
 		{
 			if(complexRepresentation == ComplexParts)
 				throw BadUsageException("Incorrect construction of time/frequency data: trying to create complex representation from single image");
-			_data.emplace_back(polarisationType, image);
+			_data.emplace_back(polarizationType, image);
 		}
 
-		TimeFrequencyData(PolarizationEnum polarisationType,
+		TimeFrequencyData(PolarizationEnum polarizationType,
 											const Image2DCPtr &real,
 											const Image2DCPtr &imaginary) :
 				_complexRepresentation(ComplexParts)
 		{
-			_data.emplace_back(polarisationType, real, imaginary);
+			_data.emplace_back(polarizationType, real, imaginary);
 		}
 		
 		TimeFrequencyData(ComplexRepresentation complexRepresentation,
-											PolarizationEnum polarisationA,
+											PolarizationEnum polarizationA,
 											const Image2DCPtr &imageA,
-											PolarizationEnum polarisationB,
+											PolarizationEnum polarizationB,
 											const Image2DCPtr &imageB) :
 				_complexRepresentation(complexRepresentation)
 		{
 			_data.reserve(2);
-			_data.emplace_back(polarisationA, imageA);
-			_data.emplace_back(polarisationB, imageB);
+			_data.emplace_back(polarizationA, imageA);
+			_data.emplace_back(polarizationB, imageB);
 		}
 		
-		TimeFrequencyData(PolarizationEnum polarisationA,
+		TimeFrequencyData(PolarizationEnum polarizationA,
 											const Image2DCPtr &realA,
 											const Image2DCPtr &imaginaryA,
-											PolarizationEnum polarisationB,
+											PolarizationEnum polarizationB,
 											const Image2DCPtr &realB,
 											const Image2DCPtr &imaginaryB) :
 				    _complexRepresentation(ComplexParts)
 		{
 			_data.reserve(2);
-			_data.emplace_back(polarisationA, realA, imaginaryA);
-			_data.emplace_back(polarisationB, realB, imaginaryB);
+			_data.emplace_back(polarizationA, realA, imaginaryA);
+			_data.emplace_back(polarizationB, realB, imaginaryB);
 		}
 		
 		TimeFrequencyData(
@@ -142,9 +142,9 @@ class TimeFrequencyData
 			return data;
 		}
 
-		static TimeFrequencyData FromLinear(size_t polarisationCount, Image2DCPtr *realImages, Image2DCPtr *imagImages)
+		static TimeFrequencyData FromLinear(size_t polarizationCount, Image2DCPtr *realImages, Image2DCPtr *imagImages)
 		{
-			switch(polarisationCount)
+			switch(polarizationCount)
 			{
 				case 1:
 					return TimeFrequencyData(Polarization::StokesI, realImages[0], imagImages[0]);
@@ -160,24 +160,24 @@ class TimeFrequencyData
 		
 		bool IsEmpty() const { return _data.empty(); }
 
-		bool HasPolarisation(PolarizationEnum polarisation) const
+		bool HasPolarization(PolarizationEnum polarization) const
 		{
 			for(const PolarizedTimeFrequencyData& data : _data)
-				if(data._polarization == polarisation)
+				if(data._polarization == polarization)
 					return true;
 			return false;
 		}
 		
-		PolarizationEnum GetPolarisation(size_t index) const
+		PolarizationEnum GetPolarization(size_t index) const
 		{ return _data[index]._polarization; }
 		
-		bool HasXX() const { return HasPolarisation(Polarization::XX); }
+		bool HasXX() const { return HasPolarization(Polarization::XX); }
 
-		bool HasXY() const { return HasPolarisation(Polarization::XY); }
+		bool HasXY() const { return HasPolarization(Polarization::XY); }
 
-		bool HasYX() const { return HasPolarisation(Polarization::YX); }
+		bool HasYX() const { return HasPolarization(Polarization::YX); }
 
-		bool HasYY() const { return HasPolarisation(Polarization::YY); }
+		bool HasYY() const { return HasPolarization(Polarization::YY); }
 		
 		/**
 		 * This function returns a new Image2D that contains
@@ -217,13 +217,13 @@ class TimeFrequencyData
 			return std::array<Image2DCPtr,2>{ _data[0]._images[0], _data[0]._images[1] };
 		}
 		
-		void Set(PolarizationEnum polarisationType,
+		void Set(PolarizationEnum polarizationType,
 			const Image2DCPtr &real,
 			const Image2DCPtr &imaginary)
 		{
 			     _complexRepresentation = ComplexParts;
 			_data.clear();
-			_data.emplace_back(polarisationType, real, imaginary);
+			_data.emplace_back(polarizationType, real, imaginary);
 		}
 
 		void SetNoMask()
@@ -239,11 +239,11 @@ class TimeFrequencyData
 				data._flagging = mask;
 		}
 
-		Mask2DCPtr GetMask(PolarizationEnum polarisation) const
+		Mask2DCPtr GetMask(PolarizationEnum polarization) const
 		{
 			for(const PolarizedTimeFrequencyData& data : _data)
 			{
-				if(data._polarization == polarisation)
+				if(data._polarization == polarization)
 				{
 					if(data._flagging == nullptr)
 						return GetSetMask<false>();
@@ -254,19 +254,19 @@ class TimeFrequencyData
 			return GetSingleMask();
 		}
 
-		void SetIndividualPolarisationMasks(const Mask2DCPtr* maskPerPolarization)
+		void SetIndividualPolarizationMasks(const Mask2DCPtr* maskPerPolarization)
 		{
 			for(size_t p=0; p!=_data.size(); ++p)
 				_data[p]._flagging = maskPerPolarization[p];
 		}
 
-		void SetIndividualPolarisationMasks(const Mask2DPtr* maskPerPolarization)
+		void SetIndividualPolarizationMasks(const Mask2DPtr* maskPerPolarization)
 		{
 			for(size_t p=0; p!=_data.size(); ++p)
 				_data[p]._flagging = maskPerPolarization[p];
 		}
 
-		void SetIndividualPolarisationMasks(const Mask2DCPtr &maskA, const Mask2DCPtr &maskB)
+		void SetIndividualPolarizationMasks(const Mask2DCPtr &maskA, const Mask2DCPtr &maskB)
 		{
 			if(_data.size() != 2)
 				throw BadUsageException("Trying to set two individual mask in non-matching time frequency data");
@@ -274,7 +274,7 @@ class TimeFrequencyData
 			_data[1]._flagging = maskB;
 		}
 
-		void SetIndividualPolarisationMasks(const Mask2DCPtr &maskA, const Mask2DCPtr &maskB, const Mask2DCPtr &maskC, const Mask2DCPtr &maskD)
+		void SetIndividualPolarizationMasks(const Mask2DCPtr &maskA, const Mask2DCPtr &maskB, const Mask2DCPtr &maskC, const Mask2DCPtr &maskD)
 		{
 			if(_data.size() != 4)
 				throw BadUsageException("Trying to set four individual mask in non-matching time frequency data");
@@ -295,26 +295,26 @@ class TimeFrequencyData
 		
 		TimeFrequencyData *CreateTFData(ComplexRepresentation complexRepresentation) const;
 		
-		TimeFrequencyData Make(PolarizationEnum polarisation) const
+		TimeFrequencyData Make(PolarizationEnum polarization) const
 		{
 			for(const PolarizedTimeFrequencyData& data : _data)
 			{
-				if(data._polarization == polarisation)
+				if(data._polarization == polarization)
 					return TimeFrequencyData(_complexRepresentation, data);
 			}
 			
 			TimeFrequencyData newData;
 			size_t
-				xxPol = getPolarisationIndex(Polarization::XX),
-				xyPol = getPolarisationIndex(Polarization::XY),
-				yxPol = getPolarisationIndex(Polarization::YX),
-				yyPol = getPolarisationIndex(Polarization::YY);
+				xxPol = getPolarizationIndex(Polarization::XX),
+				xyPol = getPolarizationIndex(Polarization::XY),
+				yxPol = getPolarizationIndex(Polarization::YX),
+				yyPol = getPolarizationIndex(Polarization::YY);
 			bool hasLinear = xxPol < _data.size() || xyPol < _data.size();
 			if(hasLinear)
 			{
 				if(_complexRepresentation == ComplexParts)
 				{
-					switch(polarisation)
+					switch(polarization)
 					{
 					case Polarization::StokesI:
 						newData = TimeFrequencyData(Polarization::StokesI, getFirstSum(xxPol, yyPol), getSecondSum(xxPol, yyPol));
@@ -329,13 +329,13 @@ class TimeFrequencyData
 						newData = TimeFrequencyData(Polarization::StokesV, getNegRealPlusImag(xyPol, yxPol), getRealMinusImag(xyPol, yxPol));
 						break;
 					default:
-						throw BadUsageException("Polarisation not available or not implemented");
+						throw BadUsageException("Polarization not available or not implemented");
 					}
 				}
 				else // _complexRepresentation != ComplexParts
 				{
 					// TODO should be done on real or imaginary
-					switch(polarisation)
+					switch(polarization)
 					{
 						case Polarization::StokesI:
 							newData = TimeFrequencyData(_complexRepresentation, Polarization::StokesI, getFirstSum(xxPol, yyPol));
@@ -344,22 +344,22 @@ class TimeFrequencyData
 							newData = TimeFrequencyData(_complexRepresentation, Polarization::StokesQ, getFirstDiff(xxPol, yyPol));
 							break;
 						default:
-							throw BadUsageException("Requested polarisation type not available in time frequency data");
+							throw BadUsageException("Requested polarization type not available in time frequency data");
 					}
 				}
 			}
 			else {
 				size_t
-					rrPol = getPolarisationIndex(Polarization::RR),
-					rlPol = getPolarisationIndex(Polarization::RL),
-					lrPol = getPolarisationIndex(Polarization::LR),
-					llPol = getPolarisationIndex(Polarization::LL);
+					rrPol = getPolarizationIndex(Polarization::RR),
+					rlPol = getPolarizationIndex(Polarization::RL),
+					lrPol = getPolarizationIndex(Polarization::LR),
+					llPol = getPolarizationIndex(Polarization::LL);
 				bool hasCircular = rrPol < _data.size() || rlPol < _data.size();
 				if(hasCircular)
 				{
 					if(_complexRepresentation == ComplexParts)
 					{
-						switch(polarisation)
+						switch(polarization)
 						{
 						case Polarization::StokesI:
 							newData = TimeFrequencyData(Polarization::StokesI, getFirstSum(rrPol, llPol), getSecondSum(rrPol, llPol));
@@ -374,7 +374,7 @@ class TimeFrequencyData
 							newData = TimeFrequencyData(Polarization::StokesV, getFirstDiff(rrPol, llPol), getSecondDiff(rrPol, llPol));
 							break;
 						default:
-							throw BadUsageException("Requested polarisation type not available in time frequency data");
+							throw BadUsageException("Requested polarization type not available in time frequency data");
 							break;
 						}
 					}
@@ -382,13 +382,13 @@ class TimeFrequencyData
 				else
 					throw BadUsageException("Trying to convert the polarization in time frequency data in an invalid way");
 			}
-			newData.SetGlobalMask(GetMask(polarisation));
+			newData.SetGlobalMask(GetMask(polarization));
 			return newData;
 		}
 
-		TimeFrequencyData *CreateTFData(PolarizationEnum polarisation) const
+		TimeFrequencyData *CreateTFData(PolarizationEnum polarization) const
 		{
-			return new TimeFrequencyData(Make(polarisation));
+			return new TimeFrequencyData(Make(polarization));
 		}
 
 		Image2DCPtr GetRealPart() const
@@ -438,7 +438,7 @@ class TimeFrequencyData
 			return _complexRepresentation;
 		}
 		
-		std::vector<PolarizationEnum> Polarisations() const
+		std::vector<PolarizationEnum> Polarizations() const
 		{
 			std::vector<PolarizationEnum> pols;
 			for(const PolarizedTimeFrequencyData& data : _data)
@@ -451,7 +451,7 @@ class TimeFrequencyData
 			if(rhs._data.size() != _data.size() || rhs._complexRepresentation != _complexRepresentation)
 			{
 				std::stringstream s;
-				s << "Can not subtract time-frequency data: they do not have the same number of polarisations or complex representation! ("
+				s << "Can not subtract time-frequency data: they do not have the same number of polarizations or complex representation! ("
 					<< rhs._data.size() << " vs. " << _data.size() << ")";
 				throw BadUsageException(s.str());
 			}
@@ -470,7 +470,7 @@ class TimeFrequencyData
 			if(lhs._data.size() != _data.size() || lhs._complexRepresentation != _complexRepresentation)
 			{
 				std::stringstream s;
-				s << "Can not subtract time-frequency data: they do not have the same number of polarisations or complex representation! ("
+				s << "Can not subtract time-frequency data: they do not have the same number of polarizations or complex representation! ("
 					<< lhs._data.size() << " vs. " << _data.size() << ")";
 				throw BadUsageException(s.str());
 			}
@@ -489,7 +489,7 @@ class TimeFrequencyData
 			if(lhs._data.size() != rhs._data.size() || lhs._complexRepresentation != rhs._complexRepresentation)
 			{
 				std::stringstream s;
-				s << "Can not subtract time-frequency data: they do not have the same number of polarisations or complex representation! ("
+				s << "Can not subtract time-frequency data: they do not have the same number of polarizations or complex representation! ("
 					<< lhs._data.size() << " vs. " << rhs._data.size() << ")";
 				throw BadUsageException(s.str());
 			}
@@ -510,7 +510,7 @@ class TimeFrequencyData
 			if(lhs._data.size() != rhs._data.size() || lhs._complexRepresentation != rhs._complexRepresentation)
 			{
 				std::stringstream s;
-				s << "Can not add time-frequency data: they do not have the same number of polarisations or complex representation! ("
+				s << "Can not add time-frequency data: they do not have the same number of polarizations or complex representation! ("
 					<< lhs._data.size() << " vs. " << rhs._data.size() << ")";
 				throw BadUsageException(s.str());
 			}
@@ -687,19 +687,19 @@ class TimeFrequencyData
 			return s.str();
 		}
 		
-		size_t PolarisationCount() const
+		size_t PolarizationCount() const
 		{
 			return _data.size();
 		}
 		
-		TimeFrequencyData *CreateTFDataFromPolarisationIndex(size_t index) const
+		TimeFrequencyData *CreateTFDataFromPolarizationIndex(size_t index) const
 		{
 			return new TimeFrequencyData(_complexRepresentation, _data[index]);
 		}
 		
 		void SetPolarizationData(size_t polarizationIndex, const TimeFrequencyData &data)
 		{
-			if(data.PolarisationCount() != 1)
+			if(data.PolarizationCount() != 1)
 				throw BadUsageException("Trying to set multiple polarizations by single polarization index");
 			else if(data.ComplexRepresentation() != ComplexRepresentation())
 				throw BadUsageException("Trying to combine TFData's with different complex representations");
@@ -819,54 +819,54 @@ class TimeFrequencyData
 		Image2DCPtr getFirstSum(size_t dataIndexA, size_t dataIndexB) const
 		{
 			if(dataIndexA >= _data.size())
-				throw BadUsageException("Polarisation not available");
+				throw BadUsageException("Polarization not available");
 			if(dataIndexB >= _data.size())
-				throw BadUsageException("Polarisation not available");
+				throw BadUsageException("Polarization not available");
 			return GetSum(_data[dataIndexA]._images[0], _data[dataIndexB]._images[0]);
 		}
 		
 		Image2DCPtr getSecondSum(size_t dataIndexA, size_t dataIndexB) const
 		{
 			if(dataIndexA >= _data.size())
-				throw BadUsageException("Polarisation not available");
+				throw BadUsageException("Polarization not available");
 			if(dataIndexB >= _data.size())
-				throw BadUsageException("Polarisation not available");
+				throw BadUsageException("Polarization not available");
 			return GetSum(_data[dataIndexA]._images[1], _data[dataIndexB]._images[1]);
 		}
 		
 		Image2DCPtr getFirstDiff(size_t dataIndexA, size_t dataIndexB) const
 		{
 			if(dataIndexA >= _data.size())
-				throw BadUsageException("Polarisation not available");
+				throw BadUsageException("Polarization not available");
 			if(dataIndexB >= _data.size())
-				throw BadUsageException("Polarisation not available");
+				throw BadUsageException("Polarization not available");
 			return GetDifference(_data[dataIndexA]._images[0], _data[dataIndexB]._images[0]);
 		}
 		
 		Image2DCPtr getSecondDiff(size_t dataIndexA, size_t dataIndexB) const
 		{
 			if(dataIndexA >= _data.size())
-				throw BadUsageException("Polarisation not available");
+				throw BadUsageException("Polarization not available");
 			if(dataIndexB >= _data.size())
-				throw BadUsageException("Polarisation not available");
+				throw BadUsageException("Polarization not available");
 			return GetDifference(_data[dataIndexA]._images[1], _data[dataIndexB]._images[1]);
 		}
 		
 		Image2DCPtr getNegRealPlusImag(size_t xyIndex, size_t yxIndex) const
 		{
 			if(xyIndex >= _data.size())
-				throw BadUsageException("Polarisation not available");
+				throw BadUsageException("Polarization not available");
 			if(yxIndex >= _data.size())
-				throw BadUsageException("Polarisation not available");
+				throw BadUsageException("Polarization not available");
 			return GetNegatedSum(_data[xyIndex]._images[1], _data[yxIndex]._images[0]);
 		}
 		
 		Image2DCPtr getRealMinusImag(size_t xyIndex, size_t yxIndex) const
 		{
 			if(xyIndex >= _data.size())
-				throw BadUsageException("Polarisation not available");
+				throw BadUsageException("Polarization not available");
 			if(yxIndex >= _data.size())
-				throw BadUsageException("Polarisation not available");
+				throw BadUsageException("Polarization not available");
 			return GetDifference(_data[xyIndex]._images[0], _data[yxIndex]._images[1]);
 		}
 		
@@ -886,13 +886,13 @@ class TimeFrequencyData
 		Mask2DCPtr GetCombinedMask() const;
 
 		/**
-		 * Returns the data index of the given polarisation, or _data.size() if
+		 * Returns the data index of the given polarization, or _data.size() if
 		 * not found.
 		 */
-		size_t getPolarisationIndex(PolarizationEnum polarisation) const
+		size_t getPolarizationIndex(PolarizationEnum polarization) const
 		{
 			for(size_t i=0; i!=_data.size(); ++i)
-				if(_data[i]._polarization == polarisation)
+				if(_data[i]._polarization == polarization)
 					return i;
 			return _data.size();
 		}
@@ -904,16 +904,16 @@ class TimeFrequencyData
 				_flagging(nullptr),
 				_polarization(Polarization::StokesI)
 			{ }
-			PolarizedTimeFrequencyData(PolarizationEnum polarisation, const Image2DCPtr& image) :
+			PolarizedTimeFrequencyData(PolarizationEnum polarization, const Image2DCPtr& image) :
 				_images{image, nullptr},
 				_flagging(nullptr),
-				_polarization(polarisation)
+				_polarization(polarization)
 			{ }
 				
-			PolarizedTimeFrequencyData(PolarizationEnum polarisation, const Image2DCPtr& imageA, const Image2DCPtr& imageB) :
+			PolarizedTimeFrequencyData(PolarizationEnum polarization, const Image2DCPtr& imageA, const Image2DCPtr& imageB) :
 				_images{imageA, imageB},
 				_flagging(nullptr),
-				_polarization(polarisation)
+				_polarization(polarization)
 			{ }
 				
 			// Second image is only filled when complex representation = complex parts
