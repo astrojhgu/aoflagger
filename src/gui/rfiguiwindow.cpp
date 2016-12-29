@@ -1622,7 +1622,7 @@ void RFIGuiWindow::onAddToImagePlane()
 		if(_timeFrequencyWidget.GetFullMetaData() != 0 && _timeFrequencyWidget.GetFullMetaData()->HasUVW())
 		{
 			TimeFrequencyData activeData = GetActiveData();
-			if(activeData.PolarisationCount() != 1)
+			if(activeData.PolarizationCount() != 1)
 			{
 				TimeFrequencyData *singlePolarization = activeData.CreateTFData(Polarization::StokesI);
 				activeData = *singlePolarization;

@@ -382,7 +382,7 @@ void RFIPlots::MakeScatterPlot(class MultiPlot &plot, size_t plotIndex, SampleRo
 
 void RFIPlots::MakeTimeScatterPlot(class MultiPlot &plot, const TimeFrequencyData &data, TimeFrequencyMetaDataCPtr metaData, unsigned startIndex)
 {
-	switch(data.PolarisationCount())
+	switch(data.PolarizationCount())
 	{
 		case 4:
 		{
@@ -427,7 +427,7 @@ void RFIPlots::MakeTimeScatterPlot(class MultiPlot &plot, const TimeFrequencyDat
 
 void RFIPlots::MakeFrequencyScatterPlot(class MultiPlot &plot, const TimeFrequencyData &data, TimeFrequencyMetaDataCPtr metaData, unsigned startIndex)
 {
-	switch(data.PolarisationCount())
+	switch(data.PolarizationCount())
 	{
 		case 4:
 		{

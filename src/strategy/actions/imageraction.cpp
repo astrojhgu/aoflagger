@@ -18,7 +18,7 @@ namespace rfiStrategy {
 			throw BadUsageException("No imager available to create image.");
 		TimeFrequencyData &data = artifacts.ContaminatedData();
 		TimeFrequencyMetaDataCPtr metaData = artifacts.MetaData();
-		if(data.PolarisationCount() > 1)
+		if(data.PolarizationCount() > 1)
 		{
 			TimeFrequencyData *tmp = data.CreateTFData(Polarization::StokesI);
 			data = *tmp;

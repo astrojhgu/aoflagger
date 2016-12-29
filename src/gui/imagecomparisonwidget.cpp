@@ -52,52 +52,52 @@ void ImageComparisonWidget::updateVisualizedImage()
 	{
 		if(_showPP && _showQQ)
 		{
-			if((selectedData->HasPolarisation(Polarization::XX) && selectedData->HasPolarisation(Polarization::YY)) ||
-				(selectedData->HasPolarisation(Polarization::RR) && selectedData->HasPolarisation(Polarization::LL)) ||
-				(selectedData->HasPolarisation(Polarization::StokesI)) )
+			if((selectedData->HasPolarization(Polarization::XX) && selectedData->HasPolarization(Polarization::YY)) ||
+				(selectedData->HasPolarization(Polarization::RR) && selectedData->HasPolarization(Polarization::LL)) ||
+				(selectedData->HasPolarization(Polarization::StokesI)) )
 			image = selectedData->Make(Polarization::StokesI).GetSingleImage();
 		}
 		else if(_showQP && _showPQ)
 		{
-			if(selectedData->HasPolarisation(Polarization::XY) && selectedData->HasPolarisation(Polarization::YX))
+			if(selectedData->HasPolarization(Polarization::XY) && selectedData->HasPolarization(Polarization::YX))
 				image = selectedData->Make(Polarization::StokesU).GetSingleImage();
-			else if(selectedData->HasPolarisation(Polarization::RL) && selectedData->HasPolarisation(Polarization::LR))
+			else if(selectedData->HasPolarization(Polarization::RL) && selectedData->HasPolarization(Polarization::LR))
 				image = selectedData->Make(Polarization::StokesQ).GetSingleImage();
 		}
 		else if(_showPP)
 		{
-			if(selectedData->HasPolarisation(Polarization::XX))
+			if(selectedData->HasPolarization(Polarization::XX))
 				image = selectedData->Make(Polarization::XX).GetSingleImage();
-			else if(selectedData->HasPolarisation(Polarization::RR))
+			else if(selectedData->HasPolarization(Polarization::RR))
 				image = selectedData->Make(Polarization::RR).GetSingleImage();
-			else if(selectedData->HasPolarisation(Polarization::StokesI))
+			else if(selectedData->HasPolarization(Polarization::StokesI))
 				image = selectedData->Make(Polarization::StokesI).GetSingleImage();
 		}
 		else if(_showPQ)
 		{
-			if(selectedData->HasPolarisation(Polarization::XY))
+			if(selectedData->HasPolarization(Polarization::XY))
 				image = selectedData->Make(Polarization::XY).GetSingleImage();
-			else if(selectedData->HasPolarisation(Polarization::RL))
+			else if(selectedData->HasPolarization(Polarization::RL))
 				image = selectedData->Make(Polarization::RL).GetSingleImage();
-			else if(selectedData->HasPolarisation(Polarization::StokesQ))
+			else if(selectedData->HasPolarization(Polarization::StokesQ))
 				image = selectedData->Make(Polarization::StokesQ).GetSingleImage();
 		}
 		else if(_showQP)
 		{
-			if(selectedData->HasPolarisation(Polarization::YX))
+			if(selectedData->HasPolarization(Polarization::YX))
 				image = selectedData->Make(Polarization::YX).GetSingleImage();
-			else if(selectedData->HasPolarisation(Polarization::LR))
+			else if(selectedData->HasPolarization(Polarization::LR))
 				image = selectedData->Make(Polarization::LR).GetSingleImage();
-			else if(selectedData->HasPolarisation(Polarization::StokesU))
+			else if(selectedData->HasPolarization(Polarization::StokesU))
 				image = selectedData->Make(Polarization::StokesU).GetSingleImage();
 		}
 		else if(_showQQ)
 		{
-			if(selectedData->HasPolarisation(Polarization::YY))
+			if(selectedData->HasPolarization(Polarization::YY))
 				image = selectedData->Make(Polarization::YY).GetSingleImage();
-			else if(selectedData->HasPolarisation(Polarization::LL))
+			else if(selectedData->HasPolarization(Polarization::LL))
 				image = selectedData->Make(Polarization::LL).GetSingleImage();
-			else if(selectedData->HasPolarisation(Polarization::StokesV))
+			else if(selectedData->HasPolarization(Polarization::StokesV))
 				image = selectedData->Make(Polarization::StokesV).GetSingleImage();
 		}
 	}

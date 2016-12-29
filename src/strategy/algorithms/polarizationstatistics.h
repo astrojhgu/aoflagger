@@ -19,23 +19,23 @@ class PolarizationStatistics {
 
 		void Add(class TimeFrequencyData &data)
 		{
-			unsigned polarizationCount = data.PolarisationCount();
+			unsigned polarizationCount = data.PolarizationCount();
 			if(_flaggedCounts.size() == 0)
 			{
-				_polarizations = data.Polarisations();
+				_polarizations = data.Polarizations();
 				for(unsigned i=0;i<polarizationCount;++i)
 				{
 					_flaggedCounts.push_back(0);
 					_totalCounts.push_back(0);
 					_names.push_back(Polarization::TypeToFullString(_polarizations[i]));
 				}
-			} else if(_polarizations != data.Polarisations())
+			} else if(_polarizations != data.Polarizations())
 			{
 				throw std::runtime_error("Adding differently polarized data to statistics");
 			}
 			for(unsigned i=0;i<polarizationCount;++i)
 			{
-				TimeFrequencyData *polData = data.CreateTFDataFromPolarisationIndex(i);
+				TimeFrequencyData *polData = data.CreateTFDataFromPolarizationIndex(i);
 				Mask2DCPtr mask = polData->GetSingleMask();
 				delete polData;
 				_flaggedCounts[i] += mask->GetCount<true>();

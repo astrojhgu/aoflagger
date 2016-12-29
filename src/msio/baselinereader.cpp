@@ -71,7 +71,7 @@ TimeFrequencyData BaselineReader::GetNextResult(std::vector<class UVW>& uvw)
 		_polarizations.size(),
 		_results[requestIndex]._realImages.data(),
 		_results[requestIndex]._imaginaryImages.data());
-	data.SetIndividualPolarisationMasks(_results[requestIndex]._flags.data());
+	data.SetIndividualPolarizationMasks(_results[requestIndex]._flags.data());
 	uvw = _results[0]._uvw;
 	
 	_results.erase(_results.begin() + requestIndex);

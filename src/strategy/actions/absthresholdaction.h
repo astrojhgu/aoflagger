@@ -25,7 +25,7 @@ namespace rfiStrategy {
 			virtual void Perform(class ArtifactSet &artifacts, class ProgressListener &)
 			{
 				TimeFrequencyData &data = artifacts.ContaminatedData();
-				if(data.PolarisationCount() != 1)
+				if(data.PolarizationCount() != 1)
 					throw std::runtime_error("Can not threshold multiple polarisations at once; use a for-each-polarisation block.");
 				
 				data.SetGlobalMask(PerformThreshold(data.GetSingleImage()));

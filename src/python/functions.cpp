@@ -32,7 +32,7 @@ void sumthreshold(Data& data, double thresholdFactor, bool horizontal, bool vert
 	if(!vertical)
 		thresholdConfig.RemoveVerticalOperations();
 	
-	if(data.TFData().PolarisationCount() != 1)
+	if(data.TFData().PolarizationCount() != 1)
 		throw std::runtime_error("Input data in sum_threshold has wrong format");
 	
 	Mask2DPtr mask = Mask2D::CreateCopy(data.TFData().GetSingleMask());
@@ -43,7 +43,7 @@ void sumthreshold(Data& data, double thresholdFactor, bool horizontal, bool vert
 
 void high_pass_filter(Data& data, size_t kernelWidth, size_t kernelHeight, double horizontalSigmaSquared, double verticalSigmaSquared)
 {
-	if(data.TFData().PolarisationCount() != 1)
+	if(data.TFData().PolarizationCount() != 1)
 		throw std::runtime_error("High-pass filtering needs single polarization");
 	HighPassFilter filter;
 	filter.SetHWindowSize(kernelWidth);

@@ -466,7 +466,7 @@ namespace rfiStrategy {
 		} else if(polarizationCount == 2)
 		{
 			data = TimeFrequencyData(TimeFrequencyData::AmplitudePart, Polarization::XX, images[0], Polarization::YY, images[1]);
-			data.SetIndividualPolarisationMasks(masks[0], masks[1]);
+			data.SetIndividualPolarizationMasks(masks[0], masks[1]);
 		}
 		else throw std::runtime_error("Don't know how to convert polarizations in file");
 	}

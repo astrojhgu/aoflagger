@@ -156,7 +156,7 @@ void SVDMitigater::CreateSingularValueGraph(const TimeFrequencyData &data, Plot2
 	plot.SetLogarithmicYAxis(true);
 	for(size_t i=0;i<polarisationCount;++i)
 	{
-		TimeFrequencyData *polarizationData = data.CreateTFDataFromPolarisationIndex(i);
+		TimeFrequencyData *polarizationData = data.CreateTFDataFromPolarizationIndex(i);
 		SVDMitigater svd;
 		svd.Initialize(*polarizationData);
 		svd.Decompose();

@@ -18,7 +18,7 @@ class VertEVD
 	public:
 		static void Perform(TimeFrequencyData &data, bool timeIntegrated)
 		{
-			if(data.PolarisationCount() != 1)
+			if(data.PolarizationCount() != 1)
 				throw std::runtime_error("Can not decompose multipolarization data");
 			if(data.ComplexRepresentation() != TimeFrequencyData::ComplexParts)
 				throw std::runtime_error("Can only decompose complex data");

@@ -43,7 +43,7 @@ namespace rfiStrategy {
 			virtual void Perform(class ArtifactSet &artifacts, class ProgressListener &)
 			{
 				TimeFrequencyData data(artifacts.ContaminatedData());
-				if(data.PolarisationCount()!=1)
+				if(data.PolarizationCount()!=1)
 				{
 					throw std::runtime_error("Profile changing requires one polarization");
 				}

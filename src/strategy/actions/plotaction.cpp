@@ -127,7 +127,7 @@ namespace rfiStrategy {
 		double rms = 0.0;
 		for(unsigned i=0;i<data.PolarisationCount();++i)
 		{
-			TimeFrequencyData *polarisation = data.CreateTFDataFromPolarisationIndex(i);
+			TimeFrequencyData *polarisation = data.CreateTFDataFromPolarizationIndex(i);
 			Mask2DCPtr mask = polarisation->GetSingleMask();
 			for(unsigned j=0;j<polarisation->ImageCount();++j)
 			{

@@ -10,7 +10,10 @@ BOOST_PYTHON_MODULE(aoflagger)
 	using namespace boost::python;
 	
 	class_<aoflagger_python::Data>("Data")
+		.def("clear_mask", &aoflagger_python::Data::clear_mask)
 		.def("convert_to_polarization", &aoflagger_python::Data::convert_to_polarization)
+		.def("convert_to_complex", &aoflagger_python::Data::convert_to_complex)
+		.def("join_mask", &aoflagger_python::Data::join_mask)
 		.def("polarizations", &aoflagger_python::Data::polarizations);
 
 	def("sumthreshold", aoflagger_python::sumthreshold);

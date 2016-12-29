@@ -414,11 +414,11 @@ namespace aoflagger {
 					Polarization::XX, input._data->images[0], input._data->images[1],
 					Polarization::YY, input._data->images[2], input._data->images[3]
 				);
-				inputData.SetIndividualPolarisationMasks(mask, mask);
+				inputData.SetIndividualPolarizationMasks(mask, mask);
 				revisedData = TimeFrequencyData(
 					Polarization::XX, zeroImage, zeroImage,
 					Polarization::YY, zeroImage, zeroImage);
-				revisedData.SetIndividualPolarisationMasks(mask, mask);
+				revisedData.SetIndividualPolarizationMasks(mask, mask);
 				break;
 			case 8:
 				inputData = TimeFrequencyData::FromLinear(
@@ -427,11 +427,11 @@ namespace aoflagger {
 					input._data->images[4], input._data->images[5],
 					input._data->images[6], input._data->images[7]
 				);
-				inputData.SetIndividualPolarisationMasks(mask, mask, mask, mask);
+				inputData.SetIndividualPolarizationMasks(mask, mask, mask, mask);
 				revisedData = TimeFrequencyData::FromLinear(
 					zeroImage, zeroImage, zeroImage, zeroImage,
 					zeroImage, zeroImage, zeroImage, zeroImage);
-				revisedData.SetIndividualPolarisationMasks(mask, mask, mask, mask);
+				revisedData.SetIndividualPolarizationMasks(mask, mask, mask, mask);
 				break;
 		}
 		artifacts.SetOriginalData(inputData);

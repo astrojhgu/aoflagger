@@ -163,9 +163,9 @@ namespace rfiStrategy {
 					if(isDirectPolarizationSelected(oldContaminatedData.GetPolarisation(polarizationIndex)))
 					{
 						TimeFrequencyData *newContaminatedData =
-							oldContaminatedData.CreateTFDataFromPolarisationIndex(polarizationIndex);
+							oldContaminatedData.CreateTFDataFromPolarizationIndex(polarizationIndex);
 						TimeFrequencyData *newOriginalData =
-							oldOriginalData.CreateTFDataFromPolarisationIndex(polarizationIndex);
+							oldOriginalData.CreateTFDataFromPolarizationIndex(polarizationIndex);
 
 						artifacts.SetContaminatedData(*newContaminatedData);
 						artifacts.SetOriginalData(*newOriginalData);
@@ -177,7 +177,7 @@ namespace rfiStrategy {
 						
 						if(changeRevised)
 						{
-							TimeFrequencyData *newRevised = oldRevisedData.CreateTFDataFromPolarisationIndex(polarizationIndex);
+							TimeFrequencyData *newRevised = oldRevisedData.CreateTFDataFromPolarizationIndex(polarizationIndex);
 							artifacts.SetRevisedData(*newRevised);
 							delete newRevised;
 						}

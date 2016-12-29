@@ -41,7 +41,7 @@ void PlotFrame::plot()
 		drawn = true;
 	}
 
-	if(_data.PolarisationCount()>0 && _data.GetPolarisation(0) == Polarization::StokesI)
+	if(_data.PolarizationCount()>0 && _data.GetPolarisation(0) == Polarization::StokesI)
 	{
 		plotTimeGraph(_data, "Stokes I");
 		drawn = true;
