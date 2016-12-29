@@ -16,26 +16,20 @@ class BaseException : public std::runtime_error {
 		/**
 		 * Constructor that initialises the exception as if an unspecified error occured.
 		 */
-		BaseException() noexcept : std::runtime_error("Unspecified error"), _description("Unspecified error") { }
+		BaseException() noexcept : std::runtime_error("Unspecified error") { }
 		
 		/**
 		 * Constructor that initialises the exception with a specified description.
 		 * @param description The description that should describe the cause of the exception.
 		 */
-		explicit BaseException(const std::string &description) noexcept : std::runtime_error(_description), _description(description) { }
+		explicit BaseException(const std::string &description) noexcept : std::runtime_error(description) { }
 		
 		/**
 		 * Destructor.
 		 */
 		virtual ~BaseException() noexcept { }
 		
-		/**
-		 * Implementation of the std::exception::what() method that returns a description of the exception.
-		 * @return A description of the exception.
-		 */
-		virtual const char *what() const noexcept { return _description.c_str(); }
 	private:
-		const std::string _description;
 };
 
 /**
