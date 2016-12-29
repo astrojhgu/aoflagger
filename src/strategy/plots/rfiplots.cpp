@@ -79,7 +79,7 @@ void RFIPlots::MakeMeanSpectrumPlot(Plot2DPointSet &pointSet, const TimeFrequenc
 	}
 	
 	TimeFrequencyData displayData = data;
-	if(displayData.PhaseRepresentation() == TimeFrequencyData::ComplexRepresentation)
+	if(displayData.ComplexRepresentation() == TimeFrequencyData::ComplexParts)
 	{
 		TimeFrequencyData *newData = data.CreateTFData(TimeFrequencyData::AmplitudePart);
 		displayData = *newData;

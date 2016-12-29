@@ -63,15 +63,15 @@ namespace rfiStrategy {
 			virtual void Perform(ArtifactSet &artifacts, class ProgressListener &)
 			{
 				TimeFrequencyData &contaminated = artifacts.ContaminatedData();
-				if(contaminated.ImageCount() != 2 || contaminated.PhaseRepresentation() != TimeFrequencyData::ComplexRepresentation)
+				if(contaminated.ImageCount() != 2 || contaminated.ComplexRepresentation() != TimeFrequencyData::ComplexParts)
 					throw std::runtime_error("Directional clean action requires single complex image in contaminated data");
 
 				TimeFrequencyData &revised = artifacts.RevisedData();
-				if(revised.ImageCount() != 2 || revised.PhaseRepresentation() != TimeFrequencyData::ComplexRepresentation)
+				if(revised.ImageCount() != 2 || revised.ComplexRepresentation() != TimeFrequencyData::ComplexParts)
 					throw std::runtime_error("Directional clean action requires single complex image in revised data");
 
 				TimeFrequencyData &original = artifacts.OriginalData();
-				if(original.ImageCount() != 2 || original.PhaseRepresentation() != TimeFrequencyData::ComplexRepresentation)
+				if(original.ImageCount() != 2 || original.ComplexRepresentation() != TimeFrequencyData::ComplexParts)
 					throw std::runtime_error("Directional clean action requires single complex image in original data");
 
 				Image2DPtr

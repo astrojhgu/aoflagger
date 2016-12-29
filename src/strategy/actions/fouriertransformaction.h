@@ -37,7 +37,7 @@ namespace rfiStrategy {
 		private:
 			void perform(TimeFrequencyData &data, TimeFrequencyMetaDataCPtr /*metaData*/)
 			{
-				if(data.PhaseRepresentation() != TimeFrequencyData::ComplexRepresentation || data.ImageCount() != 2)
+				if(data.ComplexRepresentation() != TimeFrequencyData::ComplexParts || data.ImageCount() != 2)
 					throw std::runtime_error("Fourier transform action needs a single complex image as input");
 				Image2DPtr
 					real = Image2D::CreateCopy(data.GetImage(0)),

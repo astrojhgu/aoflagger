@@ -20,7 +20,7 @@ class VertEVD
 		{
 			if(data.PolarisationCount() != 1)
 				throw std::runtime_error("Can not decompose multipolarization data");
-			if(data.PhaseRepresentation() != TimeFrequencyData::ComplexRepresentation)
+			if(data.ComplexRepresentation() != TimeFrequencyData::ComplexParts)
 				throw std::runtime_error("Can only decompose complex data");
 			
 			Image2DCPtr

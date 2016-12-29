@@ -180,6 +180,7 @@ set(STRATEGY_CONTROL_FILES
   strategy/control/actioncontainer.cpp
   strategy/control/actionfactory.cpp
   strategy/control/defaultstrategy.cpp
+  strategy/control/pythonstrategy.cpp
   strategy/control/strategyreader.cpp
   strategy/control/strategywriter.cpp)
 
@@ -221,16 +222,20 @@ else()
 		remote/vdsfile.cpp)
 endif(BOOST_ASIO_H_FOUND AND SIGCXX_FOUND)
 
+set(PYTHON_FILES
+	python/functions.cpp)
+
 set(ALL_LIBRARIES
 	${BLAS_LIBRARIES} ${LAPACK_LIBRARIES}
 	${Boost_THREAD_LIBRARY} ${Boost_SYSTEM_LIBRARY}
-	${Boost_FILESYSTEM_LIBRARY} ${Boost_DATE_TIME_LIBRARY} ${Boost_SIGNALS_LIBRARY}
+	${Boost_FILESYSTEM_LIBRARY} ${Boost_DATE_TIME_LIBRARY} ${Boost_PYTHON_LIBRARIES} ${Boost_SIGNALS_LIBRARY}
 	${FFTW3_LIB}
 	${CASACORE_LIBRARIES}
 	${LAPACK_lapack_LIBRARY}
 	${CFITSIO_LIBRARY}
 	${CMAKE_THREAD_LIBS_INIT}
 	${PNG_LIBRARIES} ${LIBXML2_LIBRARIES}
+	${PYTHON_LIBRARY}
 	${CMAKE_THREAD_LIBS_INIT})
 
 if(GTKMM_FOUND AND GLIBMM_FOUND)
@@ -247,11 +252,17 @@ if(SIGCXX_FOUND)
   set(ALL_LIBRARIES ${ALL_LIBRARIES} ${SIGCXX_LIBRARIES})
 endif(SIGCXX_FOUND)
 
-add_library(aoflagger SHARED ${IMAGING_FILES} ${INTERFACE_FILES} ${MSIO_FILES} ${QUALITY_FILES} ${STRATEGY_FILES} ${STRUCTURES_FILES} ${UTIL_FILES})
-SET_TARGET_PROPERTIES(aoflagger PROPERTIES SOVERSION 0)
+add_library(aoflagger SHARED ${IMAGING_FILES} ${INTERFACE_FILES} ${MSIO_FILES} ${QUALITY_FILES} ${STRATEGY_FILES} ${STRUCTURES_FILES} ${UTIL_FILES} ${PYTHON_FILES})
+set_target_properties(aoflagger PROPERTIES SOVERSION 0)
 target_link_libraries(aoflagger ${ALL_LIBRARIES})
 
 link_libraries(aoflagger)
+
+add_library(python_aoflagger SHARED python/pyinterface.cpp)
+set_target_properties(python_aoflagger PROPERTIES SOVERSION 0)
+set_target_properties(python_aoflagger PROPERTIES OUTPUT_NAME "aoflagger")
+set_target_properties(python_aoflagger PROPERTIES PREFIX "")
+target_link_libraries(python_aoflagger ${ALL_LIBRARIES} )
 
 add_library(aoflaggerremote OBJECT ${REMOTE_FILES})
 set(AOFLAGGERREMOTE_OBJECT $<TARGET_OBJECTS:aoflaggerremote>)

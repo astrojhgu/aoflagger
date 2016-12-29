@@ -407,3 +407,9 @@ void RFIGuiController::OpenTestSet(unsigned index, bool gaussianTestSets)
 	_rfiGuiWindow.GetTimeFrequencyWidget().SetNewData(data, SelectedMetaData());
 	_rfiGuiWindow.GetTimeFrequencyWidget().Update();
 }
+
+void RFIGuiController::ExecutePythonStrategy()
+{
+	TimeFrequencyData data = OriginalData(); 
+	_pythonStrategy.Execute(data);
+}

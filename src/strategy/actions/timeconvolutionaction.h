@@ -106,7 +106,7 @@ namespace rfiStrategy {
 				
 				if(_operation == SingleSincOperation || _operation == SincOperation || _operation == ProjectedSincOperation)
 				{
-					newRevisedData = TimeFrequencyData(artifacts.ContaminatedData().PhaseRepresentation(), artifacts.ContaminatedData().Polarisations()[0], newImage);
+					newRevisedData = TimeFrequencyData(artifacts.ContaminatedData().ComplexRepresentation(), artifacts.ContaminatedData().Polarisations()[0], newImage);
 				}
 
 				newRevisedData.SetMask(artifacts.RevisedData());

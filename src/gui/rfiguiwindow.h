@@ -127,7 +127,7 @@ class RFIGuiWindow : public Gtk::Window, private StrategyController {
 		void onDifferenceToOriginalPressed();
 		void onBackgroundToOriginalPressed();
 		void onHightlightPressed();
-		void keepPhasePart(enum TimeFrequencyData::PhaseRepresentation phaseRepresentation);
+		void keepPhasePart(enum TimeFrequencyData::ComplexRepresentation phaseRepresentation);
 		void onKeepRealPressed() { keepPhasePart(TimeFrequencyData::RealPart); }
 		void onKeepImaginaryPressed() { keepPhasePart(TimeFrequencyData::ImaginaryPart); }
 		void onKeepPhasePressed() { keepPhasePart(TimeFrequencyData::PhasePart); }
@@ -239,6 +239,8 @@ class RFIGuiWindow : public Gtk::Window, private StrategyController {
 		void openTestSet(unsigned index);
 		
 		void onControllerStateChange();
+		
+		void onExecutePythonStrategy();
 		
 		class RFIGuiController *_controller;
 		

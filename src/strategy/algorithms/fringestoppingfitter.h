@@ -8,12 +8,12 @@
 #include "../../structures/samplerow.h"
 #include "../../structures/timefrequencymetadata.h"
 
-class FringeStoppingFitter : public SurfaceFitMethod {
+class FringeStoppingFitter final : public SurfaceFitMethod {
 	public:
 		FringeStoppingFitter();
 		virtual ~FringeStoppingFitter();
 
-		virtual void SetMetaData(TimeFrequencyMetaDataCPtr metaData)
+		void SetMetaData(TimeFrequencyMetaDataCPtr metaData)
 		{
 			_metaData = metaData;
 			_fieldInfo = &metaData->Field();
@@ -22,7 +22,7 @@ class FringeStoppingFitter : public SurfaceFitMethod {
 			_antenna2Info = &metaData->Antenna2();
 			_observationTimes = &metaData->ObservationTimes();
 		}
-		virtual void Initialize(const TimeFrequencyData &input) throw()
+		virtual void Initialize(const TimeFrequencyData &input) final override
 		{
 			_originalData=&input;
 			_realBackground =
@@ -32,20 +32,20 @@ class FringeStoppingFitter : public SurfaceFitMethod {
 			_originalMask =
 				input.GetSingleMask();
 		}
-		virtual unsigned int TaskCount()
+		virtual unsigned int TaskCount() final override
 		{
 			return _fringeFit ? _originalData->ImageHeight() : _originalData->ImageWidth();
 		}
-		virtual void PerformFit(unsigned taskNumber);
-		virtual void PerformStaticFrequencyFitOnOneChannel(unsigned y);
+		virtual void PerformFit(unsigned taskNumber) final override;
+		void PerformStaticFrequencyFitOnOneChannel(unsigned y);
 		void PerformFringeStop();
-		virtual class TimeFrequencyData Background()
+		virtual class TimeFrequencyData Background() final override
 		{
 			return TimeFrequencyData(Polarization::StokesI, _realBackground, _imaginaryBackground);
 		}
-		virtual enum TimeFrequencyData::PhaseRepresentation PhaseRepresentation() const
+		virtual enum TimeFrequencyData::ComplexRepresentation ComplexRepresentation() const final override
 		{
-			return TimeFrequencyData::ComplexRepresentation;
+			return TimeFrequencyData::ComplexParts;
 		}
 		void SetFringesToConsider(long double fringesToConsider)
 		{

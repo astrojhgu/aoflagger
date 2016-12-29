@@ -114,7 +114,7 @@ namespace rfiStrategy {
 							throw BadUsageException("Can not replace flagged values for multiple polarizations: use a For Each Polarisation action");
 						if(revisedData.PolarisationCount() != 1 || originalData.PolarisationCount() != 1)
 							throw BadUsageException("Revised or original data has multiple polarisations");
-						if(contaminatedData.PhaseRepresentation() != revisedData.PhaseRepresentation() || contaminatedData.PhaseRepresentation() != originalData.PhaseRepresentation())
+						if(contaminatedData.ComplexRepresentation() != revisedData.ComplexRepresentation() || contaminatedData.ComplexRepresentation() != originalData.ComplexRepresentation())
 							throw BadUsageException("Contaminated and Revised data do not have equal phase representations");
 						Mask2DCPtr mask = contaminatedData.GetSingleMask();
 						unsigned imageCount = contaminatedData.ImageCount();
@@ -175,14 +175,6 @@ namespace rfiStrategy {
 			}
 			void Set(TimeFrequencyData &dest, const TimeFrequencyData &source)
 			{
-				/*TimeFrequencyData *phaseData =
-					source.CreateTFData(dest.PhaseRepresentation());
-				TimeFrequencyData *phaseAndPolData =
-					phaseData->CreateTFData(dest.Polarisation());
-				delete phaseData;
-				phaseAndPolData->SetMask(dest);
-				dest = *phaseAndPolData;
-				delete phaseAndPolData;*/
 				if(dest.ImageCount() != source.ImageCount())
 				{
 					std::ostringstream s;

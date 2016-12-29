@@ -39,7 +39,7 @@ class GrayScalePlotPage : public PlotSheet {
 		
 		ImageWidget &grayScaleWidget() { return _imageWidget; }
 	private:
-		void updateImageImpl(QualityTablesFormatter::StatisticKind statisticKind, PolarizationEnum polarisation, enum TimeFrequencyData::PhaseRepresentation phase);
+		void updateImageImpl(QualityTablesFormatter::StatisticKind statisticKind, PolarizationEnum polarisation, enum TimeFrequencyData::ComplexRepresentation phase);
 		
 		void initStatisticKinds(Gtk::Toolbar& toolbar);
 		void initPolarizations(Gtk::Toolbar& toolbar);
@@ -47,7 +47,7 @@ class GrayScalePlotPage : public PlotSheet {
 		void initPlotOptions(Gtk::Toolbar& toolbar);
 		
 		PolarizationEnum getSelectedPolarization() const;
-		enum TimeFrequencyData::PhaseRepresentation getSelectedPhase() const;
+		enum TimeFrequencyData::ComplexRepresentation getSelectedPhase() const;
 		
 		void onSelectCount() { _selectStatisticKind = QualityTablesFormatter::CountStatistic; updateImage(); }
 		void onSelectMean() { _selectStatisticKind = QualityTablesFormatter::MeanStatistic; updateImage(); }
@@ -83,7 +83,7 @@ class GrayScalePlotPage : public PlotSheet {
 		Image2DCPtr normalizeYAxis(Image2DCPtr input);
 		
 		void setToPolarization(TimeFrequencyData &data, PolarizationEnum polarisation);
-		void setToPhase(TimeFrequencyData &data, enum TimeFrequencyData::PhaseRepresentation phase);
+		void setToPhase(TimeFrequencyData &data, enum TimeFrequencyData::ComplexRepresentation phase);
 		
 		Gtk::SeparatorToolItem _separator1, _separator2, _separator3, _separator4, _separator5, _separator6;
 		

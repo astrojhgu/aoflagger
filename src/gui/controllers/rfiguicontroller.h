@@ -6,6 +6,8 @@
 #include "../../structures/timefrequencydata.h"
 #include "../../structures/timefrequencymetadata.h"
 
+#include "../../strategy/control/pythonstrategy.h"
+
 class RFIGuiController
 {
 	public:
@@ -131,6 +133,8 @@ class RFIGuiController
 		
 		class PlotManager &PlotManager() { return *_plotManager; }
 		
+		void ExecutePythonStrategy();
+		
 	private:
 		void plotMeanSpectrum(bool weight);
 		
@@ -142,6 +146,7 @@ class RFIGuiController
 		class StrategyController* _strategyController;
 		
 		class PlotManager *_plotManager;
+		PythonStrategy _pythonStrategy;
 };
 
 #endif

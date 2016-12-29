@@ -11,7 +11,7 @@
 
 #include "surfacefitmethod.h"
 
-class LocalFitMethod : public SurfaceFitMethod {
+class LocalFitMethod final : public SurfaceFitMethod {
 	public:
 		enum Method { None, Average, GaussianWeightedAverage, FastGaussianWeightedAverage, Median, Minimum };
 		LocalFitMethod();
@@ -58,11 +58,11 @@ class LocalFitMethod : public SurfaceFitMethod {
 			_vSquareSize = vSquareSize;
 			_method = method;
 		}
-		virtual void Initialize(const TimeFrequencyData &input);
-		virtual unsigned TaskCount();
-		virtual void PerformFit(unsigned taskNumber);
-		virtual TimeFrequencyData Background() { return *_background; }
-		virtual enum TimeFrequencyData::PhaseRepresentation PhaseRepresentation() const
+		virtual void Initialize(const TimeFrequencyData &input) final override;
+		virtual unsigned TaskCount() final override;
+		virtual void PerformFit(unsigned taskNumber) final override;
+		virtual TimeFrequencyData Background() final override { return *_background; }
+		virtual enum TimeFrequencyData::ComplexRepresentation ComplexRepresentation() const final override
 		{
 			return TimeFrequencyData::AmplitudePart;
 		}

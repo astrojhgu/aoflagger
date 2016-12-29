@@ -719,6 +719,10 @@ void RFIGuiWindow::createToolbar()
 	_closeExecuteFrameButton = Gtk::ToggleAction::create("CloseExecuteFrame", "Close execute frame");
 	_actionGroup->add(_closeExecuteFrameButton);
 	_closeExecuteFrameButton->set_active(true); 
+	
+	_actionGroup->add( Gtk::Action::create("ExecutePythonStrategy", "_Execute script"),
+		sigc::mem_fun(*this, &RFIGuiWindow::onExecutePythonStrategy) );
+	
 	_actionGroup->add(Gtk::Action::create("ShowStats", "Show _stats"),
 		Gtk::AccelKey("F2"),
 		sigc::mem_fun(*this, &RFIGuiWindow::onShowStats) );
@@ -1061,6 +1065,8 @@ void RFIGuiWindow::createToolbar()
     "      <menuitem action='EditStrategy'/>"
     "      <menuitem action='ExecuteStrategy'/>"
     "      <menuitem action='CloseExecuteFrame'/>"
+    "      <separator/>"
+    "      <menuitem action='ExecutePythonStrategy'/>"
     "      <separator/>"
     "      <menuitem action='Segment'/>"
     "      <menuitem action='Cluster'/>"
@@ -1407,7 +1413,7 @@ void RFIGuiWindow::onPlotSumSpectrumPressed()
 	_controller->PlotSumSpectrum();
 }
 
-void RFIGuiWindow::keepPhasePart(enum TimeFrequencyData::PhaseRepresentation phaseRepresentation)
+void RFIGuiWindow::keepPhasePart(enum TimeFrequencyData::ComplexRepresentation phaseRepresentation)
 {
 	if(HasImage())
 	{
@@ -2026,4 +2032,9 @@ void RFIGuiWindow::onHelpAbout()
 	aboutDialog.set_website("http://aoflagger.sourceforge.net/");
 	
 	aboutDialog.run();
+}
+
+void RFIGuiWindow::onExecutePythonStrategy()
+{
+	_controller->ExecutePythonStrategy();
 }

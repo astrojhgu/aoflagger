@@ -17,18 +17,18 @@
 class TimeFrequencyData
 {
 	public:
-		enum PhaseRepresentation { PhasePart, AmplitudePart, RealPart, ImaginaryPart, ComplexRepresentation };
+		enum ComplexRepresentation { PhasePart, AmplitudePart, RealPart, ImaginaryPart, ComplexParts };
 
 		TimeFrequencyData() :
-			_phaseRepresentation(AmplitudePart),
+			_complexRepresentation(AmplitudePart),
 			_data()
 		{ }
 
-		TimeFrequencyData(PhaseRepresentation phaseRepresentation,
+		TimeFrequencyData(ComplexRepresentation complexRepresentation,
 				PolarizationEnum polarisationType, const Image2DCPtr& image) :
-			_phaseRepresentation(phaseRepresentation)
+			_complexRepresentation(complexRepresentation)
 		{
-			if(phaseRepresentation == ComplexRepresentation)
+			if(complexRepresentation == ComplexParts)
 				throw BadUsageException("Incorrect construction of time/frequency data: trying to create complex representation from single image");
 			_data.emplace_back(polarisationType, image);
 		}
@@ -36,17 +36,17 @@ class TimeFrequencyData
 		TimeFrequencyData(PolarizationEnum polarisationType,
 											const Image2DCPtr &real,
 											const Image2DCPtr &imaginary) :
-				_phaseRepresentation(ComplexRepresentation)
+				_complexRepresentation(ComplexParts)
 		{
 			_data.emplace_back(polarisationType, real, imaginary);
 		}
 		
-		TimeFrequencyData(PhaseRepresentation phase,
+		TimeFrequencyData(ComplexRepresentation complexRepresentation,
 											PolarizationEnum polarisationA,
 											const Image2DCPtr &imageA,
 											PolarizationEnum polarisationB,
 											const Image2DCPtr &imageB) :
-				_phaseRepresentation(phase)
+				_complexRepresentation(complexRepresentation)
 		{
 			_data.reserve(2);
 			_data.emplace_back(polarisationA, imageA);
@@ -59,7 +59,7 @@ class TimeFrequencyData
 											PolarizationEnum polarisationB,
 											const Image2DCPtr &realB,
 											const Image2DCPtr &imaginaryB) :
-				_phaseRepresentation(ComplexRepresentation)
+				    _complexRepresentation(ComplexParts)
 		{
 			_data.reserve(2);
 			_data.emplace_back(polarisationA, realA, imaginaryA);
@@ -67,14 +67,14 @@ class TimeFrequencyData
 		}
 		
 		TimeFrequencyData(
-			PhaseRepresentation phase,
+			     ComplexRepresentation complexRepresentation,
 			PolarizationEnum* polarizations,
 			size_t polarizationCount,
 			Image2DCPtr* images) :
-				_phaseRepresentation(phase)
+				    _complexRepresentation(complexRepresentation)
 		{
 			_data.reserve(polarizationCount);
-			if(phase == ComplexRepresentation)
+			if(complexRepresentation == ComplexParts)
 			{
 				for(size_t p=0; p!=polarizationCount; p++)
 					_data.emplace_back(polarizations[p], images[p*2], images[p*2+1]);
@@ -89,7 +89,7 @@ class TimeFrequencyData
 			PolarizationEnum* polarizations,
 			size_t polarizationCount,
 			Image2DCPtr* realImages, Image2DCPtr* imaginaryImages) :
-				_phaseRepresentation(ComplexRepresentation)
+				    _complexRepresentation(ComplexParts)
 		{
 			_data.reserve(polarizationCount);
 			for(size_t p=0; p!=polarizationCount; p++)
@@ -100,7 +100,7 @@ class TimeFrequencyData
 			PolarizationEnum* polarizations,
 			size_t polarizationCount,
 			Image2DPtr* realImages, Image2DPtr* imaginaryImages) :
-				_phaseRepresentation(ComplexRepresentation)
+				    _complexRepresentation(ComplexParts)
 		{
 			_data.reserve(polarizationCount);
 			for(size_t p=0; p!=polarizationCount; p++)
@@ -108,15 +108,15 @@ class TimeFrequencyData
 		}
 		
 		static TimeFrequencyData FromLinear(
-			PhaseRepresentation phaseRepresentation,
+			     ComplexRepresentation complexRepresentation,
 			const Image2DCPtr& xx,
 			const Image2DCPtr& xy,
 			const Image2DCPtr& yx,
 			const Image2DCPtr& yy)
 		{
 			TimeFrequencyData data;
-			data._phaseRepresentation = phaseRepresentation;
-			if(phaseRepresentation == ComplexRepresentation)
+			data._complexRepresentation = complexRepresentation;
+			if(complexRepresentation == ComplexParts)
 				throw BadUsageException("Incorrect construction of time/frequency data: trying to create complex full-Stokes representation from four images");
 			data._data.reserve(4);
 			data._data.emplace_back(Polarization::XX, xx);
@@ -133,7 +133,7 @@ class TimeFrequencyData
 			const Image2DCPtr &yyReal, const Image2DCPtr &yyImag)
 		{
 			TimeFrequencyData data;
-			data._phaseRepresentation = ComplexRepresentation;
+			data._complexRepresentation = ComplexParts;
 			data._data.reserve(4);
 			data._data.emplace_back(Polarization::XX, xxReal, xxImag);
 			data._data.emplace_back(Polarization::XY, xyReal, xyImag);
@@ -188,17 +188,17 @@ class TimeFrequencyData
 		 */
 		Image2DCPtr GetSingleImage() const
 		{
-			switch(_phaseRepresentation)
+			switch(_complexRepresentation)
 			{
 				case PhasePart:
 				case AmplitudePart:
 				case RealPart:
 				case ImaginaryPart:
-					return GetSingleImageFromSinglePhaseImage();
-				case ComplexRepresentation:
+					return GetSingleImageFromSingleComplexPart();
+				case ComplexParts:
 					return GetSingleAbsoluteFromComplex();
 			}
-			throw BadUsageException("Incorrect phase representation");
+			throw BadUsageException("Incorrect complex representation");
 		}
 
 		Mask2DCPtr GetSingleMask() const
@@ -208,7 +208,7 @@ class TimeFrequencyData
 
 		std::array<Image2DCPtr,2> GetSingleComplexImage() const
 		{
-			if(_phaseRepresentation != ComplexRepresentation)
+			if(_complexRepresentation != ComplexParts)
 				throw BadUsageException("Trying to create single complex image, but no complex data available");
 			if(_data.size() != 1)
 				throw BadUsageException("Not implemented");
@@ -221,7 +221,7 @@ class TimeFrequencyData
 			const Image2DCPtr &real,
 			const Image2DCPtr &imaginary)
 		{
-			_phaseRepresentation = ComplexRepresentation;
+			     _complexRepresentation = ComplexParts;
 			_data.clear();
 			_data.emplace_back(polarisationType, real, imaginary);
 		}
@@ -284,14 +284,23 @@ class TimeFrequencyData
 			_data[3]._flagging = maskD;
 		}
 
-		TimeFrequencyData *CreateTFData(PhaseRepresentation phase) const;
+		TimeFrequencyData Make(ComplexRepresentation representation) const
+		{
+			// TODO this should be more efficient
+			TimeFrequencyData* data = CreateTFData(representation);
+			TimeFrequencyData data2(*data);
+			delete data;
+			return data2;
+		}
+		
+		TimeFrequencyData *CreateTFData(ComplexRepresentation complexRepresentation) const;
 		
 		TimeFrequencyData Make(PolarizationEnum polarisation) const
 		{
 			for(const PolarizedTimeFrequencyData& data : _data)
 			{
 				if(data._polarization == polarisation)
-					return TimeFrequencyData(_phaseRepresentation, data);
+					return TimeFrequencyData(_complexRepresentation, data);
 			}
 			
 			TimeFrequencyData newData;
@@ -303,7 +312,7 @@ class TimeFrequencyData
 			bool hasLinear = xxPol < _data.size() || xyPol < _data.size();
 			if(hasLinear)
 			{
-				if(_phaseRepresentation == ComplexRepresentation)
+				if(_complexRepresentation == ComplexParts)
 				{
 					switch(polarisation)
 					{
@@ -323,16 +332,16 @@ class TimeFrequencyData
 						throw BadUsageException("Polarisation not available or not implemented");
 					}
 				}
-				else // _phaseRepresentation != ComplexRepresentation
+				else // _complexRepresentation != ComplexParts
 				{
 					// TODO should be done on real or imaginary
 					switch(polarisation)
 					{
 						case Polarization::StokesI:
-							newData = TimeFrequencyData(_phaseRepresentation, Polarization::StokesI, getFirstSum(xxPol, yyPol));
+							newData = TimeFrequencyData(_complexRepresentation, Polarization::StokesI, getFirstSum(xxPol, yyPol));
 							break;
 						case Polarization::StokesQ:
-							newData = TimeFrequencyData(_phaseRepresentation, Polarization::StokesQ, getFirstDiff(xxPol, yyPol));
+							newData = TimeFrequencyData(_complexRepresentation, Polarization::StokesQ, getFirstDiff(xxPol, yyPol));
 							break;
 						default:
 							throw BadUsageException("Requested polarisation type not available in time frequency data");
@@ -348,7 +357,7 @@ class TimeFrequencyData
 				bool hasCircular = rrPol < _data.size() || rlPol < _data.size();
 				if(hasCircular)
 				{
-					if(_phaseRepresentation == ComplexRepresentation)
+					if(_complexRepresentation == ComplexParts)
 					{
 						switch(polarisation)
 						{
@@ -387,10 +396,10 @@ class TimeFrequencyData
 			if(_data.size() != 1)
 			{
 				throw BadUsageException("This tfdata contains !=1 polarizations; which real part should I return?");
-			} else if(_phaseRepresentation == ComplexRepresentation || _phaseRepresentation == RealPart) {
+			} else if(_complexRepresentation == ComplexParts || _complexRepresentation == RealPart) {
 				return _data[0]._images[0];
 			} else {
-				throw BadUsageException("Trying to retrieve real part from time frequency data in which phase doesn't have a complex or real representation");
+				throw BadUsageException("Trying to retrieve real part from time frequency data in which values are not stored as complex or reals");
 			}
 		}
 
@@ -399,12 +408,12 @@ class TimeFrequencyData
 			if(_data.size() != 1)
 			{
 				throw BadUsageException("This tfdata contains !=1 polarizations; which imaginary part should I return?");
-			} else if(_phaseRepresentation == ComplexRepresentation) {
+			} else if(_complexRepresentation == ComplexParts) {
 				return _data[0]._images[1];
-			} else if(_phaseRepresentation == ImaginaryPart) {
+			} else if(_complexRepresentation == ImaginaryPart) {
 				return _data[0]._images[0];
 			} else {
-				throw BadUsageException("Trying to retrieve imaginary part from time frequency data in which phase doesn't have a complex or real representation");
+				throw BadUsageException("Trying to retrieve imaginary part from time frequency data in which values are not stored as complex or imaginary representation");
 			}
 		}
 
@@ -424,9 +433,9 @@ class TimeFrequencyData
 				return 0;
 		}
 
-		enum PhaseRepresentation PhaseRepresentation() const
+		enum ComplexRepresentation ComplexRepresentation() const
 		{
-			return _phaseRepresentation;
+			return _complexRepresentation;
 		}
 		
 		std::vector<PolarizationEnum> Polarisations() const
@@ -439,10 +448,10 @@ class TimeFrequencyData
 
 		void Subtract(const TimeFrequencyData &rhs)
 		{
-			if(rhs._data.size() != _data.size() || rhs._phaseRepresentation != _phaseRepresentation)
+			if(rhs._data.size() != _data.size() || rhs._complexRepresentation != _complexRepresentation)
 			{
 				std::stringstream s;
-				s << "Can not subtract time-frequency data: they do not have the same number of polarisations or phase representation! ("
+				s << "Can not subtract time-frequency data: they do not have the same number of polarisations or complex representation! ("
 					<< rhs._data.size() << " vs. " << _data.size() << ")";
 				throw BadUsageException(s.str());
 			}
@@ -458,10 +467,10 @@ class TimeFrequencyData
 
 		void SubtractAsRHS(const TimeFrequencyData &lhs)
 		{
-			if(lhs._data.size() != _data.size() || lhs._phaseRepresentation != _phaseRepresentation)
+			if(lhs._data.size() != _data.size() || lhs._complexRepresentation != _complexRepresentation)
 			{
 				std::stringstream s;
-				s << "Can not subtract time-frequency data: they do not have the same number of polarisations or phase representation! ("
+				s << "Can not subtract time-frequency data: they do not have the same number of polarisations or complex representation! ("
 					<< lhs._data.size() << " vs. " << _data.size() << ")";
 				throw BadUsageException(s.str());
 			}
@@ -477,10 +486,10 @@ class TimeFrequencyData
 
 		static TimeFrequencyData *CreateTFDataFromDiff(const TimeFrequencyData &lhs, const TimeFrequencyData &rhs)
 		{
-			if(lhs._data.size() != rhs._data.size() || lhs._phaseRepresentation != rhs._phaseRepresentation)
+			if(lhs._data.size() != rhs._data.size() || lhs._complexRepresentation != rhs._complexRepresentation)
 			{
 				std::stringstream s;
-				s << "Can not subtract time-frequency data: they do not have the same number of polarisations or phase representation! ("
+				s << "Can not subtract time-frequency data: they do not have the same number of polarisations or complex representation! ("
 					<< lhs._data.size() << " vs. " << rhs._data.size() << ")";
 				throw BadUsageException(s.str());
 			}
@@ -498,10 +507,10 @@ class TimeFrequencyData
 
 		static TimeFrequencyData *CreateTFDataFromSum(const TimeFrequencyData &lhs, const TimeFrequencyData &rhs)
 		{
-			if(lhs._data.size() != rhs._data.size() || lhs._phaseRepresentation != rhs._phaseRepresentation)
+			if(lhs._data.size() != rhs._data.size() || lhs._complexRepresentation != rhs._complexRepresentation)
 			{
 				std::stringstream s;
-				s << "Can not add time-frequency data: they do not have the same number of polarisations or phase representation! ("
+				s << "Can not add time-frequency data: they do not have the same number of polarisations or complex representation! ("
 					<< lhs._data.size() << " vs. " << rhs._data.size() << ")";
 				throw BadUsageException(s.str());
 			}
@@ -657,13 +666,13 @@ class TimeFrequencyData
 		std::string Description() const
 		{
 			std::ostringstream s;
-			switch(_phaseRepresentation)
+			switch(_complexRepresentation)
 			{
 				case RealPart: s << "Real component of "; break;
 				case ImaginaryPart: s << "Imaginary component of "; break;
 				case PhasePart: s << "Phase of "; break;
 				case AmplitudePart: s << "Amplitude of "; break;
-				case ComplexRepresentation:
+				case ComplexParts:
 					break;
 			}
 			if(_data.empty())
@@ -685,15 +694,15 @@ class TimeFrequencyData
 		
 		TimeFrequencyData *CreateTFDataFromPolarisationIndex(size_t index) const
 		{
-			return new TimeFrequencyData(_phaseRepresentation, _data[index]);
+			return new TimeFrequencyData(_complexRepresentation, _data[index]);
 		}
 		
 		void SetPolarizationData(size_t polarizationIndex, const TimeFrequencyData &data)
 		{
 			if(data.PolarisationCount() != 1)
 				throw BadUsageException("Trying to set multiple polarizations by single polarization index");
-			else if(data.PhaseRepresentation() != PhaseRepresentation())
-				throw BadUsageException("Trying to combine TFData's with different phase representations");
+			else if(data.ComplexRepresentation() != ComplexRepresentation())
+				throw BadUsageException("Trying to combine TFData's with different complex representations");
 			else
 				_data[polarizationIndex] = data._data[0];
 		}
@@ -744,9 +753,9 @@ class TimeFrequencyData
 		 */
 		bool IsImaginary() const
 		{
-			if(PhaseRepresentation() == RealPart)
+			if(ComplexRepresentation() == RealPart)
 				return false;
-			else if(PhaseRepresentation() == ImaginaryPart)
+			else if(ComplexRepresentation() == ImaginaryPart)
 				return true;
 			else
 				throw std::runtime_error("Data is not real or imaginary");
@@ -763,18 +772,18 @@ class TimeFrequencyData
 				return getAbsoluteFromComplex(0);
 		}
 
-		Image2DCPtr GetSingleImageFromSinglePhaseImage() const
+		Image2DCPtr GetSingleImageFromSingleComplexPart() const
 		{
 			if(_data.size() == 4)
 			{
-				if(_phaseRepresentation == PhasePart)
+				if(_complexRepresentation == PhasePart)
 					return getSinglePhaseFromTwoPolPhase(0, 3);
 				else
 					return getFirstSum(0, 3);
 			}
 			if(_data.size() == 2)
 			{
-				if(_phaseRepresentation == PhasePart)
+				if(_complexRepresentation == PhasePart)
 					return getSinglePhaseFromTwoPolPhase(0, 1);
 				else
 					return getFirstSum(0, 1);
@@ -907,18 +916,18 @@ class TimeFrequencyData
 				_polarization(polarisation)
 			{ }
 				
-			// Second image is only filled when phase representation = complex
+			// Second image is only filled when complex representation = complex parts
 			Image2DCPtr _images[2];
 			Mask2DCPtr _flagging;
 			PolarizationEnum _polarization;
 		};
 		
-		TimeFrequencyData(enum PhaseRepresentation phase, const PolarizedTimeFrequencyData& source) :
-		_phaseRepresentation(phase), _data(1, source)
+		TimeFrequencyData(enum ComplexRepresentation complexRepresentation, const PolarizedTimeFrequencyData& source) :
+			_complexRepresentation(complexRepresentation), _data(1, source)
 		{
 		}
 
-		enum PhaseRepresentation _phaseRepresentation;
+		enum ComplexRepresentation _complexRepresentation;
 		
 		std::vector<PolarizedTimeFrequencyData> _data;
 };
