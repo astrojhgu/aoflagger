@@ -1216,7 +1216,7 @@ void RFIGuiWindow::onSetToOne()
 			imaginary = Image2D::CreateCopy(images[0]);
 		real->SetAll(1.0);
 		imaginary->SetAll(0.0);
-		TimeFrequencyData newData(data.GetPolarisation(0), real, imaginary);
+		TimeFrequencyData newData(data.GetPolarization(0), real, imaginary);
 		newData.SetMask(data);
 		_timeFrequencyWidget.SetNewData(newData, _timeFrequencyWidget.GetSelectedMetaData());
 		_timeFrequencyWidget.Update();
@@ -1236,7 +1236,7 @@ void RFIGuiWindow::onSetToI()
 			imaginary = Image2D::CreateCopy(images[0]);
 		real->SetAll(0.0);
 		imaginary->SetAll(1.0);
-		TimeFrequencyData newData(data.GetPolarisation(0), real, imaginary);
+		TimeFrequencyData newData(data.GetPolarization(0), real, imaginary);
 		newData.SetMask(data);
 		_timeFrequencyWidget.SetNewData(newData, _timeFrequencyWidget.GetSelectedMetaData());
 		_timeFrequencyWidget.Update();
@@ -1256,7 +1256,7 @@ void RFIGuiWindow::onSetToOnePlusI()
 			imaginary = Image2D::CreateCopy(images[0]);
 		real->SetAll(1.0);
 		imaginary->SetAll(1.0);
-		TimeFrequencyData newData(data.GetPolarisation(0), real, imaginary);
+		TimeFrequencyData newData(data.GetPolarization(0), real, imaginary);
 		newData.SetMask(data);
 		_timeFrequencyWidget.SetNewData(newData, _timeFrequencyWidget.GetSelectedMetaData());
 		_timeFrequencyWidget.Update();

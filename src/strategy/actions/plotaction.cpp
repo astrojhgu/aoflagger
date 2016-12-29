@@ -125,7 +125,7 @@ namespace rfiStrategy {
 		TimeFrequencyData &data = artifacts.ContaminatedData();
 		TimeFrequencyMetaDataCPtr metaData = artifacts.MetaData();
 		double rms = 0.0;
-		for(unsigned i=0;i<data.PolarisationCount();++i)
+		for(unsigned i=0;i<data.PolarizationCount();++i)
 		{
 			TimeFrequencyData *polarisation = data.CreateTFDataFromPolarizationIndex(i);
 			Mask2DCPtr mask = polarisation->GetSingleMask();
@@ -136,7 +136,7 @@ namespace rfiStrategy {
 			}
 			delete polarisation;
 		}
-		rms /= data.PolarisationCount();
+		rms /= data.PolarizationCount();
 		;
 		AOLogger::Info << "RMS of " << metaData->Antenna1().name << " x " << metaData->Antenna2().name << ": "
 			<< rms << '\n';

@@ -125,8 +125,8 @@ void RFIGuiController::PlotLogLogDist()
 	if(IsImageLoaded())
 	{
 		TimeFrequencyData activeData = ActiveData();
-		HistogramCollection histograms(activeData.PolarisationCount());
-		for(unsigned p=0;p!=activeData.PolarisationCount();++p)
+		HistogramCollection histograms(activeData.PolarizationCount());
+		for(unsigned p=0;p!=activeData.PolarizationCount();++p)
 		{
 			TimeFrequencyData *polData = activeData.CreateTFDataFromPolarizationIndex(p);
 			Image2DCPtr image = polData->GetSingleImage();

@@ -151,7 +151,7 @@ void SVDMitigater::Compose()
 
 void SVDMitigater::CreateSingularValueGraph(const TimeFrequencyData &data, Plot2D &plot)
 {
-	size_t polarisationCount = data.PolarisationCount();
+	size_t polarisationCount = data.PolarizationCount();
 	plot.SetTitle("Distribution of singular values");
 	plot.SetLogarithmicYAxis(true);
 	for(size_t i=0;i<polarisationCount;++i)

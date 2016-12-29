@@ -49,7 +49,7 @@ namespace rfiStrategy {
 					contaminatedData = artifacts.ContaminatedData(),
 					originalData = artifacts.OriginalData();
 					
-				if(contaminatedData.Polarisations() != originalData.Polarisations())
+				if(contaminatedData.Polarizations() != originalData.Polarizations())
 					throw BadUsageException("Contaminated and original do not have equal polarisation, in for each polarisation block");
 
 				// Since Stokes parameters are (normally) not directly available but
@@ -155,12 +155,12 @@ namespace rfiStrategy {
 					oldRevisedData = artifacts.RevisedData(),
 					oldOriginalData = artifacts.OriginalData();
 					
-				bool changeRevised = (oldRevisedData.Polarisations() == oldContaminatedData.Polarisations());
-				unsigned count = oldContaminatedData.PolarisationCount();
+				bool changeRevised = (oldRevisedData.Polarizations() == oldContaminatedData.Polarizations());
+				unsigned count = oldContaminatedData.PolarizationCount();
 
 				for(unsigned polarizationIndex = 0; polarizationIndex < count; ++polarizationIndex)
 				{
-					if(isDirectPolarizationSelected(oldContaminatedData.GetPolarisation(polarizationIndex)))
+					if(isDirectPolarizationSelected(oldContaminatedData.GetPolarization(polarizationIndex)))
 					{
 						TimeFrequencyData *newContaminatedData =
 							oldContaminatedData.CreateTFDataFromPolarizationIndex(polarizationIndex);
@@ -205,7 +205,7 @@ namespace rfiStrategy {
 					oldRevisedData = artifacts.RevisedData(),
 					oldOriginalData = artifacts.OriginalData();
 
-				bool changeRevised = (oldRevisedData.Polarisations() == oldContaminatedData.Polarisations());
+				bool changeRevised = (oldRevisedData.Polarizations() == oldContaminatedData.Polarizations());
 
 				Mask2DPtr mask = Mask2D::CreateSetMaskPtr<false>(oldContaminatedData.ImageWidth(), oldContaminatedData.ImageHeight());
 

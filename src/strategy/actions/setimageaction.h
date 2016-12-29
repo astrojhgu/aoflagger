@@ -110,9 +110,9 @@ namespace rfiStrategy {
 						const TimeFrequencyData
 							revisedData = artifacts.RevisedData(),
 							originalData = artifacts.OriginalData();
-						if(contaminatedData.PolarisationCount() != 1)
+						if(contaminatedData.PolarizationCount() != 1)
 							throw BadUsageException("Can not replace flagged values for multiple polarizations: use a For Each Polarisation action");
-						if(revisedData.PolarisationCount() != 1 || originalData.PolarisationCount() != 1)
+						if(revisedData.PolarizationCount() != 1 || originalData.PolarizationCount() != 1)
 							throw BadUsageException("Revised or original data has multiple polarisations");
 						if(contaminatedData.ComplexRepresentation() != revisedData.ComplexRepresentation() || contaminatedData.ComplexRepresentation() != originalData.ComplexRepresentation())
 							throw BadUsageException("Contaminated and Revised data do not have equal phase representations");

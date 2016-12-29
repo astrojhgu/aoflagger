@@ -305,10 +305,10 @@ class TimeFrequencyData
 			
 			TimeFrequencyData newData;
 			size_t
-				xxPol = getPolarizationIndex(Polarization::XX),
-				xyPol = getPolarizationIndex(Polarization::XY),
-				yxPol = getPolarizationIndex(Polarization::YX),
-				yyPol = getPolarizationIndex(Polarization::YY);
+				xxPol = GetPolarizationIndex(Polarization::XX),
+				xyPol = GetPolarizationIndex(Polarization::XY),
+				yxPol = GetPolarizationIndex(Polarization::YX),
+				yyPol = GetPolarizationIndex(Polarization::YY);
 			bool hasLinear = xxPol < _data.size() || xyPol < _data.size();
 			if(hasLinear)
 			{
@@ -350,10 +350,10 @@ class TimeFrequencyData
 			}
 			else {
 				size_t
-					rrPol = getPolarizationIndex(Polarization::RR),
-					rlPol = getPolarizationIndex(Polarization::RL),
-					lrPol = getPolarizationIndex(Polarization::LR),
-					llPol = getPolarizationIndex(Polarization::LL);
+					rrPol = GetPolarizationIndex(Polarization::RR),
+					rlPol = GetPolarizationIndex(Polarization::RL),
+					lrPol = GetPolarizationIndex(Polarization::LR),
+					llPol = GetPolarizationIndex(Polarization::LL);
 				bool hasCircular = rrPol < _data.size() || rlPol < _data.size();
 				if(hasCircular)
 				{
@@ -761,6 +761,18 @@ class TimeFrequencyData
 				throw std::runtime_error("Data is not real or imaginary");
 		}
 		
+		/**
+		 * Returns the data index of the given polarization, or _data.size() if
+		 * not found.
+		 */
+		size_t GetPolarizationIndex(PolarizationEnum polarization) const
+		{
+			for(size_t i=0; i!=_data.size(); ++i)
+				if(_data[i]._polarization == polarization)
+					return i;
+			return _data.size();
+		}
+
 	private:
 		Image2DCPtr GetSingleAbsoluteFromComplex() const
 		{
@@ -884,18 +896,6 @@ class TimeFrequencyData
 			return Mask2D::CreateSetMaskPtr<InitValue>(ImageWidth(), ImageHeight());
 		}
 		Mask2DCPtr GetCombinedMask() const;
-
-		/**
-		 * Returns the data index of the given polarization, or _data.size() if
-		 * not found.
-		 */
-		size_t getPolarizationIndex(PolarizationEnum polarization) const
-		{
-			for(size_t i=0; i!=_data.size(); ++i)
-				if(_data[i]._polarization == polarization)
-					return i;
-			return _data.size();
-		}
 
 		struct PolarizedTimeFrequencyData
 		{

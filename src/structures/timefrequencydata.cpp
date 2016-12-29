@@ -96,7 +96,7 @@ TimeFrequencyData *TimeFrequencyData::CreateTFDataFromComplexCombination(const T
 	if(real.ComplexRepresentation() == ComplexParts ||
 		imaginary.ComplexRepresentation() == ComplexParts)
 		throw BadUsageException("Trying to create complex TF data from incorrect phase representations");
-	if(real.Polarisations() != imaginary.Polarisations())
+	if(real.Polarizations() != imaginary.Polarizations())
 		throw BadUsageException("Combining real/imaginary time frequency data from different polarisations");
 	TimeFrequencyData* data = new TimeFrequencyData();
 	data->_data.resize(real._data.size());

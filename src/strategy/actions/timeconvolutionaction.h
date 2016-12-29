@@ -88,7 +88,7 @@ namespace rfiStrategy {
 						delete realData;
 						delete imagData;
 						PerformExtrapolatedSincOperation(artifacts, real, imaginary, listener);
-						newRevisedData = TimeFrequencyData(data.Polarisations()[0], real, imaginary);
+						newRevisedData = TimeFrequencyData(data.Polarizations()[0], real, imaginary);
 					}
 					break;
 					case FFTSincOperation:
@@ -100,13 +100,13 @@ namespace rfiStrategy {
 						delete realData;
 						delete imagData;
 						PerformFFTSincOperation(artifacts, real, imaginary);
-						newRevisedData = TimeFrequencyData(data.Polarisations()[0], real, imaginary);
+						newRevisedData = TimeFrequencyData(data.Polarizations()[0], real, imaginary);
 						break;
 				}
 				
 				if(_operation == SingleSincOperation || _operation == SincOperation || _operation == ProjectedSincOperation)
 				{
-					newRevisedData = TimeFrequencyData(artifacts.ContaminatedData().ComplexRepresentation(), artifacts.ContaminatedData().Polarisations()[0], newImage);
+					newRevisedData = TimeFrequencyData(artifacts.ContaminatedData().ComplexRepresentation(), artifacts.ContaminatedData().Polarizations()[0], newImage);
 				}
 
 				newRevisedData.SetMask(artifacts.RevisedData());

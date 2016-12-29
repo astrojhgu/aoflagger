@@ -27,7 +27,7 @@ namespace aoflagger_python
 		
 		boost::python::list polarizations() const
 		{
-			const std::vector<PolarizationEnum> pols = _tfData.Polarisations();
+			const std::vector<PolarizationEnum> pols = _tfData.Polarizations();
 			boost::python::list polList;
 			for (PolarizationEnum p : pols)
 				polList.append(p);
@@ -37,7 +37,7 @@ namespace aoflagger_python
 		void set_polarization_data(PolarizationEnum polarization, const Data& data)
 		{
 			size_t polIndex = _tfData.GetPolarizationIndex(polarization);
-			_tfData.SetPolarizationData(polIndex, data);
+			_tfData.SetPolarizationData(polIndex, data._tfData);
 		}
 		
 		Data convert_to_polarization(PolarizationEnum polarization)

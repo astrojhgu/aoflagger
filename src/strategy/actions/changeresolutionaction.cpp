@@ -95,7 +95,7 @@ namespace rfiStrategy {
 	
 	void ChangeResolutionAction::DecreaseTimeWithMask(TimeFrequencyData &data)
 	{
-		size_t polCount = data.PolarisationCount();
+		size_t polCount = data.PolarizationCount();
 		for(size_t i=0;i<polCount;++i)
 		{
 			TimeFrequencyData *polData = data.CreateTFDataFromPolarizationIndex(i);
