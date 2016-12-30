@@ -50,6 +50,14 @@ namespace aoflagger_python
 			return Data(_tfData.Make(complexRepresentation));
 		}
 		
+		Data make_complex()
+		{
+			TimeFrequencyData* newTFData = _tfData.CreateTFDataFromComplexCombination(_tfData, _tfData);
+			Data newData(*newTFData);
+			delete newTFData;
+			return newData;
+		}
+		
 		TimeFrequencyData& TFData() { return _tfData; }
 		const TimeFrequencyData& TFData() const { return _tfData; }
 		

@@ -14,7 +14,9 @@ BOOST_PYTHON_MODULE(aoflagger)
 		.def("convert_to_polarization", &aoflagger_python::Data::convert_to_polarization)
 		.def("convert_to_complex", &aoflagger_python::Data::convert_to_complex)
 		.def("join_mask", &aoflagger_python::Data::join_mask)
-		.def("polarizations", &aoflagger_python::Data::polarizations);
+		.def("make_complex", &aoflagger_python::Data::make_complex)
+		.def("polarizations", &aoflagger_python::Data::polarizations)
+		.def("set_polarization_data", &aoflagger_python::Data::set_polarization_data);
 
 	def("sumthreshold", aoflagger_python::sumthreshold);
 	def("high_pass_filter", aoflagger_python::high_pass_filter);

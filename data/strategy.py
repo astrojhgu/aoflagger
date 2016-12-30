@@ -37,6 +37,7 @@ def flag(input):
       aoflagger.sumthreshold(data, base_threshold, True, True)
 
     if polarization in inpPolarizations:
+      data = data.make_complex()
       output.set_polarization_data(polarization, data)
     else:
       output.join_mask(polarization, data)

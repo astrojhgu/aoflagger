@@ -85,7 +85,7 @@ void PythonStrategy::Execute(TimeFrequencyData& tfData)
 			aoflagger_python::Data data(tfData);
 			flagFunction(data);
 		}
-	} catch(const error_already_set& e) {
+	} catch(const error_already_set&) {
 		throw std::runtime_error(getPythonError());
 	}
 	
