@@ -1,20 +1,57 @@
 #include "functions.h"
 
-#include "../strategy/algorithms/thresholdconfig.h"
 #include "../strategy/algorithms/highpassfilter.h"
+#include "../strategy/algorithms/medianwindow.h"
+#include "../strategy/algorithms/siroperator.h"
+#include "../strategy/algorithms/thresholdconfig.h"
+
+#include "../structures/image2d.h"
+#include "../structures/samplerow.h"
+#include "../structures/timefrequencydata.h"
 
 #include <boost/python.hpp>
 
 using namespace boost::python;
 
+#include <iostream>
 namespace aoflagger_python
 {
 
 static object flagFunction;
-	
-void set_flag_function(PyObject* callable)
+
+void enlarge(const Data& input, Data& destination, size_t horizontalFactor, size_t verticalFactor)
 {
-	flagFunction = object(boost::python::handle<>(boost::python::borrowed(callable)));
+	TimeFrequencyData timeFrequencyData = input.TFData();
+	const size_t
+		imageCount = timeFrequencyData.ImageCount(),
+		newWidth = destination.TFData().ImageWidth(),
+		newHeight = destination.TFData().ImageHeight();
+	if(destination.TFData().ImageCount() != imageCount)
+		throw std::runtime_error("Error in enlarge() call: source and image have different number of images");
+	std::cout << "Enlarging " << horizontalFactor << " x " << verticalFactor << " to " << newWidth << " x " << newHeight << '\n';
+	
+	if(horizontalFactor > 1)
+	{
+		for(size_t i=0;i<imageCount;++i)
+		{
+			Image2DCPtr image = timeFrequencyData.GetImage(i);
+			Image2DPtr newImage = image->EnlargeHorizontally(horizontalFactor, newWidth);
+			timeFrequencyData.SetImage(i, newImage);
+		}
+	}
+	
+	for(size_t i=0;i<imageCount;++i)
+	{
+		Image2DCPtr image = timeFrequencyData.GetImage(i);
+		if(verticalFactor > 1)
+		{
+			Image2DPtr newImage = image->EnlargeVertically(verticalFactor, newHeight);
+			destination.TFData().SetImage(i, newImage);
+		}
+		else {
+			destination.TFData().SetImage(i, image);
+		}
+	}
 }
 
 object get_flag_function()
@@ -22,6 +59,92 @@ object get_flag_function()
 	return flagFunction;
 }
 	
+void low_pass_filter(Data& data, size_t kernelWidth, size_t kernelHeight, double horizontalSigmaSquared, double verticalSigmaSquared)
+{
+	if(data.TFData().PolarizationCount() != 1)
+		throw std::runtime_error("High-pass filtering needs single polarization");
+	HighPassFilter filter;
+	filter.SetHWindowSize(kernelWidth);
+	filter.SetVWindowSize(kernelHeight);
+	filter.SetHKernelSigmaSq(horizontalSigmaSquared);
+	filter.SetVKernelSigmaSq(verticalSigmaSquared);
+	Mask2DCPtr mask = data.TFData().GetSingleMask();
+	size_t imageCount = data.TFData().ImageCount();
+	
+	for(size_t i=0;i<imageCount;++i)
+		data.TFData().SetImage(i, filter.ApplyLowPass(data.TFData().GetImage(i), mask));
+}
+
+void high_pass_filter(Data& data, size_t kernelWidth, size_t kernelHeight, double horizontalSigmaSquared, double verticalSigmaSquared)
+{
+	if(data.TFData().PolarizationCount() != 1)
+		throw std::runtime_error("High-pass filtering needs single polarization");
+	HighPassFilter filter;
+	filter.SetHWindowSize(kernelWidth);
+	filter.SetVWindowSize(kernelHeight);
+	filter.SetHKernelSigmaSq(horizontalSigmaSquared);
+	filter.SetVKernelSigmaSq(verticalSigmaSquared);
+	Mask2DCPtr mask = data.TFData().GetSingleMask();
+	size_t imageCount = data.TFData().ImageCount();
+	
+	for(size_t i=0;i<imageCount;++i)
+		data.TFData().SetImage(i, filter.ApplyHighPass(data.TFData().GetImage(i), mask));
+}
+
+void scale_invariant_rank_operator(Data& data, double level_horizontal, double level_vertical)
+{
+	Mask2DPtr mask = Mask2D::CreateCopy(data.TFData().GetSingleMask());
+	
+	SIROperator::OperateHorizontally(mask, level_horizontal);
+	SIROperator::OperateVertically(mask, level_vertical);
+	data.TFData().SetGlobalMask(mask);
+}
+
+void set_flag_function(PyObject* callable)
+{
+	flagFunction = object(boost::python::handle<>(boost::python::borrowed(callable)));
+}
+
+Data shrink(const Data& data, size_t horizontalFactor, size_t verticalFactor)
+{
+	TimeFrequencyData timeFrequencyData = data.TFData();
+	const size_t imageCount = timeFrequencyData.ImageCount();
+	const size_t maskCount = timeFrequencyData.MaskCount();
+	
+	if(horizontalFactor > 1)
+	{
+		for(size_t i=0;i<imageCount;++i)
+		{
+			Image2DCPtr image = timeFrequencyData.GetImage(i);
+			Image2DPtr newImage = image->ShrinkHorizontally(horizontalFactor);
+			timeFrequencyData.SetImage(i, newImage);
+		}
+		for(size_t i=0;i<maskCount;++i)
+		{
+			Mask2DCPtr mask = timeFrequencyData.GetMask(i);
+			Mask2DPtr newMask = mask->ShrinkHorizontally(horizontalFactor);
+			timeFrequencyData.SetMask(i, newMask);
+		}
+	}
+	
+	if(verticalFactor > 1)
+	{
+		for(size_t i=0;i<imageCount;++i)
+		{
+			Image2DCPtr image = timeFrequencyData.GetImage(i);
+			Image2DPtr newImage = image->ShrinkVertically(verticalFactor);
+			timeFrequencyData.SetImage(i, newImage);
+		}
+		for(size_t i=0;i<maskCount;++i)
+		{
+			Mask2DCPtr mask = timeFrequencyData.GetMask(i);
+			Mask2DPtr newMask = mask->ShrinkVertically(verticalFactor);
+			timeFrequencyData.SetMask(i, newMask);
+		}
+	}
+	return Data(timeFrequencyData);
+}
+
 void sumthreshold(Data& data, double thresholdFactor, bool horizontal, bool vertical)
 {
 	ThresholdConfig thresholdConfig;
@@ -41,20 +164,62 @@ void sumthreshold(Data& data, double thresholdFactor, bool horizontal, bool vert
 	data.TFData().SetGlobalMask(mask);
 }
 
-void high_pass_filter(Data& data, size_t kernelWidth, size_t kernelHeight, double horizontalSigmaSquared, double verticalSigmaSquared)
+void threshold_channel_rms(Data& data, double threshold, bool thresholdLowValues)
 {
-	if(data.TFData().PolarizationCount() != 1)
-		throw std::runtime_error("High-pass filtering needs single polarization");
-	HighPassFilter filter;
-	filter.SetHWindowSize(kernelWidth);
-	filter.SetVWindowSize(kernelHeight);
-	filter.SetHKernelSigmaSq(horizontalSigmaSquared);
-	filter.SetVKernelSigmaSq(verticalSigmaSquared);
-	Mask2DCPtr mask = data.TFData().GetSingleMask();
-	size_t imageCount = data.TFData().ImageCount();
-	
-	for(size_t i=0;i<imageCount;++i)
-		data.TFData().SetImage(i, filter.ApplyHighPass(data.TFData().GetImage(i), mask));
+	Image2DCPtr image = data.TFData().GetSingleImage();
+	SampleRowPtr channels = SampleRow::CreateEmpty(image->Height());
+	Mask2DPtr mask = Mask2D::CreateCopy(data.TFData().GetSingleMask());
+	for(size_t y=0;y<image->Height();++y)
+	{
+		SampleRowPtr row = SampleRow::CreateFromRowWithMissings(image, mask, y);
+		channels->SetValue(y, row->RMSWithMissings());
+	}
+	bool change;
+	do {
+		num_t median = channels->MedianWithMissings();
+		num_t stddev = channels->StdDevWithMissings(median);
+		change = false;
+		double effectiveThreshold = threshold * stddev;
+		for(size_t y=0;y<channels->Size();++y)
+		{
+			if(!channels->ValueIsMissing(y) && (channels->Value(y) - median > effectiveThreshold || (thresholdLowValues && median - channels->Value(y) > effectiveThreshold)))
+			{
+				mask->SetAllHorizontally<true>(y);
+				channels->SetValueMissing(y);
+				change = true;
+			}
+		}
+	} while(change);
+	data.TFData().SetGlobalMask(mask);
 }
-	
+
+void threshold_timestep_rms(Data& data, double threshold)
+{
+	Image2DCPtr image = data.TFData().GetSingleImage();
+	SampleRowPtr timesteps = SampleRow::CreateEmpty(image->Width());
+	Mask2DPtr mask = Mask2D::CreateCopy(data.TFData().GetSingleMask());
+	for(size_t x=0;x<image->Width();++x)
+	{
+		SampleRowPtr row = SampleRow::CreateFromColumnWithMissings(image, mask, x);
+		timesteps->SetValue(x, row->RMSWithMissings());
+	}
+	bool change;
+	MedianWindow<num_t>::SubtractMedian(timesteps, 512);
+	do {
+		num_t median = 0.0;
+		num_t stddev = timesteps->StdDevWithMissings(0.0);
+		change = false;
+		for(size_t x=0;x<timesteps->Size();++x)
+		{
+			if(!timesteps->ValueIsMissing(x) && (timesteps->Value(x) - median > stddev * threshold || median - timesteps->Value(x) > stddev * threshold))
+			{
+				mask->SetAllVertically<true>(x);
+				timesteps->SetValueMissing(x);
+				change = true;
+			}
+		}
+	} while(change);
+	data.TFData().SetGlobalMask(mask);
+}
+
 }

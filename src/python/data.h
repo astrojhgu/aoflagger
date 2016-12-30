@@ -15,14 +15,45 @@ namespace aoflagger_python
 		Data(const TimeFrequencyData& tfData) : _tfData(tfData)
 		{ }
 		
+		Data operator-(const Data& other) const
+		{
+			std::unique_ptr<TimeFrequencyData> diff(
+				TimeFrequencyData::CreateTFDataFromDiff(_tfData, other.TFData())
+			);
+			return Data(*diff);
+		}
+		
 		void clear_mask()
 		{
 			_tfData.SetNoMask();
 		}
 		
+		Data convert_to_polarization(PolarizationEnum polarization) const
+		{
+			return Data(_tfData.Make(polarization));
+		}
+		
+		Data convert_to_complex(enum TimeFrequencyData::ComplexRepresentation complexRepresentation) const
+		{
+			return Data(_tfData.Make(complexRepresentation));
+		}
+		
+		Data copy() const
+		{
+			return Data(_tfData);
+		}
+		
 		void join_mask(const Data& other)
 		{
 			_tfData.JoinMask(other._tfData);
+		}
+		
+		Data make_complex() const
+		{
+			std::unique_ptr<TimeFrequencyData> newTFData(
+				_tfData.CreateTFDataFromComplexCombination(_tfData, _tfData)
+			);
+			return Data(*newTFData);
 		}
 		
 		boost::python::list polarizations() const
@@ -34,28 +65,24 @@ namespace aoflagger_python
 			return polList;
 		}
 		
+		void set_image(const Data& image_data)
+		{
+			const TimeFrequencyData& source = image_data._tfData;
+			const size_t imageCount = source.ImageCount();
+			if(imageCount != _tfData.ImageCount())
+			{
+				std::ostringstream s;
+				s << "set_image() was executed with incompatible polarizations: input had " << imageCount << ", destination had " << _tfData.ImageCount();
+				throw BadUsageException(s.str());
+			}
+			for(size_t i=0; i!=imageCount; ++i)
+				_tfData.SetImage(i, source.GetImage(i));
+		}
+		
 		void set_polarization_data(PolarizationEnum polarization, const Data& data)
 		{
 			size_t polIndex = _tfData.GetPolarizationIndex(polarization);
 			_tfData.SetPolarizationData(polIndex, data._tfData);
-		}
-		
-		Data convert_to_polarization(PolarizationEnum polarization)
-		{
-			return Data(_tfData.Make(polarization));
-		}
-		
-		Data convert_to_complex(enum TimeFrequencyData::ComplexRepresentation complexRepresentation)
-		{
-			return Data(_tfData.Make(complexRepresentation));
-		}
-		
-		Data make_complex()
-		{
-			TimeFrequencyData* newTFData = _tfData.CreateTFDataFromComplexCombination(_tfData, _tfData);
-			Data newData(*newTFData);
-			delete newTFData;
-			return newData;
 		}
 		
 		TimeFrequencyData& TFData() { return _tfData; }

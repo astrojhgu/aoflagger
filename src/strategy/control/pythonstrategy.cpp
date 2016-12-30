@@ -39,6 +39,18 @@ PythonStrategy::PythonStrategy() : _code(
 		file.read(data.data(), size);
 		_code = data.data();
 	}
+
+	Py_Initialize();
+
+	// The following statement add the curr path to the Python search path
+	boost::filesystem::path workingDir = boost::filesystem::current_path().normalize();
+	PyObject* sysPath = PySys_GetObject(const_cast<char*>("path"));
+	PyList_Insert( sysPath, 0, PyString_FromString(workingDir.string().c_str()));
+}
+
+PythonStrategy::~PythonStrategy()
+{
+	Py_Finalize();
 }
 
 std::string PythonStrategy::getPythonError()
@@ -65,13 +77,6 @@ std::string PythonStrategy::getPythonError()
 
 void PythonStrategy::Execute(TimeFrequencyData& tfData)
 {
-	Py_Initialize();
-	
-	// The following statement add the curr path to the Python search path
-	boost::filesystem::path workingDir = boost::filesystem::current_path().normalize();
-	PyObject* sysPath = PySys_GetObject(const_cast<char*>("path"));
-	PyList_Insert( sysPath, 0, PyString_FromString(workingDir.string().c_str()));
-
 	try {
 		object main = import("__main__");
 		object global(main.attr("__dict__"));
@@ -83,13 +88,10 @@ void PythonStrategy::Execute(TimeFrequencyData& tfData)
 			throw std::runtime_error("Incorrect Python strategy: strategy did not provide a flag method. Make sure your strategy uses aoflagger.set_flag_function() to provide the flag function to the caller");
 		else {
 			aoflagger_python::Data data(tfData);
-			flagFunction(data);
+			flagFunction(boost::ref(data));
+			tfData = data.TFData();
 		}
 	} catch(const error_already_set&) {
 		throw std::runtime_error(getPythonError());
 	}
-	
-	Py_Finalize();
 }
-
-

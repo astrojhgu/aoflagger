@@ -9,6 +9,7 @@ class PythonStrategy
 {
 public:
 	PythonStrategy();
+	~PythonStrategy();
 	
 	void Execute(TimeFrequencyData& tfData);
 	

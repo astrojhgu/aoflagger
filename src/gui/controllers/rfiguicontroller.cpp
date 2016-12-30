@@ -412,4 +412,6 @@ void RFIGuiController::ExecutePythonStrategy()
 {
 	TimeFrequencyData data = OriginalData(); 
 	_pythonStrategy.Execute(data);
+	_rfiGuiWindow.GetTimeFrequencyWidget().SetContaminatedData(data);
+	_rfiGuiWindow.GetTimeFrequencyWidget().Update();
 }

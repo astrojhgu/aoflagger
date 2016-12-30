@@ -10,17 +10,26 @@ BOOST_PYTHON_MODULE(aoflagger)
 	using namespace boost::python;
 	
 	class_<aoflagger_python::Data>("Data")
+		.def(self - self)
+		.def("__copy__", &aoflagger_python::Data::copy)
 		.def("clear_mask", &aoflagger_python::Data::clear_mask)
 		.def("convert_to_polarization", &aoflagger_python::Data::convert_to_polarization)
 		.def("convert_to_complex", &aoflagger_python::Data::convert_to_complex)
 		.def("join_mask", &aoflagger_python::Data::join_mask)
 		.def("make_complex", &aoflagger_python::Data::make_complex)
 		.def("polarizations", &aoflagger_python::Data::polarizations)
+		.def("set_image", &aoflagger_python::Data::set_image)
 		.def("set_polarization_data", &aoflagger_python::Data::set_polarization_data);
 
-	def("sumthreshold", aoflagger_python::sumthreshold);
+	def("enlarge", aoflagger_python::enlarge);
 	def("high_pass_filter", aoflagger_python::high_pass_filter);
+	def("low_pass_filter", aoflagger_python::low_pass_filter);
+	def("scale_invariant_rank_operator", aoflagger_python::scale_invariant_rank_operator);
+	def("shrink", aoflagger_python::shrink);
+	def("sumthreshold", aoflagger_python::sumthreshold);
 	def("set_flag_function", aoflagger_python::set_flag_function);
+	def("threshold_channel_rms", aoflagger_python::threshold_channel_rms);
+	def("threshold_timestep_rms", aoflagger_python::threshold_timestep_rms);
 	
 	enum_<PolarizationEnum>("Polarization")
 		.value("StokesI", Polarization::StokesI)
