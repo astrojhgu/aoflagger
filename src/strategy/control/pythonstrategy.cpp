@@ -6,6 +6,8 @@
 #include <boost/python.hpp>
 #include <boost/filesystem.hpp>
 
+#include <fstream>
+
 using namespace boost::python;
 
 PythonStrategy::PythonStrategy() : _code(
