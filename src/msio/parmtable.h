@@ -124,11 +124,11 @@ class ParmTable
 					const unsigned xShape = values.shape(row)[0];
 					if(xShape > curXShape)
 						curXShape = xShape;
-					
+					AOLogger::Debug << "Image has size " << xShape << " x " << curYShape << '\n';
 					const casacore::Array<double> valueArray = values(row);
 					casacore::Array<double>::const_iterator vIter = valueArray.begin();
-					for(unsigned x=0;x<xShape;++x) {
-						for(unsigned y=0;y<curYShape;++y) {
+					for(unsigned y=0;y<curYShape;++y) {
+						for(unsigned x=0;x<xShape;++x) {
 							destImage->SetValue(yPos + y, xPos + x, *vIter);
 							++vIter;
 						}

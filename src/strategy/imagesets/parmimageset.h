@@ -100,21 +100,21 @@ namespace rfiStrategy {
 
 	void ParmImageSetIndex::Previous()
 	{
-		++_antennaIndex;
-		if(_antennaIndex >= ParmSet().AntennaCount())
+		if(_antennaIndex > 0)
+			--_antennaIndex;
+		else
 		{
-			_antennaIndex = 0;
+			_antennaIndex = ParmSet().AntennaCount() - 1;
 			_valid = false;
 		}
 	}
 	
 	void ParmImageSetIndex::Next()
 	{
-		if(_antennaIndex > 0)
-			--_antennaIndex;
-		else
+		++_antennaIndex;
+		if(_antennaIndex >= ParmSet().AntennaCount())
 		{
-			_antennaIndex = ParmSet().AntennaCount() - 1;
+			_antennaIndex = 0;
 			_valid = false;
 		}
 	}
