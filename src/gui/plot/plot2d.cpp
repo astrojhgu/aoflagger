@@ -200,6 +200,9 @@ void Plot2D::render(Cairo::RefPtr<Cairo::Context> cr, Plot2DPointSet &pointSet)
 	const double plotWidth = _width - rightMargin - plotLeftMargin;
 	const double plotHeight = _height - bottomMargin - _topMargin;
 	
+	cr->rectangle(plotLeftMargin, _topMargin, plotWidth, plotHeight);
+	cr->clip();
+	
 	double
 		minXLog10 = log10(xLeft),
 		maxXLog10 = log10(xRight),
@@ -321,4 +324,5 @@ void Plot2D::render(Cairo::RefPtr<Cairo::Context> cr, Plot2DPointSet &pointSet)
 		cr->line_to(plotWidth + plotLeftMargin, yMax * plotHeight / (yMax - yMin) + _topMargin);
 		cr->stroke();
 	}
+	cr->reset_clip();
 }
