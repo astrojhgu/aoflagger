@@ -70,6 +70,10 @@ namespace rfiStrategy {
 		explicit JoinedSPWSet(MSImageSet* msImageSet) : _msImageSet(msImageSet)
 		{
 			const std::vector<MeasurementSet::Sequence>& sequences = _msImageSet->Sequences();
+			size_t nBands = _msImageSet->BandCount();
+			_nChannels.resize(nBands);
+			for(size_t b=0; b!=nBands; ++b)
+				_nChannels[b] = _msImageSet->GetBandInfo(b).channels.size();
 			for(size_t sequenceIndex = 0; sequenceIndex!=sequences.size(); ++sequenceIndex)
 			{
 				const MeasurementSet::Sequence& s = sequences[sequenceIndex];
@@ -87,6 +91,7 @@ namespace rfiStrategy {
 			JoinedSPWSet* newSet = new JoinedSPWSet();
 			newSet->_msImageSet.reset( _msImageSet->Copy() );
 			newSet->_joinedSequences = _joinedSequences;
+			newSet->_nChannels = _nChannels;
 			return newSet;
 		}
 
@@ -128,7 +133,6 @@ namespace rfiStrategy {
 					data.emplace_back(_msImageSet->GetNextRequested());
 					totalHeight += data.back()->Data().ImageHeight();
 				}
-				AOLogger::Info << "SPW combined: " << totalHeight << " channels.\n";
 				
 				// Combine the images
 				TimeFrequencyData tfData(data[0]->Data());
@@ -202,11 +206,35 @@ namespace rfiStrategy {
 		
 		virtual void AddWriteFlagsTask(const ImageSetIndex &index, std::vector<Mask2DCPtr> &flags) override final
 		{
-			// TODO
+			const std::vector<std::pair<size_t /*spw*/, size_t /*seq*/>>& indexInformation =
+				static_cast<const JoinedSPWSetIndex&>(index)._iterator->second;
+			size_t width = flags.front()->Width();
+			size_t chIndex = 0;
+			for(size_t spw=0; spw!=indexInformation.size(); ++spw)
+			{
+				const std::pair<size_t, size_t>& spwAndSeq = indexInformation[spw];
+				std::vector<Mask2DCPtr> spwFlags(flags.size());
+				for(size_t m=0; m!=flags.size(); ++m)
+				{
+					Mask2DPtr spwMask = Mask2D::CreateUnsetMaskPtr(width, _nChannels[spwAndSeq.first]);
+					for(size_t y=0; y!=_nChannels[spwAndSeq.first]; ++y)
+					{
+						const bool *srcPtr = flags[m]->ValuePtr(0, y + chIndex);
+						bool *destPtr = spwMask->ValuePtr(0, y);
+						for(size_t x=0; x!=flags[m]->Width(); ++x)
+							destPtr[x] = srcPtr[x];
+					}
+					spwFlags[m] = std::move(spwMask);
+				}
+				chIndex += _nChannels[spw];
+				
+				MSImageSetIndex msIndex(*_msImageSet, spwAndSeq.second);
+				_msImageSet->AddWriteFlagsTask(msIndex, spwFlags);
+			}
 		}
 		virtual void PerformWriteFlagsTask() override final
 		{
-			// TODO
+			_msImageSet->PerformWriteFlagsTask();
 		}
 		
 		const std::map<JoinedSequence, std::vector<std::pair<size_t, size_t>>>& JoinedSequences() const { return _joinedSequences; }
@@ -219,6 +247,7 @@ namespace rfiStrategy {
 		std::map<JoinedSequence, std::vector<std::pair<size_t, size_t>>> _joinedSequences;
 		std::vector<std::map<JoinedSequence, std::vector<std::pair<size_t, size_t>>>::const_iterator> _requests;
 		std::list<BaselineData> _baselineData;
+		std::vector<size_t> _nChannels;
 	};
 	
 	JoinedSPWSetIndex::JoinedSPWSetIndex(class JoinedSPWSet &set) :
