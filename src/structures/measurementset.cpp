@@ -246,7 +246,7 @@ size_t MeasurementSet::PolarizationCount(const std::string &filename)
 	return polarizationCount;
 }
 
-bool MeasurementSet::HasRFIConsoleHistory()
+bool MeasurementSet::HasAOFlaggerHistory()
 {
 	casacore::MeasurementSet ms(_path);
 	casacore::Table histtab(ms.history());

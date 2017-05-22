@@ -11,6 +11,7 @@
 
 #include "../../strategy/imagesets/imageset.h"
 #include "../../strategy/imagesets/msimageset.h"
+#include "../../strategy/imagesets/joinedspwset.h"
 
 #include "../../quality/histogramcollection.h"
 
@@ -340,7 +341,7 @@ void RFIGuiController::PlotSingularValues()
 	}
 }
 
-void RFIGuiController::Open(const std::string& filename, BaselineIOMode ioMode, bool readUVW, const std::string& dataColumn, bool subtractModel, size_t polCountToRead, bool loadBaseline, bool loadStrategy)
+void RFIGuiController::Open(const std::string& filename, BaselineIOMode ioMode, bool readUVW, const std::string& dataColumn, bool subtractModel, size_t polCountToRead, bool loadBaseline, bool loadStrategy, bool combineSPW)
 {
 	std::cout << "Opening " << filename << std::endl;
 	try
@@ -360,6 +361,12 @@ void RFIGuiController::Open(const std::string& filename, BaselineIOMode ioMode, 
 				msImageSet->SetReadAllPolarisations();
 	
 			msImageSet->SetReadUVW(readUVW);
+			
+			if(combineSPW)
+			{
+				msImageSet->Initialize();
+				imageSet = new rfiStrategy::JoinedSPWSet(msImageSet);
+			}
 		}
 		imageSet->Initialize();
 		

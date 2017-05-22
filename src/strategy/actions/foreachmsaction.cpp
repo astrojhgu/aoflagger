@@ -39,7 +39,7 @@ void ForEachMSAction::Perform(ArtifactSet &artifacts, ProgressListener &progress
 		if(_skipIfAlreadyProcessed)
 		{
 			MeasurementSet set(filename);
-			if(set.HasRFIConsoleHistory())
+			if(set.HasAOFlaggerHistory())
 			{
 				skip = true;
 				AOLogger::Info << "Skipping " << filename << ",\n"
@@ -49,13 +49,14 @@ void ForEachMSAction::Perform(ArtifactSet &artifacts, ProgressListener &progress
 		
 		if(!skip)
 		{
-			std::unique_ptr<ImageSet> imageSet(ImageSet::Create(filename, _baselineIOMode, _readUVW));
+			std::unique_ptr<ImageSet> imageSet(ImageSet::Create(filename, _baselineIOMode));
 			bool isMS = dynamic_cast<MSImageSet*>(&*imageSet) != 0;
 			if(isMS)
 			{ 
 				MSImageSet *msImageSet = static_cast<MSImageSet*>(&*imageSet);
 				msImageSet->SetDataColumnName(_dataColumnName);
 				msImageSet->SetSubtractModel(_subtractModel);
+				msImageSet->SetReadUVW(_readUVW);
 			}
 			imageSet->Initialize();
 			

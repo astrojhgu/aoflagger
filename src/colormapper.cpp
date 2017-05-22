@@ -444,7 +444,6 @@ long double HueToRGB(long double p,long double q,long double tc)
 
 void HLStoRGB(long double hue,long double lum,long double sat,long double &red,long double &green, long double &blue)
 {
-
 	if (sat == 0) {
 			red=green=blue=lum;
 		}

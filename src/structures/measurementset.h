@@ -193,7 +193,7 @@ class MeasurementSet {
 			return times;
 		}
 		
-		bool HasRFIConsoleHistory();
+		bool HasAOFlaggerHistory();
 		
 		void GetAOFlaggerHistory(std::ostream &stream);
 		

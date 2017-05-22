@@ -121,7 +121,7 @@ static void run(int argc, char *argv[])
 			if(interactive)
 				window.OpenPath(filenames[0]);
 			else
-				window.Controller().Open(filenames[0], DirectReadMode, true, dataColumnName, false, 4, false, true);
+				window.Controller().Open(filenames[0], DirectReadMode, true, dataColumnName, false, 4, false, true, false);
 		}
 		
 		if(!savedBaselines.empty())

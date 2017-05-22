@@ -26,6 +26,7 @@ MSOptionWindow::MSOptionWindow(class RFIGuiController &controller, const std::st
 	_directReadButton("Direct IO"),
 	_indirectReadButton("Indirect IO"),
 	_memoryReadButton("Memory-mode IO"),
+	_combineSPWsButton("Combine SPWs"),
 	_readUVWButton("Read UVW"),
 	_loadOptimizedStrategy("Load optimized strategy")
 {
@@ -46,6 +47,8 @@ MSOptionWindow::MSOptionWindow(class RFIGuiController &controller, const std::st
 	_indirectReadButton.set_group(group);
 	_memoryReadButton.set_group(group);
 	_directReadButton.set_active(true);
+	
+	_rightVBox.pack_start(_combineSPWsButton);
 
 	_rightVBox.pack_start(_readUVWButton);
 	_readUVWButton.set_active(true);
@@ -107,6 +110,8 @@ void MSOptionWindow::onOpen()
 	BaselineIOMode ioMode = DirectReadMode;
 	if(_indirectReadButton.get_active()) ioMode = IndirectReadMode;
 	else if(_memoryReadButton.get_active()) ioMode = MemoryReadMode;
+	
+	bool combineSPWs = _combineSPWsButton.get_active();
 	bool readUVW = _readUVWButton.get_active();
 	
 	std::string dataColumnName;
@@ -135,7 +140,7 @@ void MSOptionWindow::onOpen()
 	
 	bool loadStrategy = _loadOptimizedStrategy.get_active();
 	
-	_controller.Open(_filename, ioMode, readUVW, dataColumnName, subtractModel, polCount, true, loadStrategy);
+	_controller.Open(_filename, ioMode, readUVW, dataColumnName, subtractModel, polCount, true, loadStrategy, combineSPWs);
 	
 	hide();
 }

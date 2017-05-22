@@ -23,6 +23,8 @@ namespace rfiStrategy {
 			
 			explicit MSImageSetIndex(class rfiStrategy::ImageSet &set) : ImageSetIndex(set), _sequenceIndex(0), _isValid(true) { }
 			
+			MSImageSetIndex(class rfiStrategy::ImageSet &set, size_t sequenceIndex) : ImageSetIndex(set), _sequenceIndex(sequenceIndex), _isValid(true) { }
+			
 			virtual void Previous();
 			virtual void Next();
 			virtual std::string Description() const;
@@ -34,6 +36,7 @@ namespace rfiStrategy {
 				index->_isValid = _isValid;
 				return index;
 			}
+			size_t SequenceIndex() const { return _sequenceIndex; }
 		private:
 			size_t _sequenceIndex;
 			bool _isValid;
@@ -95,6 +98,14 @@ namespace rfiStrategy {
 
 			virtual void Initialize();
 	
+			virtual ImageSetIndex *StartIndex() { return new MSImageSetIndex(*this); }
+
+			virtual void PerformWriteDataTask(const ImageSetIndex &index, std::vector<Image2DCPtr> realImages, std::vector<Image2DCPtr> imaginaryImages)
+			{
+				const MSImageSetIndex &msIndex = static_cast<const MSImageSetIndex&>(index);
+				_reader->PerformDataWriteTask(realImages, imaginaryImages, GetAntenna1(msIndex), GetAntenna2(msIndex), GetBand(msIndex), GetSequenceId(msIndex));
+			}
+			
 			size_t GetAntenna1(const ImageSetIndex &index) {
 				return _sequences[static_cast<const MSImageSetIndex&>(index)._sequenceIndex].antenna1;
 			}
@@ -111,8 +122,6 @@ namespace rfiStrategy {
 				return _sequences[static_cast<const MSImageSetIndex&>(index)._sequenceIndex].sequenceId;
 			}
 	
-			virtual ImageSetIndex *StartIndex() { return new MSImageSetIndex(*this); }
-
 			MSImageSetIndex *Index(size_t antenna1, size_t antenna2, size_t bandIndex, size_t sequenceId)
 			{
 				MSImageSetIndex *index = new MSImageSetIndex(*this);
@@ -175,14 +184,12 @@ namespace rfiStrategy {
 			size_t SequenceCount() const { return _sequencesPerBaselineCount; }
 			void SetReadFlags(bool readFlags) { _readFlags = readFlags; }
 			BaselineReaderPtr Reader() { return _reader; }
-			virtual void PerformWriteDataTask(const ImageSetIndex &index, std::vector<Image2DCPtr> realImages, std::vector<Image2DCPtr> imaginaryImages)
-			{
-				const MSImageSetIndex &msIndex = static_cast<const MSImageSetIndex&>(index);
-				_reader->PerformDataWriteTask(realImages, imaginaryImages, GetAntenna1(msIndex), GetAntenna2(msIndex), GetBand(msIndex), GetSequenceId(msIndex));
-			}
 			void SetReadUVW(bool readUVW)
 			{
 				_readUVW = readUVW;
+			}
+			const std::vector<MeasurementSet::Sequence>& Sequences() const {
+				return _sequences;
 			}
 		private:
 			friend class MSImageSetIndex;
