@@ -8,10 +8,11 @@
 #include "../../structures/antennainfo.h"
 #include "../../structures/timefrequencydata.h"
 #include "../../structures/timefrequencymetadata.h"
-#include "../../msio/baselinereader.h"
-#include "../../structures//measurementset.h"
+#include "../../structures/measurementset.h"
 
-#include "imageset.h"
+#include "../../msio/baselinereader.h"
+
+#include "indexableset.h"
 
 #include "../../util/aologger.h"
 
@@ -42,7 +43,7 @@ namespace rfiStrategy {
 			bool _isValid;
 	};
 	
-	class MSImageSet : public ImageSet {
+	class MSImageSet : public IndexableSet {
 		public:
 			MSImageSet(const std::string &location, BaselineIOMode ioMode) :
 				_msFile(location),
@@ -106,23 +107,25 @@ namespace rfiStrategy {
 				_reader->PerformDataWriteTask(realImages, imaginaryImages, GetAntenna1(msIndex), GetAntenna2(msIndex), GetBand(msIndex), GetSequenceId(msIndex));
 			}
 			
-			size_t GetAntenna1(const ImageSetIndex &index) {
+			virtual BaselineReaderPtr Reader() override final { return _reader; }
+			
+			virtual size_t GetAntenna1(const ImageSetIndex &index) override final {
 				return _sequences[static_cast<const MSImageSetIndex&>(index)._sequenceIndex].antenna1;
 			}
-			size_t GetAntenna2(const ImageSetIndex &index) {
+			virtual size_t GetAntenna2(const ImageSetIndex &index) override final {
 				return _sequences[static_cast<const MSImageSetIndex&>(index)._sequenceIndex].antenna2;
 			}
-			size_t GetBand(const ImageSetIndex &index) {
+			virtual size_t GetBand(const ImageSetIndex &index) override final {
 				return _sequences[static_cast<const MSImageSetIndex&>(index)._sequenceIndex].spw;
 			}
-			size_t GetField(const ImageSetIndex &index) {
+			virtual size_t GetField(const ImageSetIndex &index) override final {
 				return _sequences[static_cast<const MSImageSetIndex&>(index)._sequenceIndex].fieldId;
 			}
-			size_t GetSequenceId(const ImageSetIndex &index) {
+			virtual size_t GetSequenceId(const ImageSetIndex &index) override final {
 				return _sequences[static_cast<const MSImageSetIndex&>(index)._sequenceIndex].sequenceId;
 			}
 	
-			MSImageSetIndex *Index(size_t antenna1, size_t antenna2, size_t bandIndex, size_t sequenceId)
+			virtual MSImageSetIndex *Index(size_t antenna1, size_t antenna2, size_t bandIndex, size_t sequenceId) final override
 			{
 				MSImageSetIndex *index = new MSImageSetIndex(*this);
 				index->_sequenceIndex = FindBaselineIndex(antenna1, antenna2, bandIndex, sequenceId);
@@ -168,22 +171,22 @@ namespace rfiStrategy {
 				_readDipoleCrossPolarisations = false;
 			}
 
-			size_t AntennaCount() { return _set.AntennaCount(); }
-			class ::AntennaInfo GetAntennaInfo(unsigned antennaIndex) { return _set.GetAntennaInfo(antennaIndex); }
-			class ::BandInfo GetBandInfo(unsigned bandIndex)
+			virtual size_t BandCount() const final override { return _bandCount; }
+			virtual class ::AntennaInfo GetAntennaInfo(unsigned antennaIndex) final override { return _set.GetAntennaInfo(antennaIndex); }
+			virtual class ::BandInfo GetBandInfo(unsigned bandIndex) final override
 			{
 				return _set.GetBandInfo(bandIndex);
 			}
-			class ::FieldInfo GetFieldInfo(unsigned fieldIndex)
+			virtual size_t SequenceCount() const final override { return _sequencesPerBaselineCount; }
+			
+			size_t AntennaCount() { return _set.AntennaCount(); }
+			virtual class ::FieldInfo GetFieldInfo(unsigned fieldIndex)
 			{
 				return _set.GetFieldInfo(fieldIndex);
 			}
 			std::vector<double> ObservationTimesVector(const ImageSetIndex &index);
-			size_t BandCount() const { return _bandCount; }
 			size_t FieldCount() const { return _fieldCount; }
-			size_t SequenceCount() const { return _sequencesPerBaselineCount; }
 			void SetReadFlags(bool readFlags) { _readFlags = readFlags; }
-			BaselineReaderPtr Reader() { return _reader; }
 			void SetReadUVW(bool readUVW)
 			{
 				_readUVW = readUVW;

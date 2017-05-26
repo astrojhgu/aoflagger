@@ -8,14 +8,13 @@
 
 #include "rfiguiwindow.h"
 
-
 GoToWindow::GoToWindow(RFIGuiWindow &rfiGuiWindow) : Gtk::Window(),
 	_antenna1Frame("Antenna 1"), _antenna2Frame("Antenna 2"),
 	_bandFrame("Band"), _sequenceFrame("Time sequence"),
 	_loadButton("Load"),
 	_keepOpenCB("Keep window open"),
 	_rfiGuiWindow(rfiGuiWindow),
-	_imageSet(&dynamic_cast<rfiStrategy::MSImageSet&>(rfiGuiWindow.GetImageSet()))
+	_imageSet(&static_cast<rfiStrategy::IndexableSet&>(rfiGuiWindow.GetImageSet()))
 {
 	set_default_size(0, 500);
 	_antennaeStore = Gtk::ListStore::create(_antennaModelColumns);
@@ -83,7 +82,7 @@ GoToWindow::GoToWindow(RFIGuiWindow &rfiGuiWindow) : Gtk::Window(),
 		{
 			++lastSeqIndex;
 		}
-		std::unique_ptr<rfiStrategy::MSImageSetIndex> index(_imageSet->Index(_sequences[lastSeqIndex].antenna1, _sequences[lastSeqIndex].antenna2, _sequences[lastSeqIndex].spw, i));
+		std::unique_ptr<rfiStrategy::ImageSetIndex> index(_imageSet->Index(_sequences[lastSeqIndex].antenna1, _sequences[lastSeqIndex].antenna2, _sequences[lastSeqIndex].spw, i));
 		size_t fIndex = _imageSet->GetField(*index);
 		FieldInfo field = _imageSet->GetFieldInfo(fIndex);
 		desc << field.name << " (" << fIndex << ')';

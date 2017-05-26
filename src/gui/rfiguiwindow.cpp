@@ -476,7 +476,7 @@ void RFIGuiWindow::SetImageSet(rfiStrategy::ImageSet *newImageSet, bool loadBase
 	
 	if(loadBaseline)
 	{
-		if(dynamic_cast<rfiStrategy::MSImageSet*>(newImageSet) != 0)
+		if(dynamic_cast<rfiStrategy::IndexableSet*>(newImageSet) != 0)
 		{
 			onGoToPressed();
 		} else {
@@ -1472,7 +1472,7 @@ void RFIGuiWindow::onGoToPressed()
 {
 	if(HasImageSet())
 	{
-		rfiStrategy::MSImageSet *msSet = dynamic_cast<rfiStrategy::MSImageSet*>(_imageSet);
+		rfiStrategy::IndexableSet *msSet = dynamic_cast<rfiStrategy::IndexableSet*>(_imageSet);
 		if(msSet != 0)
 		{
 			if(_gotoWindow != 0)

@@ -5,42 +5,15 @@
 #include "imageset.h"
 #include "msimageset.h"
 
+#include "../../structures/measurementset.h"
+
 #include <vector>
 #include <list>
 #include <map>
 
 namespace rfiStrategy {
 	
-	struct JoinedSequence
-	{
-		unsigned antenna1, antenna2;
-		unsigned sequenceId;
-		unsigned fieldId;
-		
-		JoinedSequence(unsigned _antenna1, unsigned _antenna2, unsigned _sequenceId, unsigned _fieldId) :
-			antenna1(_antenna1), antenna2(_antenna2),
-			sequenceId(_sequenceId),
-			fieldId(_fieldId)
-			{ }
-		bool operator<(const JoinedSequence &rhs) const
-		{
-			if(antenna1 < rhs.antenna1) return true;
-			else if(antenna1 == rhs.antenna1)
-			{
-				if(antenna2 < rhs.antenna2) return true;
-				else if(antenna2 == rhs.antenna2)
-				{
-					return sequenceId < rhs.sequenceId;
-				}
-			}
-			return false;
-		}
-		bool operator==(const JoinedSequence &rhs) const
-		{
-			return antenna1==rhs.antenna1 && antenna2==rhs.antenna2 &&
-				sequenceId==rhs.sequenceId;
-		}
-	};
+	using Sequence = MeasurementSet::Sequence;
 	
 	class JoinedSPWSetIndex : public ImageSetIndex {
 		public:
@@ -56,11 +29,11 @@ namespace rfiStrategy {
 			{ return new JoinedSPWSetIndex(*this); }
 			
 		private:
-			std::map<JoinedSequence, std::vector<std::pair<size_t, size_t>>>::const_iterator _iterator;
+			std::map<Sequence, std::vector<std::pair<size_t, size_t>>>::const_iterator _iterator;
 			bool _isValid;
 	};
 	
-	class JoinedSPWSet : public ImageSet
+	class JoinedSPWSet : public IndexableSet
 	{
 	public:
 		/**
@@ -77,7 +50,7 @@ namespace rfiStrategy {
 			for(size_t sequenceIndex = 0; sequenceIndex!=sequences.size(); ++sequenceIndex)
 			{
 				const MeasurementSet::Sequence& s = sequences[sequenceIndex];
-				JoinedSequence js(s.antenna1, s.antenna2, s.sequenceId, s.fieldId);
+				Sequence js(s.antenna1, s.antenna2, 0, s.sequenceId, s.fieldId);
 				// TODO Central frequency instead of spw id is a better idea
 				_joinedSequences[js].push_back(std::make_pair(s.spw, sequenceIndex));
 			}
@@ -237,15 +210,100 @@ namespace rfiStrategy {
 			_msImageSet->PerformWriteFlagsTask();
 		}
 		
-		const std::map<JoinedSequence, std::vector<std::pair<size_t, size_t>>>& JoinedSequences() const { return _joinedSequences; }
+		virtual BaselineReaderPtr Reader() override final
+		{
+			return _msImageSet->Reader();
+		}
+		
+		const std::map<Sequence, std::vector<std::pair<size_t, size_t>>>& JoinedSequences() const { return _joinedSequences; }
 		
 		MSImageSet& msImageSet() { return *_msImageSet; }
+		
+		virtual size_t GetAntenna1(const ImageSetIndex &index) override final
+		{
+			return static_cast<const JoinedSPWSetIndex&>(index)._iterator->first.antenna1;
+		}
+		
+		virtual size_t GetAntenna2(const ImageSetIndex &index) override final
+		{
+			return static_cast<const JoinedSPWSetIndex&>(index)._iterator->first.antenna2;
+		}
+		
+		virtual size_t GetBand(const ImageSetIndex &index) override final
+		{
+			return 0;
+		}
+		
+		virtual size_t GetField(const ImageSetIndex &index) override final
+		{
+			return static_cast<const JoinedSPWSetIndex&>(index)._iterator->first.fieldId;
+		}
+		
+		virtual size_t GetSequenceId(const ImageSetIndex &index) override final
+		{
+			return static_cast<const JoinedSPWSetIndex&>(index)._iterator->first.sequenceId;
+		}
+		
+		virtual AntennaInfo GetAntennaInfo(unsigned antennaIndex) override final
+		{
+			return _msImageSet->GetAntennaInfo(antennaIndex);
+		}
+		
+		virtual size_t BandCount() const override final
+		{
+			return 1;
+		}
+		
+		virtual BandInfo GetBandInfo(unsigned bandIndex) override final
+		{
+			BandInfo band = _msImageSet->GetBandInfo(0);
+			size_t chIndex = band.channels.size();
+			for(size_t i=1; i!=_msImageSet->BandCount(); ++i)
+			{
+				const BandInfo srcBand = _msImageSet->GetBandInfo(i);
+				band.channels.resize(chIndex + srcBand.channels.size());
+				for(size_t ch=0; ch!=srcBand.channels.size(); ++ch)
+					band.channels[ch + chIndex] = srcBand.channels[ch];
+				chIndex += srcBand.channels.size();
+			}
+			return band;
+		}
+		
+		virtual size_t SequenceCount() const override final
+		{
+			return _msImageSet->SequenceCount();
+		}
+		
+		virtual ImageSetIndex* Index(size_t antenna1, size_t antenna2, size_t bandIndex, size_t sequenceId) override final
+		{
+			for(auto i=_joinedSequences.begin(); i != _joinedSequences.end() ; ++i)
+			{
+				bool antennaMatch = (i->first.antenna1 == antenna1 && i->first.antenna2 == antenna2) || (i->first.antenna1 == antenna2 && i->first.antenna2 == antenna1);
+				if(antennaMatch && i->first.sequenceId == sequenceId)
+				{
+					JoinedSPWSetIndex* index = new JoinedSPWSetIndex(*this);
+					index->_iterator = i;
+					return index;
+				}
+			}
+			std::stringstream str;
+			str << "Baseline not found: "
+				<< "antenna1=" << antenna1 << ", "
+				<< "antenna2=" << antenna2 << ", "
+				<< "sequenceId=" << sequenceId;
+			throw BadUsageException(str.str());
+		}
+		
+		virtual FieldInfo GetFieldInfo(unsigned fieldIndex) override final
+		{
+			return _msImageSet->GetFieldInfo(fieldIndex);
+		}
 	private:
 		JoinedSPWSet() { }
 		
 		std::unique_ptr<MSImageSet> _msImageSet;
-		std::map<JoinedSequence, std::vector<std::pair<size_t, size_t>>> _joinedSequences;
-		std::vector<std::map<JoinedSequence, std::vector<std::pair<size_t, size_t>>>::const_iterator> _requests;
+		std::map<Sequence, std::vector<std::pair<size_t, size_t>>> _joinedSequences;
+		std::vector<std::map<Sequence, std::vector<std::pair<size_t, size_t>>>::const_iterator> _requests;
 		std::list<BaselineData> _baselineData;
 		std::vector<size_t> _nChannels;
 	};
@@ -281,7 +339,7 @@ namespace rfiStrategy {
 	{
 		MSImageSet& msImageSet = static_cast<JoinedSPWSet&>(imageSet()).msImageSet();
 		
-		const JoinedSequence &sequence = _iterator->first;
+		const Sequence &sequence = _iterator->first;
 		size_t
 			antenna1 = sequence.antenna1,
 			antenna2 = sequence.antenna2,

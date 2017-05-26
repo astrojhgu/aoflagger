@@ -126,8 +126,8 @@ static void run(int argc, char *argv[])
 		
 		if(!savedBaselines.empty())
 		{
-			rfiStrategy::MSImageSet* imageSet =
-				dynamic_cast<rfiStrategy::MSImageSet*>(&window.GetImageSet());
+			rfiStrategy::IndexableSet* imageSet =
+				dynamic_cast<rfiStrategy::IndexableSet*>(&window.GetImageSet());
 			if(imageSet == 0)
 				throw std::runtime_error("Option -save-baseline can only be used for measurement sets.\n");
 			window.GetTimeFrequencyWidget().SetShowXAxisDescription(true);

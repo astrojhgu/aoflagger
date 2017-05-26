@@ -14,6 +14,7 @@
 #include <gtkmm/window.h>
 
 #include "../strategy/control/types.h"
+#include "../strategy/imagesets/indexableset.h"
 
 class GoToWindow : public Gtk::Window {
 	public:
@@ -69,7 +70,7 @@ class GoToWindow : public Gtk::Window {
 		Glib::RefPtr<Gtk::ListStore> _antennaeStore, _bandStore, _sequenceStore;
 
 		RFIGuiWindow &_rfiGuiWindow;
-		rfiStrategy::MSImageSet *_imageSet;
+		rfiStrategy::IndexableSet *_imageSet;
 };
 
 #endif
