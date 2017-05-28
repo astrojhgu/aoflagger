@@ -68,7 +68,7 @@ namespace rfiStrategy {
 			{
 			}
 
-			virtual MSImageSet *Copy()
+			virtual MSImageSet *Copy() override final
 			{
 				MSImageSet *newSet = new MSImageSet(_set.Path(), _ioMode);
 				newSet->_reader = _reader;
@@ -87,21 +87,21 @@ namespace rfiStrategy {
 				return newSet;
 			}
 	
-			virtual std::string Name() { return _set.Path(); }
-			virtual std::string File() { return _set.Path(); }
+			virtual std::string Name() override final { return _set.Path(); }
+			virtual std::string File() override final { return _set.Path(); }
 			
-			virtual void AddReadRequest(const ImageSetIndex &index);
-			virtual void PerformReadRequests();
-			virtual BaselineData *GetNextRequested();
+			virtual void AddReadRequest(const ImageSetIndex &index) override final;
+			virtual void PerformReadRequests() override final;
+			virtual BaselineData *GetNextRequested() override final;
 
-			virtual void AddWriteFlagsTask(const ImageSetIndex &index, std::vector<Mask2DCPtr> &flags);
-			virtual void PerformWriteFlagsTask();
+			virtual void AddWriteFlagsTask(const ImageSetIndex &index, std::vector<Mask2DCPtr> &flags) override final;
+			virtual void PerformWriteFlagsTask() override final;
 
-			virtual void Initialize();
+			virtual void Initialize() override final;
 	
-			virtual ImageSetIndex *StartIndex() { return new MSImageSetIndex(*this); }
+			virtual ImageSetIndex *StartIndex() override final { return new MSImageSetIndex(*this); }
 
-			virtual void PerformWriteDataTask(const ImageSetIndex &index, std::vector<Image2DCPtr> realImages, std::vector<Image2DCPtr> imaginaryImages)
+			virtual void PerformWriteDataTask(const ImageSetIndex &index, std::vector<Image2DCPtr> realImages, std::vector<Image2DCPtr> imaginaryImages) override final
 			{
 				const MSImageSetIndex &msIndex = static_cast<const MSImageSetIndex&>(index);
 				_reader->PerformDataWriteTask(realImages, imaginaryImages, GetAntenna1(msIndex), GetAntenna2(msIndex), GetBand(msIndex), GetSequenceId(msIndex));
@@ -180,7 +180,7 @@ namespace rfiStrategy {
 			virtual size_t SequenceCount() const final override { return _sequencesPerBaselineCount; }
 			
 			size_t AntennaCount() { return _set.AntennaCount(); }
-			virtual class ::FieldInfo GetFieldInfo(unsigned fieldIndex)
+			virtual class ::FieldInfo GetFieldInfo(unsigned fieldIndex) override final
 			{
 				return _set.GetFieldInfo(fieldIndex);
 			}

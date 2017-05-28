@@ -419,15 +419,15 @@ namespace rfiStrategy {
 	
 	void DefaultStrategy::DetermineSettings(ImageSet& measurementSet, DefaultStrategy::TelescopeId& telescopeId, unsigned int& flags, double& frequency, double& timeRes, double& frequencyRes)
 	{
-		MSImageSet *msImageSet = dynamic_cast<MSImageSet*>(&measurementSet);
+		IndexableSet *indexableSet = dynamic_cast<IndexableSet*>(&measurementSet);
 		FitsImageSet *fitsImageSet = dynamic_cast<FitsImageSet*>(&measurementSet);
 		BHFitsImageSet *bhFitsImageSet = dynamic_cast<BHFitsImageSet*>(&measurementSet);
 		FilterBankSet *fbImageSet = dynamic_cast<FilterBankSet*>(&measurementSet);
 
-		if(msImageSet != 0)
+		if(indexableSet != 0)
 		{
 			DetermineSettings(
-				msImageSet->Reader()->Set(),
+				indexableSet->Reader()->Set(),
 				telescopeId,
 				flags,
 				frequency,

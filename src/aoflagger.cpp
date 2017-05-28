@@ -117,6 +117,7 @@ int main(int argc, char **argv)
 		"  -column <name> specify column to flag\n"
 		"  -bands <list> comma separated list of (zero-indexed) band ids to process\n"
 		"  -fields <list> comma separated list of (zero-indexed) field ids to process\n"
+		"  -combine-spws Join all SPWs together in frequency direction before flagging\n"
 		"\n"
 		"This tool supports at least the Casa measurement set, the SDFITS and Filterbank formats. See\n"
 		"the documentation for support of other file types.\n";
@@ -137,6 +138,7 @@ int main(int argc, char **argv)
 	Parameter<bool> logVerbose;
 	Parameter<bool> skipFlagged;
 	Parameter<std::string> dataColumn;
+	Parameter<bool> combineSPWs;
 	std::set<size_t> bands, fields;
 
 	size_t parameterIndex = 1;
@@ -208,6 +210,10 @@ int main(int argc, char **argv)
 			++parameterIndex;
 			NumberList::ParseIntList(argv[parameterIndex], fields);
 		}
+		else if(flag == "combine-spws")
+		{
+			combineSPWs = true;
+		}
 		else
 		{
 			AOLogger::Init(basename(argv[0]));
@@ -242,6 +248,8 @@ int main(int argc, char **argv)
 			fomAction->Bands() = bands;
 		if(!fields.empty())
 			fomAction->Fields() = fields;
+		if(combineSPWs.IsSet())
+			fomAction->SetCombineSPWs(combineSPWs);
 		std::stringstream commandLineStr;
 		commandLineStr << argv[0];
 		for(int i=1;i<argc;++i)

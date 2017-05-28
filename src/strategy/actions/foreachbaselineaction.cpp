@@ -157,7 +157,7 @@ namespace rfiStrategy {
 	bool ForEachBaselineAction::IsBaselineSelected(ImageSetIndex &index)
 	{
 		ImageSet *imageSet = _artifacts->ImageSet();
-		MSImageSet *msImageSet = dynamic_cast<MSImageSet*>(imageSet);
+		IndexableSet *msImageSet = dynamic_cast<IndexableSet*>(imageSet);
 		size_t a1id, a2id;
 		if(msImageSet != 0)
 		{

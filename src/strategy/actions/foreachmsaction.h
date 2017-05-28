@@ -11,7 +11,14 @@ namespace rfiStrategy {
 
 	class ForEachMSAction  : public ActionBlock {
 		public:
-			ForEachMSAction() : _readUVW(false), _dataColumnName("DATA"), _subtractModel(false), _skipIfAlreadyProcessed(false), _loadOptimizedStrategy(false), _baselineIOMode(AutoReadMode),
+			ForEachMSAction() : 
+			_readUVW(false), 
+			_dataColumnName("DATA"),
+			_subtractModel(false), 
+			_combineSPWs(false),
+			_skipIfAlreadyProcessed(false),
+			_loadOptimizedStrategy(false),
+			_baselineIOMode(AutoReadMode),
 			_threadCount(0)
 			{
 			}
@@ -40,6 +47,9 @@ namespace rfiStrategy {
 
 			const std::string &DataColumnName() const { return _dataColumnName; }
 			void SetDataColumnName(const std::string &name) { _dataColumnName = name; }
+			
+			bool CombineSPWs() const { return _combineSPWs; }
+			void SetCombineSPWs(bool combineSPWs) { _combineSPWs = combineSPWs; }
 
 			bool SubtractModel() const { return _subtractModel; }
 			void SetSubtractModel(bool subtractModel) { _subtractModel = subtractModel; }
@@ -67,6 +77,7 @@ namespace rfiStrategy {
 			std::string _dataColumnName;
 			bool _subtractModel;
 			std::string _commandLineForHistory;
+			bool _combineSPWs;
 			bool _skipIfAlreadyProcessed;
 			bool _loadOptimizedStrategy;
 			BaselineIOMode _baselineIOMode;

@@ -22,8 +22,14 @@ namespace rfiStrategy {
 			virtual std::string Description() const = 0;
 			virtual bool IsValid() const = 0;
 			virtual ImageSetIndex *Copy() const = 0;
-			void Reattach(ImageSet &imageSet) { _set = &imageSet; }
+			void Reattach(ImageSet &imageSet) {
+				_set = &imageSet;
+				reattach();
+			}
 		protected:
+			virtual void reattach() { }
+			ImageSetIndex(const ImageSetIndex&) = default;
+			ImageSetIndex& operator=(const ImageSetIndex&) = default;
 			ImageSet &imageSet() const { return *_set; }
 		private:
 			class ImageSet *_set;

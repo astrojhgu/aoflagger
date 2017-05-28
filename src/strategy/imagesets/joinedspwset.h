@@ -29,6 +29,10 @@ namespace rfiStrategy {
 			{ return new JoinedSPWSetIndex(*this); }
 			
 		private:
+			JoinedSPWSetIndex(const JoinedSPWSetIndex&) = default;
+			JoinedSPWSetIndex& operator=(const JoinedSPWSetIndex&) = delete;
+			virtual void reattach() final override;
+			
 			std::map<Sequence, std::vector<std::pair<size_t, size_t>>>::const_iterator _iterator;
 			bool _isValid;
 	};
@@ -57,6 +61,9 @@ namespace rfiStrategy {
 			for(auto& js : _joinedSequences)
 				std::sort(js.second.begin(), js.second.end());
 		}
+		
+		JoinedSPWSet(const JoinedSPWSet& source) = delete;
+		JoinedSPWSet& operator=(const JoinedSPWSet& source) = delete;
 		
 		virtual ~JoinedSPWSet() override { };
 		virtual ImageSet *Copy() override final
@@ -164,7 +171,9 @@ namespace rfiStrategy {
 				
 				metaData->SetBand(band);
 				
-				BaselineData combinedData(tfData, metaData);
+				ImageSetIndex* index = Index(request->first.antenna1, request->first.antenna2, request->first.spw, request->first.sequenceId);
+				BaselineData combinedData(tfData, metaData, *index);
+				delete index;
 				_baselineData.push_back(combinedData);
 			}
 			_requests.clear();
@@ -333,6 +342,11 @@ namespace rfiStrategy {
 			_isValid = false;
 		}
 		--_iterator;
+	}
+
+	void JoinedSPWSetIndex::reattach()
+	{
+		_iterator = static_cast<JoinedSPWSet&>(imageSet()).JoinedSequences().find(_iterator->first);
 	}
 
 	std::string JoinedSPWSetIndex::Description() const

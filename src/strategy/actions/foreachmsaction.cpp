@@ -10,6 +10,7 @@
 #include "../control/defaultstrategy.h"
 
 #include "../imagesets/imageset.h"
+#include "../imagesets/joinedspwset.h"
 #include "../imagesets/msimageset.h"
 
 #include "../../util/aologger.h"
@@ -57,6 +58,12 @@ void ForEachMSAction::Perform(ArtifactSet &artifacts, ProgressListener &progress
 				msImageSet->SetDataColumnName(_dataColumnName);
 				msImageSet->SetSubtractModel(_subtractModel);
 				msImageSet->SetReadUVW(_readUVW);
+				if(_combineSPWs)
+				{
+					msImageSet->Initialize();
+					imageSet.release();
+					imageSet.reset(new JoinedSPWSet(msImageSet));
+				}
 			}
 			imageSet->Initialize();
 			
