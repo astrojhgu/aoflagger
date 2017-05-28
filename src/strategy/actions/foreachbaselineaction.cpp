@@ -13,9 +13,6 @@
 #include "../imagesets/filterbankset.h"
 #include "../imagesets/qualitystatimageset.h"
 
-#include <sys/types.h>
-#include <sys/sysctl.h>
-
 #include <iostream>
 #include <sstream>
 
