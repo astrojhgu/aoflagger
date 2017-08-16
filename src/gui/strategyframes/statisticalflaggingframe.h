@@ -21,9 +21,15 @@ class StatisticalFlaggingFrame : public Gtk::Frame {
 		_dilluteTimeSizeScale(Gtk::ORIENTATION_HORIZONTAL),
 		_dilluteFrequencySizeLabel("Dillution frequency size:"),
 		_dilluteFrequencySizeScale(Gtk::ORIENTATION_HORIZONTAL),
-		_minTimeRatioLabel("Minimum time ratio:"),
+		_minTimesAvailableRatioLabel("Minimum time ratio:"),
+		_minTimesAvailableRatioScale(Gtk::ORIENTATION_HORIZONTAL),
+		_minFreqAvailableRatioLabel("Minimum frequency ratio:"),
+		_minFreqAvailableRatioScale(Gtk::ORIENTATION_HORIZONTAL),
+		_minTFAvailableRatioLabel("Minimum total available ratio:"),
+		_minTFAvailableRatioScale(Gtk::ORIENTATION_HORIZONTAL),
+		_minTimeRatioLabel("SIR-operator time extension:"),
 		_minTimeRatioScale(Gtk::ORIENTATION_HORIZONTAL),
-		_minFreqRatioLabel("Minimum frequency ratio:"),
+		_minFreqRatioLabel("SIR-operator frequency extension:"),
 		_minFreqRatioScale(Gtk::ORIENTATION_HORIZONTAL),
 		_applyButton("Apply")
 		{
@@ -40,6 +46,27 @@ class StatisticalFlaggingFrame : public Gtk::Frame {
 			_dilluteFrequencySizeScale.set_value(_action.EnlargeFrequencySize());
 			_dilluteFrequencySizeScale.set_increments(1, 10);
 			_box.pack_start(_dilluteFrequencySizeScale);
+
+			_box.pack_start(_minTimesAvailableRatioLabel);
+
+			_minTimesAvailableRatioScale.set_range(0, 100);
+			_minTimesAvailableRatioScale.set_value(_action.MinAvailableTimesRatio()*100.0);
+			_minTimesAvailableRatioScale.set_increments(.25, 5);
+			_box.pack_start(_minTimesAvailableRatioScale);
+
+			_box.pack_start(_minFreqAvailableRatioLabel);
+
+			_minFreqAvailableRatioScale.set_range(0, 100);
+			_minFreqAvailableRatioScale.set_value(_action.MinAvailableFrequenciesRatio()*100.0);
+			_minFreqAvailableRatioScale.set_increments(.25, 5);
+			_box.pack_start(_minFreqAvailableRatioScale);
+
+			_box.pack_start(_minTFAvailableRatioLabel);
+
+			_minTFAvailableRatioScale.set_range(0, 100);
+			_minTFAvailableRatioScale.set_value(_action.MinAvailableTFRatio()*100.0);
+			_minTFAvailableRatioScale.set_increments(.25, 5);
+			_box.pack_start(_minTFAvailableRatioScale);
 
 			_box.pack_start(_minTimeRatioLabel);
 
@@ -74,6 +101,13 @@ class StatisticalFlaggingFrame : public Gtk::Frame {
 		Gtk::Label _dilluteFrequencySizeLabel;
 		Gtk::Scale _dilluteFrequencySizeScale;
 		
+		Gtk::Label _minTimesAvailableRatioLabel;
+		Gtk::Scale _minTimesAvailableRatioScale;
+		Gtk::Label _minFreqAvailableRatioLabel;
+		Gtk::Scale _minFreqAvailableRatioScale;
+		Gtk::Label _minTFAvailableRatioLabel;
+		Gtk::Scale _minTFAvailableRatioScale;
+		
 		Gtk::Label _minTimeRatioLabel;
 		Gtk::Scale _minTimeRatioScale;
 		Gtk::Label _minFreqRatioLabel;
@@ -85,6 +119,9 @@ class StatisticalFlaggingFrame : public Gtk::Frame {
 		{
 			_action.SetEnlargeTimeSize((size_t) _dilluteTimeSizeScale.get_value());
 			_action.SetEnlargeFrequencySize((size_t) _dilluteFrequencySizeScale.get_value());
+			_action.SetMinAvailableTimesRatio(_minTimesAvailableRatioScale.get_value()/100.0);
+			_action.SetMinAvailableFrequenciesRatio(_minFreqAvailableRatioScale.get_value()/100.0);
+			_action.SetMinAvailableTFRatio(_minTFAvailableRatioScale.get_value()/100.0);
 			_action.SetMinimumGoodTimeRatio(_minTimeRatioScale.get_value()/100.0);
 			_action.SetMinimumGoodFrequencyRatio(_minFreqRatioScale.get_value()/100.0);
 			_editStrategyWindow.UpdateAction(&_action);

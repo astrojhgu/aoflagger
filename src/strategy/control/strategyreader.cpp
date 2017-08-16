@@ -185,9 +185,13 @@ xmlNode *StrategyReader::getTextNode(xmlNode *node, const char *subNodeName, boo
 			}
 		}
 	}
-	std::ostringstream str;
-	str << "Error occured in reading xml file: could not find value node \"" << subNodeName << '\"';
-	throw StrategyReaderError(str.str());
+	if(allowEmpty)
+		return 0;
+	else {
+		std::ostringstream str;
+		str << "Error occured in reading xml file: could not find value node \"" << subNodeName << '\"';
+		throw StrategyReaderError(str.str());
+	}
 }
 
 int StrategyReader::getInt(xmlNode *node, const char *name) const 
@@ -200,6 +204,15 @@ double StrategyReader::getDouble(xmlNode *node, const char *name) const
 {
 	xmlNode *valNode = getTextNode(node, name);
 	return NumberParser::ToDouble((const char *) valNode->content);
+}
+
+double StrategyReader::getDoubleOr(xmlNode *node, const char *name, double alternative) const 
+{
+	xmlNode *valNode = getTextNode(node, name, true);
+	if(valNode == 0)
+		return alternative;
+	else
+		return NumberParser::ToDouble((const char *) valNode->content);
 }
 
 std::string StrategyReader::getString(xmlNode *node, const char *name) const 
@@ -604,8 +617,9 @@ class Action *StrategyReader::parseStatisticalFlagAction(xmlNode *node)
 	StatisticalFlagAction *newAction = new StatisticalFlagAction();
 	newAction->SetEnlargeFrequencySize(getInt(node, "enlarge-frequency-size"));
 	newAction->SetEnlargeTimeSize(getInt(node, "enlarge-time-size"));
-	newAction->SetMaxContaminatedFrequenciesRatio(getDouble(node, "max-contaminated-frequencies-ratio"));
-	newAction->SetMaxContaminatedTimesRatio(getDouble(node, "max-contaminated-times-ratio"));
+	newAction->SetMinAvailableFrequenciesRatio(getDoubleOr(node, "min-available-frequencies-ratio", 0.0));
+	newAction->SetMinAvailableTimesRatio(getDoubleOr(node, "min-available-times-ratio", 0.0));
+	newAction->SetMinAvailableTFRatio(getDoubleOr(node, "min-available-tf-ratio", 0.0));
 	newAction->SetMinimumGoodFrequencyRatio(getDouble(node, "minimum-good-frequency-ratio"));
 	newAction->SetMinimumGoodTimeRatio(getDouble(node, "minimum-good-time-ratio"));
 	return newAction;

@@ -424,8 +424,9 @@ namespace rfiStrategy {
 		Attribute("type", "StatisticalFlagAction");
 		Write<size_t>("enlarge-frequency-size", action.EnlargeFrequencySize());
 		Write<size_t>("enlarge-time-size", action.EnlargeTimeSize());
-		Write<num_t>("max-contaminated-frequencies-ratio", action.MaxContaminatedFrequenciesRatio());
-		Write<num_t>("max-contaminated-times-ratio", action.MaxContaminatedTimesRatio());
+		Write<num_t>("min-available-frequencies-ratio", action.MinAvailableFrequenciesRatio());
+		Write<num_t>("min-available-times-ratio", action.MinAvailableTimesRatio());
+		Write<num_t>("min-available-tf-ratio", action.MinAvailableTFRatio());
 		Write<num_t>("minimum-good-frequency-ratio", action.MinimumGoodFrequencyRatio());
 		Write<num_t>("minimum-good-time-ratio", action.MinimumGoodTimeRatio());
 	}

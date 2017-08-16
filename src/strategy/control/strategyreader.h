@@ -31,6 +31,7 @@ class StrategyReader {
 		xmlNode *getTextNode(xmlNode *node, const char *subNodeName, bool allowEmpty = false) const;
 		int getInt(xmlNode *node, const char *name) const;
 		double getDouble(xmlNode *node, const char *name) const;
+		double getDoubleOr(xmlNode *node, const char *name, double alternative) const;
 		std::string getString(xmlNode *node, const char *name) const;
 		bool getBool(xmlNode *node, const char *name) const { return getInt(node,name) != 0; }
 
