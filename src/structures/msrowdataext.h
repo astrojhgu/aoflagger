@@ -8,39 +8,16 @@
 class MSRowDataExt : public Serializable
 {
 	public:
-		MSRowDataExt()
-		: _data()
-		{
-		}
+		MSRowDataExt() = default;
 		
-		MSRowDataExt(unsigned polarizationCount, unsigned channelCount)
-		: _data(polarizationCount, channelCount)
+		MSRowDataExt(unsigned polarizationCount, unsigned channelCount) :
+			_data(polarizationCount, channelCount),
+			_antenna1(),
+			_antenna2(),
+			_timeOffsetIndex(),
+			_u(), _v(), _w(),
+			_time()
 		{
-		}
-		
-		MSRowDataExt(const MSRowDataExt &source) :
-		_data(source._data),
-		_antenna1(source._antenna1),
-		_antenna2(source._antenna2),
-		_timeOffsetIndex(source._timeOffsetIndex),
-		_u(source._u),
-		_v(source._v),
-		_w(source._w),
-		_time(source._time)
-		{
-		}
-		
-		MSRowDataExt &operator=(const MSRowDataExt &source)
-		{
-			_data = source._data;
-			_antenna1 = source._antenna1;
-			_antenna2 = source._antenna2;
-			_timeOffsetIndex = source._timeOffsetIndex;
-			_u = source._u;
-			_v = source._v;
-			_w = source._w;
-			_time = source._time;
-			return *this;
 		}
 		
 		const MSRowData &Data() const { return _data; }
