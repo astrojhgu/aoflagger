@@ -8,13 +8,13 @@
 #include "../baseexception.h"
 #include "types.h"
 
-#include <boost/shared_ptr.hpp>
+#include <memory>
 
 #include <exception>
 #include <cmath>
 
-typedef boost::shared_ptr<class Image2D> Image2DPtr;
-typedef boost::shared_ptr<const class Image2D> Image2DCPtr;
+typedef std::shared_ptr<class Image2D> Image2DPtr;
+typedef std::shared_ptr<const class Image2D> Image2DCPtr;
 
 /**
  * This class represents a two dimensional single-valued (=gray scale) image. It can be

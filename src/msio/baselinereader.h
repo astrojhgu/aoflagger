@@ -4,8 +4,7 @@
 #include <map>
 #include <vector>
 #include <stdexcept>
-
-#include <boost/shared_ptr.hpp>
+#include <memory>
 
 #include "../structures/antennainfo.h"
 #include "../structures/image2d.h"
@@ -13,8 +12,8 @@
 #include "../structures/measurementset.h"
 #include "../structures/polarization.h"
 
-typedef boost::shared_ptr<class BaselineReader> BaselineReaderPtr;
-typedef boost::shared_ptr<const class BaselineReader> BaselineReaderCPtr;
+typedef std::shared_ptr<class BaselineReader> BaselineReaderPtr;
+typedef std::shared_ptr<const class BaselineReader> BaselineReaderCPtr;
 
 class BaselineReader {
 	public:

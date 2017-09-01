@@ -1,14 +1,13 @@
 #ifndef MASK2D_H
 #define MASK2D_H
 
-#include <string.h>
-
-#include <boost/shared_ptr.hpp>
+#include <cstring>
+#include <memory>
 
 #include "image2d.h"
 
-typedef boost::shared_ptr<class Mask2D> Mask2DPtr;
-typedef boost::shared_ptr<const class Mask2D> Mask2DCPtr;
+typedef std::shared_ptr<class Mask2D> Mask2DPtr;
+typedef std::shared_ptr<const class Mask2D> Mask2DCPtr;
 
 class Mask2D {
 	public:
@@ -94,24 +93,24 @@ class Mask2D {
 			return Mask2DPtr(CreateCopy(*source));
 		}
 
-		inline bool Value(size_t x, size_t y) const
+		bool Value(size_t x, size_t y) const
 		{
 			return _values[y][x];
 		}
 		
-		inline void SetValue(size_t x, size_t y, bool newValue)
+		void SetValue(size_t x, size_t y, bool newValue)
 		{
 			_values[y][x] = newValue;
 		}
 		
-		inline void SetHorizontalValues(size_t x, size_t y, bool newValue, size_t count)
+		void SetHorizontalValues(size_t x, size_t y, bool newValue, size_t count)
 		{
 			memset(&_values[y][x], newValue, count * sizeof(bool));
 		}
 		
-		inline size_t Width() const { return _width; }
+		size_t Width() const { return _width; }
 		
-		inline size_t Height() const { return _height; }
+		size_t Height() const { return _height; }
 
 		bool AllFalse() const
 		{
@@ -138,7 +137,7 @@ class Mask2D {
 		 * 
 		 * @see Stride()
 		 */
-		inline bool *ValuePtr(size_t x, size_t y)
+		bool *ValuePtr(size_t x, size_t y)
 		{
 			return &_values[y][x];
 		}
@@ -155,17 +154,17 @@ class Mask2D {
 		 * 
 		 * @see Stride()
 		 */
-		inline const bool *ValuePtr(size_t x, size_t y) const
+		const bool *ValuePtr(size_t x, size_t y) const
 		{
 			return &_values[y][x];
 		}
 		
-		inline bool *Data()
+		bool *Data()
 		{
 			return _valuesConsecutive;
 		}
 		
-		inline const bool *Data() const
+		const bool *Data() const
 		{
 			return _valuesConsecutive;
 		}
@@ -178,7 +177,7 @@ class Mask2D {
 		 * 
 		 * @see ValuePtr(unsigned, unsigned)
 		 */
-		inline size_t Stride() const
+		size_t Stride() const
 		{
 			return _stride;
 		}

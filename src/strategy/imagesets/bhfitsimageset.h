@@ -5,6 +5,7 @@
 #include <set>
 #include <stack>
 #include <map>
+#include <memory>
 
 #include "imageset.h"
 
@@ -110,7 +111,7 @@ return *this;
 			std::pair<int, int> getRangeFromString(const std::string &rangeStr);
 			std::string flagFilePath() const;
 
-			boost::shared_ptr<class FitsFile> _file;
+			std::shared_ptr<class FitsFile> _file;
 			std::stack<BaselineData> _baselineData;
 			std::vector<TimeRange> _timeRanges;
 			int _width, _height;

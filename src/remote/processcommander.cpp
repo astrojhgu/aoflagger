@@ -105,9 +105,8 @@ void ProcessCommander::continueReadAntennaTablesTask(ServerConnectionPtr serverC
 	boost::mutex::scoped_lock lock(_mutex);
 	
 	const Hostname &hostname = serverConnection->GetHostname();
-	std::vector<AntennaInfo> *antennas = new std::vector<AntennaInfo>();
-	serverConnection->ReadAntennaTables(_nodeCommands.Top(hostname).LocalPath(),
-																			boost::shared_ptr<std::vector<AntennaInfo> >(antennas));
+	std::unique_ptr<std::vector<AntennaInfo>> antennas(new std::vector<AntennaInfo>());
+	serverConnection->ReadAntennaTables(_nodeCommands.Top(hostname).LocalPath(), std::move(antennas));
 	
 	onCurrentTaskFinished();
 }
@@ -262,7 +261,7 @@ void ProcessCommander::onConnectionFinishReadQualityTables(ServerConnectionPtr s
 	delete &histogramCollection;
 }
 
-void ProcessCommander::onConnectionFinishReadAntennaTables(ServerConnectionPtr serverConnection, boost::shared_ptr<std::vector<AntennaInfo> > antennas, size_t polarizationCount)
+void ProcessCommander::onConnectionFinishReadAntennaTables(ServerConnectionPtr serverConnection, std::shared_ptr<std::vector<AntennaInfo> > antennas, size_t polarizationCount)
 {
 	boost::mutex::scoped_lock lock(_mutex);
 	_polarizationCount = polarizationCount;

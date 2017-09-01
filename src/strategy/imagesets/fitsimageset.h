@@ -95,7 +95,7 @@ namespace rfiStrategy {
 			
 			void saveSingleDishFlags(std::vector<Mask2DCPtr> &flags, size_t ifIndex);
 			
-			boost::shared_ptr<class FitsFile> _file;
+			std::shared_ptr<class FitsFile> _file;
 			std::vector<std::pair<size_t,size_t> > _baselines;
 			size_t _bandCount;
 			std::vector<AntennaInfo> _antennaInfos;

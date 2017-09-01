@@ -7,8 +7,7 @@
 #include <cstring>
 #include <iostream>
 #include <limits>
-
-#include <string.h>
+#include <cstring>
 
 #include <boost/numeric/conversion/bounds.hpp>
 

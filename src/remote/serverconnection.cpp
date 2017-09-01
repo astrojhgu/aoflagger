@@ -101,9 +101,9 @@ void ServerConnection::ReadQualityTables(const std::string &msFilename, Statisti
 		boost::bind(&ServerConnection::onReceiveQualityTablesResponseHeader, shared_from_this()));
 }
 
-void ServerConnection::ReadAntennaTables(const std::string &msFilename, boost::shared_ptr<std::vector<AntennaInfo> > antennas)
+void ServerConnection::ReadAntennaTables(const std::string &msFilename, std::shared_ptr<std::vector<AntennaInfo> > antennas)
 {
-	_antennas = antennas;
+	_antennas = std::move(antennas);
 	
 	std::stringstream reqBuffer;
 	

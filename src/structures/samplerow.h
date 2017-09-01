@@ -1,16 +1,16 @@
 #ifndef SAMPLEROW_H
 #define SAMPLEROW_H
 
+#include <algorithm>
 #include <limits>
 #include <cmath>
-
-#include <boost/shared_ptr.hpp>
+#include <memory>
 
 #include "image2d.h"
 #include "mask2d.h"
 
-typedef boost::shared_ptr<class SampleRow> SampleRowPtr;
-typedef boost::shared_ptr<const class SampleRow> SampleRowCPtr;
+typedef std::shared_ptr<class SampleRow> SampleRowPtr;
+typedef std::shared_ptr<const class SampleRow> SampleRowCPtr;
 
 #include "../strategy/algorithms/convolutions.h"
 

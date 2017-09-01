@@ -2,10 +2,9 @@
 #define AOREMOTE__SERVER_CONNECTION_H
 
 #include <string>
+#include <memory>
 
 #include <boost/asio/ip/tcp.hpp>
-
-#include <boost/enable_shared_from_this.hpp>
 
 #include <boost/signals2/signal.hpp>
 
@@ -20,9 +19,9 @@ class HistogramCollection;
 
 namespace aoRemote {
 
-typedef boost::shared_ptr<class ServerConnection> ServerConnectionPtr;
+typedef std::shared_ptr<class ServerConnection> ServerConnectionPtr;
 
-class ServerConnection : public boost::enable_shared_from_this<ServerConnection>
+class ServerConnection : public std::enable_shared_from_this<ServerConnection>
 
 {
 	public:
@@ -34,7 +33,7 @@ class ServerConnection : public boost::enable_shared_from_this<ServerConnection>
 		
 		void StopClient();
 		void ReadQualityTables(const std::string &msFilename, class StatisticsCollection &collection, HistogramCollection &histogramCollection);
-		void ReadAntennaTables(const std::string &msFilename, boost::shared_ptr<std::vector<AntennaInfo> > antennas);
+		void ReadAntennaTables(const std::string &msFilename, std::shared_ptr<std::vector<AntennaInfo> > antennas);
 		void ReadBandTable(const std::string &msFilename, BandInfo &band);
 		void ReadDataRows(const std::string &msFilename, size_t rowStart, size_t rowCount, MSRowDataExt *destinationArray);
 		void WriteDataRows(const std::string &msFilename, size_t rowStart, size_t rowCount, const MSRowDataExt *rowArray);
@@ -44,7 +43,7 @@ class ServerConnection : public boost::enable_shared_from_this<ServerConnection>
 		
 		boost::signals2::signal<void(ServerConnectionPtr)> &SignalAwaitingCommand() { return _onAwaitingCommand; }
 		boost::signals2::signal<void(ServerConnectionPtr, StatisticsCollection&, HistogramCollection&)> &SignalFinishReadQualityTables() { return _onFinishReadQualityTables; }
-		boost::signals2::signal<void(ServerConnectionPtr, boost::shared_ptr<std::vector<AntennaInfo> >, size_t)> &SignalFinishReadAntennaTables() { return _onFinishReadAntennaTables; }
+		boost::signals2::signal<void(ServerConnectionPtr, std::shared_ptr<std::vector<AntennaInfo> >, size_t)> &SignalFinishReadAntennaTables() { return _onFinishReadAntennaTables; }
 		boost::signals2::signal<void(ServerConnectionPtr, BandInfo&)> &SignalFinishReadBandTable() { return _onFinishReadBandTable; }
 		boost::signals2::signal<void(ServerConnectionPtr, MSRowDataExt*, size_t)> &SignalFinishReadDataRows() { return _onFinishReadDataRows; }
 		boost::signals2::signal<void(ServerConnectionPtr, const std::string&)> &SignalError() { return _onError; }
@@ -57,7 +56,7 @@ class ServerConnection : public boost::enable_shared_from_this<ServerConnection>
 		
 		boost::signals2::signal<void(ServerConnectionPtr)> _onAwaitingCommand;
 		boost::signals2::signal<void(ServerConnectionPtr, StatisticsCollection&, HistogramCollection&)> _onFinishReadQualityTables;
-		boost::signals2::signal<void(ServerConnectionPtr, boost::shared_ptr<std::vector<AntennaInfo> >, size_t)> _onFinishReadAntennaTables;
+		boost::signals2::signal<void(ServerConnectionPtr, std::shared_ptr<std::vector<AntennaInfo> >, size_t)> _onFinishReadAntennaTables;
 		boost::signals2::signal<void(ServerConnectionPtr, BandInfo&)> _onFinishReadBandTable;
 		boost::signals2::signal<void(ServerConnectionPtr, MSRowDataExt*, size_t)> _onFinishReadDataRows;
 		boost::signals2::signal<void(ServerConnectionPtr, const std::string&)> _onError;
@@ -90,7 +89,7 @@ class ServerConnection : public boost::enable_shared_from_this<ServerConnection>
 		
 		StatisticsCollection *_collection;
 		HistogramCollection *_histogramCollection;
-		boost::shared_ptr<std::vector<AntennaInfo> > _antennas;
+		std::shared_ptr<std::vector<AntennaInfo> > _antennas;
 		BandInfo *_band;
 		MSRowDataExt *_readRowData;
 		const MSRowDataExt *_writeRowData;

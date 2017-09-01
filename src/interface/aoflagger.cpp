@@ -21,10 +21,8 @@
 
 #include <vector>
 #include <typeinfo>
-
-#include <boost/shared_ptr.hpp>
-
-#include <boost/thread/mutex.hpp>
+#include <memory>
+#include <mutex>
 
 namespace aoflagger {
 	
@@ -258,7 +256,7 @@ namespace aoflagger {
 				return *this;
 			}
 			
-			boost::shared_ptr<rfiStrategy::Strategy> strategyPtr;
+			std::shared_ptr<rfiStrategy::Strategy> strategyPtr;
 	};
 	
 	Strategy::Strategy(enum TelescopeId telescopeId, unsigned strategyFlags, double frequency, double timeRes, double frequencyRes) :
@@ -317,11 +315,11 @@ namespace aoflagger {
 				_implementation(new QualityStatisticsDataImp(_scanTimes, nScans, nPolarizations, computeHistograms))
 			{
 			}
-			explicit QualityStatisticsData(boost::shared_ptr<QualityStatisticsDataImp> implementation) :
+			explicit QualityStatisticsData(std::shared_ptr<QualityStatisticsDataImp> implementation) :
 				_implementation(implementation)
 			{
 			}
-			boost::shared_ptr<QualityStatisticsDataImp> _implementation;
+			std::shared_ptr<QualityStatisticsDataImp> _implementation;
 	};
 
 	QualityStatistics::QualityStatistics(const double* scanTimes, size_t nScans, const double* channelFrequencies, size_t nChannels, size_t nPolarizations, bool computeHistograms) :
