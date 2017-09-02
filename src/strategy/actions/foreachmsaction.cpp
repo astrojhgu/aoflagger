@@ -62,7 +62,8 @@ void ForEachMSAction::Perform(ArtifactSet &artifacts, ProgressListener &progress
 				{
 					msImageSet->Initialize();
 					imageSet.release();
-					imageSet.reset(new JoinedSPWSet(msImageSet));
+					std::unique_ptr<MSImageSet> msImageSetPtr(msImageSet);
+					imageSet.reset(new JoinedSPWSet(std::move(msImageSetPtr)));
 				}
 			}
 			imageSet->Initialize();

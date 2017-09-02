@@ -3,6 +3,7 @@
 
 #include <set>
 #include <mutex>
+#include <memory>
 
 #include <gtkmm/actiongroup.h>
 #include <gtkmm/box.h>
@@ -31,8 +32,8 @@ class RFIGuiWindow : public Gtk::Window, private StrategyController {
 		RFIGuiWindow();
 		~RFIGuiWindow();
 
-		void SetImageSet(rfiStrategy::ImageSet *newImageSet, bool loadBaseline);
-		void SetImageSetIndex(rfiStrategy::ImageSetIndex *newImageSetIndex);
+		void SetImageSet(std::unique_ptr<rfiStrategy::ImageSet> newImageSet, bool loadBaseline);
+		void SetImageSetIndex(std::unique_ptr<rfiStrategy::ImageSetIndex> newImageSetIndex);
 		rfiStrategy::ImageSet &GetImageSet() const { return *_imageSet; }
 		rfiStrategy::ImageSetIndex &GetImageSetIndex() const { return *_imageSetIndex; }
 		void SetRevisedData(const TimeFrequencyData &data)
@@ -43,7 +44,7 @@ class RFIGuiWindow : public Gtk::Window, private StrategyController {
 		{
 			_timeFrequencyWidget.Update();
 		}
- 		bool HasImageSet() const { return _imageSet != 0; }
+ 		bool HasImageSet() const { return _imageSet != nullptr; }
 		bool HasImage() const { return _timeFrequencyWidget.HasImage(); }
 		Mask2DCPtr Mask() const { return GetOriginalData().GetSingleMask(); }
 		Mask2DCPtr AltMask() const { return GetContaminatedData().GetSingleMask(); }
@@ -240,7 +241,7 @@ class RFIGuiWindow : public Gtk::Window, private StrategyController {
 		
 		void onExecutePythonStrategy();
 		
-		class RFIGuiController *_controller;
+		std::unique_ptr<class RFIGuiController> _controller;
 		
 		Gtk::Box _mainVBox;
 		Gtk::Paned _panedArea;
@@ -265,25 +266,25 @@ class RFIGuiWindow : public Gtk::Window, private StrategyController {
 			_gaussianTestSetsButton, _rayleighTestSetsButton, _zeroTestSetsButton,
 			_ncpSetButton, _b1834SetButton, _emptySetButton,
 			_sim16ChannelsButton, _sim64ChannelsButton, _sim256ChannelsButton;
-		class ImagePlaneWindow *_imagePlaneWindow;
-		class HistogramWindow *_histogramWindow;
-		Gtk::Window
-			*_optionWindow, *_editStrategyWindow,
-			*_gotoWindow,
-			*_progressWindow, *_highlightWindow,
-			*_plotComplexPlaneWindow, *_imagePropertiesWindow;
+		std::unique_ptr<class ImagePlaneWindow> _imagePlaneWindow;
+		std::unique_ptr<class HistogramWindow> _histogramWindow;
+		std::unique_ptr<class PlotWindow> _plotWindow;
+		std::unique_ptr<Gtk::Window>
+			_optionWindow, _editStrategyWindow,
+			_gotoWindow,
+			_progressWindow, _highlightWindow,
+			_plotComplexPlaneWindow, _imagePropertiesWindow;
 
-		rfiStrategy::ImageSet *_imageSet;
-		rfiStrategy::ImageSetIndex *_imageSetIndex;
-		rfiStrategy::Strategy *_strategy;
+		std::unique_ptr<rfiStrategy::ImageSet> _imageSet;
+		std::unique_ptr<rfiStrategy::ImageSetIndex> _imageSetIndex;
+		std::unique_ptr<rfiStrategy::Strategy> _strategy;
 		int _gaussianTestSets;
 		std::mutex _ioMutex;
 		SegmentedImagePtr _segmentedImage;
-		class SpatialMatrixMetaData *_spatialMetaData;
+		std::unique_ptr<class SpatialMatrixMetaData> _spatialMetaData;
 		std::vector<double> _horProfile, _vertProfile;
 		TimeFrequencyData _storedData;
 		TimeFrequencyMetaDataCPtr _storedMetaData;
-		class PlotWindow *_plotWindow;
 };
 
 #endif

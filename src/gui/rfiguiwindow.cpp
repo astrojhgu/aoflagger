@@ -64,14 +64,8 @@
 RFIGuiWindow::RFIGuiWindow() : 
 	_controller(new RFIGuiController(*this, this)),
 	_mainVBox(Gtk::ORIENTATION_VERTICAL),
-	_imagePlaneWindow(0), _histogramWindow(0), _optionWindow(0), _editStrategyWindow(0),
-	_gotoWindow(0), _progressWindow(0), _highlightWindow(0), _plotComplexPlaneWindow(0),
-	_imagePropertiesWindow(0),
-	_imageSet(0),
-	_imageSetIndex(0),
-	_gaussianTestSets(true),
-	_spatialMetaData(0),
-	_plotWindow(new PlotWindow(_controller->PlotManager()))
+	_plotWindow(new PlotWindow(_controller->PlotManager())),
+	_gaussianTestSets(true)
 {
 	createToolbar();
 
@@ -95,10 +89,10 @@ RFIGuiWindow::RFIGuiWindow() :
 	set_default_size(800,600);
 	set_default_icon_name("aoflagger");
 
-	_strategy = rfiStrategy::DefaultStrategy::CreateStrategy(
+	_strategy.reset(rfiStrategy::DefaultStrategy::CreateStrategy(
 		rfiStrategy::DefaultStrategy::GENERIC_TELESCOPE,
-		rfiStrategy::DefaultStrategy::FLAG_GUI_FRIENDLY);
-	_imagePlaneWindow = new ImagePlaneWindow();
+		rfiStrategy::DefaultStrategy::FLAG_GUI_FRIENDLY));
+	_imagePlaneWindow.reset(new ImagePlaneWindow());
 	
 	onTFZoomChanged();
 	
@@ -112,35 +106,23 @@ RFIGuiWindow::~RFIGuiWindow()
 	while(!_actionGroup->get_actions().empty())
 		_actionGroup->remove(*_actionGroup->get_actions().begin());
 	
-	delete _imagePlaneWindow;
-	delete _plotWindow;
-	if(_histogramWindow != 0)
-		delete _histogramWindow;
-	if(_optionWindow != 0)
-		delete _optionWindow;
-	if(_editStrategyWindow != 0)
-		delete _editStrategyWindow;
-	if(_gotoWindow != 0)
-		delete _gotoWindow;
-	if(_progressWindow != 0)
-		delete _progressWindow;
-	if(_highlightWindow != 0)
-		delete _highlightWindow;
-	if(_imagePropertiesWindow != 0)
-		delete _imagePropertiesWindow;
+	_imagePlaneWindow.reset();
+	_plotWindow.reset();
+	_histogramWindow.reset();
+	_optionWindow.reset();
+	_editStrategyWindow.reset();
+	_gotoWindow.reset();
+	_progressWindow.reset();
+	_highlightWindow.reset();
+	_imagePropertiesWindow.reset();
 	
 	// The rfistrategy needs the lock to clean up
 	lock.unlock();
-	
-	delete _strategy;
-	if(HasImageSet())
-	{
-		delete _imageSetIndex;
-		delete _imageSet;
-	}
-	if(_spatialMetaData != 0)
-		delete _spatialMetaData;
-	delete _controller;
+	_strategy.reset();
+	_imageSetIndex.reset();
+	_imageSet.reset();
+	_spatialMetaData.reset();
+	_controller.reset();
 }
 
 void RFIGuiWindow::onActionDirectoryOpen()
@@ -176,10 +158,10 @@ void RFIGuiWindow::onActionDirectoryOpenForSpatial()
   if(result == Gtk::RESPONSE_OK)
 	{
 		std::unique_lock<std::mutex> lock(_ioMutex);
-		rfiStrategy::SpatialMSImageSet *imageSet = new rfiStrategy::SpatialMSImageSet(dialog.get_filename());
+		std::unique_ptr<rfiStrategy::SpatialMSImageSet> imageSet(new rfiStrategy::SpatialMSImageSet(dialog.get_filename()));
 		imageSet->Initialize();
 		lock.unlock();
-		SetImageSet(imageSet, true);
+		SetImageSet(std::move(imageSet), true);
 	}
 }
 
@@ -198,10 +180,10 @@ void RFIGuiWindow::onActionDirectoryOpenForST()
   if(result == Gtk::RESPONSE_OK)
 	{
 		std::unique_lock<std::mutex> lock(_ioMutex);
-		rfiStrategy::SpatialTimeImageSet *imageSet = new rfiStrategy::SpatialTimeImageSet(dialog.get_filename());
+		std::unique_ptr<rfiStrategy::SpatialTimeImageSet> imageSet(new rfiStrategy::SpatialTimeImageSet(dialog.get_filename()));
 		imageSet->Initialize();
 		lock.unlock();
-		SetImageSet(imageSet, true);
+		SetImageSet(std::move(imageSet), true);
 	}
 }
 
@@ -224,16 +206,15 @@ void RFIGuiWindow::onActionFileOpen()
 
 void RFIGuiWindow::OpenPath(const std::string &path)
 {
-	if(_optionWindow != 0)
-		delete _optionWindow;
+	_optionWindow.reset();
 	if(rfiStrategy::ImageSet::IsMSFile(path))
 	{
-		_optionWindow = new MSOptionWindow(*_controller, path);
+		_optionWindow.reset(new MSOptionWindow(*_controller, path));
 		_optionWindow->present();
 	}
 	else {
 		std::unique_lock<std::mutex> lock(_ioMutex);
-		rfiStrategy::ImageSet *imageSet = rfiStrategy::ImageSet::Create(path, DirectReadMode);
+		std::unique_ptr<rfiStrategy::ImageSet> imageSet(rfiStrategy::ImageSet::Create(path, DirectReadMode));
 		imageSet->Initialize();
 		lock.unlock();
 		
@@ -252,7 +233,7 @@ void RFIGuiWindow::OpenPath(const std::string &path)
 		);
 		NotifyChange();
 		
-		SetImageSet(imageSet, true);
+		SetImageSet(std::move(imageSet), true);
 	}
 }
 
@@ -282,14 +263,12 @@ void RFIGuiWindow::loadCurrentTFData()
 			
 			_timeFrequencyWidget.SetNewData(baseline->Data(), baseline->MetaData());
 			delete baseline;
-			if(_spatialMetaData != 0)
+			_spatialMetaData.reset();
+			rfiStrategy::SpatialMSImageSet* smsImageSet =
+				dynamic_cast<rfiStrategy::SpatialMSImageSet*>(_imageSet.get());
+			if(smsImageSet != 0)
 			{
-				delete _spatialMetaData;
-				_spatialMetaData = 0;
-			}
-			if(dynamic_cast<rfiStrategy::SpatialMSImageSet*>(_imageSet) != 0)
-			{
-				_spatialMetaData = new SpatialMatrixMetaData(static_cast<rfiStrategy::SpatialMSImageSet*>(_imageSet)->SpatialMetaData(*_imageSetIndex));
+				_spatialMetaData.reset(new SpatialMatrixMetaData(smsImageSet->SpatialMetaData(*_imageSetIndex)));
 			}
 			// Disable forward/back buttons when only one baseline is available
 			rfiStrategy::ImageSetIndex* firstIndex = _imageSet->StartIndex();
@@ -351,18 +330,13 @@ void RFIGuiWindow::onLoadNext()
 
 void RFIGuiWindow::onEditStrategyPressed()
 {
-	if(_editStrategyWindow != 0)
-		delete _editStrategyWindow;
-	_editStrategyWindow = new EditStrategyWindow(*this);
+	_editStrategyWindow.reset(new EditStrategyWindow(*this));
 	_editStrategyWindow->show();
 }
 
 void RFIGuiWindow::onExecuteStrategyPressed()
 {
-	delete _progressWindow;
-
-	ProgressWindow *window = new ProgressWindow(*this);
-	_progressWindow = window;
+	_progressWindow.reset(new ProgressWindow(*this));
 	_progressWindow->show();
 
 	rfiStrategy::ArtifactSet artifacts(&_ioMutex);
@@ -390,12 +364,12 @@ void RFIGuiWindow::onExecuteStrategyPressed()
 			artifacts.SetMetaData(_timeFrequencyWidget.GetFullMetaData());
 	if(HasImageSet())
 	{
-		artifacts.SetImageSet(_imageSet);
-		artifacts.SetImageSetIndex(_imageSetIndex);
+		artifacts.SetImageSet(_imageSet.get());
+		artifacts.SetImageSetIndex(_imageSetIndex.get());
 	}
 	_strategy->InitializeAll();
 	try {
-		_strategy->StartPerformThread(artifacts, *window);
+		_strategy->StartPerformThread(artifacts, static_cast<ProgressWindow&>(*_progressWindow));
 	}  catch(std::exception &e)
 	{
 		showError(e.what());
@@ -449,8 +423,7 @@ void RFIGuiWindow::onExecuteStrategyFinished()
 	}
 	if(_closeExecuteFrameButton->get_active())
 	{
-		delete _progressWindow;
-		_progressWindow = 0;
+		_progressWindow.reset();
 	}
 }
 
@@ -465,18 +438,14 @@ void RFIGuiWindow::onToggleImage()
 	_timeFrequencyWidget.Update();
 }
 
-void RFIGuiWindow::SetImageSet(rfiStrategy::ImageSet *newImageSet, bool loadBaseline)
+void RFIGuiWindow::SetImageSet(std::unique_ptr<rfiStrategy::ImageSet> newImageSet, bool loadBaseline)
 {
-	if(_imageSet != 0) {
-		delete _imageSet;
-		delete _imageSetIndex;
-	}
-	_imageSet = newImageSet;
-	_imageSetIndex = _imageSet->StartIndex();
+	_imageSetIndex.reset(newImageSet->StartIndex());
+	_imageSet = std::move(newImageSet);
 	
 	if(loadBaseline)
 	{
-		if(dynamic_cast<rfiStrategy::IndexableSet*>(newImageSet) != 0)
+		if(dynamic_cast<rfiStrategy::IndexableSet*>(_imageSet.get()) != 0)
 		{
 			onGoToPressed();
 		} else {
@@ -485,16 +454,13 @@ void RFIGuiWindow::SetImageSet(rfiStrategy::ImageSet *newImageSet, bool loadBase
 	}
 }
 
-void RFIGuiWindow::SetImageSetIndex(rfiStrategy::ImageSetIndex *newImageSetIndex)
+void RFIGuiWindow::SetImageSetIndex(std::unique_ptr<rfiStrategy::ImageSetIndex> newImageSetIndex)
 {
 	if(HasImageSet())
 	{
-		delete _imageSetIndex;
-		_imageSetIndex = newImageSetIndex;
+		_imageSetIndex = std::move(newImageSetIndex);
 		_imageSetIndexDescription = _imageSetIndex->Description();
 		loadCurrentTFData();
-	} else {
-		delete newImageSetIndex;
 	}
 }
 
@@ -1164,9 +1130,7 @@ void RFIGuiWindow::onBackgroundToOriginalPressed()
 
 void RFIGuiWindow::onHightlightPressed()
 {
-	if(_highlightWindow != 0)
-		delete _highlightWindow;
-	_highlightWindow = new HighlightWindow(*this);
+	_highlightWindow.reset(new HighlightWindow(*this));
 	_highlightWindow->show();
 }
 
@@ -1329,9 +1293,7 @@ void RFIGuiWindow::onPlotLogLogDistPressed()
 void RFIGuiWindow::onPlotComplexPlanePressed()
 {
 	if(HasImage()) {
-		if(_plotComplexPlaneWindow != 0)
-			delete _plotComplexPlaneWindow;
-		_plotComplexPlaneWindow = new ComplexPlanePlotWindow(*this, _controller->PlotManager());
+		_plotComplexPlaneWindow.reset(new ComplexPlanePlotWindow(*this, _controller->PlotManager()));
 		_plotComplexPlaneWindow->show();
 	}
 }
@@ -1388,8 +1350,8 @@ void RFIGuiWindow::onPlotSingularValuesPressed()
 
 void RFIGuiWindow::ShowHistogram(HistogramCollection& histogramCollection)
 {
-	if(_histogramWindow == 0)
-		_histogramWindow = new HistogramWindow(histogramCollection);
+	if(_histogramWindow == nullptr)
+		_histogramWindow.reset(new HistogramWindow(histogramCollection));
 	else
 		_histogramWindow->SetStatistics(histogramCollection);
 	_histogramWindow->show();
@@ -1397,9 +1359,7 @@ void RFIGuiWindow::ShowHistogram(HistogramCollection& histogramCollection)
 
 void RFIGuiWindow::onImagePropertiesPressed()
 {
-	if(_imagePropertiesWindow != 0)
-		delete _imagePropertiesWindow;
-	_imagePropertiesWindow = new ImagePropertiesWindow(_timeFrequencyWidget, "Time-frequency plotting options");
+	_imagePropertiesWindow.reset(new ImagePropertiesWindow(_timeFrequencyWidget, "Time-frequency plotting options"));
 	_imagePropertiesWindow->show();
 }
 
@@ -1472,12 +1432,11 @@ void RFIGuiWindow::onGoToPressed()
 {
 	if(HasImageSet())
 	{
-		rfiStrategy::IndexableSet *msSet = dynamic_cast<rfiStrategy::IndexableSet*>(_imageSet);
-		if(msSet != 0)
+		rfiStrategy::IndexableSet *msSet =
+			dynamic_cast<rfiStrategy::IndexableSet*>(_imageSet.get());
+		if(msSet != nullptr)
 		{
-			if(_gotoWindow != 0)
-				delete _gotoWindow;
-			_gotoWindow = new GoToWindow(*this);
+			_gotoWindow.reset(new GoToWindow(*this));
 			_gotoWindow->show();
 		} else {
 			showError("Can not goto in this image set; format does not support goto");
@@ -1497,8 +1456,9 @@ void RFIGuiWindow::onLoadLongestBaselinePressed()
 {
 	if(HasImageSet())
 	{
-		rfiStrategy::MSImageSet *msSet = dynamic_cast<rfiStrategy::MSImageSet*>(_imageSet);
-		if(msSet != 0)
+		rfiStrategy::MSImageSet *msSet =
+			dynamic_cast<rfiStrategy::MSImageSet*>(_imageSet.get());
+		if(msSet != nullptr)
 		{
 			double longestSq = 0.0;
 			size_t longestA1=0, longestA2=0;
@@ -1507,7 +1467,7 @@ void RFIGuiWindow::onLoadLongestBaselinePressed()
 			for(size_t a=0; a!=antCount; a++)
 				antennas[a] = msSet->GetAntennaInfo(a);
 			
-			rfiStrategy::ImageSetIndex *index = msSet->StartIndex();
+			std::unique_ptr<rfiStrategy::ImageSetIndex> index(msSet->StartIndex());
 			size_t band = msSet->GetBand(*_imageSetIndex);
 			size_t sequenceId = msSet->GetSequenceId(*_imageSetIndex);
 			while(index->IsValid())
@@ -1527,9 +1487,8 @@ void RFIGuiWindow::onLoadLongestBaselinePressed()
 				}
 				index->Next();
 			}
-			delete index;
-			rfiStrategy::MSImageSetIndex *newIndex = msSet->Index(longestA1, longestA2, band, sequenceId);
-			SetImageSetIndex(newIndex);
+			SetImageSetIndex(std::unique_ptr<rfiStrategy::MSImageSetIndex>(
+				msSet->Index(longestA1, longestA2, band, sequenceId)));
 		}
 	}
 }
@@ -1538,8 +1497,9 @@ void RFIGuiWindow::onLoadShortestBaselinePressed()
 {
 	if(HasImageSet())
 	{
-		rfiStrategy::MSImageSet *msSet = dynamic_cast<rfiStrategy::MSImageSet*>(_imageSet);
-		if(msSet != 0)
+		rfiStrategy::MSImageSet *msSet =
+			dynamic_cast<rfiStrategy::MSImageSet*>(_imageSet.get());
+		if(msSet != nullptr)
 		{
 			double smallestSq = 1e26;
 			size_t smallestA1=0, smallestA2=0;
@@ -1548,7 +1508,7 @@ void RFIGuiWindow::onLoadShortestBaselinePressed()
 			for(size_t a=0; a!=antCount; a++)
 				antennas[a] = msSet->GetAntennaInfo(a);
 			
-			rfiStrategy::ImageSetIndex *index = msSet->StartIndex();
+			std::unique_ptr<rfiStrategy::ImageSetIndex> index(msSet->StartIndex());
 			size_t band = msSet->GetBand(*_imageSetIndex);
 			size_t sequenceId = msSet->GetSequenceId(*_imageSetIndex);
 			while(index->IsValid())
@@ -1568,9 +1528,8 @@ void RFIGuiWindow::onLoadShortestBaselinePressed()
 				}
 				index->Next();
 			}
-			delete index;
-			rfiStrategy::MSImageSetIndex *newIndex = msSet->Index(smallestA1, smallestA2, band, sequenceId);
-			SetImageSetIndex(newIndex);
+			SetImageSetIndex(std::unique_ptr<rfiStrategy::MSImageSetIndex>(
+				msSet->Index(smallestA1, smallestA2, band, sequenceId)));
 		}
 	}
 }
@@ -1630,8 +1589,8 @@ void RFIGuiWindow::onAddToImagePlane()
 			}
 			_imagePlaneWindow->AddData(activeData, _timeFrequencyWidget.GetSelectedMetaData());
 		}
-		else if(_spatialMetaData != 0)
-			_imagePlaneWindow->AddData(GetActiveData(), _spatialMetaData);
+		else if(_spatialMetaData != nullptr)
+			_imagePlaneWindow->AddData(GetActiveData(), _spatialMetaData.get());
 		else
 			showError("No meta data found.");
 	}  catch(std::exception &e)
@@ -1980,8 +1939,7 @@ void RFIGuiWindow::onSubtractDataFromMem()
 
 void RFIGuiWindow::SetStrategy(rfiStrategy::Strategy* newStrategy)
 {
-	delete _strategy;
-	_strategy = newStrategy;
+	_strategy.reset(newStrategy);
 }
 
 void RFIGuiWindow::onControllerStateChange()

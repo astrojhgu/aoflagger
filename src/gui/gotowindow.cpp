@@ -179,7 +179,7 @@ void GoToWindow::onLoadClicked()
 		size_t a2Index = a2Row[_antennaModelColumns.antennaIndex];
 		size_t bIndex = bRow[_bandModelColumns.bandIndex];
 		size_t sIndex = sRow[_sequenceModelColumns.sequenceIndex];
-		_rfiGuiWindow.SetImageSetIndex(_imageSet->Index(a1Index, a2Index, bIndex, sIndex));
+		_rfiGuiWindow.SetImageSetIndex(std::unique_ptr<rfiStrategy::ImageSetIndex>(_imageSet->Index(a1Index, a2Index, bIndex, sIndex)));
 		if(!_keepOpenCB.get_active())
 			hide();
 	}

@@ -346,10 +346,11 @@ void RFIGuiController::Open(const std::string& filename, BaselineIOMode ioMode, 
 	std::cout << "Opening " << filename << std::endl;
 	try
 	{
-		rfiStrategy::ImageSet *imageSet = rfiStrategy::ImageSet::Create(filename, ioMode);
-		if(dynamic_cast<rfiStrategy::MSImageSet*>(imageSet) != 0)
+		std::unique_ptr<rfiStrategy::ImageSet> imageSet(rfiStrategy::ImageSet::Create(filename, ioMode));
+		rfiStrategy::MSImageSet* msImageSet =
+			dynamic_cast<rfiStrategy::MSImageSet*>(imageSet.get());
+		if(msImageSet != 0)
 		{
-			rfiStrategy::MSImageSet *msImageSet = static_cast<rfiStrategy::MSImageSet*>(imageSet);
 			msImageSet->SetSubtractModel(subtractModel);
 			msImageSet->SetDataColumnName(dataColumn);
 	
@@ -365,7 +366,9 @@ void RFIGuiController::Open(const std::string& filename, BaselineIOMode ioMode, 
 			if(combineSPW)
 			{
 				msImageSet->Initialize();
-				imageSet = new rfiStrategy::JoinedSPWSet(msImageSet);
+				imageSet.release();
+				std::unique_ptr<rfiStrategy::MSImageSet> msImageSetPtr(msImageSet);
+				imageSet.reset(new rfiStrategy::JoinedSPWSet(std::move(msImageSetPtr)));
 			}
 		}
 		imageSet->Initialize();
@@ -388,7 +391,7 @@ void RFIGuiController::Open(const std::string& filename, BaselineIOMode ioMode, 
 			_strategyController->NotifyChange();
 		}
 	
-		_rfiGuiWindow.SetImageSet(imageSet, loadBaseline);
+		_rfiGuiWindow.SetImageSet(std::move(imageSet), loadBaseline);
 	} catch(std::exception &e)
 	{
 		Gtk::MessageDialog dialog(_rfiGuiWindow, e.what(), false, Gtk::MESSAGE_ERROR);

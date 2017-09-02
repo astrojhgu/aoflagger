@@ -135,7 +135,8 @@ static void run(int argc, char *argv[])
 			window.GetTimeFrequencyWidget().SetShowZAxisDescription(true);
 			for(std::set<SavedBaseline>::const_iterator i=savedBaselines.begin(); i!=savedBaselines.end(); ++i)
 			{
-				window.SetImageSetIndex(imageSet->Index(i->a1Index, i->a2Index, i->bandIndex, i->sequenceIndex));
+				window.SetImageSetIndex(std::unique_ptr<rfiStrategy::ImageSetIndex>(
+					imageSet->Index(i->a1Index, i->a2Index, i->bandIndex, i->sequenceIndex)));
 				window.GetTimeFrequencyWidget().SaveByExtension(i->filename, 800, 480);
 			}
 		}

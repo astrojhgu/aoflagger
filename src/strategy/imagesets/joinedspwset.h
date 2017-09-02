@@ -44,7 +44,8 @@ namespace rfiStrategy {
 		 * @param msImageSet An already initialized image set of which ownership is transferred to
 		 * this class.
 		 */
-		explicit JoinedSPWSet(MSImageSet* msImageSet) : _msImageSet(msImageSet)
+		explicit JoinedSPWSet(std::unique_ptr<MSImageSet> msImageSet) :
+			_msImageSet(std::move(msImageSet))
 		{
 			const std::vector<MeasurementSet::Sequence>& sequences = _msImageSet->Sequences();
 			size_t nBands = _msImageSet->BandCount();
