@@ -49,17 +49,6 @@ namespace aoflagger {
 			{
 			}
 			
-			ImageSetData(const ImageSetData &source) :
-				images(source.images)
-			{
-			}
-			
-			ImageSetData& operator=(const ImageSetData &source)
-			{
-				images = source.images;
-				return* this;
-			}
-			
 			std::vector<Image2DPtr> images;
 	};
 	
@@ -100,6 +89,11 @@ namespace aoflagger {
 	{
 	}
 	
+	ImageSet::ImageSet::ImageSet(aoflagger::ImageSet&& sourceImageSet) :
+		_data(new ImageSetData(std::move(*sourceImageSet._data)))
+	{
+	}
+	
 	ImageSet::~ImageSet()
 	{
 		delete _data;
@@ -108,6 +102,12 @@ namespace aoflagger {
 	ImageSet &ImageSet::operator=(const ImageSet& sourceImageSet)
 	{
 		*_data = *sourceImageSet._data;
+		return *this;
+	}
+	
+	ImageSet &ImageSet::operator=(ImageSet&& sourceImageSet)
+	{
+		*_data = std::move(*sourceImageSet._data);
 		return *this;
 	}
 	
@@ -169,28 +169,15 @@ namespace aoflagger {
 			{
 			}
 			
-			FlagMaskData(const FlagMaskData &source) :
-				mask(source.mask)
-			{
-			}
-			
-			FlagMaskData& operator=(const FlagMaskData &source)
-			{
-				mask = source.mask;
-				return *this;
-			}
-			
 			Mask2DPtr mask;
 	};
 	
 	FlagMask::FlagMask() : _data(0)
-	{
-	}
+	{ }
 	
 	FlagMask::FlagMask(size_t width, size_t height) : _data(new FlagMaskData(
 		Mask2D::CreateUnsetMaskPtr(width, height)	))
-	{
-	}
+	{ }
 	
 	FlagMask::FlagMask(size_t width, size_t height, bool initialValue) : _data(new FlagMaskData(
 		Mask2D::CreateUnsetMaskPtr(width, height)	))
@@ -203,9 +190,24 @@ namespace aoflagger {
 	
 	FlagMask::FlagMask(const FlagMask& sourceMask) :
 		_data(new FlagMaskData(*sourceMask._data))
-	{
-	}
+	{ }
 			
+	FlagMask::FlagMask(FlagMask&& sourceMask) :
+		_data(new FlagMaskData(std::move(*sourceMask._data)))
+	{ }
+	
+	FlagMask& FlagMask::operator=(const FlagMask& flagMask)
+	{
+		*_data = *flagMask._data;
+		return *this;
+	}
+	
+	FlagMask& FlagMask::operator=(FlagMask&& flagMask)
+	{
+		*_data = std::move(*flagMask._data);
+		return *this;
+	}
+	
 	FlagMask::~FlagMask()
 	{
 		// _data might be 0, but it's fine to delete 0; (by standard)
@@ -237,24 +239,11 @@ namespace aoflagger {
 		return _data->mask->ValuePtr(0, 0);
 	}
 	
-	
 	class StrategyData {
 		public:
 			explicit StrategyData(rfiStrategy::Strategy *strategy)
 			: strategyPtr(strategy)
-			{
-			}
-			
-			StrategyData(const StrategyData& source)
-			: strategyPtr(source.strategyPtr)
-			{
-			}
-			
-			StrategyData& operator=(const StrategyData& source)
-			{
-				strategyPtr = source.strategyPtr;
-				return *this;
-			}
+			{ }
 			
 			std::shared_ptr<rfiStrategy::Strategy> strategyPtr;
 	};
@@ -280,6 +269,11 @@ namespace aoflagger {
 	{
 	}
 	
+	Strategy::Strategy(Strategy&& sourceStrategy) :
+		_data(new StrategyData(std::move(*sourceStrategy._data)))
+	{
+	}
+	
 	Strategy::~Strategy()
 	{
 		delete _data;
@@ -291,6 +285,11 @@ namespace aoflagger {
 		return *this;
 	}
 
+	Strategy &Strategy::operator=(Strategy&& sourceStrategy)
+	{
+		*_data = std::move(*sourceStrategy._data);
+		return *this;
+	}
 	
 	class QualityStatisticsDataImp
 	{
@@ -333,6 +332,11 @@ namespace aoflagger {
 	{
 	}
 	
+	QualityStatistics::QualityStatistics(QualityStatistics&& sourceQS) :
+		_data(new QualityStatisticsData(std::move(sourceQS._data->_implementation)))
+	{
+	}
+	
 	QualityStatistics::~QualityStatistics()
 	{
 		delete _data;
@@ -341,6 +345,12 @@ namespace aoflagger {
 	QualityStatistics& QualityStatistics::operator=(const QualityStatistics& sourceQS)
 	{
 		_data->_implementation = sourceQS._data->_implementation;
+		return *this;
+	}
+	
+	QualityStatistics& QualityStatistics::operator=(QualityStatistics&& sourceQS)
+	{
+		_data->_implementation = std::move(sourceQS._data->_implementation);
 		return *this;
 	}
 	
