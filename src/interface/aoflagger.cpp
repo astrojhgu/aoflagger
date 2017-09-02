@@ -382,7 +382,7 @@ namespace aoflagger {
 	
 	FlagMask AOFlagger::Run(Strategy& strategy, const ImageSet& input)
 	{
-		boost::mutex mutex;
+		std::mutex mutex;
 		rfiStrategy::ArtifactSet artifacts(&mutex);
 		ProgressListener* listener;
 		if(_statusListener == 0)

@@ -28,7 +28,7 @@ find_package(LibXml2 REQUIRED)
 find_package(PNG REQUIRED)
 #Prevent accidentally finding old BoostConfig.cmake file from casapy
 set(Boost_NO_BOOST_CMAKE ON)
-find_package(Boost REQUIRED COMPONENTS date_time thread filesystem python signals system)
+find_package(Boost REQUIRED COMPONENTS date_time filesystem python signals system)
 find_package(Threads REQUIRED)
 find_library(FFTW3_LIB fftw3 REQUIRED)
 enable_language(Fortran OPTIONAL)

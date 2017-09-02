@@ -50,7 +50,7 @@ namespace rfiStrategy {
 		private:
 			enum PlotKind _plotKind;
 			bool _logYAxis;
-			boost::mutex _plotMutex;
+			std::mutex _plotMutex;
 
 			void plotAntennaFlagCounts(class ArtifactSet &artifacts);
 			void plotFrequencyFlagCounts(class ArtifactSet &artifacts);

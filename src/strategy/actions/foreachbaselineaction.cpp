@@ -15,9 +15,8 @@
 
 #include <iostream>
 #include <sstream>
-
-#include <boost/thread.hpp>
-
+#include <thread>
+#include <vector>
 
 namespace rfiStrategy {
 	
@@ -124,18 +123,18 @@ namespace rfiStrategy {
 			_progressTaskCount = new int[_threadCount];
 			progress.OnStartTask(*this, 0, 1, "Initializing");
 
-			boost::thread_group threadGroup;
+			std::vector<std::thread> threadGroup;
 			ReaderFunction reader(*this);
-			threadGroup.create_thread(reader);
+			threadGroup.emplace_back(reader);
 			
 			size_t mathThreads = mathThreadCount();
 			for(unsigned i=0;i<mathThreads;++i)
 			{
 				PerformFunction function(*this, progress, i);
-				threadGroup.create_thread(function);
+				threadGroup.emplace_back(function);
 			}
-			
-			threadGroup.join_all();
+			for(std::thread& t : threadGroup)
+				t.join();
 			progress.OnEndTask(*this);
 
 			if(_resultSet != 0)
@@ -208,7 +207,7 @@ namespace rfiStrategy {
 
 	class ImageSetIndex *ForEachBaselineAction::GetNextIndex()
 	{
-		boost::mutex::scoped_lock lock(_mutex);
+		std::lock_guard<std::mutex> lock(_mutex);
 		while(_loopIndex->IsValid())
 		{
 			if(IsBaselineSelected(*_loopIndex))
@@ -225,24 +224,24 @@ namespace rfiStrategy {
 
 	void ForEachBaselineAction::SetExceptionOccured()
 	{
-		boost::mutex::scoped_lock lock(_mutex);
+		std::lock_guard<std::mutex> lock(_mutex);
 		_exceptionOccured = true;
 	}
 	
 	void ForEachBaselineAction::SetFinishedBaselines()
 	{
-		boost::mutex::scoped_lock lock(_mutex);
+		std::lock_guard<std::mutex> lock(_mutex);
 		_finishedBaselines = true;
 	}
 	
 	void ForEachBaselineAction::PerformFunction::operator()()
 	{
-		boost::mutex::scoped_lock ioLock(_action._artifacts->IOMutex());
+		std::unique_lock<std::mutex> ioLock(_action._artifacts->IOMutex());
 		ImageSet *privateImageSet = _action._artifacts->ImageSet()->Copy();
 		ioLock.unlock();
 
 		try {
-			boost::mutex::scoped_lock lock(_action._mutex);
+			std::unique_lock<std::mutex> lock(_action._mutex);
 			ArtifactSet newArtifacts(*_action._artifacts);
 			lock.unlock();
 			
@@ -326,7 +325,7 @@ namespace rfiStrategy {
 			size_t wantedCount = maxRecommendedBufferSize - _action.GetBaselinesInBufferCount();
 			size_t requestedCount = 0;
 			
-			boost::mutex::scoped_lock lock(_action._artifacts->IOMutex());
+			std::unique_lock<std::mutex> lock(_action._artifacts->IOMutex());
 			watch.Start();
 			
 			for(size_t i=0;i<wantedCount;++i)
@@ -352,9 +351,8 @@ namespace rfiStrategy {
 				{
 					BaselineData *baseline = _action._artifacts->ImageSet()->GetNextRequested();
 					
-					boost::mutex::scoped_lock bufferLock(_action._mutex);
+					std::lock_guard<std::mutex> bufferLock(_action._mutex);
 					_action._baselineBuffer.push(baseline);
-					bufferLock.unlock();
 				}
 			}
 			
@@ -371,7 +369,7 @@ namespace rfiStrategy {
 
 	void ForEachBaselineAction::SetProgress(ProgressListener &progress, int no, int count, const std::string& taskName, int threadId)
 	{
-	  boost::mutex::scoped_lock lock(_mutex);
+	  std::lock_guard<std::mutex> lock(_mutex);
 		_progressTaskNo[threadId] = no;
 		_progressTaskCount[threadId] = count;
 		size_t totalCount = 0, totalNo = 0;

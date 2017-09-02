@@ -6,6 +6,7 @@
 #include <deque>
 #include <vector>
 #include <memory>
+#include <mutex>
 
 #include "clusteredobservation.h"
 #include "nodecommandmap.h"
@@ -139,7 +140,7 @@ class ProcessCommander
 		 * their thread, locking is required for accessing data that might be
 		 * accessed by the processes.
 		 */
-		boost::mutex _mutex;
+		std::mutex _mutex;
 		
 		Task currentTask() const {
 			if(!_tasks.empty()) return _tasks.front();

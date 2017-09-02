@@ -25,7 +25,7 @@ void NormalizeVarianceAction::initializeStdDevs(ArtifactSet &artifacts)
 	// std dev. When a new measurement set is read, Initialize or Finalize
 	// will be called, causing a clean().
 	
-	boost::mutex::scoped_lock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 	if(!_isInitialized)
 	{
 		if(!artifacts.HasImageSet())
@@ -58,7 +58,7 @@ void NormalizeVarianceAction::initializeStdDevs(ArtifactSet &artifacts)
 
 void NormalizeVarianceAction::clean()
 {
-	boost::mutex::scoped_lock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 	_isInitialized = false;
 	_stddevs.clear(); // frees a bit of memory.
 }

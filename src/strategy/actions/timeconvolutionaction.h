@@ -16,8 +16,6 @@
 #include "../../util/ffttools.h"
 #include "../../util/progresslistener.h"
 
-#include <boost/concept_check.hpp>
-
 namespace rfiStrategy {
 
 	class TimeConvolutionAction : public Action

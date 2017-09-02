@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <mutex>
 
 #include <libgen.h>
 
@@ -31,13 +32,13 @@
 
 class ConsoleProgressHandler : public ProgressListener {
 	private:
-		boost::mutex _mutex;
+		std::mutex _mutex;
 		
 	public:
 		
 		virtual void OnStartTask(const rfiStrategy::Action &action, size_t taskNo, size_t taskCount, const std::string &description, size_t weight)
 		{
-			boost::mutex::scoped_lock lock(_mutex);
+			std::lock_guard<std::mutex> lock(_mutex);
 			ProgressListener::OnStartTask(action, taskNo, taskCount, description, weight);
 			
 			double totalProgress = TotalProgress();
@@ -52,7 +53,7 @@ class ConsoleProgressHandler : public ProgressListener {
 		
 		virtual void OnEndTask(const rfiStrategy::Action &action)
 		{
-			boost::mutex::scoped_lock lock(_mutex);
+			std::lock_guard<std::mutex> lock(_mutex);
 			
 			ProgressListener::OnEndTask(action);
 		}
@@ -235,7 +236,7 @@ int main(int argc, char **argv)
 
 		Stopwatch watch(true);
 
-		boost::mutex ioMutex;
+		std::mutex ioMutex;
 		
 		rfiStrategy::ForEachMSAction *fomAction = new rfiStrategy::ForEachMSAction();
 		if(readMode.IsSet())

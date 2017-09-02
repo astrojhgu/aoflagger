@@ -1,9 +1,12 @@
 #ifndef PROGRESSWINDOW_H
 #define PROGRESSWINDOW_H
 
+#include "../types.h"
+
+#include "../util/progresslistener.h"
+
 #include <glibmm.h>
 
-#include <boost/thread/mutex.hpp>
 #include <boost/date_time/posix_time/posix_time_types.hpp>
 
 #include <gtkmm/box.h>
@@ -11,9 +14,7 @@
 #include <gtkmm/progressbar.h>
 #include <gtkmm/window.h>
 
-#include "../types.h"
-
-#include "../util/progresslistener.h"
+#include <mutex>
 
 class ProgressWindow : public Gtk::Window, public ProgressListener {
 	public:
@@ -27,7 +28,7 @@ class ProgressWindow : public Gtk::Window, public ProgressListener {
 	private:
 		void UpdateProgress();
 		Glib::Dispatcher _progressChangeSignal;
-		boost::mutex _mutex;
+		std::mutex _mutex;
 
 		Gtk::Label
 			_currentTaskTitleLabel, _currentTaskLabel,

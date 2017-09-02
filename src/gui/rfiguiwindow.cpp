@@ -108,7 +108,7 @@ RFIGuiWindow::RFIGuiWindow() :
 
 RFIGuiWindow::~RFIGuiWindow()
 {
-	boost::mutex::scoped_lock lock(_ioMutex);
+	std::unique_lock<std::mutex> lock(_ioMutex);
 	while(!_actionGroup->get_actions().empty())
 		_actionGroup->remove(*_actionGroup->get_actions().begin());
 	
@@ -175,7 +175,7 @@ void RFIGuiWindow::onActionDirectoryOpenForSpatial()
 
   if(result == Gtk::RESPONSE_OK)
 	{
-		boost::mutex::scoped_lock lock(_ioMutex);
+		std::unique_lock<std::mutex> lock(_ioMutex);
 		rfiStrategy::SpatialMSImageSet *imageSet = new rfiStrategy::SpatialMSImageSet(dialog.get_filename());
 		imageSet->Initialize();
 		lock.unlock();
@@ -197,7 +197,7 @@ void RFIGuiWindow::onActionDirectoryOpenForST()
 
   if(result == Gtk::RESPONSE_OK)
 	{
-		boost::mutex::scoped_lock lock(_ioMutex);
+		std::unique_lock<std::mutex> lock(_ioMutex);
 		rfiStrategy::SpatialTimeImageSet *imageSet = new rfiStrategy::SpatialTimeImageSet(dialog.get_filename());
 		imageSet->Initialize();
 		lock.unlock();
@@ -232,7 +232,7 @@ void RFIGuiWindow::OpenPath(const std::string &path)
 		_optionWindow->present();
 	}
 	else {
-		boost::mutex::scoped_lock lock(_ioMutex);
+		std::unique_lock<std::mutex> lock(_ioMutex);
 		rfiStrategy::ImageSet *imageSet = rfiStrategy::ImageSet::Create(path, DirectReadMode);
 		imageSet->Initialize();
 		lock.unlock();
@@ -274,7 +274,7 @@ void RFIGuiWindow::loadCurrentTFData()
 {
 	if(_imageSet != 0) {
 		try {
-			boost::mutex::scoped_lock lock(_ioMutex);
+			std::unique_lock<std::mutex> lock(_ioMutex);
 			_imageSet->AddReadRequest(*_imageSetIndex);
 			_imageSet->PerformReadRequests();
 			rfiStrategy::BaselineData *baseline = _imageSet->GetNextRequested();
@@ -332,7 +332,7 @@ void RFIGuiWindow::setSetNameInStatusBar()
 void RFIGuiWindow::onLoadPrevious()
 {
 	if(_imageSet != 0) {
-		boost::mutex::scoped_lock lock(_ioMutex);
+		std::unique_lock<std::mutex> lock(_ioMutex);
 		_imageSetIndex->Previous();
 		lock.unlock();
 		loadCurrentTFData();
@@ -342,7 +342,7 @@ void RFIGuiWindow::onLoadPrevious()
 void RFIGuiWindow::onLoadNext()
 {
 	if(_imageSet != 0) {
-		boost::mutex::scoped_lock lock(_ioMutex);
+		std::unique_lock<std::mutex> lock(_ioMutex);
 		_imageSetIndex->Next();
 		lock.unlock();
 		loadCurrentTFData();

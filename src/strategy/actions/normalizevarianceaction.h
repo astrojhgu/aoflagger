@@ -2,8 +2,7 @@
 #define RFISTRATEGYNORMALIZEVARIANCEACTION_H
 
 #include <map>
-
-#include <boost/thread/mutex.hpp>
+#include <mutex>
 
 #include "action.h"
 
@@ -38,7 +37,7 @@ namespace rfiStrategy {
 			void SetMedianFilterSizeInS(double filterSize) { _medianFilterSizeInS = filterSize; }
 		private:
 			double _medianFilterSizeInS;
-			boost::mutex _mutex;
+			std::mutex _mutex;
 			bool _isInitialized;
 			std::map<double, double> _stddevs;
 			

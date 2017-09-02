@@ -3,8 +3,7 @@
 
 #include <string>
 #include <vector>
-
-#include <boost/thread.hpp>
+#include <thread>
 
 #include "../../structures/timefrequencydata.h"
 
@@ -70,7 +69,7 @@ namespace rfiStrategy {
 				void operator()();
 			} *_threadFunc;
 
-			boost::thread *_thread;
+			std::thread *_thread;
 	};
 }
 

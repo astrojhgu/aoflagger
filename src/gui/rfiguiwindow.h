@@ -2,9 +2,7 @@
 #define MSWINDOW_H
 
 #include <set>
-
-#include <boost/smart_ptr/scoped_ptr.hpp>
-#include <boost/thread/mutex.hpp>
+#include <mutex>
 
 #include <gtkmm/actiongroup.h>
 #include <gtkmm/box.h>
@@ -279,7 +277,7 @@ class RFIGuiWindow : public Gtk::Window, private StrategyController {
 		rfiStrategy::ImageSetIndex *_imageSetIndex;
 		rfiStrategy::Strategy *_strategy;
 		int _gaussianTestSets;
-		boost::mutex _ioMutex;
+		std::mutex _ioMutex;
 		SegmentedImagePtr _segmentedImage;
 		class SpatialMatrixMetaData *_spatialMetaData;
 		std::vector<double> _horProfile, _vertProfile;

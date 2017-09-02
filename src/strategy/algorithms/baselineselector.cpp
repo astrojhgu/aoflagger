@@ -7,6 +7,9 @@
 
 #include "thresholdtools.h"
 
+#include <algorithm>
+#include <map>
+
 namespace rfiStrategy
 {
 

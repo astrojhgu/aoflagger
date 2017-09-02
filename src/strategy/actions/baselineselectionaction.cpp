@@ -1,6 +1,7 @@
 #include "baselineselectionaction.h"
 
 #include <iostream>
+#include <mutex>
 
 #include "../../util/plot.h"
 
@@ -33,7 +34,7 @@ namespace rfiStrategy {
 		Mask2DCPtr mask = artifacts.ContaminatedData().GetSingleMask();
 
 		BaselineSelector &info = *artifacts.BaselineSelectionInfo();
-		boost::mutex::scoped_lock lock(info.Mutex());
+		std::lock_guard<std::mutex> lock(info.Mutex());
 		info.Add(mask, artifacts.MetaData());
 	}
 	
@@ -54,7 +55,7 @@ namespace rfiStrategy {
 
 			Strategy::SyncAll(*GetRoot());
 
-			boost::mutex::scoped_lock lock(info.Mutex());
+			std::lock_guard<std::mutex> lock(info.Mutex());
 
 			BaselineSelector &selector = *artifacts.BaselineSelectionInfo();
 			selector.SetAbsThreshold(_absThreshold);
@@ -98,7 +99,7 @@ namespace rfiStrategy {
 
 	void BaselineSelectionAction::flagBaselines(ArtifactSet &artifacts, const std::vector<BaselineSelector::SingleBaselineInfo> &baselines)
 	{
-		boost::mutex::scoped_lock lock(artifacts.IOMutex());
+		std::lock_guard<std::mutex> lock(artifacts.IOMutex());
 
 		ImageSet *imageSet = artifacts.ImageSet();
 		BaselineReaderPtr reader = dynamic_cast<MSImageSet&>(*imageSet).Reader();

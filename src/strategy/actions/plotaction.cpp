@@ -1,4 +1,4 @@
-#include <boost/thread.hpp>
+#include <mutex>
 
 #include "plotaction.h"
 
@@ -17,7 +17,7 @@ namespace rfiStrategy {
 	
 	void PlotAction::Perform(ArtifactSet &artifacts, ProgressListener &)
 	{
-		boost::mutex::scoped_lock lock(_plotMutex);
+		std::lock_guard<std::mutex> lock(_plotMutex);
 		switch(_plotKind)
 		{
 			case AntennaFlagCountPlot:

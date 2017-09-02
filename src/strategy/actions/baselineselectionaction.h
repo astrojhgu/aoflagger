@@ -1,15 +1,13 @@
 #ifndef RFIBASELINESELECTIONACTION_H
 #define RFIBASELINESELECTIONACTION_H
 
-#include <vector>
-
-#include <boost/thread/mutex.hpp>
-
 #include "../../structures/types.h"
 
 #include "action.h"
 
 #include "../algorithms/baselineselector.h"
+
+#include <vector>
 
 namespace rfiStrategy {
 

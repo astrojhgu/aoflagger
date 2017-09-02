@@ -4,8 +4,7 @@
 #include <string>
 #include <set>
 #include <vector>
-
-#include <boost/thread/mutex.hpp>
+#include <mutex>
 
 #include "../../structures/timefrequencymetadata.h"
 #include "../../structures/mask2d.h"
@@ -74,7 +73,7 @@ namespace rfiStrategy {
 			void Add(Mask2DCPtr mask, TimeFrequencyMetaDataCPtr metaData);
 			void Add(class DefaultStatistics &baselineStat, class AntennaInfo &antenna1, class AntennaInfo &antenna2);
 			
-			boost::mutex &Mutex() { return _mutex; }
+			std::mutex &Mutex() { return _mutex; }
 			
 			double Threshold() const { return _threshold; }
 			double AbsThreshold() const { return _absThreshold; }
@@ -86,7 +85,7 @@ namespace rfiStrategy {
 			
 			size_t BaselineCount() const { return _baselines.size(); }
 		private:
-			boost::mutex _mutex;
+			std::mutex _mutex;
 			BaselineVector _baselines;
 			double _threshold, _absThreshold;
 			double _smoothingSigma;

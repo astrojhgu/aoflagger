@@ -8,9 +8,8 @@
 
 #include <stack>
 #include <set>
-
-#include <boost/thread/mutex.hpp>
-#include <boost/thread/condition.hpp>
+#include <mutex>
+#include <condition_variable>
 
 #include "../../util/progresslistener.h"
 
@@ -87,25 +86,25 @@ namespace rfiStrategy {
 
 			size_t BaselineProgress()
 			{
-				boost::mutex::scoped_lock lock(_mutex);
+				std::lock_guard<std::mutex> lock(_mutex);
 				return _baselineProgress;
 			}
 			void IncBaselineProgress()
 			{
-				boost::mutex::scoped_lock lock(_mutex);
+				std::lock_guard<std::mutex> lock(_mutex);
 				++_baselineProgress;
 			}
 			
 			void WaitForBufferAvailable(size_t maxSize)
 			{
-				boost::mutex::scoped_lock lock(_mutex);
+				std::unique_lock<std::mutex> lock(_mutex);
 				while(_baselineBuffer.size() > maxSize && !_exceptionOccured)
 					_dataProcessed.wait(lock);
 			}
 			
 			class BaselineData *GetNextBaseline()
 			{
-				boost::mutex::scoped_lock lock(_mutex);
+				std::unique_lock<std::mutex> lock(_mutex);
 				while(_baselineBuffer.size() == 0 && !_exceptionOccured && !_finishedBaselines)
 					_dataAvailable.wait(lock);
 				if((_finishedBaselines && _baselineBuffer.size() == 0) || _exceptionOccured)
@@ -121,7 +120,7 @@ namespace rfiStrategy {
 
 			size_t GetBaselinesInBufferCount()
 			{
-				boost::mutex::scoped_lock lock(_mutex);
+				std::lock_guard<std::mutex> lock(_mutex);
 				return _baselineBuffer.size();
 			}
 			
@@ -163,8 +162,8 @@ namespace rfiStrategy {
 			ImageSetIndex *_loopIndex;
 			ArtifactSet *_artifacts, *_resultSet;
 			
-			boost::mutex _mutex;
-			boost::condition _dataAvailable, _dataProcessed;
+			std::mutex _mutex;
+			std::condition_variable _dataAvailable, _dataProcessed;
 			std::stack<BaselineData*> _baselineBuffer;
 			bool _finishedBaselines;
 

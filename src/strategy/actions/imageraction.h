@@ -1,11 +1,11 @@
 #ifndef RFISTRATEGYIMAGERACTION_H
 #define RFISTRATEGYIMAGERACTION_H
 
-#include <boost/thread.hpp>
-
 #include "action.h"
 
 #include "../control/artifactset.h"
+
+#include <mutex>
 
 namespace rfiStrategy {
 
@@ -42,7 +42,7 @@ namespace rfiStrategy {
 
 		private:
 			enum ImagingType _type;
-			boost::mutex _imagerMutex;
+			std::mutex _imagerMutex;
 	};
 
 }

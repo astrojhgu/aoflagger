@@ -5,11 +5,10 @@
 
 #include "../imagesets/imageset.h"
 
+#include <condition_variable>
 #include <stack>
-
-#include <boost/thread/mutex.hpp>
-#include <boost/thread/condition.hpp>
-#include <boost/thread/thread.hpp>
+#include <mutex>
+#include <thread>
 
 #include "../../structures/mask2d.h"
 
@@ -63,17 +62,17 @@ namespace rfiStrategy {
 
 			void pushInBuffer(const BufferItem &newItem)
 			{
-				boost::mutex::scoped_lock lock(_mutex);
+				std::unique_lock<std::mutex> lock(_mutex);
 				while(_buffer.size() >= _maxBufferItems)
 					_bufferChange.wait(lock);
 				_buffer.push(newItem);
 				_bufferChange.notify_all();
 			}
 
-			boost::mutex _mutex;
-			boost::mutex *_ioMutex;
-			boost::condition _bufferChange;
-			boost::thread *_flusher;
+			std::mutex _mutex;
+			std::mutex *_ioMutex;
+			std::condition_variable _bufferChange;
+			std::thread *_flusher;
 			bool _isFinishing;
 
 			size_t _maxBufferItems;

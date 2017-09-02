@@ -3,16 +3,15 @@
 #include "../actions/imageraction.h"
 #include "../algorithms/baselinetimeplaneimager.h"
 
-#include <boost/thread/mutex.hpp>
-
 #include "../../util/progresslistener.h"
 
+#include <mutex>
 #include <vector>
 
 namespace rfiStrategy {
 	void ImagerAction::Perform(ArtifactSet &artifacts, ProgressListener &progress)
 	{
-		boost::mutex::scoped_lock lock(_imagerMutex);
+		std::lock_guard<std::mutex> lock(_imagerMutex);
 		UVImager *imager = artifacts.Imager();
 		if(imager == 0)
 			throw BadUsageException("No imager available to create image.");

@@ -1,6 +1,7 @@
 #ifndef RFI_RFISTRATEGY_H
 #define RFI_RFISTRATEGY_H 
 
+#include <mutex>
 #include <vector>
 
 #include "../../structures/types.h"
@@ -19,7 +20,7 @@ namespace rfiStrategy {
 	class	ArtifactSet
 	{
 		public:
-			explicit ArtifactSet(boost::mutex *ioMutex) : _metaData(), _sensitivity(1.0L), _projectedDirectionRad(0.0L), _imageSet(0),
+			explicit ArtifactSet(std::mutex *ioMutex) : _metaData(), _sensitivity(1.0L), _projectedDirectionRad(0.0L), _imageSet(0),
 			_imageSetIndex(0), _imager(0),
 			_ioMutex(ioMutex),
 			_antennaFlagCountPlot(0), _frequencyFlagCountPlot(0),
@@ -132,7 +133,7 @@ namespace rfiStrategy {
 				_metaData = metaData;
 			}
 
-			boost::mutex &IOMutex()
+			std::mutex &IOMutex()
 			{
 				return *_ioMutex;
 			}
@@ -234,7 +235,7 @@ namespace rfiStrategy {
 			class ImageSetIndex *_imageSetIndex;
 			class UVImager *_imager;
 
-			boost::mutex *_ioMutex;
+			std::mutex *_ioMutex;
 			class AntennaFlagCountPlot *_antennaFlagCountPlot;
 			class FrequencyFlagCountPlot *_frequencyFlagCountPlot;
 			class FrequencyPowerPlot *_frequencyPowerPlot;
