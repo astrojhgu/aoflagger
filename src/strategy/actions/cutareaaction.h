@@ -17,7 +17,7 @@ namespace rfiStrategy {
 			~CutAreaAction()
 			{
 			}
-			virtual std::string Description()
+			virtual std::string Description() final override
 			{
 				return "Cut area";
 			}
@@ -34,7 +34,7 @@ namespace rfiStrategy {
 			void SetBottomChannels(int channels) { _bottomChannels = channels; }
 			int BottomChannels() const { return _bottomChannels; }
 
-			virtual void Perform(class ArtifactSet &artifacts, class ProgressListener &progress)
+			virtual void Perform(class ArtifactSet &artifacts, class ProgressListener &progress) final override
 			{
 				TimeFrequencyData oldOriginal(artifacts.OriginalData());
 				TimeFrequencyData oldRevised(artifacts.RevisedData());
@@ -59,7 +59,7 @@ namespace rfiStrategy {
 				artifacts.SetMetaData(oldMetaData);
 			}
 
-			virtual ActionType Type() const { return CutAreaActionType; }
+			virtual ActionType Type() const final override { return CutAreaActionType; }
 		private:
 			void Cut(class TimeFrequencyData &data)
 			{

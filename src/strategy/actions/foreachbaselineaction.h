@@ -37,14 +37,14 @@ namespace rfiStrategy {
 			virtual ~ForEachBaselineAction()
 			{
 			}
-			virtual std::string Description()
+			virtual std::string Description() final override
 			{
 				return "For each baseline";
 			}
-			virtual void Initialize()
+			virtual void Initialize() final override
 			{
 			}
-			virtual void Perform(ArtifactSet &artifacts, ProgressListener &progress);
+			virtual void Perform(ArtifactSet &artifacts, ProgressListener &progress) final override;
 
 			enum BaselineSelection Selection() const throw() { return _selection; }
 			void SetSelection(enum BaselineSelection selection) throw() { _selection = selection; }
@@ -52,7 +52,7 @@ namespace rfiStrategy {
 			size_t ThreadCount() const throw() { return _threadCount; }
 			void SetThreadCount(size_t threadCount) throw() { _threadCount = threadCount; }
 			
-			virtual ActionType Type() const { return ForEachBaselineActionType; }
+			virtual ActionType Type() const final override { return ForEachBaselineActionType; }
 
 			std::set<size_t> &AntennaeToSkip() { return _antennaeToSkip; }
 			const std::set<size_t> &AntennaeToSkip() const { return _antennaeToSkip; }
@@ -138,10 +138,10 @@ namespace rfiStrategy {
 				ProgressListener &_progress;
 				size_t _threadIndex;
 				void operator()();
-				virtual void OnStartTask(const Action &action, size_t taskNo, size_t taskCount, const std::string &description, size_t weight=1);
-				virtual void OnEndTask(const Action &action);
-				virtual void OnProgress(const Action &action, size_t progres, size_t maxProgress);
-				virtual void OnException(const Action &action, std::exception &thrownException);
+				virtual void OnStartTask(const Action &action, size_t taskNo, size_t taskCount, const std::string &description, size_t weight=1) final override;
+				virtual void OnEndTask(const Action &action) final override;
+				virtual void OnProgress(const Action &action, size_t progres, size_t maxProgress) final override;
+				virtual void OnException(const Action &action, std::exception &thrownException) final override;
 			};
 			
 			struct ReaderFunction

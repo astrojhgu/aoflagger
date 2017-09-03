@@ -14,11 +14,11 @@ namespace rfiStrategy {
 		public:
 			QuickCalibrateAction() { }
 
-			virtual std::string Description()
+			virtual std::string Description() final override
 			{
 				return "Quickly calibrate";
 			}
-			virtual void Perform(class ArtifactSet &artifacts, class ProgressListener &)
+			virtual void Perform(class ArtifactSet &artifacts, class ProgressListener &) final override
 			{
 				Image2DCPtr image = artifacts.ContaminatedData().GetSingleImage();
 				Mask2DCPtr mask = artifacts.ContaminatedData().GetSingleMask();
@@ -32,7 +32,7 @@ namespace rfiStrategy {
 					artifacts.ContaminatedData().SetImage(i, normalized);
 				}
 			}
-			virtual ActionType Type() const { return QuickCalibrateActionType; }
+			virtual ActionType Type() const final override { return QuickCalibrateActionType; }
 		private:
 	};
 }

@@ -49,7 +49,7 @@ class Plot2D : public Plotable {
 		size_t PointSetCount() const { return _pointSets.size(); }
 		Plot2DPointSet &GetPointSet(size_t index) { return *_pointSets[index]; }
 		const Plot2DPointSet &GetPointSet(size_t index) const { return *_pointSets[index]; }
-		virtual void Render(Gtk::DrawingArea &drawingArea);
+		virtual void Render(Gtk::DrawingArea &drawingArea) final override;
 		void SetLogarithmicXAxis(bool logarithmicXAxis)
 		{
 			_logarithmicXAxis = logarithmicXAxis;

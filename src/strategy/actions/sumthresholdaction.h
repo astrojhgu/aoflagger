@@ -15,11 +15,11 @@ namespace rfiStrategy {
 				SumThresholdAction() : _baseSensitivity(1.0), _inTimeDirection(true), _inFrequencyDirection(true)
 				{
 				}
-				virtual std::string Description()
+				virtual std::string Description() final override
 				{
 					return "SumThreshold";
 				}
-				virtual void Perform(ArtifactSet &artifacts, class ProgressListener &)
+				virtual void Perform(ArtifactSet &artifacts, class ProgressListener &) final override
 				{
 					ThresholdConfig thresholdConfig;
 					thresholdConfig.InitializeLengthsDefault();
@@ -40,7 +40,7 @@ namespace rfiStrategy {
 				{
 					_baseSensitivity = baseSensitivity;
 				}
-				virtual ActionType Type() const { return SumThresholdActionType; }
+				virtual ActionType Type() const final override { return SumThresholdActionType; }
 				
 				bool TimeDirectionFlagging() const { return _inTimeDirection; }
 				void SetTimeDirectionFlagging(bool timeDirection) { _inTimeDirection = timeDirection; }

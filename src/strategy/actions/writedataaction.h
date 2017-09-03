@@ -21,19 +21,19 @@ namespace rfiStrategy {
 			{
 			}
 
-			virtual std::string Description()
+			virtual std::string Description() final override
 			{
 				return "Write data to file";
 			}
 
-			virtual void Perform(class ArtifactSet &artifacts, ProgressListener &)
+			virtual void Perform(class ArtifactSet &artifacts, ProgressListener &) final override
 			{
 				std::unique_lock<std::mutex> lock(artifacts.IOMutex());
 				ImageSet &set = *artifacts.ImageSet();
 				set.PerformWriteDataTask(*artifacts.ImageSetIndex(), artifacts.RevisedData());
 			}
 
-			virtual ActionType Type() const
+			virtual ActionType Type() const final override
 			{
 				return WriteDataActionType;
 			}

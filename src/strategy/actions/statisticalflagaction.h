@@ -16,12 +16,12 @@ namespace rfiStrategy {
 			_minAvailableTFRatio(0.0),
 			_minimumGoodTimeRatio(0.2), _minimumGoodFrequencyRatio(0.2) { }
 			virtual ~StatisticalFlagAction() { }
-			virtual std::string Description()
+			virtual std::string Description() final override
 			{
 				return "Statistical flagging";
 			}
-			virtual void Perform(class ArtifactSet &artifacts, class ProgressListener &listener);
-			virtual ActionType Type() const { return StatisticalFlagActionType; }
+			virtual void Perform(class ArtifactSet &artifacts, class ProgressListener &listener) final override;
+			virtual ActionType Type() const final override { return StatisticalFlagActionType; }
 
 			size_t EnlargeTimeSize() const { return _enlargeTimeSize; }
 			void SetEnlargeTimeSize(size_t size) { _enlargeTimeSize = size; }

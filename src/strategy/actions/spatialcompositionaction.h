@@ -17,7 +17,7 @@ namespace rfiStrategy {
 			virtual ~SpatialCompositionAction()
 			{
 			}
-			virtual std::string Description()
+			virtual std::string Description() final override
 			{
 				switch(_operation)
 				{
@@ -32,9 +32,9 @@ namespace rfiStrategy {
 						return "Spatial composition (remove eigenvalue)";
 				}
 			}
-			virtual void Perform(ArtifactSet &artifacts, ProgressListener &progress);
+			virtual void Perform(ArtifactSet &artifacts, ProgressListener &progress) final override;
 
-			virtual ActionType Type() const { return SpatialCompositionActionType; }
+			virtual ActionType Type() const final override { return SpatialCompositionActionType; }
 
 			enum Operation Operation() const { return _operation; }
 			void SetOperation(enum Operation operation) { _operation = operation; }

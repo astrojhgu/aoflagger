@@ -29,7 +29,7 @@ namespace rfiStrategy {
 			{
 				Finish();
 			}
-			virtual void Finish()
+			virtual void Finish() final override
 			{
 				if(_values != 0)
 				{
@@ -55,12 +55,12 @@ namespace rfiStrategy {
 					_values = 0;
 				}
 			}
-			virtual std::string Description()
+			virtual std::string Description() final override
 			{
 				return "Directional cleaning";
 			}
-			virtual ActionType Type() const { return DirectionalCleanActionType; }
-			virtual void Perform(ArtifactSet &artifacts, class ProgressListener &)
+			virtual ActionType Type() const final override { return DirectionalCleanActionType; }
+			virtual void Perform(ArtifactSet &artifacts, class ProgressListener &) final override
 			{
 				TimeFrequencyData &contaminated = artifacts.ContaminatedData();
 				if(contaminated.ImageCount() != 2 || contaminated.ComplexRepresentation() != TimeFrequencyData::ComplexParts)

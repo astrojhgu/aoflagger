@@ -18,11 +18,11 @@ namespace rfiStrategy {
 				ImageSetIndex(set), _intervalIndex(0), _isValid(true)
 			{ }
 			
-			virtual void Previous();
-			virtual void Next();
-			virtual std::string Description() const;
-			virtual bool IsValid() const { return _isValid; }
-			virtual FilterBankSetIndex *Copy() const
+			virtual void Previous() final override;
+			virtual void Next() final override;
+			virtual std::string Description() const final override;
+			virtual bool IsValid() const final override { return _isValid; }
+			virtual FilterBankSetIndex *Copy() const final override
 			{
 				FilterBankSetIndex *index = new FilterBankSetIndex(imageSet());
 				index->_intervalIndex = _intervalIndex;

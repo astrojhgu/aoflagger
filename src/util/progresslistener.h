@@ -48,13 +48,13 @@ class ProgressListener
 };
 
 class DummyProgressListener : public ProgressListener {
-  virtual void OnStartTask(const rfiStrategy::Action &, size_t, size_t, const std::string &, size_t = 1)
+  virtual void OnStartTask(const rfiStrategy::Action &, size_t, size_t, const std::string &, size_t = 1) final override
     {}
-  virtual void OnEndTask(const rfiStrategy::Action &)
+  virtual void OnEndTask(const rfiStrategy::Action &) final override
     {}
-  virtual void OnProgress(const rfiStrategy::Action &, size_t, size_t)
+  virtual void OnProgress(const rfiStrategy::Action &, size_t, size_t) final override
     {}
-  virtual void OnException(const rfiStrategy::Action &, std::exception &)
+  virtual void OnException(const rfiStrategy::Action &, std::exception &) final override
     {}
 };
 

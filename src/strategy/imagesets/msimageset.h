@@ -26,10 +26,10 @@ namespace rfiStrategy {
 			
 			MSImageSetIndex(class rfiStrategy::ImageSet &set, size_t sequenceIndex) : ImageSetIndex(set), _sequenceIndex(sequenceIndex), _isValid(true) { }
 			
-			virtual void Previous();
-			virtual void Next();
-			virtual std::string Description() const;
-			virtual bool IsValid() const { return _isValid; }
+			virtual void Previous() final override;
+			virtual void Next() final override;
+			virtual std::string Description() const final override;
+			virtual bool IsValid() const final override { return _isValid; }
 			virtual MSImageSetIndex *Copy() const final override
 			{
 				MSImageSetIndex *index = new MSImageSetIndex(imageSet());

@@ -14,11 +14,11 @@ namespace rfiStrategy {
 		public:
 			SingleImageSetIndex(ImageSet &set, const std::string& description) : ImageSetIndex(set), _valid(true), _description(description) { }
 			virtual ~SingleImageSetIndex() { }
-			virtual void Previous() { _valid = false; }
-			virtual void Next() { _valid = false; }
-			virtual std::string Description() const { return _description; }
-			virtual bool IsValid() const { return _valid; }
-			virtual ImageSetIndex *Copy() const
+			virtual void Previous() final override { _valid = false; }
+			virtual void Next() final override { _valid = false; }
+			virtual std::string Description() const final override { return _description; }
+			virtual bool IsValid() const final override { return _valid; }
+			virtual ImageSetIndex *Copy() const final override
 			{
 				SingleImageSetIndex *index = new SingleImageSetIndex(imageSet(), _description);
 				index->_valid = _valid;
@@ -41,15 +41,15 @@ namespace rfiStrategy {
 				delete _lastRead;
 			}
 
-			virtual std::unique_ptr<ImageSetIndex> StartIndex() final override
+			virtual std::unique_ptr<ImageSetIndex> StartIndex() override
 			{
 				return std::unique_ptr<ImageSetIndex>(new SingleImageSetIndex(*this, Name()));
 			}
 			
-			virtual std::string Name() = 0;
-			virtual std::string File() = 0;
+			virtual std::string Name() override = 0;
+			virtual std::string File() override = 0;
 			
-			virtual void AddReadRequest(const ImageSetIndex &)
+			virtual void AddReadRequest(const ImageSetIndex &) override
 			{
 				if(_lastRead != 0)
 				{
@@ -60,12 +60,12 @@ namespace rfiStrategy {
 					++_readCount;
 				}
 			}
-			virtual void PerformReadRequests()
+			virtual void PerformReadRequests() override
 			{
 				_lastRead = Read();
 				_lastRead->SetIndex(SingleImageSetIndex(*this, Name()));
 			}
-			virtual BaselineData *GetNextRequested()
+			virtual BaselineData *GetNextRequested() override
 			{
 				if(_readCount == 0)
 					throw std::runtime_error("All data reads have already been requested");
@@ -81,14 +81,14 @@ namespace rfiStrategy {
 				throw std::runtime_error("Flag writing is not implemented for this file (SingleImageSet)");
 			}
 			
-			virtual void AddWriteFlagsTask(const ImageSetIndex &index, std::vector<Mask2DCPtr> &flags)
+			virtual void AddWriteFlagsTask(const ImageSetIndex &index, std::vector<Mask2DCPtr> &flags) override
 			{
 				delete _writeFlagsIndex;
 				_writeFlagsIndex = index.Copy();
 				_writeFlagsMasks = flags;
 			}
 			
-			virtual void PerformWriteFlagsTask()
+			virtual void PerformWriteFlagsTask() override
 			{
 				if(_writeFlagsIndex == 0)
 					throw std::runtime_error("Nothing to write");

@@ -15,15 +15,15 @@ namespace rfiStrategy {
 			~TimeSelectionAction()
 			{
 			}
-			virtual std::string Description()
+			virtual std::string Description() final override
 			{
 				return "Time selection";
 			}
-			virtual void Perform(ArtifactSet &artifacts, class ProgressListener &)
+			virtual void Perform(ArtifactSet &artifacts, class ProgressListener &) final override
 			{
 				AutomaticSelection(artifacts);
 			}
-			virtual ActionType Type() const { return TimeSelectionActionType; }
+			virtual ActionType Type() const final override { return TimeSelectionActionType; }
 
 			num_t Threshold() const { return _threshold; }
 			void SetThreshold(num_t threshold) { _threshold = threshold; }

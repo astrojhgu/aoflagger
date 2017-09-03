@@ -362,10 +362,10 @@ namespace aoflagger {
 	}
 	
 	class ErrorListener : public ProgressListener {
-		virtual void OnStartTask(const rfiStrategy::Action &, size_t, size_t, const std::string &, size_t = 1) {}
-		virtual void OnEndTask(const rfiStrategy::Action &) {}
-		virtual void OnProgress(const rfiStrategy::Action &, size_t, size_t) {}
-		virtual void OnException(const rfiStrategy::Action &, std::exception &e)
+		virtual void OnStartTask(const rfiStrategy::Action &, size_t, size_t, const std::string &, size_t = 1) final override {}
+		virtual void OnEndTask(const rfiStrategy::Action &) final override {}
+		virtual void OnProgress(const rfiStrategy::Action &, size_t, size_t) final override {}
+		virtual void OnException(const rfiStrategy::Action &, std::exception &e) final override
 		{
 			std::cerr <<
 				"*** EXCEPTION OCCURED IN THE AOFLAGGER ***\n"
@@ -378,13 +378,13 @@ namespace aoflagger {
 	public:
 		explicit ForwardingListener(StatusListener* destination) : _destination(destination)
 		{ }
-		virtual void OnStartTask(const rfiStrategy::Action &, size_t taskNo, size_t taskCount, const std::string &description, size_t weight) {
+		virtual void OnStartTask(const rfiStrategy::Action &, size_t taskNo, size_t taskCount, const std::string &description, size_t weight) final override {
 			_destination->OnStartTask(taskNo, taskCount, description); }
-		virtual void OnEndTask(const rfiStrategy::Action &) {
+		virtual void OnEndTask(const rfiStrategy::Action &) final override {
 			_destination->OnEndTask(); }
-		virtual void OnProgress(const rfiStrategy::Action &, size_t progress, size_t maxProgress) {
+		virtual void OnProgress(const rfiStrategy::Action &, size_t progress, size_t maxProgress) final override {
 			_destination->OnProgress(progress, maxProgress); }
-		virtual void OnException(const rfiStrategy::Action &, std::exception &thrownException) {
+		virtual void OnException(const rfiStrategy::Action &, std::exception &thrownException) final override {
 			_destination->OnException(thrownException); }
 	private:
 		StatusListener *_destination;

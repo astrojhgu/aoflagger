@@ -23,19 +23,19 @@ namespace rfiStrategy {
 			explicit SpatialMSImageSetIndex(ImageSet &set) : ImageSetIndex(set), _timeIndex(0), _channelIndex(0), _isValid(true)
 			{
 			}
-			inline virtual void Previous();
-			inline virtual void Next();
-			virtual std::string Description() const
+			inline virtual void Previous() final override;
+			inline virtual void Next() final override;
+			virtual std::string Description() const final override
 			{
 				std::stringstream s;
 				s << "Time index " << _timeIndex << ", channel " << _channelIndex;
 				return s.str();
 			}
-			virtual bool IsValid() const
+			virtual bool IsValid() const final override
 			{
 				return _isValid;
 			}
-			virtual ImageSetIndex *Copy() const
+			virtual ImageSetIndex *Copy() const final override
 			{
 				SpatialMSImageSetIndex *newIndex = new SpatialMSImageSetIndex(imageSet());
 				newIndex->_timeIndex = _timeIndex;

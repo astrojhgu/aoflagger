@@ -17,7 +17,7 @@ namespace rfiStrategy {
 
 			SetImageAction() : _newImage(FromOriginal), _add(false) { }
 
-			virtual std::string Description()
+			virtual std::string Description() final override
 			{
 				if(_add)
 				{
@@ -53,7 +53,7 @@ namespace rfiStrategy {
 					}
 				}
 			}
-			virtual void Perform(class ArtifactSet &artifacts, class ProgressListener &listener)
+			virtual void Perform(class ArtifactSet &artifacts, class ProgressListener &listener) final override
 			{
 				if(_add)
 					PerformAdd(artifacts, listener);
@@ -70,7 +70,7 @@ namespace rfiStrategy {
 			{
 				_add = add;
 			}
-			virtual ActionType Type() const { return SetImageActionType; }
+			virtual ActionType Type() const final override { return SetImageActionType; }
 		private:
 			void PerformSet(class ArtifactSet &artifacts, class ProgressListener &)
 			{

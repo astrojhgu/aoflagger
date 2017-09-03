@@ -21,19 +21,19 @@ namespace rfiStrategy {
 			explicit SpatialTimeImageSetIndex(ImageSet &set) : ImageSetIndex(set), _channelIndex(0), _isValid(true)
 			{
 			}
-			inline virtual void Previous();
-			inline virtual void Next();
-			virtual std::string Description() const
+			inline virtual void Previous() final override;
+			inline virtual void Next() final override;
+			virtual std::string Description() const final override
 			{
 				std::stringstream s;
 				s << "Channel " << _channelIndex;
 				return s.str();
 			}
-			virtual bool IsValid() const
+			virtual bool IsValid() const final override
 			{
 				return _isValid;
 			}
-			virtual ImageSetIndex *Copy() const
+			virtual ImageSetIndex *Copy() const final override
 			{
 				SpatialTimeImageSetIndex *newIndex = new SpatialTimeImageSetIndex(imageSet());
 				newIndex->_channelIndex = _channelIndex;
@@ -47,99 +47,81 @@ namespace rfiStrategy {
 	};
 	
 	class SpatialTimeImageSet : public ImageSet {
-		public:
-			explicit SpatialTimeImageSet(const std::string &location) : _set(location), _loader(_set)
-			{
-			}
-			virtual ~SpatialTimeImageSet()
-			{
-			}
-			virtual std::unique_ptr<ImageSet> Clone() final override
-			{
-				return 0;
-			}
+	public:
+		explicit SpatialTimeImageSet(const std::string &location) : _set(location), _loader(_set)
+		{
+		}
+		virtual ~SpatialTimeImageSet()
+		{
+		}
+		virtual std::unique_ptr<ImageSet> Clone() final override
+		{
+			return 0;
+		}
 
-			virtual std::unique_ptr<ImageSetIndex> StartIndex() final override
-			{
-				return std::unique_ptr<ImageSetIndex>(new SpatialTimeImageSetIndex(*this));
-			}
-			virtual void Initialize()
-			{
-			}
-			virtual std::string Name()
-			{
-				return "Spatial time matrix";
-			}
-			virtual std::string File()
-			{
-				return _set.Path(); 
-			}
-			virtual TimeFrequencyData *LoadData(const ImageSetIndex &index)
-			{
-				const SpatialTimeImageSetIndex &sIndex = static_cast<const SpatialTimeImageSetIndex&>(index);
-				TimeFrequencyData *result = new TimeFrequencyData(_loader.Load(sIndex._channelIndex));
-				return result;
-			}
-			virtual void LoadFlags(const ImageSetIndex &/*index*/, TimeFrequencyData &/*destination*/)
-			{
-			}
-			virtual TimeFrequencyMetaDataCPtr LoadMetaData(const ImageSetIndex &/*index*/)
-			{
-				return TimeFrequencyMetaDataCPtr();
-			}
-			virtual size_t GetPart(const ImageSetIndex &/*index*/)
-			{
-				return 0;
-			}
-			virtual size_t GetAntenna1(const ImageSetIndex &/*index*/)
-			{
-				return 0;
-			}
-			virtual size_t GetAntenna2(const ImageSetIndex &/*index*/)
-			{
-				return 0;
-			}
-			size_t GetTimeIndexCount()
-			{
-				return _loader.TimestepsCount();
-			}
-			size_t GetFrequencyCount()
-			{
-				return _loader.ChannelCount();
-			}
-			virtual void AddReadRequest(const ImageSetIndex &index)
-			{
-				_baseline.push(BaselineData(index));
-			}
-			virtual void PerformReadRequests()
-			{
-				TimeFrequencyData *data = LoadData(_baseline.top().Index());
-				_baseline.top().SetData(*data);
-				_baseline.top().SetMetaData(TimeFrequencyMetaDataPtr());
-				delete data;
-			}
-			virtual BaselineData *GetNextRequested()
-			{
-				BaselineData data = _baseline.top();
-				_baseline.pop();
-				return new BaselineData(data);
-			}
-			virtual void AddWriteFlagsTask(const ImageSetIndex &, std::vector<Mask2DCPtr> &)
-			{
-				throw std::runtime_error("Not implemented");
-			}
-			virtual void PerformWriteFlagsTask()
-			{
-				throw std::runtime_error("Not implemented");
-			}
-			virtual void PerformWriteDataTask(const ImageSetIndex &, std::vector<Image2DCPtr>, std::vector<Image2DCPtr>)
-			{
-				throw std::runtime_error("Not implemented");
-			}
-		private:
-			MeasurementSet _set;
-			SpatialTimeLoader _loader;
-			std::stack<BaselineData> _baseline;
+		virtual std::unique_ptr<ImageSetIndex> StartIndex() final override
+		{
+			return std::unique_ptr<ImageSetIndex>(new SpatialTimeImageSetIndex(*this));
+		}
+		virtual void Initialize() final override
+		{
+		}
+		virtual std::string Name() final override
+		{
+			return "Spatial time matrix";
+		}
+		virtual std::string File() final override
+		{
+			return _set.Path(); 
+		}
+		size_t GetTimeIndexCount()
+		{
+			return _loader.TimestepsCount();
+		}
+		size_t GetFrequencyCount()
+		{
+			return _loader.ChannelCount();
+		}
+		virtual void AddReadRequest(const ImageSetIndex &index) final override
+		{
+			_baseline.push(BaselineData(index));
+		}
+		virtual void PerformReadRequests() final override
+		{
+			TimeFrequencyData *data = loadData(_baseline.top().Index());
+			_baseline.top().SetData(*data);
+			_baseline.top().SetMetaData(TimeFrequencyMetaDataPtr());
+			delete data;
+		}
+		virtual BaselineData *GetNextRequested() final override
+		{
+			BaselineData data = _baseline.top();
+			_baseline.pop();
+			return new BaselineData(data);
+		}
+		virtual void AddWriteFlagsTask(const ImageSetIndex &, std::vector<Mask2DCPtr> &) final override
+		{
+			throw std::runtime_error("Not implemented");
+		}
+		virtual void PerformWriteFlagsTask() final override
+		{
+			throw std::runtime_error("Not implemented");
+		}
+		virtual void PerformWriteDataTask(const ImageSetIndex &, std::vector<Image2DCPtr>, std::vector<Image2DCPtr>) final override
+		{
+			throw std::runtime_error("Not implemented");
+		}
+	private:
+		MeasurementSet _set;
+		SpatialTimeLoader _loader;
+		std::stack<BaselineData> _baseline;
+		
+		virtual TimeFrequencyData *loadData(const ImageSetIndex &index)
+		{
+			const SpatialTimeImageSetIndex &sIndex = static_cast<const SpatialTimeImageSetIndex&>(index);
+			TimeFrequencyData *result = new TimeFrequencyData(_loader.Load(sIndex._channelIndex));
+			return result;
+		}
 	};
 
 	void SpatialTimeImageSetIndex::Previous()

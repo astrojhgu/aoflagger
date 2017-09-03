@@ -25,14 +25,14 @@ namespace rfiStrategy {
 			~ForEachMSAction()
 			{
 			}
-			virtual std::string Description()
+			virtual std::string Description() final override
 			{
 				return "For each measurement set";
 			}
-			virtual void Initialize();
-			virtual void Perform(ArtifactSet &artifacts, ProgressListener &progress);
-			virtual ActionType Type() const { return ForEachMSActionType; }
-			virtual unsigned int Weight() const { return ActionBlock::Weight() * _filenames.size(); }
+			virtual void Initialize() final override;
+			virtual void Perform(ArtifactSet &artifacts, ProgressListener &progress) final override;
+			virtual ActionType Type() const final override { return ForEachMSActionType; }
+			virtual unsigned int Weight() const final override { return ActionBlock::Weight() * _filenames.size(); }
 			void AddDirectory(const std::string &name);
 			void writeHistory(const std::string &filename);
 

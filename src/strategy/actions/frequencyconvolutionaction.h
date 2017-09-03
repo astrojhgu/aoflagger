@@ -27,12 +27,12 @@ namespace rfiStrategy {
 			FrequencyConvolutionAction() : Action(), _kernelKind(SincKernel), _convolutionSize(4.0), _inSamples(false)
 			{
 			}
-			virtual std::string Description()
+			virtual std::string Description() final override
 			{
 				return "Frequency convolution";
 			}
-			virtual ActionType Type() const { return FrequencyConvolutionActionType; }
-			virtual void Perform(ArtifactSet &artifacts, class ProgressListener &listener)
+			virtual ActionType Type() const final override { return FrequencyConvolutionActionType; }
+			virtual void Perform(ArtifactSet &artifacts, class ProgressListener &listener) final override
 			{
 				TimeFrequencyData &data = artifacts.ContaminatedData();
 				if(_kernelKind == TotalKernel)

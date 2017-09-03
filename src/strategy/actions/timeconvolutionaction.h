@@ -26,7 +26,7 @@ namespace rfiStrategy {
 			TimeConvolutionAction() : Action(), _operation(IterativeExtrapolatedSincOperation), _sincSize(32.0), _directionRad(M_PI*(-86.7/180.0)), _etaParameter(0.2), _autoAngle(true), _isSincScaleInSamples(false), _alwaysRemove(false), _useHammingWindow(false), _iterations(1), _channelAveragingSize(4)
 			{
 			}
-			virtual std::string Description()
+			virtual std::string Description() final override
 			{
 				switch(_operation)
 				{
@@ -56,8 +56,8 @@ namespace rfiStrategy {
 						break;
 				}
 			}
-			virtual ActionType Type() const { return TimeConvolutionActionType; }
-			virtual void Perform(ArtifactSet &artifacts, class ProgressListener &listener)
+			virtual ActionType Type() const final override { return TimeConvolutionActionType; }
+			virtual void Perform(ArtifactSet &artifacts, class ProgressListener &listener) final override
 			{
 				Image2DCPtr newImage;
 				TimeFrequencyData newRevisedData;

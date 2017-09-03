@@ -20,15 +20,15 @@ namespace rfiStrategy {
 			UVProjectAction() : Action(), _directionRad(68.0/180.0*M_PI/*atann(600.0/(8.0*320.0))*/), _etaParameter(0.2), _reverse(false), _onRevised(false), _onContaminated(true)
 			{
 			}
-			virtual std::string Description()
+			virtual std::string Description() final override
 			{
 				if(_reverse)
 					return "Reverse UV-project";
 				else
 					return "UV-project";
 			}
-			virtual ActionType Type() const { return UVProjectActionType; }
-			virtual void Perform(ArtifactSet &artifacts, class ProgressListener &)
+			virtual ActionType Type() const final override { return UVProjectActionType; }
+			virtual void Perform(ArtifactSet &artifacts, class ProgressListener &) final override
 			{
 				if(_onContaminated)
 					perform(artifacts.ContaminatedData(), artifacts.MetaData());

@@ -22,7 +22,7 @@ namespace rfiStrategy {
 			virtual ~ForEachPolarisationBlock()
 			{
 			}
-			virtual std::string Description()
+			virtual std::string Description() final override
 			{
 				if(selectedPolarizationCount() == 1)
 				{
@@ -38,12 +38,12 @@ namespace rfiStrategy {
 				return "For each polarisation";
 			}
 			
-			virtual void Initialize()
+			virtual void Initialize() final override
 			{ }
 			
-			virtual ActionType Type() const { return ForEachPolarisationBlockType; }
+			virtual ActionType Type() const final override { return ForEachPolarisationBlockType; }
 			
-			virtual void Perform(ArtifactSet &artifacts, ProgressListener &progress)
+			virtual void Perform(ArtifactSet &artifacts, ProgressListener &progress) final override
 			{
 				const TimeFrequencyData
 					contaminatedData = artifacts.ContaminatedData(),

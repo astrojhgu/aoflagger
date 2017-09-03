@@ -20,15 +20,15 @@ namespace rfiStrategy {
 			FourierTransformAction() : Action(), _inverse(false), _dynamic(false), _sections(64)
 			{
 			}
-			virtual std::string Description()
+			virtual std::string Description() final override
 			{
 				if(_inverse)
 					return "Inv Fourier transform";
 				else
 					return "Fourier transform";
 			}
-			virtual ActionType Type() const { return FourierTransformActionType; }
-			virtual void Perform(ArtifactSet &artifacts, class ProgressListener &)
+			virtual ActionType Type() const final override { return FourierTransformActionType; }
+			virtual void Perform(ArtifactSet &artifacts, class ProgressListener &) final override
 			{
 				perform(artifacts.ContaminatedData(), artifacts.MetaData());
 			}

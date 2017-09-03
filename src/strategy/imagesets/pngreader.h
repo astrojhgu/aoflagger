@@ -26,21 +26,21 @@ namespace rfiStrategy {
 				return nullptr;
 			}
 
-			virtual void Initialize()
+			virtual void Initialize() final override
 			{
 			}
 
-			virtual std::string Name()
+			virtual std::string Name() final override
 			{
 				return "Png format";
 			}
 			
-			virtual std::string File()
+			virtual std::string File() final override
 			{
 				return _path;
 			}
 			
-			virtual BaselineData *Read();
+			virtual BaselineData *Read() final override;
 
 		private:
 			std::string _path;

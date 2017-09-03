@@ -20,11 +20,11 @@ namespace rfiStrategy {
 		
 		explicit FitsImageSetIndex(class rfiStrategy::ImageSet &set) : ImageSetIndex(set), _baselineIndex(0), _band(0), _field(0), _isValid(true) { }
 		
-		virtual void Previous();
-		virtual void Next();
-		virtual std::string Description() const;
-		virtual bool IsValid() const throw() { return _isValid; }
-		virtual FitsImageSetIndex *Copy() const
+		virtual void Previous() final override;
+		virtual void Next() final override;
+		virtual std::string Description() const final override;
+		virtual bool IsValid() const final override { return _isValid; }
+		virtual FitsImageSetIndex *Copy() const final override
 		{
 			FitsImageSetIndex *index = new FitsImageSetIndex(imageSet());
 			index->_baselineIndex = _baselineIndex;

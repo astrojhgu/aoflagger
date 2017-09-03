@@ -46,25 +46,25 @@ class NumericTickSet : public TickSet
 			set(sizeRequest);
 		}
 		
-		virtual unsigned Size() const
+		virtual unsigned Size() const final override
 		{
 			return _ticks.size();
 		}
 		
-		virtual Tick GetTick(unsigned i) const
+		virtual Tick GetTick(unsigned i) const final override
 		{
 			std::stringstream tickStr;
 			tickStr << _ticks[i];
 			return Tick((_ticks[i] - _min) / (_max - _min), tickStr.str());
 		}
 		
-		virtual void Reset()
+		virtual void Reset() final override
 		{
 			_ticks.clear();
 			set(_sizeRequest);
 		}
 		
-		virtual void Set(unsigned maxSize)
+		virtual void Set(unsigned maxSize) final override
 		{
 			_ticks.clear();
 			set(maxSize);
@@ -160,25 +160,25 @@ class LogarithmicTickSet : public TickSet
 			set(sizeRequest);
 		}
 		
-		virtual unsigned Size() const
+		virtual unsigned Size() const final override
 		{
 			return _ticks.size();
 		}
 		
-		virtual Tick GetTick(unsigned i) const
+		virtual Tick GetTick(unsigned i) const final override
 		{
 			std::stringstream tickStr;
 			tickStr << _ticks[i];
 			return Tick((log10(_ticks[i]) - _minLog10) / (_maxLog10 - _minLog10), tickStr.str());
 		}
 		
-		virtual void Reset()
+		virtual void Reset() final override
 		{
 			_ticks.clear();
 			set(_sizeRequest);
 		}
 		
-		virtual void Set(unsigned maxSize)
+		virtual void Set(unsigned maxSize) final override
 		{
 			_ticks.clear();
 			set(maxSize);
@@ -298,24 +298,24 @@ class TimeTickSet : public TickSet
 			set(sizeRequest);
 		}
 		
-		virtual unsigned Size() const
+		virtual unsigned Size() const final override
 		{
 			return _ticks.size();
 		}
 		
-		virtual Tick GetTick(unsigned i) const
+		virtual Tick GetTick(unsigned i) const final override
 		{
 			double val = _ticks[i];
 			return Tick((val - _min) / (_max - _min), Date::AipsMJDToTimeString(val));
 		}
 		
-		virtual void Reset()
+		virtual void Reset() final override
 		{
 			_ticks.clear();
 			set(_sizeRequest);
 		}
 		
-		virtual void Set(unsigned maxSize)
+		virtual void Set(unsigned maxSize) final override
 		{
 			_ticks.clear();
 			set(maxSize);
@@ -445,25 +445,25 @@ class TextTickSet : public TickSet
 			set(sizeRequest);
 		}
 		
-		virtual unsigned Size() const
+		virtual unsigned Size() const final override
 		{
 			return _ticks.size();
 		}
 		
-		virtual Tick GetTick(unsigned i) const
+		virtual Tick GetTick(unsigned i) const final override
 		{
 			const size_t labelIndex = _ticks[i];
 			const double val = (_labels.size() == 1) ? 0.5 : (double) labelIndex / (double) (_labels.size() - 1);
 			return Tick(val, _labels[labelIndex]);
 		}
 		
-		virtual void Reset()
+		virtual void Reset() final override
 		{
 			_ticks.clear();
 			set(_sizeRequest);
 		}
 		
-		virtual void Set(unsigned maxSize)
+		virtual void Set(unsigned maxSize) final override
 		{
 			_ticks.clear();
 			set(maxSize);

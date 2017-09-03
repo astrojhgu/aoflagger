@@ -83,8 +83,8 @@ namespace rfiStrategy {
 
 	ActionContainer *Action::GetRoot() const
 	{
-		if(_parent == 0)
-			return static_cast<ActionContainer*>(_parent);
+		if(_parent == nullptr)
+			return _parent;
 		else
 		{
 			ActionContainer *iter = _parent;

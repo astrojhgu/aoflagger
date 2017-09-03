@@ -21,10 +21,10 @@ class ProgressWindow : public Gtk::Window, public ProgressListener {
 		explicit ProgressWindow(class RFIGuiWindow &parentWindow);
 		~ProgressWindow();
 
-		virtual void OnStartTask(const rfiStrategy::Action &action, size_t taskNo, size_t taskCount, const std::string &description, size_t weight=1);
-		virtual void OnEndTask(const rfiStrategy::Action &action);
-		virtual void OnProgress(const rfiStrategy::Action &action, size_t progress, size_t maxProgress);
-		virtual void OnException(const rfiStrategy::Action &action, std::exception &thrownException);
+		virtual void OnStartTask(const rfiStrategy::Action &action, size_t taskNo, size_t taskCount, const std::string &description, size_t weight=1) final override;
+		virtual void OnEndTask(const rfiStrategy::Action &action) final override;
+		virtual void OnProgress(const rfiStrategy::Action &action, size_t progress, size_t maxProgress) final override;
+		virtual void OnException(const rfiStrategy::Action &action, std::exception &thrownException) final override;
 	private:
 		void UpdateProgress();
 		Glib::Dispatcher _progressChangeSignal;

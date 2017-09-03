@@ -11,12 +11,12 @@ namespace rfiStrategy {
 	class CombineFlagResults : public ActionContainer
 	{
 			public:
-				virtual std::string Description()
+				virtual std::string Description() final override
 				{
 					return "Combine flag results";
 				}
-				virtual ActionType Type() const { return CombineFlagResultsType; }
-				virtual void Perform(ArtifactSet &artifacts, class ProgressListener &listener)
+				virtual ActionType Type() const final override { return CombineFlagResultsType; }
+				virtual void Perform(ArtifactSet &artifacts, class ProgressListener &listener) final override
 				{
 					if(GetChildCount() == 1)
 					{

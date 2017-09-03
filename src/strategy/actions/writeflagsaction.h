@@ -20,15 +20,15 @@ namespace rfiStrategy {
 			WriteFlagsAction();
 			virtual ~WriteFlagsAction();
 
-			virtual std::string Description()
+			virtual std::string Description() final override
 			{
 				return "Write flags to file";
 			}
 
-			virtual void Perform(class ArtifactSet &artifacts, ProgressListener &progress);
-			virtual ActionType Type() const { return WriteFlagsActionType; }
-			virtual void Finish();
-			virtual void Sync() { Finish(); Initialize(); }
+			virtual void Perform(class ArtifactSet &artifacts, ProgressListener &progress) final override;
+			virtual ActionType Type() const final override { return WriteFlagsActionType; }
+			virtual void Finish() final override;
+			virtual void Sync() final override { Finish(); Initialize(); }
 
 			void SetMaxBufferItems(size_t maxBufferItems) { _maxBufferItems = maxBufferItems; }
 			void SetMinBufferItemsForWriting(size_t minBufferItemsForWriting) { _minBufferItemsForWriting = minBufferItemsForWriting; }

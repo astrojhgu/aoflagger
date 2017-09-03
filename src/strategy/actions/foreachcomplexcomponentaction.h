@@ -16,7 +16,7 @@ namespace rfiStrategy {
 			ForEachComplexComponentAction() : ActionBlock(), _onAmplitude(false), _onPhase(false), _onReal(true), _onImaginary(true), _restoreFromAmplitude(false)
 			{
 			}
-			virtual std::string Description()
+			virtual std::string Description() final override
 			{
 				if(IterationCount() == 1)
 				{
@@ -32,8 +32,8 @@ namespace rfiStrategy {
 				}
 				return "For each complex component";
 			}
-			virtual ActionType Type() const { return ForEachComplexComponentActionType; }
-			virtual void Perform(ArtifactSet &artifacts, class ProgressListener &listener)
+			virtual ActionType Type() const final override { return ForEachComplexComponentActionType; }
+			virtual void Perform(ArtifactSet &artifacts, class ProgressListener &listener) final override
 			{
 				size_t taskCount = 0;
 				if(_onAmplitude) ++taskCount;

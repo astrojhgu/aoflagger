@@ -17,12 +17,12 @@ namespace rfiStrategy {
 			{
 			}
 			
-			virtual std::string Description()
+			virtual std::string Description() final override
 			{
 				return "Absolute threshold";
 			}
 			
-			virtual void Perform(class ArtifactSet &artifacts, class ProgressListener &)
+			virtual void Perform(class ArtifactSet &artifacts, class ProgressListener &) final override
 			{
 				TimeFrequencyData &data = artifacts.ContaminatedData();
 				if(data.PolarizationCount() != 1)
@@ -30,7 +30,7 @@ namespace rfiStrategy {
 				
 				data.SetGlobalMask(PerformThreshold(data.GetSingleImage()));
 			}
-			virtual ActionType Type() const { return AbsThresholdActionType; }
+			virtual ActionType Type() const final override { return AbsThresholdActionType; }
 			
 			double Threshold() const { return _threshold; }
 			void SetThreshold(double threshold) { _threshold = threshold; }

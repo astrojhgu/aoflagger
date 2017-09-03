@@ -86,8 +86,8 @@ class RFIGuiWindow : public Gtk::Window, private StrategyController {
 		
 		class RFIGuiController& Controller() { return *_controller; }
 	private:
-		rfiStrategy::Strategy &Strategy() { return *_strategy; }
-		void SetStrategy(rfiStrategy::Strategy *newStrategy);
+		rfiStrategy::Strategy &Strategy() final override { return *_strategy; }
+		void SetStrategy(rfiStrategy::Strategy *newStrategy) final override;
 
 		void createToolbar();
 		void loadCurrentTFData();

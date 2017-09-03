@@ -36,7 +36,7 @@ class ConsoleProgressHandler : public ProgressListener {
 		
 	public:
 		
-		virtual void OnStartTask(const rfiStrategy::Action &action, size_t taskNo, size_t taskCount, const std::string &description, size_t weight)
+		virtual void OnStartTask(const rfiStrategy::Action &action, size_t taskNo, size_t taskCount, const std::string &description, size_t weight) final override
 		{
 			std::lock_guard<std::mutex> lock(_mutex);
 			ProgressListener::OnStartTask(action, taskNo, taskCount, description, weight);
@@ -51,19 +51,19 @@ class ConsoleProgressHandler : public ProgressListener {
 			AOLogger::Progress << description << "...\n";
 		}
 		
-		virtual void OnEndTask(const rfiStrategy::Action &action)
+		virtual void OnEndTask(const rfiStrategy::Action &action) final override
 		{
 			std::lock_guard<std::mutex> lock(_mutex);
 			
 			ProgressListener::OnEndTask(action);
 		}
 
-		virtual void OnProgress(const rfiStrategy::Action &action, size_t i, size_t j)
+		virtual void OnProgress(const rfiStrategy::Action &action, size_t i, size_t j) final override
 		{
 			ProgressListener::OnProgress(action, i, j);
 		}
 
-		virtual void OnException(const rfiStrategy::Action &, std::exception &thrownException) 
+		virtual void OnException(const rfiStrategy::Action &, std::exception &thrownException) final override
 		{
 			AOLogger::Error <<
 				"An exception occured during execution of the strategy!\n"

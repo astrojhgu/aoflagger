@@ -27,7 +27,7 @@ class MSRowData : public Serializable
 		_imagData(polarizationCount * channelCount)
 		{ }
 		
-		virtual void Serialize(std::ostream &stream) const
+		virtual void Serialize(std::ostream &stream) const final override
 		{
 			SerializeToUInt32(stream, _polarizationCount);
 			SerializeToUInt32(stream, _channelCount);
@@ -37,7 +37,7 @@ class MSRowData : public Serializable
 				SerializeToFloat(stream, val);
 		}
 		
-		virtual void Unserialize(std::istream &stream)
+		virtual void Unserialize(std::istream &stream) final override
 		{
 			_polarizationCount = UnserializeUInt32(stream);
 			_channelCount = UnserializeUInt32(stream);

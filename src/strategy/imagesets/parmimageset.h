@@ -24,15 +24,15 @@ namespace rfiStrategy {
 			virtual ~ParmImageSetIndex()
 			{
 			}
-			inline virtual void Previous();
+			inline virtual void Previous() final override;
 			
-			inline virtual void Next();
+			inline virtual void Next() final override;
 			
-			inline virtual std::string Description() const;
+			inline virtual std::string Description() const final override;
 			
-			virtual bool IsValid() const { return _valid; }
+			virtual bool IsValid() const final override { return _valid; }
 			
-			virtual ParmImageSetIndex *Copy() const
+			virtual ParmImageSetIndex *Copy() const final override
 			{
 				ParmImageSetIndex *index = new ParmImageSetIndex(imageSet());
 				index->_antennaIndex = _antennaIndex;
