@@ -336,7 +336,7 @@ void ServerConnection::onReceiveAntennaTablesResponseData(size_t dataSize)
 	size_t count = Serializable::UnserializeUInt32(stream);
 	for(size_t i=0;i<count;++i)
 	{
-		_antennas->push_back(AntennaInfo());
+		_antennas->emplace_back();
 		_antennas->rbegin()->Unserialize(stream);
 	}
 
