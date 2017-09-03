@@ -43,42 +43,50 @@ namespace rfiStrategy {
 		public:
 			explicit FitsImageSet(const std::string &file);
 			~FitsImageSet();
-			virtual void Initialize();
+			virtual void Initialize() override final;
 
-			virtual FitsImageSet *Copy();
+			virtual std::unique_ptr<ImageSet> Clone() override final;
 
-			virtual ImageSetIndex *StartIndex()
+			virtual std::unique_ptr<ImageSetIndex> StartIndex() override final
 			{
-				return new FitsImageSetIndex(*this);
+				return std::unique_ptr<ImageSetIndex>(new FitsImageSetIndex(*this));
 			}
-			virtual std::string Name()
+			virtual std::string Name() override final
 			{
 				return File();
 			}
-			virtual std::string File();
-			const std::vector<std::pair<size_t,size_t> > &Baselines() const throw() { return _baselines; }
-			size_t BandCount() { return _bandCount; }
-			class AntennaInfo GetAntennaInfo(unsigned antennaIndex) { return _antennaInfos[antennaIndex]; }
-			virtual void AddReadRequest(const ImageSetIndex &index)
+			virtual std::string File() override final;
+			virtual void AddReadRequest(const ImageSetIndex &index) override final
 			{
 				_baselineData.push(loadData(index));
 			}
-			virtual void PerformReadRequests()
+			virtual void PerformReadRequests() override final
 			{
 			}
-			virtual BaselineData *GetNextRequested()
+			virtual BaselineData *GetNextRequested() override final
 			{
 				BaselineData *data = new BaselineData(_baselineData.top());
 				_baselineData.pop();
 				return data;
 			}
-			virtual void AddWriteFlagsTask(const ImageSetIndex &index, std::vector<Mask2DCPtr> &flags);
-			virtual void PerformWriteFlagsTask();
-			virtual void PerformWriteDataTask(const ImageSetIndex &, std::vector<Image2DCPtr>, std::vector<Image2DCPtr>)
+			virtual void AddWriteFlagsTask(const ImageSetIndex &index, std::vector<Mask2DCPtr> &flags) override final;
+			virtual void PerformWriteFlagsTask() override final;
+			virtual void PerformWriteDataTask(const ImageSetIndex &, std::vector<Image2DCPtr>, std::vector<Image2DCPtr>) override final
 			{
 				throw BadUsageException("Not implemented");
 			}
-			
+			const std::vector<std::pair<size_t,size_t> > &Baselines() const
+			{
+				return _baselines;
+			}
+			size_t BandCount() const
+			{
+				return _bandCount;
+			}
+			class AntennaInfo GetAntennaInfo(unsigned antennaIndex) const
+			{
+				return _antennaInfos[antennaIndex];
+			}
 			std::string ReadTelescopeName();
 			
 		private:

@@ -32,10 +32,10 @@ public:
 	
 	virtual std::string Name()
 	{ return File(); }
-	virtual std::string File()
+	virtual std::string File() final override
 	{ return _filename; }
 	
-	virtual BaselineData *Read()
+	BaselineData *Read()
 	{
 		QualityTablesFormatter formatter(_filename);
 		StatisticsCollection statCollection;
@@ -63,9 +63,9 @@ public:
 		return baselineData;
 	}
 	
-	virtual ImageSet *Copy()
+	virtual std::unique_ptr<ImageSet> Clone() final override
 	{
-		return new QualityStatImageSet(_filename);
+		return std::unique_ptr<ImageSet>(new QualityStatImageSet(_filename));
 	}
 	
 	virtual void Initialize()

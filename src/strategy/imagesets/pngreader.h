@@ -21,9 +21,9 @@ namespace rfiStrategy {
 			{
 			}
 
-			virtual ImageSet *Copy()
+			virtual std::unique_ptr<ImageSet> Clone() final override
 			{
-				return 0;
+				return nullptr;
 			}
 
 			virtual void Initialize()

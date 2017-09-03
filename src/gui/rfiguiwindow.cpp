@@ -271,10 +271,10 @@ void RFIGuiWindow::loadCurrentTFData()
 				_spatialMetaData.reset(new SpatialMatrixMetaData(smsImageSet->SpatialMetaData(*_imageSetIndex)));
 			}
 			// Disable forward/back buttons when only one baseline is available
-			rfiStrategy::ImageSetIndex* firstIndex = _imageSet->StartIndex();
+			std::unique_ptr<rfiStrategy::ImageSetIndex> firstIndex = _imageSet->StartIndex();
 			firstIndex->Next();
 			bool multipleBaselines = firstIndex->IsValid();
-			delete firstIndex;
+			firstIndex.reset();
 			_previousButton->set_sensitive(multipleBaselines);
 			_reloadButton->set_sensitive(true);
 			_nextButton->set_sensitive(multipleBaselines);
@@ -440,7 +440,7 @@ void RFIGuiWindow::onToggleImage()
 
 void RFIGuiWindow::SetImageSet(std::unique_ptr<rfiStrategy::ImageSet> newImageSet, bool loadBaseline)
 {
-	_imageSetIndex.reset(newImageSet->StartIndex());
+	_imageSetIndex = newImageSet->StartIndex();
 	_imageSet = std::move(newImageSet);
 	
 	if(loadBaseline)

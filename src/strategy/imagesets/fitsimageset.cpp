@@ -41,9 +41,9 @@ namespace rfiStrategy {
 	{
 	}
 	
-	FitsImageSet *FitsImageSet::Copy()
+	std::unique_ptr<ImageSet> FitsImageSet::Clone()
 	{
-		return new FitsImageSet(*this);
+		return std::unique_ptr<FitsImageSet>(new FitsImageSet(*this));
 	}
 
 	void FitsImageSet::Initialize()

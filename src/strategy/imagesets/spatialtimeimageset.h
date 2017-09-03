@@ -54,14 +54,14 @@ namespace rfiStrategy {
 			virtual ~SpatialTimeImageSet()
 			{
 			}
-			virtual ImageSet *Copy()
+			virtual std::unique_ptr<ImageSet> Clone() final override
 			{
 				return 0;
 			}
 
-			virtual ImageSetIndex *StartIndex()
+			virtual std::unique_ptr<ImageSetIndex> StartIndex() final override
 			{
-				return new SpatialTimeImageSetIndex(*this);
+				return std::unique_ptr<ImageSetIndex>(new SpatialTimeImageSetIndex(*this));
 			}
 			virtual void Initialize()
 			{

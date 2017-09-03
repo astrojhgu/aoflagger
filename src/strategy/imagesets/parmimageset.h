@@ -51,35 +51,35 @@ namespace rfiStrategy {
 			ParmImageSet(const std::string &path) : _path(path), _parmTable(nullptr)
 			{
 			}
-			virtual ~ParmImageSet();
-			virtual ParmImageSet *Copy()
+			virtual ~ParmImageSet() override;
+			virtual std::unique_ptr<ImageSet> Clone() final override
 			{
-				throw std::runtime_error("Can not copy set");
+				throw std::runtime_error("Cannot copy set");
 			}
-			virtual ParmImageSetIndex *StartIndex()
+			virtual std::unique_ptr<ImageSetIndex> StartIndex() final override
 			{
-				return new ParmImageSetIndex(*this);
+				return std::unique_ptr<ImageSetIndex>(new ParmImageSetIndex(*this));
 			}
-			virtual void Initialize();
+			virtual void Initialize() final override;
 			
-			virtual std::string Name() { return "Parmdb"; }
+			virtual std::string Name() final override { return "Parmdb"; }
 			
-			virtual std::string File() { return _path; }
+			virtual std::string File() final override { return _path; }
 			
-			virtual TimeFrequencyData *LoadData(const ImageSetIndex &index);
+			TimeFrequencyData *LoadData(const ImageSetIndex &index);
 			
-			virtual void AddReadRequest(const ImageSetIndex &index)
+			virtual void AddReadRequest(const ImageSetIndex &index) final override
 			{
 				TimeFrequencyData *data = LoadData(index);
 				BaselineData *baseline = new BaselineData(*data, TimeFrequencyMetaDataCPtr(), index);
 				delete data;
 				_baselineBuffer.push_back(baseline);
 			}
-			virtual void PerformReadRequests()
+			virtual void PerformReadRequests() final override
 			{
 			}
 			
-			virtual BaselineData *GetNextRequested()
+			virtual BaselineData *GetNextRequested() final override
 			{
 				BaselineData *baseline = _baselineBuffer.front();
 				_baselineBuffer.pop_front();

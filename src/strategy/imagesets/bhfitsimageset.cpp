@@ -38,9 +38,9 @@ namespace rfiStrategy {
 	{
 	}
 	
-	BHFitsImageSet *BHFitsImageSet::Copy()
+	std::unique_ptr<ImageSet> BHFitsImageSet::Clone()
 	{
-		return new BHFitsImageSet(*this);
+		return std::unique_ptr<BHFitsImageSet>(new BHFitsImageSet(*this));
 	}
 
 	void BHFitsImageSet::Initialize()

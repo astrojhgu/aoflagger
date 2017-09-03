@@ -159,7 +159,7 @@ namespace rfiStrategy {
 			size_t _threadCount;
 			BaselineSelection _selection;
 
-			ImageSetIndex *_loopIndex;
+			std::unique_ptr<ImageSetIndex> _loopIndex;
 			ArtifactSet *_artifacts, *_resultSet;
 			
 			std::mutex _mutex;

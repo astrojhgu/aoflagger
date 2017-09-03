@@ -1,8 +1,9 @@
 #ifndef GUI_IMAGESET_H
 #define GUI_IMAGESET_H
 
-#include <string>
 #include <cstring>
+#include <string>
+#include <memory>
 #include <vector>
 
 #include "../../structures/types.h"
@@ -29,7 +30,9 @@ namespace rfiStrategy {
 		protected:
 			virtual void reattach() { }
 			ImageSetIndex(const ImageSetIndex&) = default;
+			ImageSetIndex(ImageSetIndex&&) = default;
 			ImageSetIndex& operator=(const ImageSetIndex&) = default;
+			ImageSetIndex& operator=(ImageSetIndex&&) = default;
 			ImageSet &imageSet() const { return *_set; }
 		private:
 			class ImageSet *_set;
@@ -97,9 +100,9 @@ namespace rfiStrategy {
 	class ImageSet {
 		public:
 			virtual ~ImageSet() { };
-			virtual ImageSet *Copy() = 0;
+			virtual std::unique_ptr<ImageSet> Clone() = 0;
 
-			virtual ImageSetIndex *StartIndex() = 0;
+			virtual std::unique_ptr<ImageSetIndex> StartIndex() = 0;
 			
 			/**
 			 * Initialize is used to initialize the image set after it has been created and

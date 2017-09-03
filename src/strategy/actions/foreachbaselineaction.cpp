@@ -39,9 +39,9 @@ namespace rfiStrategy {
 			if(msImageSet != 0)
 			{
 				// Check memory usage
-				ImageSetIndex *tempIndex = msImageSet->StartIndex();
+				std::unique_ptr<ImageSetIndex> tempIndex = msImageSet->StartIndex();
 				size_t timeStepCount = msImageSet->ObservationTimesVector(*tempIndex).size();
-				delete tempIndex;
+				tempIndex.reset();
 				size_t channelCount = msImageSet->GetBandInfo(0).channels.size();
 				double estMemorySizePerThread =
 					8.0/*bp complex*/ * 4.0 /*polarizations*/ *
@@ -107,14 +107,14 @@ namespace rfiStrategy {
 			_nextIndex = 0;
 			
 			// Count the baselines that are to be processed
-			ImageSetIndex *iteratorIndex = imageSet->StartIndex();
+			std::unique_ptr<ImageSetIndex> iteratorIndex = imageSet->StartIndex();
 			while(iteratorIndex->IsValid())
 			{
 				if(IsBaselineSelected(*iteratorIndex))
 					++_baselineCount;
 				iteratorIndex->Next();
 			}
-			delete iteratorIndex;
+			iteratorIndex.reset();
 			AOLogger::Debug << "Will process " << _baselineCount << " baselines.\n";
 			
 			// Initialize thread data and threads
@@ -146,7 +146,7 @@ namespace rfiStrategy {
 			delete[] _progressTaskCount;
 			delete[] _progressTaskNo;
 
-			delete _loopIndex;
+			_loopIndex.reset();
 
 			if(_exceptionOccured)
 				throw std::runtime_error("An exception occured in one of the sub tasks of the (multi-threaded) \"For-each baseline\"-action: the RFI strategy will not continue.");
@@ -237,7 +237,7 @@ namespace rfiStrategy {
 	void ForEachBaselineAction::PerformFunction::operator()()
 	{
 		std::unique_lock<std::mutex> ioLock(_action._artifacts->IOMutex());
-		ImageSet *privateImageSet = _action._artifacts->ImageSet()->Copy();
+		std::unique_ptr<ImageSet> privateImageSet = _action._artifacts->ImageSet()->Clone();
 		ioLock.unlock();
 
 		try {
@@ -281,8 +281,6 @@ namespace rfiStrategy {
 			_progress.OnException(_action, e);
 			_action.SetExceptionOccured();
 		}
-
-		delete privateImageSet;
 	}
 
 	void ForEachBaselineAction::PerformFunction::OnStartTask(const Action &/*action*/, size_t /*taskNo*/, size_t /*taskCount*/, const std::string &/*description*/, size_t /*weight*/)

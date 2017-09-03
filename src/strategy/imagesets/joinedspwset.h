@@ -67,18 +67,18 @@ namespace rfiStrategy {
 		JoinedSPWSet& operator=(const JoinedSPWSet& source) = delete;
 		
 		virtual ~JoinedSPWSet() override { };
-		virtual ImageSet *Copy() override final
+		virtual std::unique_ptr<ImageSet> Clone() override final
 		{
-			JoinedSPWSet* newSet = new JoinedSPWSet();
-			newSet->_msImageSet.reset( _msImageSet->Copy() );
+			std::unique_ptr<JoinedSPWSet> newSet(new JoinedSPWSet());
+			newSet->_msImageSet = _msImageSet->CloneMSImageSet();
 			newSet->_joinedSequences = _joinedSequences;
 			newSet->_nChannels = _nChannels;
 			return newSet;
 		}
 
-		virtual ImageSetIndex *StartIndex() override final
+		virtual std::unique_ptr<ImageSetIndex> StartIndex() override final
 		{
-			return new JoinedSPWSetIndex(*this);
+			return std::unique_ptr<JoinedSPWSetIndex>(new JoinedSPWSetIndex(*this));
 		}
 		
 		virtual void Initialize() override final { }

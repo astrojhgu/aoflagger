@@ -9,6 +9,7 @@
 #include <stack>
 #include <mutex>
 #include <thread>
+#include <memory>
 
 #include "../../structures/mask2d.h"
 
@@ -72,14 +73,14 @@ namespace rfiStrategy {
 			std::mutex _mutex;
 			std::mutex *_ioMutex;
 			std::condition_variable _bufferChange;
-			std::thread *_flusher;
+			std::unique_ptr<std::thread> _flusher;
 			bool _isFinishing;
 
 			size_t _maxBufferItems;
 			size_t _minBufferItemsForWriting;
 
 			std::stack<BufferItem> _buffer;
-			ImageSet *_imageSet;
+			std::unique_ptr<ImageSet> _imageSet;
 	};
 }
 #endif

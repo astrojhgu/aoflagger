@@ -30,7 +30,7 @@ namespace rfiStrategy {
 			virtual void Next();
 			virtual std::string Description() const;
 			virtual bool IsValid() const { return _isValid; }
-			virtual MSImageSetIndex *Copy() const
+			virtual MSImageSetIndex *Copy() const final override
 			{
 				MSImageSetIndex *index = new MSImageSetIndex(imageSet());
 				index->_sequenceIndex = _sequenceIndex;
@@ -68,9 +68,14 @@ namespace rfiStrategy {
 			{
 			}
 
-			virtual MSImageSet *Copy() override final
+			virtual std::unique_ptr<ImageSet> Clone() override final
 			{
-				MSImageSet *newSet = new MSImageSet(_set.Path(), _ioMode);
+				return CloneMSImageSet();
+			}
+	
+			std::unique_ptr<MSImageSet> CloneMSImageSet() const
+			{
+				std::unique_ptr<MSImageSet> newSet(new MSImageSet(_set.Path(), _ioMode));
 				newSet->_reader = _reader;
 				newSet->_dataColumnName = _dataColumnName;
 				newSet->_subtractModel = _subtractModel;
@@ -99,7 +104,10 @@ namespace rfiStrategy {
 
 			virtual void Initialize() override final;
 	
-			virtual ImageSetIndex *StartIndex() override final { return new MSImageSetIndex(*this); }
+			virtual std::unique_ptr<ImageSetIndex> StartIndex() override final
+			{
+				return std::unique_ptr<ImageSetIndex>(new MSImageSetIndex(*this));
+			}
 
 			virtual void PerformWriteDataTask(const ImageSetIndex &index, std::vector<Image2DCPtr> realImages, std::vector<Image2DCPtr> imaginaryImages) override final
 			{

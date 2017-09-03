@@ -19,7 +19,7 @@ namespace rfiStrategy {
 
 		std::string filename = artifacts.ImageSet()->File();
 		SpatialMSImageSet set(filename);
-		ImageSetIndex *index = set.StartIndex();
+		std::unique_ptr<ImageSetIndex> index(set.StartIndex());
 		size_t progressStep = 0, totalProgress = artifacts.ContaminatedData().ImageWidth() * artifacts.ContaminatedData().ImageHeight()/256;
 		while(index->IsValid())
 		{
@@ -54,7 +54,7 @@ namespace rfiStrategy {
 			++progressStep;
 			progress.OnProgress(*this, progressStep/256, totalProgress);
 		}
-		delete index;
+		index.reset();
 
 		TimeFrequencyData newRevisedData = artifacts.RevisedData();
 		for(size_t p=0;p<imageCount;++p)

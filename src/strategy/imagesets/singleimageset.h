@@ -41,9 +41,9 @@ namespace rfiStrategy {
 				delete _lastRead;
 			}
 
-			virtual ImageSetIndex *StartIndex()
+			virtual std::unique_ptr<ImageSetIndex> StartIndex() final override
 			{
-				return new SingleImageSetIndex(*this, Name());
+				return std::unique_ptr<ImageSetIndex>(new SingleImageSetIndex(*this, Name()));
 			}
 			
 			virtual std::string Name() = 0;

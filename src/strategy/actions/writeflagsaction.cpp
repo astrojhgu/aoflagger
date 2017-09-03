@@ -12,7 +12,7 @@
 
 namespace rfiStrategy {
 
-	WriteFlagsAction::WriteFlagsAction() : _ioMutex(nullptr), _flusher(0), _isFinishing(false), _maxBufferItems(18), _minBufferItemsForWriting(12), _imageSet(0)
+	WriteFlagsAction::WriteFlagsAction() : _ioMutex(nullptr), _flusher(), _isFinishing(false), _maxBufferItems(18), _minBufferItemsForWriting(12), _imageSet()
 	{
 	}
 	
@@ -28,16 +28,16 @@ namespace rfiStrategy {
 			throw BadUsageException("No image set active: can not write flags");
 
 		std::unique_lock<std::mutex> lock(_mutex);
-		if(_flusher == 0)
+		if(_flusher == nullptr)
 		{
 			_ioMutex = &artifacts.IOMutex();
 			std::unique_lock<std::mutex> iolock(*_ioMutex);
-			_imageSet = artifacts.ImageSet()->Copy();
+			_imageSet = artifacts.ImageSet()->Clone();
 			iolock.unlock();
 			_isFinishing = false;
 			FlushFunction flushFunction;
 			flushFunction._parent = this;
-			_flusher = new std::thread(flushFunction);
+			_flusher.reset( new std::thread(flushFunction) );
 		}
 		lock.unlock();
 
@@ -92,15 +92,14 @@ namespace rfiStrategy {
 		std::unique_lock<std::mutex> lock(_mutex);
 		_isFinishing = true;
 		_bufferChange.notify_all();
-		if(_flusher != 0)
+		if(_flusher != nullptr)
 		{
-			std::thread *flusher = _flusher;
-			_flusher = 0;
+			std::unique_ptr<std::thread> flusher = std::move(_flusher);
 			lock.unlock();
 			AOLogger::Debug << "Finishing the flusher thread...\n";
 			flusher->join();
-			delete flusher;
-			delete _imageSet;
+			flusher.reset();
+			_imageSet.reset();
 		}
 	}
 }

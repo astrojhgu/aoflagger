@@ -41,34 +41,33 @@ namespace rfiStrategy {
 			~FilterBankSet()
 			{ }
 
-			virtual FilterBankSet* Copy()
+			virtual std::unique_ptr<ImageSet> Clone() final override
 			{
-				FilterBankSet* set = new FilterBankSet(*this);
+				std::unique_ptr<FilterBankSet> set(new FilterBankSet(*this));
 				set->_requests.clear();
 				return set;
 			}
 	
-			virtual std::string Name() { return _location; }
+			virtual std::string Name() final override { return _location; }
 			
-			virtual std::string File() { return _location; }
+			virtual std::string File() final override { return _location; }
 			
-			virtual void AddReadRequest(const ImageSetIndex &index);
+			virtual void AddReadRequest(const ImageSetIndex &index) final override;
 			
-			virtual void PerformReadRequests();
+			virtual void PerformReadRequests() final override;
 			
-			virtual BaselineData *GetNextRequested();
+			virtual BaselineData *GetNextRequested() final override;
 
-			virtual void AddWriteFlagsTask(const ImageSetIndex &index, std::vector<Mask2DCPtr> &flags);
+			virtual void AddWriteFlagsTask(const ImageSetIndex &index, std::vector<Mask2DCPtr> &flags) final override;
 			
-			virtual void PerformWriteFlagsTask()
+			virtual void Initialize() final override;
+	
+			virtual std::unique_ptr<ImageSetIndex> StartIndex() final override
 			{
+				return std::unique_ptr<ImageSetIndex>(new FilterBankSetIndex(*this));
 			}
 
-			virtual void Initialize();
-	
-			virtual ImageSetIndex* StartIndex() { return new FilterBankSetIndex(*this); }
-
-			virtual void PerformWriteDataTask(const ImageSetIndex &index, std::vector<Image2DCPtr> realImages, std::vector<Image2DCPtr> imaginaryImages);
+			virtual void PerformWriteDataTask(const ImageSetIndex &index, std::vector<Image2DCPtr> realImages, std::vector<Image2DCPtr> imaginaryImages) final override;
 			
 			double CentreFrequency() const
 			{
