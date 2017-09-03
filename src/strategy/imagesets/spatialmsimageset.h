@@ -35,7 +35,7 @@ namespace rfiStrategy {
 			{
 				return _isValid;
 			}
-			virtual ImageSetIndex *Copy() const final override
+			virtual ImageSetIndex *Clone() const final override
 			{
 				SpatialMSImageSetIndex *newIndex = new SpatialMSImageSetIndex(imageSet());
 				newIndex->_timeIndex = _timeIndex;

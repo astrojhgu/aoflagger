@@ -25,7 +25,7 @@ namespace rfiStrategy {
 		virtual void Next() override final;
 		virtual std::string Description() const override final;
 		virtual bool IsValid() const throw() override final { return _isValid; }
-		virtual BHFitsImageSetIndex *Copy() const override final
+		virtual BHFitsImageSetIndex *Clone() const override final
 		{
 			BHFitsImageSetIndex *index = new BHFitsImageSetIndex(imageSet());
 			index->_imageIndex = _imageIndex;

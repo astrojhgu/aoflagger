@@ -18,7 +18,7 @@ namespace rfiStrategy {
 			virtual void Next() final override { _valid = false; }
 			virtual std::string Description() const final override { return _description; }
 			virtual bool IsValid() const final override { return _valid; }
-			virtual ImageSetIndex *Copy() const final override
+			virtual ImageSetIndex *Clone() const final override
 			{
 				SingleImageSetIndex *index = new SingleImageSetIndex(imageSet(), _description);
 				index->_valid = _valid;
@@ -84,7 +84,7 @@ namespace rfiStrategy {
 			virtual void AddWriteFlagsTask(const ImageSetIndex &index, std::vector<Mask2DCPtr> &flags) override
 			{
 				delete _writeFlagsIndex;
-				_writeFlagsIndex = index.Copy();
+				_writeFlagsIndex = index.Clone();
 				_writeFlagsMasks = flags;
 			}
 			

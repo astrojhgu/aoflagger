@@ -25,7 +25,7 @@ namespace rfiStrategy {
 			virtual void Next() override final;
 			virtual std::string Description() const override final;
 			virtual bool IsValid() const override final { return _isValid; }
-			virtual JoinedSPWSetIndex *Copy() const override final
+			virtual JoinedSPWSetIndex *Clone() const override final
 			{ return new JoinedSPWSetIndex(*this); }
 			
 		private:

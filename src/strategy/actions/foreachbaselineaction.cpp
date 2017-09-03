@@ -212,7 +212,7 @@ namespace rfiStrategy {
 		{
 			if(IsBaselineSelected(*_loopIndex))
 			{
-				ImageSetIndex *newIndex = _loopIndex->Copy();
+				ImageSetIndex *newIndex = _loopIndex->Clone();
 				_loopIndex->Next();
 
 				return newIndex;

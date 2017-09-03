@@ -32,7 +32,7 @@ namespace rfiStrategy {
 			
 			virtual bool IsValid() const final override { return _valid; }
 			
-			virtual ParmImageSetIndex *Copy() const final override
+			virtual ParmImageSetIndex *Clone() const final override
 			{
 				ParmImageSetIndex *index = new ParmImageSetIndex(imageSet());
 				index->_antennaIndex = _antennaIndex;

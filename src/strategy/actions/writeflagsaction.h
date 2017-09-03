@@ -35,10 +35,10 @@ namespace rfiStrategy {
 		private:
 			struct BufferItem {
 				BufferItem(const std::vector<Mask2DCPtr> &masks, const ImageSetIndex &index)
-					: _masks(masks), _index(index.Copy())
+					: _masks(masks), _index(index.Clone())
 				{
 				}
-				BufferItem(const BufferItem &source) : _masks(source._masks), _index(source._index->Copy())
+				BufferItem(const BufferItem &source) : _masks(source._masks), _index(source._index->Clone())
 				{
 				}
 				~BufferItem()
@@ -49,7 +49,7 @@ namespace rfiStrategy {
 				{
 					delete _index;
 					_masks = source._masks;
-					_index = source._index->Copy();
+					_index = source._index->Clone();
 				}
 				std::vector<Mask2DCPtr> _masks;
 				ImageSetIndex *_index;
