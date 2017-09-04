@@ -241,8 +241,8 @@ namespace aoflagger {
 	
 	class StrategyData {
 		public:
-			explicit StrategyData(rfiStrategy::Strategy *strategy)
-			: strategyPtr(strategy)
+			explicit StrategyData(std::unique_ptr<rfiStrategy::Strategy> strategy)
+			: strategyPtr(std::move(strategy))
 			{ }
 			
 			std::shared_ptr<rfiStrategy::Strategy> strategyPtr;

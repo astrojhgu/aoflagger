@@ -28,7 +28,7 @@ namespace rfiStrategy {
 						for(const_iterator i=begin();i!=end();++i)
 						{
 							artifacts.SetContaminatedData(originalFlags);
-							Action *action = *i;
+							Action *action = i->get();
 							listener.OnStartTask(*this, nr, GetChildCount(), action->Description());
 							action->Perform(artifacts, listener);
 							listener.OnEndTask(*this);

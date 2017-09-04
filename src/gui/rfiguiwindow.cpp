@@ -89,9 +89,9 @@ RFIGuiWindow::RFIGuiWindow() :
 	set_default_size(800,600);
 	set_default_icon_name("aoflagger");
 
-	_strategy.reset(rfiStrategy::DefaultStrategy::CreateStrategy(
+	_strategy = rfiStrategy::DefaultStrategy::CreateStrategy(
 		rfiStrategy::DefaultStrategy::GENERIC_TELESCOPE,
-		rfiStrategy::DefaultStrategy::FLAG_GUI_FRIENDLY));
+		rfiStrategy::DefaultStrategy::FLAG_GUI_FRIENDLY);
 	_imagePlaneWindow.reset(new ImagePlaneWindow());
 	
 	onTFZoomChanged();
@@ -1938,9 +1938,9 @@ void RFIGuiWindow::onSubtractDataFromMem()
 	}
 }
 
-void RFIGuiWindow::SetStrategy(rfiStrategy::Strategy* newStrategy)
+void RFIGuiWindow::SetStrategy(std::unique_ptr<rfiStrategy::Strategy> newStrategy)
 {
-	_strategy.reset(newStrategy);
+	_strategy = std::move(newStrategy);
 }
 
 void RFIGuiWindow::onControllerStateChange()

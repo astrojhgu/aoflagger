@@ -238,7 +238,7 @@ int main(int argc, char **argv)
 
 		std::mutex ioMutex;
 		
-		rfiStrategy::ForEachMSAction *fomAction = new rfiStrategy::ForEachMSAction();
+		std::unique_ptr<rfiStrategy::ForEachMSAction> fomAction(new rfiStrategy::ForEachMSAction());
 		if(readMode.IsSet())
 			fomAction->SetIOMode(readMode);
 		if(readUVW.IsSet())
@@ -270,7 +270,7 @@ int main(int argc, char **argv)
 		{
 			fomAction->SetLoadOptimizedStrategy(false);
 			rfiStrategy::StrategyReader reader;
-			rfiStrategy::Strategy *subStrategy;
+			std::unique_ptr<rfiStrategy::Strategy> subStrategy;
 			try {
 				AOLogger::Debug << "Opening strategy file '" << strategyFile.Value() << "'\n";
 				subStrategy = reader.CreateStrategyFromFile(strategyFile);
@@ -288,24 +288,24 @@ int main(int argc, char **argv)
 			if(!rfiStrategy::DefaultStrategy::StrategyContainsAction(*subStrategy, rfiStrategy::ForEachBaselineActionType) &&
 				!rfiStrategy::DefaultStrategy::StrategyContainsAction(*subStrategy, rfiStrategy::WriteFlagsActionType))
 			{
-				rfiStrategy::DefaultStrategy::EncapsulateSingleStrategy(*fomAction, subStrategy, rfiStrategy::DefaultStrategy::GENERIC_TELESCOPE);
+				rfiStrategy::DefaultStrategy::EncapsulateSingleStrategy(*fomAction, std::move(subStrategy), rfiStrategy::DefaultStrategy::GENERIC_TELESCOPE);
 				AOLogger::Info << "Modified single-baseline strategy so it will execute strategy on all baselines and write flags.\n";
 			}
 			else {
-				fomAction->Add(subStrategy);
+				fomAction->Add(std::move(subStrategy));
 			}
 			if(threadCount.IsSet())
 				rfiStrategy::Strategy::SetThreadCount(*fomAction, threadCount);
 		}
 		else {
 			fomAction->SetLoadOptimizedStrategy(true);
-			fomAction->Add(new rfiStrategy::Strategy()); // This helps the progress reader to determine progress
+			fomAction->Add(std::unique_ptr<rfiStrategy::Strategy>(new rfiStrategy::Strategy())); // This helps the progress reader to determine progress
 			if(threadCount.IsSet())
 				fomAction->SetLoadStrategyThreadCount(threadCount);
 		}
 		
 		rfiStrategy::Strategy overallStrategy;
-		overallStrategy.Add(fomAction);
+		overallStrategy.Add(std::move(fomAction));
 
 		rfiStrategy::ArtifactSet artifacts(&ioMutex);
 		artifacts.SetAntennaFlagCountPlot(new AntennaFlagCountPlot());

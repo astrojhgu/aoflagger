@@ -1,6 +1,7 @@
 #ifndef RFISTRATEGYREADER_H
 #define RFISTRATEGYREADER_H
 
+#include <memory>
 #include <stdexcept>
 #include <string>
 
@@ -9,22 +10,22 @@
 
 namespace rfiStrategy {
 
-	class StrategyReaderError : public std::runtime_error
-	{
-		public:
-			explicit StrategyReaderError(const std::string &arg) : std::runtime_error(arg) { }
-	};
+class StrategyReaderError : public std::runtime_error
+{
+	public:
+		explicit StrategyReaderError(const std::string &arg) : std::runtime_error(arg) { }
+};
 
 class StrategyReader {
 	public:
 		StrategyReader();
 		~StrategyReader();
 
-		class Strategy *CreateStrategyFromFile(const std::string &filename);
+		std::unique_ptr<class Strategy> CreateStrategyFromFile(const std::string &filename);
 	private:
-		class Action *parseChild(xmlNode *node);
+		std::unique_ptr<class Action> parseChild(xmlNode *node);
 		class Strategy *parseStrategy(xmlNode *node);
-		class Strategy *parseRootChildren(xmlNode *rootNode);
+		std::unique_ptr<class Strategy> parseRootChildren(xmlNode *rootNode);
 		void parseChildren(xmlNode *node, class ActionContainer *parent);
 		class Action *parseAction(xmlNode *node);
 

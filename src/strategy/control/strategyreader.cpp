@@ -61,20 +61,20 @@ StrategyReader::~StrategyReader()
 		xmlCleanupParser();
 }
 
-Strategy *StrategyReader::CreateStrategyFromFile(const std::string &filename)
+std::unique_ptr<Strategy> StrategyReader::CreateStrategyFromFile(const std::string &filename)
 {
 	_xmlDocument = xmlReadFile(filename.c_str(), NULL, 0);
 	if (_xmlDocument == NULL)
 		throw StrategyReaderError("Failed to read file");
 
 	xmlNode *rootElement = xmlDocGetRootElement(_xmlDocument);
-	Strategy *strategy = 0;
+	std::unique_ptr<Strategy> strategy;
 
 	for (xmlNode *curNode=rootElement; curNode!=NULL; curNode=curNode->next)
 	{
 		if(curNode->type == XML_ELEMENT_NODE)
 		{
-			if(strategy != 0)
+			if(strategy != nullptr)
 				throw StrategyReaderError("Multiple root elements found.");
 			if(std::string((const char *) curNode->name) != "rfi-strategy")
 				throw StrategyReaderError("Invalid structure in xml file: no rfi-strategy root node found. Maybe this is not an rfi strategy?");
@@ -103,7 +103,7 @@ Strategy *StrategyReader::CreateStrategyFromFile(const std::string &filename)
 			strategy = parseRootChildren(curNode);
 		}
 	}
-	if(strategy == 0)
+	if(strategy == nullptr)
 		throw StrategyReaderError("Could not find root element in file.");
 
 	xmlFreeDoc(_xmlDocument);
@@ -111,31 +111,31 @@ Strategy *StrategyReader::CreateStrategyFromFile(const std::string &filename)
 	return strategy;
 }
 
-Strategy *StrategyReader::parseRootChildren(xmlNode *rootNode)
+std::unique_ptr<Strategy> StrategyReader::parseRootChildren(xmlNode *rootNode)
 {
-	Strategy *strategy = 0;
+	std::unique_ptr<Strategy> strategy;
 	for (xmlNode *curNode=rootNode->children; curNode!=NULL; curNode=curNode->next) {
 		if(curNode->type == XML_ELEMENT_NODE)
 		{
-			if(strategy != 0)
+			if(strategy != nullptr)
 				throw StrategyReaderError("More than one root element in file!");
-			strategy = dynamic_cast<Strategy*>(parseAction(curNode));
-			if(strategy == 0)
+			strategy = std::unique_ptr<Strategy>(dynamic_cast<Strategy*>(parseAction(curNode)));
+			if(strategy == nullptr)
 				throw StrategyReaderError("Root element was not a strategy!");
 		}
 	}
-	if(strategy == 0)
+	if(strategy == nullptr)
 		throw StrategyReaderError("Root element not found.");
 
 	return strategy;
 }
 
-Action *StrategyReader::parseChild(xmlNode *node)
+std::unique_ptr<Action> StrategyReader::parseChild(xmlNode *node)
 {
 	if (node->type == XML_ELEMENT_NODE) {
 		std::string name((const char*) node->name);
 		if(name == "action")
-			return parseAction(node);
+			return std::unique_ptr<Action>(parseAction(node));
 	}
 	throw StrategyReaderError("Invalid structure in xml file: an action was expected");
 }

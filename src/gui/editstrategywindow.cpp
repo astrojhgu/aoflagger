@@ -201,7 +201,7 @@ void EditStrategyWindow::onRemoveActionClicked()
 	_disableUpdates = true;
 	clearRightFrame();
 	Action *action = GetSelectedAction();
-	if(action != 0 && action->Parent() != 0)
+	if(action != nullptr && action->Parent() != nullptr)
 	{
 		action->Parent()->RemoveAndDelete(action);
 		_store->clear();
@@ -389,7 +389,7 @@ size_t EditStrategyWindow::GetSelectedActionChildIndex()
 	else return 0;
 }
 
-void EditStrategyWindow::AddAction(rfiStrategy::Action *newAction)
+void EditStrategyWindow::AddAction(std::unique_ptr<rfiStrategy::Action> newAction)
 {
 	Action *action = GetSelectedAction();
 	if(action != 0)
@@ -397,11 +397,12 @@ void EditStrategyWindow::AddAction(rfiStrategy::Action *newAction)
 		rfiStrategy::ActionContainer *container = dynamic_cast<rfiStrategy::ActionContainer*>(action);
 		if(container != 0)
 		{
-			container->Add(newAction);
+			rfiStrategy::Action* actionPtr = newAction.get();
+			container->Add(std::move(newAction));
 			_store->clear();
 			fillStore();
 			_view.get_selection()->unselect_all();
-			selectAction(newAction);
+			selectAction(actionPtr);
 		}
 	}
 }
@@ -515,8 +516,9 @@ void EditStrategyWindow::onOpenClicked()
 		std::string filename(dialog.get_filename());
 		try {
 			_store->clear();
-			_strategy = reader.CreateStrategyFromFile(filename);
-			_strategyController.SetStrategy(_strategy);
+			std::unique_ptr<Strategy> s = reader.CreateStrategyFromFile(filename);
+			_strategy = s.get();
+			_strategyController.SetStrategy(std::move(s));
 			fillStore();
 		} catch(std::exception &e)
 		{
@@ -528,27 +530,25 @@ void EditStrategyWindow::onOpenClicked()
 
 void EditStrategyWindow::onAddFOBaseline()
 {
-	addContainerBetween(*_strategy, new rfiStrategy::ForEachBaselineAction());
+	addContainerBetween(*_strategy, std::unique_ptr<rfiStrategy::ForEachBaselineAction>(new rfiStrategy::ForEachBaselineAction()));
 	_store->clear();
 	fillStore();
 }
 
 void EditStrategyWindow::onAddFOMS()
 {
-	addContainerBetween(*_strategy, new rfiStrategy::ForEachMSAction());
+	addContainerBetween(*_strategy, std::unique_ptr<rfiStrategy::ForEachMSAction>(new rfiStrategy::ForEachMSAction()));
 	_store->clear();
 	fillStore();
 }
 
-void EditStrategyWindow::addContainerBetween(rfiStrategy::ActionContainer &root, rfiStrategy::ActionContainer *newContainer)
+void EditStrategyWindow::addContainerBetween(rfiStrategy::ActionContainer &root, std::unique_ptr<rfiStrategy::ActionContainer> newContainer)
 {
 	while(root.GetChildCount() > 0)
 	{
-		Action *moveAction = &root.GetFirstChild();
-		root.RemoveWithoutDelete(moveAction);
-		newContainer->Add(moveAction);
+		newContainer->Add(root.RemoveAndAcquire(&root.GetFirstChild()));
 	}
-	root.Add(dynamic_cast<Action *>(newContainer));
+	root.Add(std::move(newContainer));
 }
 
 void EditStrategyWindow::onWizardClicked()

@@ -2,6 +2,7 @@
 #include "interfaces.h"
 
 #include "../strategy/control/defaultstrategy.h"
+#include "../strategy/actions/strategy.h"
 
 #include "gtkmm-compat.h"
 
@@ -165,10 +166,10 @@ void StrategyWizardWindow::onFinishClicked()
 	if(_autoCorrelationButton.get_active())
 		flags |= rfiStrategy::DefaultStrategy::FLAG_AUTO_CORRELATION;
 	
-	rfiStrategy::Strategy *strategy =
-		rfiStrategy::DefaultStrategy::CreateStrategy(telescopeId, flags);
+	std::unique_ptr<rfiStrategy::Strategy> strategy(
+		rfiStrategy::DefaultStrategy::CreateStrategy(telescopeId, flags));
 		
-	_strategyController.SetStrategy(strategy);
+	_strategyController.SetStrategy(std::move(strategy));
 	_strategyController.NotifyChange();
 	
 	hide();
