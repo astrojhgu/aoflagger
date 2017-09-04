@@ -80,9 +80,9 @@ namespace rfiStrategy {
 			{
 			}
 			
-			virtual BaselineData *GetNextRequested() final override
+			virtual std::unique_ptr<BaselineData> GetNextRequested() final override
 			{
-				BaselineData *baseline = _baselineBuffer.front();
+				std::unique_ptr<BaselineData> baseline(std::move(_baselineBuffer.front()));
 				_baselineBuffer.pop_front();
 				return baseline;
 			}

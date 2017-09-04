@@ -180,9 +180,9 @@ namespace rfiStrategy {
 			_requests.clear();
 		}
 		
-		virtual BaselineData *GetNextRequested() override final
+		virtual std::unique_ptr<BaselineData> GetNextRequested() override final
 		{
-			BaselineData* data = new BaselineData(_baselineData.front());
+			std::unique_ptr<BaselineData> data(new BaselineData(_baselineData.front()));
 			_baselineData.pop_front();
 			return data;
 		}

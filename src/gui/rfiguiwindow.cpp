@@ -258,15 +258,16 @@ void RFIGuiWindow::loadCurrentTFData()
 			std::unique_lock<std::mutex> lock(_ioMutex);
 			_imageSet->AddReadRequest(*_imageSetIndex);
 			_imageSet->PerformReadRequests();
-			rfiStrategy::BaselineData *baseline = _imageSet->GetNextRequested();
+			std::unique_ptr<rfiStrategy::BaselineData> baseline = _imageSet->GetNextRequested();
 			lock.unlock();
 			
 			_timeFrequencyWidget.SetNewData(baseline->Data(), baseline->MetaData());
-			delete baseline;
+			baseline.reset();
+			
 			_spatialMetaData.reset();
 			rfiStrategy::SpatialMSImageSet* smsImageSet =
 				dynamic_cast<rfiStrategy::SpatialMSImageSet*>(_imageSet.get());
-			if(smsImageSet != 0)
+			if(smsImageSet != nullptr)
 			{
 				_spatialMetaData.reset(new SpatialMatrixMetaData(smsImageSet->SpatialMetaData(*_imageSetIndex)));
 			}

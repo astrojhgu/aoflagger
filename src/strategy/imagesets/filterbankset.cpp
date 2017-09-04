@@ -86,12 +86,12 @@ void FilterBankSet::AddReadRequest(const ImageSetIndex& index)
 	_requests.push_back(new BaselineData(index));
 }
 
-BaselineData* FilterBankSet::GetNextRequested()
+std::unique_ptr<BaselineData> FilterBankSet::GetNextRequested()
 {
 	if(_bitCount != 32)
 		throw std::runtime_error("Only support for 32-bit filterbank sets has been added as of yet");
 	
-	BaselineData* baseline = _requests.front();
+	std::unique_ptr<BaselineData> baseline(std::move(_requests.front()));
 	_requests.pop_front();
 	const size_t intervalIndex = reinterpret_cast<const FilterBankSetIndex&>(baseline->Index())._intervalIndex;
 	

@@ -196,13 +196,13 @@ namespace rfiStrategy {
 		}
 	}
 	
-	BaselineData *MSImageSet::GetNextRequested()
+	std::unique_ptr<BaselineData> MSImageSet::GetNextRequested()
 	{
-		BaselineData top = _baselineData.front();
+		std::unique_ptr<BaselineData> top(new BaselineData(_baselineData.front()));
 		_baselineData.erase(_baselineData.begin());
-		if(top.Data().IsEmpty())
+		if(top->Data().IsEmpty())
 			throw std::runtime_error("Calling GetNextRequested(), but requests were not read with LoadRequests.");
-		return new BaselineData(top);
+		return top;
 	}
 	
 	void MSImageSet::AddWriteFlagsTask(const ImageSetIndex &index, std::vector<Mask2DCPtr> &flags)

@@ -67,9 +67,9 @@ namespace rfiStrategy {
 			virtual void PerformReadRequests() override final
 			{
 			}
-			virtual BaselineData *GetNextRequested() override final
+			virtual std::unique_ptr<BaselineData> GetNextRequested() override final
 			{
-				BaselineData *data = new BaselineData(_baselineData.top());
+				std::unique_ptr<BaselineData> data(new BaselineData(_baselineData.top()));
 				_baselineData.pop();
 				return data;
 			}

@@ -64,13 +64,13 @@ namespace rfiStrategy {
 				_lastRead = Read();
 				_lastRead->SetIndex(SingleImageSetIndex(*this, Name()));
 			}
-			virtual BaselineData *GetNextRequested() override
+			virtual std::unique_ptr<BaselineData> GetNextRequested() override
 			{
 				if(_readCount == 0)
 					throw std::runtime_error("All data reads have already been requested");
 				if(_lastRead == 0)
 					throw std::runtime_error("GetNextRequested() was called before PerformReadRequests()");
-				return new BaselineData(*_lastRead);
+				return std::unique_ptr<BaselineData>(new BaselineData(*_lastRead));
 			}
 			
 			virtual BaselineData *Read() = 0;

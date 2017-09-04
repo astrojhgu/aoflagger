@@ -94,11 +94,11 @@ namespace rfiStrategy {
 			_baseline.top().SetMetaData(TimeFrequencyMetaDataPtr());
 			delete data;
 		}
-		virtual BaselineData *GetNextRequested() final override
+		virtual std::unique_ptr<BaselineData> GetNextRequested() final override
 		{
-			BaselineData data = _baseline.top();
+			std::unique_ptr<BaselineData> data(new BaselineData(_baseline.top()));
 			_baseline.pop();
-			return new BaselineData(data);
+			return data;
 		}
 		virtual void AddWriteFlagsTask(const ImageSetIndex &, std::vector<Mask2DCPtr> &) final override
 		{

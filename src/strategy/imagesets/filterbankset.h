@@ -56,7 +56,7 @@ namespace rfiStrategy {
 			
 			virtual void PerformReadRequests() final override;
 			
-			virtual BaselineData *GetNextRequested() final override;
+			virtual std::unique_ptr<BaselineData> GetNextRequested() final override;
 
 			virtual void AddWriteFlagsTask(const ImageSetIndex &index, std::vector<Mask2DCPtr> &flags) final override;
 			

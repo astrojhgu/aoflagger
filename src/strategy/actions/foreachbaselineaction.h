@@ -102,16 +102,16 @@ namespace rfiStrategy {
 					_dataProcessed.wait(lock);
 			}
 			
-			class BaselineData *GetNextBaseline()
+			std::unique_ptr<BaselineData> GetNextBaseline()
 			{
 				std::unique_lock<std::mutex> lock(_mutex);
 				while(_baselineBuffer.size() == 0 && !_exceptionOccured && !_finishedBaselines)
 					_dataAvailable.wait(lock);
 				if((_finishedBaselines && _baselineBuffer.size() == 0) || _exceptionOccured)
-					return 0;
+					return nullptr;
 				else
 				{
-					BaselineData *next = _baselineBuffer.top();
+					std::unique_ptr<BaselineData> next = std::move(_baselineBuffer.top());
 					_baselineBuffer.pop();
 					_dataProcessed.notify_one();
 					return next;
@@ -164,7 +164,7 @@ namespace rfiStrategy {
 			
 			std::mutex _mutex;
 			std::condition_variable _dataAvailable, _dataProcessed;
-			std::stack<BaselineData*> _baselineBuffer;
+			std::stack<std::unique_ptr<BaselineData>> _baselineBuffer;
 			bool _finishedBaselines;
 
 			int *_progressTaskNo, *_progressTaskCount;

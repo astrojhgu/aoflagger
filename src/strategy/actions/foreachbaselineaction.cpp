@@ -245,9 +245,9 @@ namespace rfiStrategy {
 			ArtifactSet newArtifacts(*_action._artifacts);
 			lock.unlock();
 			
-			BaselineData *baseline = _action.GetNextBaseline();
+			std::unique_ptr<BaselineData> baseline = _action.GetNextBaseline();
 			
-			while(baseline != 0) {
+			while(baseline != nullptr) {
 				baseline->Index().Reattach(*privateImageSet);
 				
 				std::ostringstream progressStr;
@@ -267,7 +267,6 @@ namespace rfiStrategy {
 				newArtifacts.SetMetaData(baseline->MetaData());
 
 				_action.ActionBlock::Perform(newArtifacts, *this);
-				delete baseline;
 	
 				baseline = _action.GetNextBaseline();
 				_action.IncBaselineProgress();
@@ -346,10 +345,10 @@ namespace rfiStrategy {
 				
 				for(size_t i=0;i<requestedCount;++i)
 				{
-					BaselineData *baseline = _action._artifacts->ImageSet()->GetNextRequested();
+					std::unique_ptr<BaselineData> baseline = _action._artifacts->ImageSet()->GetNextRequested();
 					
 					std::lock_guard<std::mutex> bufferLock(_action._mutex);
-					_action._baselineBuffer.push(baseline);
+					_action._baselineBuffer.emplace(std::move(baseline));
 				}
 			}
 			

@@ -109,7 +109,7 @@ namespace rfiStrategy {
 			
 			virtual void AddReadRequest(const ImageSetIndex &index) = 0;
 			virtual void PerformReadRequests() = 0;
-			virtual BaselineData *GetNextRequested() = 0;
+			virtual std::unique_ptr<BaselineData> GetNextRequested() = 0;
 			
 			virtual void AddWriteFlagsTask(const ImageSetIndex &/*index*/, std::vector<Mask2DCPtr> &/*flags*/)
 			{
