@@ -70,7 +70,7 @@ class UnitTest : public TestItem {
 			SpecificTest(Functor functor, const std::string &name) : RunnableTest(name), _functor(functor)
 			{
 			}
-			virtual void Run()
+			virtual void Run() override
 			{
 				_functor();
 			}
