@@ -33,9 +33,10 @@ namespace rfiStrategy {
 			{
 				return _isValid;
 			}
-			virtual ImageSetIndex *Clone() const final override
+			virtual std::unique_ptr<ImageSetIndex> Clone() const final override
 			{
-				SpatialTimeImageSetIndex *newIndex = new SpatialTimeImageSetIndex(imageSet());
+				std::unique_ptr<SpatialTimeImageSetIndex>
+					newIndex( new SpatialTimeImageSetIndex(imageSet()) );
 				newIndex->_channelIndex = _channelIndex;
 				newIndex->_isValid = _isValid;
 				return newIndex;

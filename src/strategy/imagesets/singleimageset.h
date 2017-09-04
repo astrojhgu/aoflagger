@@ -18,9 +18,9 @@ namespace rfiStrategy {
 			virtual void Next() final override { _valid = false; }
 			virtual std::string Description() const final override { return _description; }
 			virtual bool IsValid() const final override { return _valid; }
-			virtual ImageSetIndex *Clone() const final override
+			virtual std::unique_ptr<ImageSetIndex> Clone() const final override
 			{
-				SingleImageSetIndex *index = new SingleImageSetIndex(imageSet(), _description);
+				std::unique_ptr<SingleImageSetIndex> index( new SingleImageSetIndex(imageSet(), _description) );
 				index->_valid = _valid;
 				return index;
 			}
@@ -31,13 +31,12 @@ namespace rfiStrategy {
 	
 	class SingleImageSet : public ImageSet {
 		public:
-			SingleImageSet() : ImageSet(), _readCount(0), _lastRead(0), _writeFlagsIndex(0)
+			SingleImageSet() : ImageSet(), _readCount(0), _lastRead(nullptr), _writeFlagsIndex()
 			{
 			}
 			
 			virtual ~SingleImageSet()
 			{
-				delete _writeFlagsIndex;
 				delete _lastRead;
 			}
 
@@ -81,28 +80,26 @@ namespace rfiStrategy {
 				throw std::runtime_error("Flag writing is not implemented for this file (SingleImageSet)");
 			}
 			
-			virtual void AddWriteFlagsTask(const ImageSetIndex &index, std::vector<Mask2DCPtr> &flags) override
+			virtual void AddWriteFlagsTask(const ImageSetIndex& index, std::vector<Mask2DCPtr>& flags) override
 			{
-				delete _writeFlagsIndex;
 				_writeFlagsIndex = index.Clone();
 				_writeFlagsMasks = flags;
 			}
 			
 			virtual void PerformWriteFlagsTask() override
 			{
-				if(_writeFlagsIndex == 0)
+				if(_writeFlagsIndex == nullptr)
 					throw std::runtime_error("Nothing to write");
 				
 				Write(_writeFlagsMasks);
 				
-				delete _writeFlagsIndex;
-				_writeFlagsIndex = 0;
+				_writeFlagsIndex.reset();
 			}
 			
 		private:
 			int _readCount;
 			BaselineData *_lastRead;
-			ImageSetIndex *_writeFlagsIndex;
+			std::unique_ptr<ImageSetIndex> _writeFlagsIndex;
 			std::vector<Mask2DCPtr> _writeFlagsMasks;
 	};
 

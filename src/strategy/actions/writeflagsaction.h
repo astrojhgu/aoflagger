@@ -43,16 +43,14 @@ namespace rfiStrategy {
 				}
 				~BufferItem()
 				{
-					delete _index;
 				}
 				void operator=(const BufferItem &source)
 				{
-					delete _index;
 					_masks = source._masks;
 					_index = source._index->Clone();
 				}
 				std::vector<Mask2DCPtr> _masks;
-				ImageSetIndex *_index;
+				std::unique_ptr<ImageSetIndex> _index;
 			};
 
 			struct FlushFunction

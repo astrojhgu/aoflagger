@@ -67,7 +67,7 @@ namespace rfiStrategy {
 			const std::set<size_t>& Bands() const { return _bands; }
 		private:
 			bool IsBaselineSelected(ImageSetIndex &index);
-			class ImageSetIndex *GetNextIndex();
+			std::unique_ptr<class ImageSetIndex> GetNextIndex();
 			static std::string memToStr(double memSize);
 			
 			void SetExceptionOccured();

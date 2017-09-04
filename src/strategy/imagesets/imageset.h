@@ -22,7 +22,7 @@ namespace rfiStrategy {
 			virtual void Next() = 0;
 			virtual std::string Description() const = 0;
 			virtual bool IsValid() const = 0;
-			virtual ImageSetIndex *Clone() const = 0;
+			virtual std::unique_ptr<ImageSetIndex> Clone() const = 0;
 			void Reattach(ImageSet &imageSet) {
 				_set = &imageSet;
 				reattach();
@@ -49,29 +49,24 @@ namespace rfiStrategy {
 			{
 			}
 			BaselineData(const TimeFrequencyData& data, const TimeFrequencyMetaDataCPtr& metaData)
-			: _data(data), _metaData(metaData), _index(nullptr)
+			: _data(data), _metaData(metaData), _index()
 			{
 			}
 			explicit BaselineData(const TimeFrequencyMetaDataCPtr& metaData)
-			: _data(), _metaData(metaData), _index(nullptr)
+			: _data(), _metaData(metaData), _index()
 			{
 			}
 			BaselineData()
-			: _data(), _metaData(), _index(nullptr)
+			: _data(), _metaData(), _index()
 			{
 			}
 			BaselineData(const BaselineData& source)
-			: _data(source._data), _metaData(source._metaData), _index(nullptr)
+			: _data(source._data), _metaData(source._metaData), _index()
 			{
 				if(source._index != nullptr) _index = source._index->Clone();
 			}
-			~BaselineData()
-			{
-				delete _index;
-			}
 			BaselineData& operator=(const BaselineData &source)
 			{
-				delete _index;
 				_data = source._data;
 				_metaData = source._metaData;
 				_index = source._index->Clone();
@@ -87,14 +82,13 @@ namespace rfiStrategy {
 			ImageSetIndex &Index() { return *_index; }
 			void SetIndex(const ImageSetIndex &newIndex)
 			{
-				delete _index;
 				_index = newIndex.Clone();
 			}
 		
 		private:
 			TimeFrequencyData _data;
 			TimeFrequencyMetaDataCPtr _metaData;
-			ImageSetIndex *_index;
+			std::unique_ptr<ImageSetIndex> _index;
 	};
 	
 	class ImageSet {

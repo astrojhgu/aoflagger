@@ -32,14 +32,15 @@ namespace rfiStrategy {
 			
 			virtual bool IsValid() const final override { return _valid; }
 			
-			virtual ParmImageSetIndex *Clone() const final override
+			virtual std::unique_ptr<ImageSetIndex> Clone() const final override
 			{
-				ParmImageSetIndex *index = new ParmImageSetIndex(imageSet());
+				std::unique_ptr<ParmImageSetIndex> index( new ParmImageSetIndex(imageSet()) );
 				index->_antennaIndex = _antennaIndex;
 				return index;
 			}
 			
 			unsigned AntennaIndex() const { return _antennaIndex; }
+			
 		private:
 			inline ParmImageSet &ParmSet() const;
 			bool _valid;

@@ -205,21 +205,21 @@ namespace rfiStrategy {
 		}
 	}
 
-	class ImageSetIndex *ForEachBaselineAction::GetNextIndex()
+	std::unique_ptr<ImageSetIndex> ForEachBaselineAction::GetNextIndex()
 	{
 		std::lock_guard<std::mutex> lock(_mutex);
 		while(_loopIndex->IsValid())
 		{
 			if(IsBaselineSelected(*_loopIndex))
 			{
-				ImageSetIndex *newIndex = _loopIndex->Clone();
+				std::unique_ptr<ImageSetIndex> newIndex = _loopIndex->Clone();
 				_loopIndex->Next();
 
 				return newIndex;
 			}
 			_loopIndex->Next();
 		}
-		return 0;
+		return nullptr;
 	}
 
 	void ForEachBaselineAction::SetExceptionOccured()
@@ -328,12 +328,11 @@ namespace rfiStrategy {
 			
 			for(size_t i=0;i<wantedCount;++i)
 			{
-				ImageSetIndex *index = _action.GetNextIndex();
-				if(index != 0)
+				std::unique_ptr<ImageSetIndex> index = _action.GetNextIndex();
+				if(index != nullptr)
 				{
 					_action._artifacts->ImageSet()->AddReadRequest(*index);
 					++requestedCount;
-					delete index;
 				} else {
 					finished = true;
 					break;

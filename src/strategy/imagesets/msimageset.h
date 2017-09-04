@@ -30,9 +30,9 @@ namespace rfiStrategy {
 			virtual void Next() final override;
 			virtual std::string Description() const final override;
 			virtual bool IsValid() const final override { return _isValid; }
-			virtual MSImageSetIndex *Clone() const final override
+			virtual std::unique_ptr<ImageSetIndex> Clone() const final override
 			{
-				MSImageSetIndex *index = new MSImageSetIndex(imageSet());
+				std::unique_ptr<MSImageSetIndex> index(new MSImageSetIndex(imageSet()));
 				index->_sequenceIndex = _sequenceIndex;
 				index->_isValid = _isValid;
 				return index;

@@ -22,9 +22,9 @@ namespace rfiStrategy {
 			virtual void Next() final override;
 			virtual std::string Description() const final override;
 			virtual bool IsValid() const final override { return _isValid; }
-			virtual FilterBankSetIndex *Clone() const final override
+			virtual std::unique_ptr<ImageSetIndex> Clone() const final override
 			{
-				FilterBankSetIndex *index = new FilterBankSetIndex(imageSet());
+				std::unique_ptr<FilterBankSetIndex> index( new FilterBankSetIndex(imageSet()) );
 				index->_intervalIndex = _intervalIndex;
 				index->_isValid = _isValid;
 				return index;
