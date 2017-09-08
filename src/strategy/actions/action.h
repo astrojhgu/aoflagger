@@ -18,8 +18,6 @@ namespace rfiStrategy {
 		ChangeResolutionActionType,
 		CombineFlagResultsType,
 		CutAreaActionType,
-		DirectionProfileActionType,
-		DirectionalCleanActionType,
 		EigenValueVerticalActionType,
 		ForEachBaselineActionType,
 		ForEachComplexComponentActionType,
@@ -47,7 +45,6 @@ namespace rfiStrategy {
 		SVDActionType,
 		TimeConvolutionActionType,
 		TimeSelectionActionType,
-		UVProjectActionType,
 		WriteDataActionType,
 		WriteFlagsActionType
 	};

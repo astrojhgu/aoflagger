@@ -9,14 +9,11 @@
 #include "../actions/changeresolutionaction.h"
 #include "../actions/combineflagresultsaction.h"
 #include "../actions/cutareaaction.h"
-#include "../actions/directionalcleanaction.h"
-#include "../actions/directionprofileaction.h"
 #include "../actions/eigenvalueverticalaction.h"
 #include "../actions/foreachbaselineaction.h"
 #include "../actions/foreachcomplexcomponentaction.h"
 #include "../actions/foreachmsaction.h"
 #include "../actions/foreachpolarisationaction.h"
-#include "../actions/fouriertransformaction.h"
 #include "../actions/frequencyconvolutionaction.h"
 #include "../actions/frequencyselectionaction.h"
 #include "../actions/fringestopaction.h"
@@ -35,7 +32,6 @@
 #include "../actions/sumthresholdaction.h"
 #include "../actions/timeconvolutionaction.h"
 #include "../actions/timeselectionaction.h"
-#include "../actions/uvprojectaction.h"
 #include "../actions/writedataaction.h"
 #include "../actions/writeflagsaction.h"
 
@@ -243,10 +239,6 @@ Action *StrategyReader::parseAction(xmlNode *node)
 		newAction = parseCombineFlagResults(node);
 	else if(typeStr == "CutAreaAction")
 		newAction = parseCutAreaAction(node);
-	else if(typeStr == "DirectionalCleanAction")
-		newAction = parseDirectionalCleanAction(node);
-	else if(typeStr == "DirectionProfileAction")
-		newAction = parseDirectionProfileAction(node);
 	else if(typeStr == "EigenValueVerticalAction")
 	  newAction = parseEigenValueVerticalAction(node);
 	else if(typeStr == "ForEachBaselineAction")
@@ -257,8 +249,6 @@ Action *StrategyReader::parseAction(xmlNode *node)
 		newAction = parseForEachMSAction(node);
 	else if(typeStr == "ForEachPolarisationBlock")
 		newAction = parseForEachPolarisationBlock(node);
-	else if(typeStr == "FourierTransformAction")
-		newAction = parseFourierTransformAction(node);
 	else if(typeStr == "FrequencyConvolutionAction")
 		newAction = parseFrequencyConvolutionAction(node);
 	else if(typeStr == "FrequencySelectionAction")
@@ -295,8 +285,6 @@ Action *StrategyReader::parseAction(xmlNode *node)
 		newAction = parseTimeConvolutionAction(node);
 	else if(typeStr == "TimeSelectionAction")
 		newAction = parseTimeSelectionAction(node);
-	else if(typeStr == "UVProjectAction")
-		newAction = parseUVProjectAction(node);
 	else if(typeStr == "WriteDataAction")
 		newAction = parseWriteDataAction(node);
 	else if(typeStr == "WriteFlagsAction")
@@ -375,24 +363,6 @@ Action *StrategyReader::parseCutAreaAction(xmlNode *node)
 	newAction->SetTopChannels(getInt(node, "top-channels"));
 	newAction->SetBottomChannels(getInt(node, "bottom-channels"));
 	parseChildren(node, newAction);
-	return newAction;
-}
-
-Action *StrategyReader::parseDirectionalCleanAction(xmlNode *node)
-{
-	DirectionalCleanAction *newAction = new DirectionalCleanAction();
-	newAction->SetLimitingDistance(getDouble(node, "limiting-distance"));
-	newAction->SetChannelConvolutionSize(getInt(node, "channel-convolution-size"));
-	newAction->SetAttenuationOfCenter(getDouble(node, "attenuation-of-center"));
-	newAction->SetMakePlot(getBool(node, "make-plot"));
-	return newAction;
-}
-
-Action *StrategyReader::parseDirectionProfileAction(xmlNode *node)
-{
-	DirectionProfileAction *newAction = new DirectionProfileAction();
-	newAction->SetAxis((enum DirectionProfileAction::Axis) getInt(node, "axis"));
-	newAction->SetProfileAction((enum DirectionProfileAction::ProfileAction) getInt(node, "profile-action"));
 	return newAction;
 }
 
@@ -505,12 +475,6 @@ Action *StrategyReader::parseForEachPolarisationBlock(xmlNode *node)
 	newAction->SetOnStokesU(getBool(node, "on-stokes-u"));
 	newAction->SetOnStokesV(getBool(node, "on-stokes-v"));
 	parseChildren(node, newAction);
-	return newAction;
-}
-
-Action *StrategyReader::parseFourierTransformAction(xmlNode *)
-{
-	FourierTransformAction *newAction = new FourierTransformAction();
 	return newAction;
 }
 
@@ -658,18 +622,6 @@ class Action *StrategyReader::parseTimeSelectionAction(xmlNode *node)
 {
 	TimeSelectionAction *newAction = new TimeSelectionAction();
 	newAction->SetThreshold(getDouble(node, "threshold"));
-	return newAction;
-}
-
-class Action *StrategyReader::parseUVProjectAction(xmlNode *node)
-{
-	UVProjectAction *newAction = new UVProjectAction();
-	newAction->SetDirectionRad(getDouble(node, "direction-rad"));
-	newAction->SetEtaParameter(getDouble(node, "eta-parameter"));
-	newAction->SetDestResolutionFactor(getDouble(node, "dest-resolution-factor"));
-	newAction->SetReverse(getBool(node, "reverse"));
-	newAction->SetOnRevised(getBool(node, "on-revised"));
-	newAction->SetOnContaminated(getBool(node, "on-contaminated"));
 	return newAction;
 }
 

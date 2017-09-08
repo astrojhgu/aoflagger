@@ -43,14 +43,11 @@ class StrategyReader {
 		class Action *parseChangeResolutionAction(xmlNode *node);
 		class Action *parseCombineFlagResults(xmlNode *node);
 		class Action *parseCutAreaAction(xmlNode *node);
-		class Action *parseDirectionalCleanAction(xmlNode *node);
-		class Action *parseDirectionProfileAction(xmlNode *node);
 		class Action *parseEigenValueVerticalAction(xmlNode *node);
 		class Action *parseForEachBaselineAction(xmlNode *node);
 		class Action *parseForEachComplexComponentAction(xmlNode *node);
 		class Action *parseForEachMSAction(xmlNode *node);
 		class Action *parseForEachPolarisationBlock(xmlNode *node);
-		class Action *parseFourierTransformAction(xmlNode *node);
 		class Action *parseFrequencyConvolutionAction(xmlNode *node);
 		class Action *parseFrequencySelectionAction(xmlNode *node);
 		class Action *parseFringeStopAction(xmlNode *node);
@@ -68,7 +65,6 @@ class StrategyReader {
 		class Action *parseSumThresholdAction(xmlNode *node);
 		class Action *parseTimeConvolutionAction(xmlNode *node);
 		class Action *parseTimeSelectionAction(xmlNode *node);
-		class Action *parseUVProjectAction(xmlNode *node);
 		class Action *parseWriteDataAction(xmlNode *node);
 		class Action *parseWriteFlagsAction(xmlNode *node);
 

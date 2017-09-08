@@ -7,15 +7,12 @@
 #include "../actions/changeresolutionaction.h"
 #include "../actions/combineflagresultsaction.h"
 #include "../actions/cutareaaction.h"
-#include "../actions/directionalcleanaction.h"
-#include "../actions/directionprofileaction.h"
 #include "../actions/eigenvalueverticalaction.h"
 #include "../actions/foreachbaselineaction.h"
 #include "../actions/foreachcomplexcomponentaction.h"
 #include "../actions/foreachpolarisationaction.h"
 #include "../actions/foreachsimulatedbaselineaction.h"
 #include "../actions/foreachmsaction.h"
-#include "../actions/fouriertransformaction.h"
 #include "../actions/frequencyconvolutionaction.h"
 #include "../actions/frequencyselectionaction.h"
 #include "../actions/fringestopaction.h"
@@ -34,7 +31,6 @@
 #include "../actions/sumthresholdaction.h"
 #include "../actions/timeconvolutionaction.h"
 #include "../actions/timeselectionaction.h"
-#include "../actions/uvprojectaction.h"
 #include "../actions/writedataaction.h"
 #include "../actions/writeflagsaction.h"
 
@@ -49,15 +45,12 @@ const std::vector<std::string> ActionFactory::GetActionList()
 	list.push_back("Change resolution");
 	list.push_back("Combine flag results");
 	list.push_back("Cut area");
-	list.push_back("Directional CLEAN");
-	list.push_back("Direction profile");
 	list.push_back("Eigen value decompisition (vertical)");
 	list.push_back("For each baseline");
 	list.push_back("For each complex component");
 	list.push_back("For each polarisation");
 	list.push_back("For each simulated baseline");
 	list.push_back("For each measurement set");
-	list.push_back("Fourier transformation");
 	list.push_back("Frequency convolution");
 	list.push_back("Frequency selection");
 	list.push_back("Fringe stopping recovery");
@@ -77,7 +70,6 @@ const std::vector<std::string> ActionFactory::GetActionList()
 	list.push_back("SumThreshold");
 	list.push_back("Time convolution");
 	list.push_back("Time selection");
-	list.push_back("UV-projection");
 	list.push_back("Write data");
 	list.push_back("Write flags");
 	return list;
@@ -97,10 +89,6 @@ std::unique_ptr<Action> ActionFactory::CreateAction(const std::string &action)
 		return make<CombineFlagResults>();
 	else if(action == "Cut area")
 		return make<CutAreaAction>();
-	else if(action == "Directional CLEAN")
-		return make<DirectionalCleanAction>();
-	else if(action == "Direction profile")
-		return make<DirectionProfileAction>();
 	else if(action == "Eigen value decompisition (vertical)")
 		return make<EigenValueVerticalAction>();
 	else if(action == "For each baseline")
@@ -119,8 +107,6 @@ std::unique_ptr<Action> ActionFactory::CreateAction(const std::string &action)
 		return make<FrequencySelectionAction>();
 	else if(action == "Fringe stopping recovery")
 		return make<FringeStopAction>();
-	else if(action == "Fourier transformation")
-		return make<FourierTransformAction>();
 	else if(action == "High-pass filter")
 		return make<HighPassFilterAction>();
 	else if(action == "Image")
@@ -153,8 +139,6 @@ std::unique_ptr<Action> ActionFactory::CreateAction(const std::string &action)
 		return make<TimeConvolutionAction>();
 	else if(action == "Time selection")
 		return make<TimeSelectionAction>();
-	else if(action == "UV-projection")
-		return make<UVProjectAction>();
 	else if(action == "Write data")
 		return make<WriteDataAction>();
 	else if(action == "Write flags")
