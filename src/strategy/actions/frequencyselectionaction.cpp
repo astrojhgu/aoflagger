@@ -11,7 +11,7 @@ void FrequencySelectionAction::Perform(ArtifactSet &artifacts, class ProgressLis
 {
 	const Image2D* image = artifacts.ContaminatedData().GetSingleImage().get();
 	SampleRowPtr channels = SampleRow::CreateEmpty(image->Height());
-	Mask2DPtr mask = Mask2D::CreateCopy(artifacts.ContaminatedData().GetSingleMask());
+	Mask2DPtr mask(new Mask2D(*artifacts.ContaminatedData().GetSingleMask()));
 	for(size_t y=0;y<image->Height();++y)
 	{
 		SampleRowPtr row = SampleRow::CreateFromRowWithMissings(image, mask.get(), y);

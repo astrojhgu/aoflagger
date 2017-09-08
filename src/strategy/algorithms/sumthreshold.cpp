@@ -36,7 +36,7 @@
 template<size_t Length>
 void ThresholdMitigater::VerticalSumThresholdLargeSSE(const Image2D* input, Mask2D* mask, num_t threshold)
 {
-	Mask2D *maskCopy = Mask2D::CreateCopy(*mask);
+	Mask2D maskCopy(*mask);
 	const size_t width = mask->Width(), height = mask->Height();
 	const __m128 zero4 = _mm_set_ps(0.0, 0.0, 0.0, 0.0);
 	const __m128i zero4i = _mm_set_epi32(0, 0, 0, 0);
@@ -116,7 +116,7 @@ void ThresholdMitigater::VerticalSumThresholdLargeSSE(const Image2D* input, Mask
 
 					for(size_t i=0;i<Length;++i)
 					{
-						unsigned *outputPtr = reinterpret_cast<unsigned*>(maskCopy->ValuePtr(x, yTop + i));
+						unsigned *outputPtr = reinterpret_cast<unsigned*>(maskCopy.ValuePtr(x, yTop + i));
 						
 						*outputPtr |= outputValues.theInt;
 					}
@@ -147,8 +147,7 @@ void ThresholdMitigater::VerticalSumThresholdLargeSSE(const Image2D* input, Mask
 			}
 		}
 	}
-	mask->Swap(*maskCopy);
-	delete maskCopy;
+	mask->Swap(maskCopy);
 }
 
 template<size_t Length>
@@ -164,7 +163,7 @@ void ThresholdMitigater::HorizontalSumThresholdLargeSSE(const Image2D* input, Ma
 	// this introduces cache misses and/or many smaller reading requests
 	
 	
-	Mask2D *maskCopy = Mask2D::CreateCopy(*mask);
+	Mask2D maskCopy(*mask);
 	const size_t width = mask->Width(), height = mask->Height();
 	const __m128 zero4 = _mm_set_ps(0.0, 0.0, 0.0, 0.0);
 	const __m128i zero4i = _mm_set_epi32(0, 0, 0, 0);
@@ -278,13 +277,13 @@ void ThresholdMitigater::HorizontalSumThresholdLargeSSE(const Image2D* input, Ma
 				}*/
 					
 				if((flagConditions & 1) != 0)
-					maskCopy->SetHorizontalValues(xLeft, y, true, Length);
+					maskCopy.SetHorizontalValues(xLeft, y, true, Length);
 				if((flagConditions & 2) != 0)
-					maskCopy->SetHorizontalValues(xLeft, y+1, true, Length);
+					maskCopy.SetHorizontalValues(xLeft, y+1, true, Length);
 				if((flagConditions & 4) != 0)
-					maskCopy->SetHorizontalValues(xLeft, y+2, true, Length);
+					maskCopy.SetHorizontalValues(xLeft, y+2, true, Length);
 				if((flagConditions & 8) != 0)
-					maskCopy->SetHorizontalValues(xLeft, y+3, true, Length);
+					maskCopy.SetHorizontalValues(xLeft, y+3, true, Length);
 				
 				// ** Subtract the sample at the left **
 				
@@ -333,8 +332,7 @@ void ThresholdMitigater::HorizontalSumThresholdLargeSSE(const Image2D* input, Ma
 			}
 		}
 	}
-	mask->Swap(*maskCopy);
-	delete maskCopy;
+	mask->Swap(maskCopy);
 }
 
 template

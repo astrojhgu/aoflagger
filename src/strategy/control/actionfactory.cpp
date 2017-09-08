@@ -29,7 +29,6 @@
 #include "../actions/setflaggingaction.h"
 #include "../actions/setimageaction.h"
 #include "../actions/slidingwindowfitaction.h"
-#include "../actions/spatialcompositionaction.h"
 #include "../actions/statisticalflagaction.h"
 #include "../actions/svdaction.h"
 #include "../actions/sumthresholdaction.h"
@@ -74,7 +73,6 @@ const std::vector<std::string> ActionFactory::GetActionList()
 	list.push_back("Set image");
 	list.push_back("Singular value decomposition");
 	list.push_back("Sliding window fit");
-	list.push_back("Spatial composition");
 	list.push_back("Statistical flagging");
 	list.push_back("SumThreshold");
 	list.push_back("Time convolution");
@@ -147,8 +145,6 @@ std::unique_ptr<Action> ActionFactory::CreateAction(const std::string &action)
 		return make<SVDAction>();
 	else if(action == "Sliding window fit")
 		return make<SlidingWindowFitAction>();
-	else if(action == "Spatial composition")
-		return make<SpatialCompositionAction>();
 	else if(action == "Statistical flagging")
 		return make<StatisticalFlagAction>();
 	else if(action == "SumThreshold")

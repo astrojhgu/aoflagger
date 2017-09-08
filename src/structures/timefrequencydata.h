@@ -728,21 +728,21 @@ class TimeFrequencyData
 			{
 				if(_data[i]._images[0])
 				{
-					Image2DPtr image = Image2D::CreateCopy(_data[i]._images[0]);
+					Image2DPtr image(new Image2D(*_data[i]._images[0]));
 					image->CopyFrom(source._data[i]._images[0], destX, destY);
-					_data[i]._images[0] = image;
+					_data[i]._images[0] = std::move(image);
 				}
 				if(_data[i]._images[1])
 				{
-					Image2DPtr image = Image2D::CreateCopy(_data[i]._images[1]);
+					Image2DPtr image(new Image2D(*_data[i]._images[1]));
 					image->CopyFrom(source._data[i]._images[1], destX, destY);
 					_data[i]._images[1] = image;
 				}
 				if(_data[i]._flagging)
 				{
-					Mask2DPtr mask = Mask2D::CreateCopy(_data[i]._flagging);
+					Mask2DPtr mask(new Mask2D(*_data[i]._flagging));
 					mask->CopyFrom(source._data[i]._flagging, destX, destY);
-					_data[i]._flagging = mask;
+					_data[i]._flagging = std::move(mask);
 				}
 			}
 		}

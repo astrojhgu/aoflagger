@@ -93,10 +93,10 @@ void high_pass_filter(Data& data, size_t kernelWidth, size_t kernelHeight, doubl
 
 void scale_invariant_rank_operator(Data& data, double level_horizontal, double level_vertical)
 {
-	Mask2DPtr mask = Mask2D::CreateCopy(data.TFData().GetSingleMask());
+	Mask2DPtr mask(new Mask2D(*data.TFData().GetSingleMask()));
 	
-	SIROperator::OperateHorizontally(mask, level_horizontal);
-	SIROperator::OperateVertically(mask, level_vertical);
+	SIROperator::OperateHorizontally(mask.get(), level_horizontal);
+	SIROperator::OperateVertically(mask.get(), level_vertical);
 	data.TFData().SetGlobalMask(mask);
 }
 
@@ -158,7 +158,7 @@ void sumthreshold(Data& data, double thresholdFactor, bool horizontal, bool vert
 	if(data.TFData().PolarizationCount() != 1)
 		throw std::runtime_error("Input data in sum_threshold has wrong format");
 	
-	Mask2DPtr mask = Mask2D::CreateCopy(data.TFData().GetSingleMask());
+	Mask2DPtr mask(new Mask2D(*data.TFData().GetSingleMask()));
 	Image2DCPtr image = data.TFData().GetSingleImage();
 	thresholdConfig.Execute(image.get(), mask.get(), false, thresholdFactor);
 	data.TFData().SetGlobalMask(mask);
@@ -168,7 +168,7 @@ void threshold_channel_rms(Data& data, double threshold, bool thresholdLowValues
 {
 	Image2DCPtr image = data.TFData().GetSingleImage();
 	SampleRowPtr channels = SampleRow::CreateEmpty(image->Height());
-	Mask2DPtr mask = Mask2D::CreateCopy(data.TFData().GetSingleMask());
+	Mask2DPtr mask(new Mask2D(*data.TFData().GetSingleMask()));
 	for(size_t y=0;y<image->Height();++y)
 	{
 		SampleRowPtr row = SampleRow::CreateFromRowWithMissings(image.get(), mask.get(), y);
@@ -197,7 +197,7 @@ void threshold_timestep_rms(Data& data, double threshold)
 {
 	Image2DCPtr image = data.TFData().GetSingleImage();
 	SampleRowPtr timesteps = SampleRow::CreateEmpty(image->Width());
-	Mask2DPtr mask = Mask2D::CreateCopy(data.TFData().GetSingleMask());
+	Mask2DPtr mask(new Mask2D(*data.TFData().GetSingleMask()));
 	for(size_t x=0;x<image->Width();++x)
 	{
 		SampleRowPtr row = SampleRow::CreateFromColumnWithMissings(image.get(), mask.get(), x);

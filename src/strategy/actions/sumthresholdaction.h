@@ -32,7 +32,7 @@ namespace rfiStrategy {
 						thresholdConfig.RemoveVerticalOperations();
 					
 					TimeFrequencyData &contaminated = artifacts.ContaminatedData();
-					Mask2DPtr mask = Mask2D::CreateCopy(contaminated.GetSingleMask());
+					Mask2DPtr mask(new Mask2D(*contaminated.GetSingleMask()));
 					const Image2D* image = contaminated.GetSingleImage().get();
 					thresholdConfig.Execute(image, mask.get(), false, artifacts.Sensitivity() * _baseSensitivity);
 					contaminated.SetGlobalMask(mask);

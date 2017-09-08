@@ -36,7 +36,7 @@ Mask2DCPtr TimeFrequencyData::GetCombinedMask() const
 		return GetMask(0);
 	else
 	{
-		Mask2DPtr mask = Mask2D::CreateCopy(GetMask(0));
+		Mask2DPtr mask(new Mask2D(*GetMask(0)));
 		size_t i = 0;
 		while(i!= MaskCount())
 		{
@@ -191,7 +191,7 @@ void TimeFrequencyData::JoinMask(const TimeFrequencyData &other)
 	{
 		for(size_t i=0;i<MaskCount();++i)
 		{
-			Mask2DPtr mask = Mask2D::CreateCopy(GetMask(i));
+			Mask2DPtr mask(new Mask2D(*GetMask(i)));
 			mask->Join(other.GetMask(i));
 			SetMask(i, mask);
 		}
@@ -199,13 +199,13 @@ void TimeFrequencyData::JoinMask(const TimeFrequencyData &other)
 	{
 		for(size_t i=0;i<MaskCount();++i)
 		{
-			Mask2DPtr mask = Mask2D::CreateCopy(GetMask(i));
+			Mask2DPtr mask(new Mask2D(*GetMask(i)));
 			mask->Join(other.GetMask(0));
 			SetMask(i, mask);
 		}
 	} else if(MaskCount() == 1)
 	{
-		Mask2DPtr mask = Mask2D::CreateCopy(GetMask(0));
+		Mask2DPtr mask(new Mask2D(*GetMask(0)));
 		mask->Join(other.GetSingleMask());
 		SetMask(0, mask);
 	}	else if(MaskCount() == 0 && _data.size() == other._data.size())

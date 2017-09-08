@@ -33,7 +33,7 @@ class ThresholdTools {
 
 		static Image2DPtr FrequencyRectangularConvolution(const Image2D* source, size_t convolutionSize)
 		{
-			Image2DPtr image = Image2D::CreateCopyPtr(*source);
+			Image2DPtr image(new Image2D(*source));
 			const size_t upperWindowHalf = (convolutionSize+1) / 2;
 			for(size_t x=0;x<image->Width();++x)
 			{

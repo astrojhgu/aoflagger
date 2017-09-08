@@ -71,7 +71,7 @@ namespace rfiStrategy {
 						}
 						break;
 					case Invert: {
-						Mask2DPtr mask = Mask2D::CreateCopy(artifacts.ContaminatedData().GetSingleMask());
+						Mask2DPtr mask(new Mask2D(*artifacts.ContaminatedData().GetSingleMask()));
 						mask->Invert();
 						artifacts.ContaminatedData().SetGlobalMask(mask);
 						break;
@@ -82,7 +82,7 @@ namespace rfiStrategy {
 						break;
 					}
 					case FlagZeros: {
-						Mask2DPtr mask = Mask2D::CreateCopy(artifacts.ContaminatedData().GetSingleMask());
+						Mask2DPtr mask(new Mask2D(*artifacts.ContaminatedData().GetSingleMask()));
 						Image2DCPtr image = artifacts.ContaminatedData().GetSingleImage();
 						for(unsigned y=0;y<image->Height();++y) {
 							for(unsigned x=0;x<image->Width();++x) {
@@ -94,7 +94,7 @@ namespace rfiStrategy {
 						break;
 					}
 					case OrOriginal: {
-						Mask2DPtr mask = Mask2D::CreateCopy(artifacts.ContaminatedData().GetSingleMask());
+						Mask2DPtr mask(new Mask2D(*artifacts.ContaminatedData().GetSingleMask()));
 						mask->Join(artifacts.OriginalData().GetSingleMask());
 						artifacts.ContaminatedData().SetGlobalMask(mask);
 						break;

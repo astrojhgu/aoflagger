@@ -23,6 +23,9 @@ typedef std::shared_ptr<const class Image2D> Image2DCPtr;
  */
 class Image2D {
 	public:
+		Image2D(const Image2D& source);
+		
+		Image2D(Image2D&& source);
 		
 		/**
 		 * Creates an image containing unset values.
@@ -136,10 +139,12 @@ class Image2D {
 		}
 
 		static Image2D *CreateCopy(const Image2D &image);
+		[[ deprecated("Use copy constructor") ]]
 		static Image2DPtr CreateCopy(const Image2DCPtr &image)
 		{
 			return Image2DPtr(CreateCopy(*image));
 		}
+		[[ deprecated("Use copy constructor") ]]
 		static Image2DPtr CreateCopyPtr(const Image2D &image)
 		{
 			return Image2DPtr(CreateCopy(image));
@@ -500,7 +505,6 @@ class Image2D {
 		{ }
 		Image2D(size_t width, size_t height, size_t widthCapacity);
 		
-		Image2D(const Image2D&) = delete;
 		Image2D& operator=(const Image2D&) = delete;
 		
 		size_t _width, _height;

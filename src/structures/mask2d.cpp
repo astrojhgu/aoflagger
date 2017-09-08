@@ -67,17 +67,6 @@ Mask2D *Mask2D::CreateSetMask(const class Image2D &templateImage)
 template Mask2D *Mask2D::CreateSetMask<false>(const class Image2D &templateImage);
 template Mask2D *Mask2D::CreateSetMask<true>(const class Image2D &templateImage);
 
-Mask2D *Mask2D::CreateCopy(const Mask2D &source)
-{
-	size_t
-		width = source.Width(),
-		height = source.Height();
-
-	Mask2D *newMask = new Mask2D(width, height);
-	memcpy(newMask->_valuesConsecutive, source._valuesConsecutive, source._stride * height * sizeof(bool));
-	return newMask;
-}
-
 Mask2DPtr Mask2D::ShrinkHorizontally(int factor) const
 {
 	size_t newWidth = (_width + factor - 1) / factor;

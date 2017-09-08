@@ -57,6 +57,12 @@ Image2D::Image2D(size_t width, size_t height, size_t widthCapacity) :
 	}
 }
 
+Image2D::Image2D(const Image2D& source) :
+	Image2D(source.Width(), source.Height())
+{
+	memcpy(_dataConsecutive, source._dataConsecutive, _stride * _height * sizeof(num_t));
+}
+
 Image2D::~Image2D()
 {
 	delete[] _dataPtr;

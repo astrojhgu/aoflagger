@@ -455,7 +455,9 @@ namespace aoflagger {
 		delete listener;
 		
 		FlagMask flagMask;
-		flagMask._data = new FlagMaskData(Mask2D::CreateCopy(artifacts.ContaminatedData().GetSingleMask()));
+		mask.reset(new Mask2D(*artifacts.ContaminatedData().GetSingleMask()));
+		flagMask._data = 
+			new FlagMaskData(std::move(mask));
 		return flagMask;
 	}
 	

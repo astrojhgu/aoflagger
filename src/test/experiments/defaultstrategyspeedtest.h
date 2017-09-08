@@ -361,25 +361,25 @@ inline void DefaultStrategySpeedTest::TimeSumThresholdN::operator()()
 		const double threshold = config.GetHorizontalThreshold(i);
 		Image2DCPtr input = artifacts.OriginalData().GetSingleImage();
 		
-		Mask2DPtr maskA = Mask2D::CreateCopy(artifacts.OriginalData().GetSingleMask());
+		Mask2DPtr maskA(new Mask2D(*artifacts.OriginalData().GetSingleMask()));
 		Stopwatch watchA(true);
 		ThresholdMitigater::HorizontalSumThresholdLargeReference(input.get(), maskA.get(), length, threshold);
 		AOLogger::Info << "Horizontal, length " << length << ": " << watchA.ToString() << '\n';
 		
 #ifdef __SSE__
-		Mask2DPtr maskC = Mask2D::CreateCopy(artifacts.OriginalData().GetSingleMask());
+		Mask2DPtr maskC(new Mask2D(*artifacts.OriginalData().GetSingleMask()));
 		Stopwatch watchC(true);
 		ThresholdMitigater::HorizontalSumThresholdLargeSSE(input.get(), maskC.get(), length, threshold);
 		AOLogger::Info << "Horizontal SSE, length " << length << ": " << watchC.ToString() << '\n';
 #endif
 		
-		Mask2DPtr maskB = Mask2D::CreateCopy(artifacts.OriginalData().GetSingleMask());
+		Mask2DPtr maskB(new Mask2D(*artifacts.OriginalData().GetSingleMask()));
 		Stopwatch watchB(true);
 		ThresholdMitigater::VerticalSumThresholdLargeReference(input.get(), maskB.get(), length, threshold);
 		AOLogger::Info << "Vertical, length " << length << ": " << watchB.ToString() << '\n';
 		
 #ifdef __SSE__
-		Mask2DPtr maskD = Mask2D::CreateCopy(artifacts.OriginalData().GetSingleMask());
+		Mask2DPtr maskD(new Mask2D(*artifacts.OriginalData().GetSingleMask()));
 		Stopwatch watchD(true);
 		ThresholdMitigater::VerticalSumThresholdLargeSSE(input.get(), maskD.get(), length, threshold);
 		AOLogger::Info << "SSE Vertical, length " << length << ": " << watchD.ToString() << '\n';
@@ -401,11 +401,11 @@ inline void DefaultStrategySpeedTest::TimeRankOperator::operator()()
 	watch.Pause();
 	strategy.reset();
 	
-	Mask2DPtr input = Mask2D::CreateCopy(artifacts.ContaminatedData().GetSingleMask());
+	Mask2DPtr input(new Mask2D(*artifacts.ContaminatedData().GetSingleMask()));
 	
 	Stopwatch operatorTimer(true);
-	SIROperator::OperateHorizontally(input, 0.2);
-	SIROperator::OperateVertically(input, 0.2);
+	SIROperator::OperateHorizontally(input.get(), 0.2);
+	SIROperator::OperateVertically(input.get(), 0.2);
 	operatorTimer.Pause();
 	
 	long double operatorTime = operatorTimer.Seconds();

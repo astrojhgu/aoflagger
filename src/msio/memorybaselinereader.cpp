@@ -246,7 +246,7 @@ void MemoryBaselineReader::PerformFlagWriteRequests()
 		if(result->_flags.size() != request.flags.size())
 			throw std::runtime_error("Polarizations do not match");
 		for(size_t p=0;p!=result->_flags.size();++p)
-			result->_flags[p] = Mask2D::CreateCopy(request.flags[p]);
+			result->_flags[p].reset(new Mask2D(*request.flags[p]));
 	}
 	_areFlagsChanged = true;
 	

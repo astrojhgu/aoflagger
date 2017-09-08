@@ -135,7 +135,6 @@ set(STRATEGY_ACTION_FILES
   strategy/actions/normalizevarianceaction.cpp
   strategy/actions/plotaction.cpp
   strategy/actions/slidingwindowfitaction.cpp
-  strategy/actions/spatialcompositionaction.cpp
   strategy/actions/statisticalflagaction.cpp
   strategy/actions/strategy.cpp
   strategy/actions/svdaction.cpp

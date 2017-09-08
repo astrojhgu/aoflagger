@@ -89,12 +89,6 @@ class Mask2D {
 			return Mask2DPtr(CreateSetMask<InitValue>(width, height));
 		}
 
-		static Mask2D *CreateCopy(const Mask2D &source);
-		static Mask2DPtr CreateCopy(Mask2DCPtr source)
-		{
-			return Mask2DPtr(CreateCopy(*source));
-		}
-
 		bool Value(size_t x, size_t y) const
 		{
 			return _values[y][x];
@@ -333,7 +327,7 @@ class Mask2D {
 		}
 	private:
 		Mask2D(size_t width, size_t height);
-
+		
 		size_t _width, _height;
 		size_t _stride;
 		

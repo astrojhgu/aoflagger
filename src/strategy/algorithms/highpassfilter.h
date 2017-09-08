@@ -36,7 +36,7 @@ class HighPassFilter
 		Image2DPtr ApplyHighPass(const Image2DCPtr &image)
 		{
 			initializeKernel();
-			Image2DPtr temp = Image2D::CreateCopy(image);
+			Image2DPtr temp(new Image2D(*image));
 			return Image2D::CreateFromDiff(image, temp);
 		}
 		
