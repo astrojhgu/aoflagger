@@ -1,4 +1,4 @@
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wsuggest-override -Werror=vla -DNDEBUG -funroll-loops -O3 -std=c++11")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror=vla -DNDEBUG -funroll-loops -O3 -std=c++11")
 
 include(CheckCXXCompilerFlag)
 include(CheckSymbolExists) 
@@ -21,6 +21,11 @@ else()
 		message(STATUS " This probably means your compiler is old (e.g. gcc < 4.2).")
 	endif(COMPILER_SUPPORTS_MARCH_NATIVE)
 endif(PORTABLE)
+
+CHECK_CXX_COMPILER_FLAG("-Wsuggest-override" COMPILER_SUPPORTS_SUGGEST_OVERRIDE)
+if(COMPILER_SUPPORTS_SUGGEST_OVERRIDE)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wsuggest-override")
+endif(COMPILER_SUPPORTS_SUGGEST_OVERRIDE)
 
 if(HAVE_POSIX_FALLOCATE)
   add_definitions(-DHAVE_POSIX_FALLOCATE)
