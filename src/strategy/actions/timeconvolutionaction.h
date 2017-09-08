@@ -81,8 +81,8 @@ namespace rfiStrategy {
 						TimeFrequencyData data = artifacts.ContaminatedData();
 						TimeFrequencyData *realData = data.CreateTFData(TimeFrequencyData::RealPart);
 						TimeFrequencyData *imagData = data.CreateTFData(TimeFrequencyData::ImaginaryPart);
-						Image2DPtr real = Image2D::CreateCopy(realData->GetSingleImage());
-						Image2DPtr imaginary = Image2D::CreateCopy(imagData->GetSingleImage());
+						Image2DPtr real(new Image2D(*realData->GetSingleImage()));
+						Image2DPtr imaginary(new Image2D(*imagData->GetSingleImage()));
 						delete realData;
 						delete imagData;
 						PerformExtrapolatedSincOperation(artifacts, real, imaginary, listener);
@@ -93,8 +93,8 @@ namespace rfiStrategy {
 						TimeFrequencyData data = artifacts.ContaminatedData();
 						TimeFrequencyData *realData = data.CreateTFData(TimeFrequencyData::RealPart);
 						TimeFrequencyData *imagData = data.CreateTFData(TimeFrequencyData::ImaginaryPart);
-						Image2DPtr real = Image2D::CreateCopy(realData->GetSingleImage());
-						Image2DPtr imaginary = Image2D::CreateCopy(imagData->GetSingleImage());
+						Image2DPtr real(new Image2D(*realData->GetSingleImage()));
+						Image2DPtr imaginary(new Image2D(*imagData->GetSingleImage()));
 						delete realData;
 						delete imagData;
 						PerformFFTSincOperation(artifacts, real, imaginary);

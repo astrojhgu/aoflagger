@@ -341,9 +341,8 @@ Image2DPtr MitigationTester::CreateTestSet(int number, Mask2DPtr rfi, unsigned w
 		case 9: { //FFT of 7
 		image=CreateTestSet(7, rfi, width, height);
 		//FFTTools::Sqrt(*image);
-		Image2D *copy = Image2D::CreateCopy(*image);
-		FFTTools::CreateHorizontalFFTImage(*image, *copy, false);
-		delete copy;
+		Image2D copy(*image);
+		FFTTools::CreateHorizontalFFTImage(*image, copy, false);
 		for(unsigned y=0;y<rfi->Height();++y) {
 			for(unsigned x=0;x<rfi->Width();++x) {
 				image->SetValue(x, y, image->Value(x, y) / sqrtn(image->Width()));
@@ -360,9 +359,8 @@ Image2DPtr MitigationTester::CreateTestSet(int number, Mask2DPtr rfi, unsigned w
 		} break;
 		case 11: { // FFT of identity matrix
 		image=CreateTestSet(10, rfi, width, height);
-		Image2D *copy = Image2D::CreateCopy(*image);
-		FFTTools::CreateHorizontalFFTImage(*image, *copy, false);
-		delete copy;
+		Image2D copy(*image);
+		FFTTools::CreateHorizontalFFTImage(*image, copy, false);
 		for(unsigned y=0;y<rfi->Height();++y) {
 			for(unsigned x=0;x<rfi->Width();++x) {
 				image->SetValue(x, y, image->Value(x, y) / sqrtn(width)); 

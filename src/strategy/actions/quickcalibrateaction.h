@@ -27,7 +27,7 @@ namespace rfiStrategy {
 				for(size_t i=0;i!=artifacts.ContaminatedData().ImageCount();++i)
 				{
 					Image2DCPtr image = artifacts.ContaminatedData().GetImage(i);
-					Image2DPtr normalized = Image2D::CreateCopy(image);
+					Image2DPtr normalized(new Image2D(*image));
 					normalized->MultiplyValues(1.0/mean);
 					artifacts.ContaminatedData().SetImage(i, normalized);
 				}

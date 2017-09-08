@@ -74,7 +74,7 @@ void NormalizeVarianceAction::Perform(ArtifactSet &artifacts, ProgressListener &
 	
 	std::vector<Image2DPtr> data;
 	for(unsigned img=0;img<original.ImageCount();++img)
-		data.push_back(Image2D::CreateCopy(original.GetImage(img)));
+		data.emplace_back(new Image2D(*original.GetImage(img)));
 		
 	// Add the first half of the window
 	const double halfWindowTime = _medianFilterSizeInS * 0.5;

@@ -123,7 +123,7 @@ namespace rfiStrategy {
 							Image2DCPtr
 								revisedImage = revisedData.GetImage(i),
 								originalImage = originalData.GetImage(i);
-							Image2DPtr image = Image2D::CreateCopy(contaminatedData.GetImage(i));
+							Image2DPtr image(new Image2D(*contaminatedData.GetImage(i)));
 							for(size_t y=0;y<image->Height();++y)
 							{
 								for(size_t x=0;x<image->Width();++x)
@@ -145,7 +145,7 @@ namespace rfiStrategy {
 						unsigned imageCount = contaminatedData.ImageCount();
 						for(unsigned i=0;i<imageCount;++i)
 						{
-							Image2DPtr image = Image2D::CreateCopy(contaminatedData.GetImage(i));
+							Image2DPtr image(new Image2D(*contaminatedData.GetImage(i)));
 							for(size_t y=0;y<image->Height();++y)
 							{
 								for(size_t x=0;x<image->Width();++x)
@@ -165,7 +165,7 @@ namespace rfiStrategy {
 						unsigned imageCount = contaminatedData.ImageCount();
 						for(unsigned i=0;i<imageCount;++i)
 						{
-							Image2DPtr image = Image2D::CreateCopy(contaminatedData.GetImage(i));
+							Image2DPtr image(new Image2D(*contaminatedData.GetImage(i)));
 							InterpolateNansAlgorithms::InterpolateFlags(image, mask);
 							contaminatedData.SetImage(i, image);
 						}

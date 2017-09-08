@@ -169,13 +169,13 @@ void TimeFrequencyData::MultiplyImages(long double factor)
 	{
 		if(data._images[0])
 		{
-			Image2DPtr newImage = Image2D::CreateCopy(data._images[0]);
+			Image2DPtr newImage(new Image2D(*data._images[0]));
 			newImage->MultiplyValues(factor);
 			data._images[0] = newImage;
 		}
 		if(data._images[1])
 		{
-			Image2DPtr newImage = Image2D::CreateCopy(data._images[1]);
+			Image2DPtr newImage(new Image2D(*data._images[1]));
 			newImage->MultiplyValues(factor);
 			data._images[1] = newImage;
 		}

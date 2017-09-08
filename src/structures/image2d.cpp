@@ -128,14 +128,6 @@ Image2D *Image2D::CreateFromDiff(const Image2D &imageA, const Image2D &imageB)
 	return image;
 }
 
-Image2D *Image2D::CreateCopy(const Image2D &image)
-{
-	const size_t width = image.Width(), height = image.Height();
-	Image2D *newImage = new Image2D(width, height);
-	memcpy(newImage->_dataConsecutive, image._dataConsecutive, image._stride * height * sizeof(num_t));
-	return newImage;
-}
-
 void Image2D::SetValues(const Image2D &source)
 {
 	const size_t size = _stride*_height;

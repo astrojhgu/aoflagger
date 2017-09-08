@@ -138,18 +138,6 @@ class Image2D {
 			return Image2DPtr(CreateFromDiff(*imageA, *imageB));
 		}
 
-		static Image2D *CreateCopy(const Image2D &image);
-		[[ deprecated("Use copy constructor") ]]
-		static Image2DPtr CreateCopy(const Image2DCPtr &image)
-		{
-			return Image2DPtr(CreateCopy(*image));
-		}
-		[[ deprecated("Use copy constructor") ]]
-		static Image2DPtr CreateCopyPtr(const Image2D &image)
-		{
-			return Image2DPtr(CreateCopy(image));
-		}
-
 		/**
 		 * Retrieves the average value of the image.
 		 * @return The average value.

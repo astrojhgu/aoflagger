@@ -11,8 +11,6 @@ namespace rfiStrategy {
 	{
 		AbsThresholdActionType,
 		ActionBlockType,
-		//AdapterType,
-		//AddStatisticsActionType,
 		BaselineSelectionActionType,
 		CalibratePassbandActionType,
 		ChangeResolutionActionType,
@@ -24,7 +22,6 @@ namespace rfiStrategy {
 		ForEachMSActionType,
 		ForEachPolarisationBlockType,
 		ForEachSimulatedBaselineActionType,
-		FourierTransformActionType,
 		FrequencyConvolutionActionType,
 		FrequencySelectionActionType,
 		FringeStopActionType,

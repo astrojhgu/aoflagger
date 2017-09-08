@@ -38,8 +38,8 @@ namespace rfiStrategy {
 				if(_kernelKind == TotalKernel)
 				{
 					Image2DPtr
-						rImage = Image2D::CreateCopy(data.GetImage(0)),
-						iImage = Image2D::CreateCopy(data.GetImage(1));
+						rImage(new Image2D(*data.GetImage(0))),
+						iImage(new Image2D(*data.GetImage(1)));
 					Convolve(rImage, iImage, artifacts.MetaData(), listener);
 					data.SetImage(0, rImage);
 					data.SetImage(1, iImage);
@@ -122,8 +122,8 @@ namespace rfiStrategy {
 			
 			void Convolve(Image2DPtr rImage, Image2DPtr iImage, TimeFrequencyMetaDataCPtr metaData, ProgressListener &listener)
 			{
-				Image2DPtr copyReal = Image2D::CreateCopy(rImage);
-				Image2DPtr copyImag = Image2D::CreateCopy(iImage);
+				Image2DPtr copyReal(new Image2D(*rImage));
+				Image2DPtr copyImag(new Image2D(*iImage));
 				const size_t
 					width = rImage->Width(),
 					height = rImage->Height();
