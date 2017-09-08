@@ -13,14 +13,6 @@ namespace rfiStrategy {
 
 	class WriteDataAction : public Action {
 		public:
-			WriteDataAction()
-			{
-			}
-
-			virtual ~WriteDataAction()
-			{
-			}
-
 			virtual std::string Description() final override
 			{
 				return "Write data to file";

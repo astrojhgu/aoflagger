@@ -23,7 +23,7 @@ void TimeSelectionAction::AutomaticSelection(ArtifactSet &artifacts)
 	Mask2DPtr mask = Mask2D::CreateCopy(artifacts.ContaminatedData().GetSingleMask());
 	for(size_t x=0;x<image->Width();++x)
 	{
-		SampleRowPtr row = SampleRow::CreateFromColumnWithMissings(image, mask, x);
+		SampleRowPtr row = SampleRow::CreateFromColumnWithMissings(image.get(), mask.get(), x);
 		timesteps->SetValue(x, row->RMSWithMissings());
 	}
 	bool change;

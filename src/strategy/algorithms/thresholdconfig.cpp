@@ -184,7 +184,7 @@ void ThresholdConfig::BinarySearch(num_t probability, num_t accuracy, size_t res
 		_verticalOperations[i].threshold *= m;
 }
 
-void ThresholdConfig::Execute(Image2DCPtr image, Mask2DPtr mask, bool additive, num_t sensitivity) const
+void ThresholdConfig::Execute(const Image2D* image, Mask2D* mask, bool additive, num_t sensitivity) const
 {
 	num_t factor;
 	
@@ -289,10 +289,10 @@ num_t ThresholdConfig::CalculateFalseAlarmRate(size_t resolution, enum Distribut
 		image->SetValues(*diff);
 		delete diff;
 	}
-	Execute(image, mask, true, 1.0L);
+	Execute(image.get(), mask.get(), true, 1.0L);
 	num_t prob = (num_t) mask->GetCount<true>() / (resolution*resolution);
 	int lengths[32];
-	ThresholdTools::CountMaskLengths(mask, lengths, 32);
+	ThresholdTools::CountMaskLengths(mask.get(), lengths, 32);
 	for(unsigned j=1;j<33;++j) {
 		if(_verbose)
 			std::cout << "," << (num_t)  lengths[j-1]*j / (resolution*resolution);

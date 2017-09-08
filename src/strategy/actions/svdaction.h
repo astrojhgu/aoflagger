@@ -9,16 +9,16 @@ namespace rfiStrategy {
 	{
 		public:
 			SVDAction() : _singularValueCount(1) { }
-			virtual ~SVDAction() { }
-			virtual std::string Description() final override
+			std::string Description() final override
 			{
 				return "Singular value decomposition";
 			}
-			virtual void Perform(class ArtifactSet &artifacts, class ProgressListener &listener) final override;
-			virtual ActionType Type() const final override { return SVDActionType; }
+			void Perform(class ArtifactSet &artifacts, class ProgressListener &listener) final override;
+			ActionType Type() const final override { return SVDActionType; }
 
 			size_t SingularValueCount() const { return _singularValueCount; }
 			void SetSingularValueCount(size_t svCount) { _singularValueCount = svCount; }
+			
 		private:
 			size_t _singularValueCount;
 	};

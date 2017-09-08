@@ -160,7 +160,7 @@ void sumthreshold(Data& data, double thresholdFactor, bool horizontal, bool vert
 	
 	Mask2DPtr mask = Mask2D::CreateCopy(data.TFData().GetSingleMask());
 	Image2DCPtr image = data.TFData().GetSingleImage();
-	thresholdConfig.Execute(image, mask, false, thresholdFactor);
+	thresholdConfig.Execute(image.get(), mask.get(), false, thresholdFactor);
 	data.TFData().SetGlobalMask(mask);
 }
 
@@ -171,7 +171,7 @@ void threshold_channel_rms(Data& data, double threshold, bool thresholdLowValues
 	Mask2DPtr mask = Mask2D::CreateCopy(data.TFData().GetSingleMask());
 	for(size_t y=0;y<image->Height();++y)
 	{
-		SampleRowPtr row = SampleRow::CreateFromRowWithMissings(image, mask, y);
+		SampleRowPtr row = SampleRow::CreateFromRowWithMissings(image.get(), mask.get(), y);
 		channels->SetValue(y, row->RMSWithMissings());
 	}
 	bool change;
@@ -200,7 +200,7 @@ void threshold_timestep_rms(Data& data, double threshold)
 	Mask2DPtr mask = Mask2D::CreateCopy(data.TFData().GetSingleMask());
 	for(size_t x=0;x<image->Width();++x)
 	{
-		SampleRowPtr row = SampleRow::CreateFromColumnWithMissings(image, mask, x);
+		SampleRowPtr row = SampleRow::CreateFromColumnWithMissings(image.get(), mask.get(), x);
 		timesteps->SetValue(x, row->RMSWithMissings());
 	}
 	bool change;

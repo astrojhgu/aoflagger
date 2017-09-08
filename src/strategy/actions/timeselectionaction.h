@@ -12,9 +12,6 @@ namespace rfiStrategy {
 			TimeSelectionAction() : _threshold(3.5)
 			{
 			}
-			~TimeSelectionAction()
-			{
-			}
 			virtual std::string Description() final override
 			{
 				return "Time selection";

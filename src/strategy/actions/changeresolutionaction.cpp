@@ -93,19 +93,18 @@ namespace rfiStrategy {
 		}
 	}
 	
-	void ChangeResolutionAction::DecreaseTimeWithMask(TimeFrequencyData &data)
+	void ChangeResolutionAction::DecreaseTimeWithMask(TimeFrequencyData& data)
 	{
 		size_t polCount = data.PolarizationCount();
 		for(size_t i=0;i<polCount;++i)
 		{
-			TimeFrequencyData *polData = data.CreateTFDataFromPolarizationIndex(i);
-			Mask2DCPtr mask = polData->GetSingleMask();
-			for(unsigned j=0;j<polData->ImageCount();++j)
+			TimeFrequencyData polData(data.CreateTFDataFromPolarizationIndex(i));
+			const Mask2D* mask = polData.GetSingleMask().get();
+			for(unsigned j=0;j<polData.ImageCount();++j)
 			{
-				Image2DCPtr image = polData->GetImage(j);
-				polData->SetImage(j, ThresholdTools::ShrinkHorizontally(_timeDecreaseFactor, image, mask));
+				const Image2D* image = polData.GetImage(j).get();
+				polData.SetImage(j, ThresholdTools::ShrinkHorizontally(_timeDecreaseFactor, image, mask));
 			}
-			delete polData;
 		}
 		size_t maskCount = data.MaskCount();
 		for(size_t i=0;i<maskCount;++i)

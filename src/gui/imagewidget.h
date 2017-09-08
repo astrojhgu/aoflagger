@@ -204,7 +204,7 @@ class ImageWidget : public Gtk::DrawingArea {
 		}
 
 	private:
-		void findMinMax(Image2DCPtr image, Mask2DCPtr mask, num_t &min, num_t &max);
+		void findMinMax(const Image2D* image, const Mask2D* mask, num_t &min, num_t &max);
 		void update(Cairo::RefPtr<Cairo::Context> cairo, unsigned width, unsigned height);
 		void redrawWithoutChanges(Cairo::RefPtr<Cairo::Context> cairo, unsigned width, unsigned height);
 		void downsampleImageBuffer(unsigned newWidth, unsigned newHeight);

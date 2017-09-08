@@ -83,7 +83,7 @@ namespace rfiStrategy {
 				Image2DPtr amplitudes = FFTTools::CreateAbsoluteImage(contaminated.GetImage(0), contaminated.GetImage(1));
 
 				if(_channelConvolutionSize != 1)
-					amplitudes = ThresholdTools::FrequencyRectangularConvolution(amplitudes, _channelConvolutionSize);
+					amplitudes = ThresholdTools::FrequencyRectangularConvolution(amplitudes.get(), _channelConvolutionSize);
 
 				if(_values == 0)
 				{
@@ -138,7 +138,7 @@ namespace rfiStrategy {
 					*uPositions = new numl_t[inputWidth],
 					*vPositions = new numl_t[inputWidth];
 					
-				SampleRowPtr row = SampleRow::CreateFromRow(amplitudeValues, y);
+				SampleRowPtr row = SampleRow::CreateFromRow(amplitudeValues.get(), y);
 				
 				UVProjection::ProjectPositions(artifacts.MetaData(), inputWidth, y, uPositions, vPositions, artifacts.ProjectedDirectionRad());
 				

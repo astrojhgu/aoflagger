@@ -692,9 +692,9 @@ class TimeFrequencyData
 			return _data.size();
 		}
 		
-		TimeFrequencyData *CreateTFDataFromPolarizationIndex(size_t index) const
+		TimeFrequencyData CreateTFDataFromPolarizationIndex(size_t index) const
 		{
-			return new TimeFrequencyData(_complexRepresentation, _data[index]);
+			return TimeFrequencyData(_complexRepresentation, _data[index]);
 		}
 		
 		void SetPolarizationData(size_t polarizationIndex, const TimeFrequencyData &data)

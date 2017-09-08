@@ -23,7 +23,7 @@ namespace rfiStrategy {
 				Image2DCPtr image = artifacts.ContaminatedData().GetSingleImage();
 				Mask2DCPtr mask = artifacts.ContaminatedData().GetSingleMask();
 				num_t mean, stddev;
-				ThresholdTools::WinsorizedMeanAndStdDev(image, mask, mean, stddev);
+				ThresholdTools::WinsorizedMeanAndStdDev(image.get(), mask.get(), mean, stddev);
 				for(size_t i=0;i!=artifacts.ContaminatedData().ImageCount();++i)
 				{
 					Image2DCPtr image = artifacts.ContaminatedData().GetImage(i);

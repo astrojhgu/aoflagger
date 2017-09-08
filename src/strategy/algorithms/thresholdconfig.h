@@ -18,7 +18,7 @@ class ThresholdConfig {
 		void InitializeThresholdsFromFirstThreshold(num_t firstThreshold, enum Distribution noiseDistribution);
 		void InitializeThresholdsWithFalseRate(size_t resolution, num_t falseAlarmRate, enum Distribution noiseDistribution);
 		num_t CalculateFalseAlarmRate(size_t resolution, enum Distribution noiseDistribution);
-		void Execute(Image2DCPtr image, Mask2DPtr mask, bool additive, num_t sensitivity) const;
+		void Execute(const Image2D* image, Mask2D* mask, bool additive, num_t sensitivity) const;
 		void SetVerbose(bool verbose) { _verbose = verbose; }
 		void SetMethod(Method method) { _method = method; }
 		void SetExpThresholdFactor(num_t expFactor) { _expFactor=expFactor; }

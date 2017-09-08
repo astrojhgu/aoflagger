@@ -298,12 +298,11 @@ void ImageWidget::SaveText(const std::string &filename)
 {
 	if(HasImage())
 	{
-		Image2DCPtr image = _image;
 		unsigned int
-			startX = (unsigned int) round(_startHorizontal * image->Width()),
-			startY = (unsigned int) round(_startVertical * image->Height()),
-			endX = (unsigned int) round(_endHorizontal * image->Width()),
-			endY = (unsigned int) round(_endVertical * image->Height());
+			startX = (unsigned int) round(_startHorizontal * _image->Width()),
+			startY = (unsigned int) round(_startVertical * _image->Height()),
+			endX = (unsigned int) round(_endHorizontal * _image->Width()),
+			endY = (unsigned int) round(_endVertical * _image->Height());
 		size_t
 			imageWidth = endX - startX,
 			imageHeight = endY - startY;
@@ -314,7 +313,7 @@ void ImageWidget::SaveText(const std::string &filename)
 		{
 			for(size_t x=startX; x!=endX; ++x)
 			{
-				file << image->Value(x, y) << '\n';
+				file << _image->Value(x, y) << '\n';
 			}
 		}
 	}
@@ -322,20 +321,20 @@ void ImageWidget::SaveText(const std::string &filename)
 
 void ImageWidget::update(Cairo::RefPtr<Cairo::Context> cairo, unsigned width, unsigned height)
 {
-	Image2DCPtr image = _image;
 	Mask2DCPtr mask = GetActiveMask(), originalMask = _originalMask, alternativeMask = _alternativeMask;
 	
 	unsigned int
-		startX = (unsigned int) round(_startHorizontal * image->Width()),
-		startY = (unsigned int) round(_startVertical * image->Height()),
-		endX = (unsigned int) round(_endHorizontal * image->Width()),
-		endY = (unsigned int) round(_endVertical * image->Height()),
+		startX = (unsigned int) round(_startHorizontal * _image->Width()),
+		startY = (unsigned int) round(_startVertical * _image->Height()),
+		endX = (unsigned int) round(_endHorizontal * _image->Width()),
+		endY = (unsigned int) round(_endVertical * _image->Height()),
 		startTimestep = startX,
 		endTimestep = endX;
 	size_t
 		imageWidth = endX - startX,
 		imageHeight = endY - startY;
 		
+	Image2DCPtr image = _image;
 	if(imageWidth > 30000)
 	{
 		int shrinkFactor = (imageWidth + 29999) / 30000;
@@ -351,7 +350,7 @@ void ImageWidget::update(Cairo::RefPtr<Cairo::Context> cairo, unsigned width, un
 	}
 
 	num_t min, max;
-	findMinMax(image, mask, min, max);
+	findMinMax(image.get(), mask.get(), min, max);
 	
 	// If these are not yet created, they are 0, so ok to delete.
 	delete _horiScale;
@@ -485,7 +484,7 @@ void ImageWidget::update(Cairo::RefPtr<Cairo::Context> cairo, unsigned width, un
 	if(_highlighting)
 	{
 		highlightMask = Mask2D::CreateSetMaskPtr<false>(image->Width(), image->Height());
-		_highlightConfig->Execute(image, highlightMask, true, 10.0);
+		_highlightConfig->Execute(image.get(), highlightMask.get(), true, 10.0);
 	}
 	const bool
 		originalActive = _showOriginalMask && originalMask != 0,
@@ -597,7 +596,7 @@ ColorMap *ImageWidget::createColorMap()
 	}
 }
 
-void ImageWidget::findMinMax(Image2DCPtr image, Mask2DCPtr mask, num_t &min, num_t &max)
+void ImageWidget::findMinMax(const Image2D* image, const Mask2D* mask, num_t &min, num_t &max)
 {
 	switch(_range)
 	{

@@ -55,10 +55,10 @@ namespace rfiStrategy {
 					{
 						default:
 						case RectangleKernel:
-						newImage = ThresholdTools::FrequencyRectangularConvolution(data.GetImage(0), (unsigned) roundn(_convolutionSize));
+						newImage = ThresholdTools::FrequencyRectangularConvolution(data.GetImage(0).get(), (unsigned) roundn(_convolutionSize));
 						break;
 						case SincKernel:
-						newImage = sincConvolution(artifacts.MetaData(), data.GetImage(0));
+						newImage = sincConvolution(artifacts.MetaData(), data.GetImage(0).get());
 						break;
 					}
 					
@@ -75,7 +75,7 @@ namespace rfiStrategy {
 			bool InSamples() const { return _inSamples; }
 			void SetInSamples(bool inSamples) { _inSamples = inSamples; }
 		private:
-			Image2DPtr sincConvolution(TimeFrequencyMetaDataCPtr metaData, Image2DCPtr source)
+			Image2DPtr sincConvolution(TimeFrequencyMetaDataCPtr metaData, const Image2D* source)
 			{
 				numl_t uvDist = averageUVDist(metaData);
 				AOLogger::Debug << "Avg uv dist: " << uvDist << '\n';
@@ -86,7 +86,7 @@ namespace rfiStrategy {
 				{
 					SampleRowPtr row = SampleRow::CreateFromColumn(source, x);
 					row->ConvolveWithSinc(1.0 / convolutionSize);
-					row->SetVerticalImageValues(destination, x);
+					row->SetVerticalImageValues(destination.get(), x);
 				}
 				return destination;
 			}

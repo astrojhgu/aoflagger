@@ -16,8 +16,8 @@
 
 void RFIPlots::Bin(Image2DCPtr image, Mask2DCPtr mask, std::vector<size_t> &valuesOutput, std::vector<long double> &binsOutput, size_t binCount, long double start, long double end, long double factor, long double stretch) throw()
 {
-	const long double min = start==end ? ThresholdTools::MinValue(image, mask) : start;
-	const long double max = start==end ? ThresholdTools::MaxValue(image, mask) : end;
+	const long double min = start==end ? ThresholdTools::MinValue(image.get(), mask.get()) : start;
+	const long double max = start==end ? ThresholdTools::MaxValue(image.get(), mask.get()) : end;
 	const long double binsize = (max-min) / binCount;
 	valuesOutput.resize(binCount);
 	binsOutput.resize(binCount);
@@ -52,7 +52,7 @@ void RFIPlots::MakeDistPlot(Plot2DPointSet &pointSet, Image2DCPtr image, Mask2DC
 	num_t mean, stddev;
 	num_t min = image->GetMinimum();
 	num_t max = image->GetMaximum();
-	ThresholdTools::WinsorizedMeanAndStdDev(image, mean, stddev);
+	ThresholdTools::WinsorizedMeanAndStdDev(image.get(), mean, stddev);
 	if(min < mean-3.0L*stddev)
 		min = mean-3.0L*stddev;
 	if(max > mean+3.0L*stddev)

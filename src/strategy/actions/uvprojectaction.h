@@ -58,7 +58,7 @@ namespace rfiStrategy {
 			{
 				if(data.ImageCount()!=1)
 					throw std::runtime_error("UV Projection can be applied on single images only");
-				Image2DCPtr image = data.GetImage(0);
+				const Image2DCPtr& image = data.GetImage(0);
 
 				Image2DPtr destination = Image2D::CreateZeroImagePtr(image->Width(), image->Height());
 					

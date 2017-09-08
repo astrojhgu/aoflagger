@@ -15,11 +15,13 @@ namespace rfiStrategy {
 				SumThresholdAction() : _baseSensitivity(1.0), _inTimeDirection(true), _inFrequencyDirection(true)
 				{
 				}
-				virtual std::string Description() final override
+				
+				std::string Description() final override
 				{
 					return "SumThreshold";
 				}
-				virtual void Perform(ArtifactSet &artifacts, class ProgressListener &) final override
+				
+				void Perform(ArtifactSet &artifacts, class ProgressListener &) final override
 				{
 					ThresholdConfig thresholdConfig;
 					thresholdConfig.InitializeLengthsDefault();
@@ -31,22 +33,25 @@ namespace rfiStrategy {
 					
 					TimeFrequencyData &contaminated = artifacts.ContaminatedData();
 					Mask2DPtr mask = Mask2D::CreateCopy(contaminated.GetSingleMask());
-					Image2DCPtr image = contaminated.GetSingleImage();
-					thresholdConfig.Execute(image, mask, false, artifacts.Sensitivity() * _baseSensitivity);
+					const Image2D* image = contaminated.GetSingleImage().get();
+					thresholdConfig.Execute(image, mask.get(), false, artifacts.Sensitivity() * _baseSensitivity);
 					contaminated.SetGlobalMask(mask);
 				}
+				
 				num_t BaseSensitivity() const { return _baseSensitivity; }
 				void SetBaseSensitivity(num_t baseSensitivity)
 				{
 					_baseSensitivity = baseSensitivity;
 				}
-				virtual ActionType Type() const final override { return SumThresholdActionType; }
+				
+				ActionType Type() const final override { return SumThresholdActionType; }
 				
 				bool TimeDirectionFlagging() const { return _inTimeDirection; }
 				void SetTimeDirectionFlagging(bool timeDirection) { _inTimeDirection = timeDirection; }
 				
 				bool FrequencyDirectionFlagging() const { return _inFrequencyDirection; }
 				void SetFrequencyDirectionFlagging(bool frequencyDirection) { _inFrequencyDirection = frequencyDirection; }
+				
 			private:
 				num_t _baseSensitivity;
 				bool _inTimeDirection;

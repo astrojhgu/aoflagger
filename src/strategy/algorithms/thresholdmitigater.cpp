@@ -8,7 +8,7 @@
 #endif
 
 template<size_t Length>
-void ThresholdMitigater::HorizontalSumThreshold(Image2DCPtr input, Mask2DPtr mask, num_t threshold)
+void ThresholdMitigater::HorizontalSumThreshold(const Image2D* input, Mask2D* mask, num_t threshold)
 {
 	if(Length <= input->Width())
 	{
@@ -33,7 +33,7 @@ void ThresholdMitigater::HorizontalSumThreshold(Image2DCPtr input, Mask2DPtr mas
 }
 
 template<size_t Length>
-void ThresholdMitigater::VerticalSumThreshold(Image2DCPtr input, Mask2DPtr mask, num_t threshold)
+void ThresholdMitigater::VerticalSumThreshold(const Image2D* input, Mask2D* mask, num_t threshold)
 {
 	if(Length <= input->Height())
 	{
@@ -58,9 +58,9 @@ void ThresholdMitigater::VerticalSumThreshold(Image2DCPtr input, Mask2DPtr mask,
 }
 
 template<size_t Length>
-void ThresholdMitigater::HorizontalSumThresholdLarge(Image2DCPtr input, Mask2DPtr mask, num_t threshold)
+void ThresholdMitigater::HorizontalSumThresholdLarge(const Image2D* input, Mask2D* mask, num_t threshold)
 {
-	Mask2DPtr maskCopy = Mask2D::CreateCopy(mask);
+	Mask2D maskCopy(*mask);
 	const size_t width = mask->Width(), height = mask->Height();
 	if(Length <= width)
 	{
@@ -90,7 +90,7 @@ void ThresholdMitigater::HorizontalSumThresholdLarge(Image2DCPtr input, Mask2DPt
 				// Check
 				if(count>0 && fabs(sum/count) > threshold)
 				{
-					maskCopy->SetHorizontalValues(xLeft, y, true, Length);
+					maskCopy.SetHorizontalValues(xLeft, y, true, Length);
 				}
 				// subtract the sample at the left
 				if(!mask->Value(xLeft, y))
@@ -107,9 +107,9 @@ void ThresholdMitigater::HorizontalSumThresholdLarge(Image2DCPtr input, Mask2DPt
 }
 
 template<size_t Length>
-void ThresholdMitigater::VerticalSumThresholdLarge(Image2DCPtr input, Mask2DPtr mask, num_t threshold)
+void ThresholdMitigater::VerticalSumThresholdLarge(const Image2D* input, Mask2D* mask, num_t threshold)
 {
-	Mask2DPtr maskCopy = Mask2D::CreateCopy(mask);
+	Mask2D maskCopy(*mask);
 	const size_t width = mask->Width(), height = mask->Height();
 	if(Length <= height)
 	{
@@ -140,7 +140,7 @@ void ThresholdMitigater::VerticalSumThresholdLarge(Image2DCPtr input, Mask2DPtr 
 				if(count>0 && fabs(sum/count) > threshold)
 				{
 					for(size_t i=0;i<Length;++i)
-						maskCopy->SetValue(x, yTop + i, true);
+						maskCopy.SetValue(x, yTop + i, true);
 				}
 				// subtract the sample at the top
 				if(!mask->Value(x, yTop))
@@ -156,7 +156,7 @@ void ThresholdMitigater::VerticalSumThresholdLarge(Image2DCPtr input, Mask2DPtr 
 	mask->Swap(maskCopy);
 }
 
-void ThresholdMitigater::HorizontalSumThresholdLargeReference(Image2DCPtr input, Mask2DPtr mask, size_t length, num_t threshold)
+void ThresholdMitigater::HorizontalSumThresholdLargeReference(const Image2D* input, Mask2D* mask, size_t length, num_t threshold)
 {
 	switch(length)
 	{
@@ -173,7 +173,7 @@ void ThresholdMitigater::HorizontalSumThresholdLargeReference(Image2DCPtr input,
 	}	
 }
 
-void ThresholdMitigater::VerticalSumThresholdLargeReference(Image2DCPtr input, Mask2DPtr mask, size_t length, num_t threshold)
+void ThresholdMitigater::VerticalSumThresholdLargeReference(const Image2D* input, Mask2D* mask, size_t length, num_t threshold)
 {
 	switch(length)
 	{
@@ -191,7 +191,7 @@ void ThresholdMitigater::VerticalSumThresholdLargeReference(Image2DCPtr input, M
 }
 
 #ifdef USE_INTRINSICS
-void ThresholdMitigater::VerticalSumThresholdLargeSSE(Image2DCPtr input, Mask2DPtr mask, size_t length, num_t threshold)
+void ThresholdMitigater::VerticalSumThresholdLargeSSE(const Image2D* input, Mask2D* mask, size_t length, num_t threshold)
 {
 	switch(length)
 	{
@@ -208,7 +208,7 @@ void ThresholdMitigater::VerticalSumThresholdLargeSSE(Image2DCPtr input, Mask2DP
 	}	
 }
 
-void ThresholdMitigater::HorizontalSumThresholdLargeSSE(Image2DCPtr input, Mask2DPtr mask, size_t length, num_t threshold)
+void ThresholdMitigater::HorizontalSumThresholdLargeSSE(const Image2D* input, Mask2D* mask, size_t length, num_t threshold)
 {
 	switch(length)
 	{
@@ -226,7 +226,7 @@ void ThresholdMitigater::HorizontalSumThresholdLargeSSE(Image2DCPtr input, Mask2
 }
 #endif
 
-void ThresholdMitigater::HorizontalVarThreshold(Image2DCPtr input, Mask2DPtr mask, size_t length, num_t threshold)
+void ThresholdMitigater::HorizontalVarThreshold(const Image2D* input, Mask2D* mask, size_t length, num_t threshold)
 {
 	size_t width = input->Width()-length+1;
 	for(size_t y=0;y<input->Height();++y) {
@@ -246,7 +246,7 @@ void ThresholdMitigater::HorizontalVarThreshold(Image2DCPtr input, Mask2DPtr mas
 	}
 }
 
-void ThresholdMitigater::VerticalVarThreshold(Image2DCPtr input, Mask2DPtr mask, size_t length, num_t threshold)
+void ThresholdMitigater::VerticalVarThreshold(const Image2D* input, Mask2D* mask, size_t length, num_t threshold)
 {
 	size_t height = input->Height()-length+1; 
 	for(size_t y=0;y<height;++y) {
@@ -266,7 +266,7 @@ void ThresholdMitigater::VerticalVarThreshold(Image2DCPtr input, Mask2DPtr mask,
 	}
 }
 
-void ThresholdMitigater::VarThreshold(Image2DCPtr input, Mask2DPtr mask, size_t length, num_t threshold)
+void ThresholdMitigater::VarThreshold(const Image2D* input, Mask2D* mask, size_t length, num_t threshold)
 {
 	HorizontalVarThreshold(input, mask, length, threshold);
 	VerticalVarThreshold(input, mask, length, threshold);

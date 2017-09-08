@@ -285,7 +285,7 @@ Image2DCPtr GrayScalePlotPage::normalizeXAxis(Image2DCPtr input)
 	Image2DPtr output = Image2D::CreateUnsetImagePtr(input->Width(), input->Height());
 	for(size_t x=0;x<input->Width();++x)
 	{
-		SampleRowPtr row = SampleRow::CreateFromColumn(input, x);
+		SampleRowPtr row = SampleRow::CreateFromColumn(input.get(), x);
 		num_t norm;
 		if(_meanNormButton.get_active())
 			norm = 1.0 / row->MeanWithMissings();
@@ -304,7 +304,7 @@ Image2DCPtr GrayScalePlotPage::normalizeYAxis(Image2DCPtr input)
 	Image2DPtr output = Image2D::CreateUnsetImagePtr(input->Width(), input->Height());
 	for(size_t y=0;y<input->Height();++y)
 	{
-		SampleRowPtr row = SampleRow::CreateFromRow(input, y);
+		SampleRowPtr row = SampleRow::CreateFromRow(input.get(), y);
 		num_t norm;
 		if(_meanNormButton.get_active())
 			norm = 1.0 / row->MeanWithMissings();

@@ -52,18 +52,18 @@ std::pair<TimeFrequencyData,TimeFrequencyMetaDataPtr> RSPReader::ReadChannelBeam
 	for(unsigned long timestep = 0;timestep < timestepEnd-timestepStart;++timestep)
 	{
 		unsigned long timestepIndex = timestep * 256;
-		SampleRowPtr realX = SampleRow::CreateFromRow(xr, timestepIndex, 256, 0);
-		SampleRowPtr imaginaryX = SampleRow::CreateFromRow(xi, timestepIndex, 256, 0);
-		SampleRowPtr realY = SampleRow::CreateFromRow(yr, timestepIndex, 256, 0);
-		SampleRowPtr imaginaryY = SampleRow::CreateFromRow(yi, timestepIndex, 256, 0);
+		SampleRowPtr realX = SampleRow::CreateFromRow(xr.get(), timestepIndex, 256, 0);
+		SampleRowPtr imaginaryX = SampleRow::CreateFromRow(xi.get(), timestepIndex, 256, 0);
+		SampleRowPtr realY = SampleRow::CreateFromRow(yr.get(), timestepIndex, 256, 0);
+		SampleRowPtr imaginaryY = SampleRow::CreateFromRow(yi.get(), timestepIndex, 256, 0);
 		
 		FFTTools::FFT(realX, imaginaryX);
 		FFTTools::FFT(realY, imaginaryY);
 		
-		realX->SetVerticalImageValues(outXR, timestep);
-		imaginaryX->SetVerticalImageValues(outXI, timestep);
-		realY->SetVerticalImageValues(outYR, timestep);
-		imaginaryY->SetVerticalImageValues(outYI, timestep);
+		realX->SetVerticalImageValues(outXR.get(), timestep);
+		imaginaryX->SetVerticalImageValues(outXI.get(), timestep);
+		realY->SetVerticalImageValues(outYR.get(), timestep);
+		imaginaryY->SetVerticalImageValues(outYI.get(), timestep);
 		
 		observationTimes.push_back(data.second->ObservationTimes()[timestepIndex + 256/2]);
 

@@ -495,7 +495,9 @@ class Image2D {
 		void ResizeWithoutReallocation(size_t newWidth);
 		
 	private:
-		Image2D(size_t width, size_t height);
+		Image2D(size_t width, size_t height) :
+			Image2D(width, height, width)
+		{ }
 		Image2D(size_t width, size_t height, size_t widthCapacity);
 		
 		Image2D(const Image2D&) = delete;

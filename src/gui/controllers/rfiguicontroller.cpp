@@ -129,9 +129,9 @@ void RFIGuiController::PlotLogLogDist()
 		HistogramCollection histograms(activeData.PolarizationCount());
 		for(unsigned p=0;p!=activeData.PolarizationCount();++p)
 		{
-			TimeFrequencyData *polData = activeData.CreateTFDataFromPolarizationIndex(p);
-			Image2DCPtr image = polData->GetSingleImage();
-			Mask2DCPtr mask = Mask2D::CreateCopy(polData->GetSingleMask());
+			TimeFrequencyData polData(activeData.CreateTFDataFromPolarizationIndex(p));
+			Image2DCPtr image = polData.GetSingleImage();
+			Mask2DCPtr mask = Mask2D::CreateCopy(polData.GetSingleMask());
 			histograms.Add(0, 1, p, image, mask);
 		}
 		_rfiGuiWindow.ShowHistogram(histograms);

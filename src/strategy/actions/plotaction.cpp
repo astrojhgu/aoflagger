@@ -127,14 +127,13 @@ namespace rfiStrategy {
 		double rms = 0.0;
 		for(unsigned i=0;i<data.PolarizationCount();++i)
 		{
-			TimeFrequencyData *polarisation = data.CreateTFDataFromPolarizationIndex(i);
-			Mask2DCPtr mask = polarisation->GetSingleMask();
-			for(unsigned j=0;j<polarisation->ImageCount();++j)
+			TimeFrequencyData polarisation(data.CreateTFDataFromPolarizationIndex(i));
+			const Mask2D* mask = polarisation.GetSingleMask().get();
+			for(unsigned j=0;j<polarisation.ImageCount();++j)
 			{
-				Image2DCPtr image = polarisation->GetImage(j);
-				rms += ThresholdTools::RMS(image, mask);
+				Image2DCPtr image = polarisation.GetImage(j);
+				rms += ThresholdTools::RMS(image.get(), mask);
 			}
-			delete polarisation;
 		}
 		rms /= data.PolarizationCount();
 		;

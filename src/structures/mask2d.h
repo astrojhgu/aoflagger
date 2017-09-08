@@ -11,6 +11,8 @@ typedef std::shared_ptr<const class Mask2D> Mask2DCPtr;
 
 class Mask2D {
 	public:
+		Mask2D(const Mask2D& source);
+		
 		~Mask2D();
 
 		// This method assumes equal height and width.
@@ -331,7 +333,6 @@ class Mask2D {
 		}
 	private:
 		Mask2D(size_t width, size_t height);
-		Mask2D(const Mask2D&) = delete;
 
 		size_t _width, _height;
 		size_t _stride;

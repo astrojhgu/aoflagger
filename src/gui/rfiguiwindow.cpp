@@ -1160,7 +1160,7 @@ void RFIGuiWindow::onAdd1SigmaFringe()
 			TimeFrequencyMetaDataCPtr metaData = SelectedMetaData();
 			num_t mean, stddev;
 			TimeFrequencyData data(GetActiveData());
-			ThresholdTools::MeanAndStdDev(data.GetRealPart(), data.GetSingleMask(), mean, stddev);
+			ThresholdTools::MeanAndStdDev(data.GetRealPart().get(), data.GetSingleMask().get(), mean, stddev);
 			FringeTestCreater::AddStaticFringe(data, metaData, stddev);
 			_timeFrequencyWidget.SetNewData(data, _timeFrequencyWidget.GetSelectedMetaData());
 			_timeFrequencyWidget.Update();
@@ -1695,7 +1695,7 @@ void RFIGuiWindow::onUnrollPhaseButtonPressed()
 		for(unsigned i=0;i<data->ImageCount();++i)
 		{
 			Image2DPtr image = Image2D::CreateCopy(data->GetImage(i));
-			ThresholdTools::UnrollPhase(image);
+			ThresholdTools::UnrollPhase(image.get());
 			data->SetImage(i, image);
 		}
 		_timeFrequencyWidget.SetNewData(*data, _timeFrequencyWidget.GetSelectedMetaData());

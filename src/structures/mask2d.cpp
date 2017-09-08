@@ -3,6 +3,11 @@
 
 #include <iostream>
 
+Mask2D::Mask2D(const Mask2D& source) : Mask2D(source.Width(), source.Height())
+{
+	memcpy(_valuesConsecutive, source._valuesConsecutive, _stride * _height * sizeof(bool));
+}
+
 Mask2D::Mask2D(size_t width, size_t height) :
 	_width(width),
 	_height(height),

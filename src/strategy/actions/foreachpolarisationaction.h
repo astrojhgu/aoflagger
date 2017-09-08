@@ -162,24 +162,20 @@ namespace rfiStrategy {
 				{
 					if(isDirectPolarizationSelected(oldContaminatedData.GetPolarization(polarizationIndex)))
 					{
-						TimeFrequencyData *newContaminatedData =
-							oldContaminatedData.CreateTFDataFromPolarizationIndex(polarizationIndex);
-						TimeFrequencyData *newOriginalData =
-							oldOriginalData.CreateTFDataFromPolarizationIndex(polarizationIndex);
+						TimeFrequencyData newContaminatedData(
+							oldContaminatedData.CreateTFDataFromPolarizationIndex(polarizationIndex));
+						TimeFrequencyData newOriginalData(
+							oldOriginalData.CreateTFDataFromPolarizationIndex(polarizationIndex));
 
-						artifacts.SetContaminatedData(*newContaminatedData);
-						artifacts.SetOriginalData(*newOriginalData);
+						artifacts.SetContaminatedData(newContaminatedData);
+						artifacts.SetOriginalData(newOriginalData);
 		
-						progress.OnStartTask(*this, polarizationIndex, count, newContaminatedData->Description());
+						progress.OnStartTask(*this, polarizationIndex, count, newContaminatedData.Description());
 		
-						delete newOriginalData;
-						delete newContaminatedData;
-						
 						if(changeRevised)
 						{
-							TimeFrequencyData *newRevised = oldRevisedData.CreateTFDataFromPolarizationIndex(polarizationIndex);
-							artifacts.SetRevisedData(*newRevised);
-							delete newRevised;
+							TimeFrequencyData newRevised( oldRevisedData.CreateTFDataFromPolarizationIndex(polarizationIndex));
+							artifacts.SetRevisedData(newRevised);
 						}
 		
 						ActionBlock::Perform(artifacts, progress);

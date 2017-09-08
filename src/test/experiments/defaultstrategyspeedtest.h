@@ -363,25 +363,25 @@ inline void DefaultStrategySpeedTest::TimeSumThresholdN::operator()()
 		
 		Mask2DPtr maskA = Mask2D::CreateCopy(artifacts.OriginalData().GetSingleMask());
 		Stopwatch watchA(true);
-		ThresholdMitigater::HorizontalSumThresholdLargeReference(input, maskA, length, threshold);
+		ThresholdMitigater::HorizontalSumThresholdLargeReference(input.get(), maskA.get(), length, threshold);
 		AOLogger::Info << "Horizontal, length " << length << ": " << watchA.ToString() << '\n';
 		
 #ifdef __SSE__
 		Mask2DPtr maskC = Mask2D::CreateCopy(artifacts.OriginalData().GetSingleMask());
 		Stopwatch watchC(true);
-		ThresholdMitigater::HorizontalSumThresholdLargeSSE(input, maskC, length, threshold);
+		ThresholdMitigater::HorizontalSumThresholdLargeSSE(input.get(), maskC.get(), length, threshold);
 		AOLogger::Info << "Horizontal SSE, length " << length << ": " << watchC.ToString() << '\n';
 #endif
 		
 		Mask2DPtr maskB = Mask2D::CreateCopy(artifacts.OriginalData().GetSingleMask());
 		Stopwatch watchB(true);
-		ThresholdMitigater::VerticalSumThresholdLargeReference(input, maskB, length, threshold);
+		ThresholdMitigater::VerticalSumThresholdLargeReference(input.get(), maskB.get(), length, threshold);
 		AOLogger::Info << "Vertical, length " << length << ": " << watchB.ToString() << '\n';
 		
 #ifdef __SSE__
 		Mask2DPtr maskD = Mask2D::CreateCopy(artifacts.OriginalData().GetSingleMask());
 		Stopwatch watchD(true);
-		ThresholdMitigater::VerticalSumThresholdLargeSSE(input, maskD, length, threshold);
+		ThresholdMitigater::VerticalSumThresholdLargeSSE(input.get(), maskD.get(), length, threshold);
 		AOLogger::Info << "SSE Vertical, length " << length << ": " << watchD.ToString() << '\n';
 #endif
 	}
