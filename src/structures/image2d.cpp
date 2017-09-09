@@ -25,8 +25,13 @@ Image2D::Image2D(size_t width, size_t height, size_t widthCapacity) :
 	_stride((((widthCapacity-1)/4)+1)*4)
 {
 	if(widthCapacity == 0) _stride=0;
-	unsigned allocHeight = ((((height-1)/4)+1)*4);
-	if(height == 0) allocHeight = 0;
+	allocate();
+}
+
+void Image2D::allocate()
+{
+	unsigned allocHeight = ((((_height-1)/4)+1)*4);
+	if(_height == 0) allocHeight = 0;
 #ifdef __APPLE__
 		// OS-X has no posix_memalign, but malloc always uses 16-byte alignment.
 		_dataConsecutive = (num_t*)malloc(_stride * allocHeight * sizeof(num_t));
@@ -35,7 +40,7 @@ Image2D::Image2D(size_t width, size_t height, size_t widthCapacity) :
 			throw std::bad_alloc();
 #endif
 	_dataPtr = new num_t*[allocHeight];
-	for(size_t y=0;y<height;++y)
+	for(size_t y=0;y<_height;++y)
 	{
 		_dataPtr[y] = &_dataConsecutive[_stride * y];
 		// Even though the values after the requested width are never relevant, we will
@@ -46,7 +51,7 @@ Image2D::Image2D(size_t width, size_t height, size_t widthCapacity) :
 			_dataPtr[y][x] = 0.0;
 		}
 	}
-	for(size_t y=height;y<allocHeight;++y)
+	for(size_t y=_height;y<allocHeight;++y)
 	{
 		_dataPtr[y] = &_dataConsecutive[_stride * y];
 		// (see remark above about initializing to zero)
@@ -63,10 +68,54 @@ Image2D::Image2D(const Image2D& source) :
 	memcpy(_dataConsecutive, source._dataConsecutive, _stride * _height * sizeof(num_t));
 }
 
+Image2D::Image2D(Image2D&& source) :
+	_width(source._width),
+	_height(source._height),
+	_stride(source._stride),
+	_dataPtr(source._dataPtr),
+	_dataConsecutive(source._dataConsecutive)
+{
+	source._width = 0;
+	source._stride = 0;
+	source._height = 0;
+	source._dataPtr = nullptr;
+	source._dataConsecutive = nullptr;
+}
+
 Image2D::~Image2D()
 {
 	delete[] _dataPtr;
 	free(_dataConsecutive);
+}
+
+Image2D& Image2D::operator=(const Image2D& rhs)
+{
+	if(_width != rhs._width ||
+		_height != rhs._height ||
+		_stride != rhs._stride)
+	{
+		delete[] _dataPtr;
+		free(_dataConsecutive);
+		_width = rhs._width;
+		_height = rhs._height;
+		_stride = rhs._stride;
+		allocate();
+	}
+	std::copy(
+		rhs._dataConsecutive,
+		rhs._dataConsecutive + _stride * _height,
+		_dataConsecutive);
+	return *this;
+}
+
+Image2D& Image2D::operator=(Image2D&& rhs)
+{
+	std::swap(rhs._width, _width);
+	std::swap(rhs._stride, _stride);
+	std::swap(rhs._height, _height);
+	std::swap(rhs._dataPtr, _dataPtr);
+	std::swap(rhs._dataConsecutive, _dataConsecutive);
+	return *this;
 }
 
 Image2D *Image2D::CreateSetImage(size_t width, size_t height, num_t initialValue) 

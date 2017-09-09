@@ -464,7 +464,7 @@ namespace rfiStrategy {
 		for(int p=0;p<polarizationCount;++p)
 		{
 			images[p]->SetTrim(0, 0, timeIndex, images[p]->Height());
-			masks[p] = masks[p]->Trim(0, 0, timeIndex, images[p]->Height());
+			masks[p].reset(new Mask2D(masks[p]->Trim(0, 0, timeIndex, images[p]->Height())));
 		}
 		observationTimes.resize(timeIndex);
 		metaData.SetObservationTimes(observationTimes);

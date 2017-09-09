@@ -659,7 +659,7 @@ class TimeFrequencyData
 				if(data._images[1])
 					data._images[1] = data._images[1]->Trim(timeStart, freqStart, timeEnd, freqEnd);
 				if(data._flagging)
-					data._flagging = data._flagging->Trim(timeStart, freqStart, timeEnd, freqEnd);
+					data._flagging.reset(new Mask2D(data._flagging->Trim(timeStart, freqStart, timeEnd, freqEnd)));
 			}
 		}
 		
@@ -741,7 +741,7 @@ class TimeFrequencyData
 				if(_data[i]._flagging)
 				{
 					Mask2DPtr mask(new Mask2D(*_data[i]._flagging));
-					mask->CopyFrom(source._data[i]._flagging, destX, destY);
+					mask->CopyFrom(*source._data[i]._flagging, destX, destY);
 					_data[i]._flagging = std::move(mask);
 				}
 			}

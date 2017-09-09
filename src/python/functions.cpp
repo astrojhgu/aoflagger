@@ -122,7 +122,7 @@ Data shrink(const Data& data, size_t horizontalFactor, size_t verticalFactor)
 		for(size_t i=0;i<maskCount;++i)
 		{
 			Mask2DCPtr mask = timeFrequencyData.GetMask(i);
-			Mask2DPtr newMask = mask->ShrinkHorizontally(horizontalFactor);
+			Mask2DPtr newMask(new Mask2D(mask->ShrinkHorizontally(horizontalFactor)));
 			timeFrequencyData.SetMask(i, newMask);
 		}
 	}
@@ -138,7 +138,7 @@ Data shrink(const Data& data, size_t horizontalFactor, size_t verticalFactor)
 		for(size_t i=0;i<maskCount;++i)
 		{
 			Mask2DCPtr mask = timeFrequencyData.GetMask(i);
-			Mask2DPtr newMask = mask->ShrinkVertically(verticalFactor);
+			Mask2DPtr newMask(new Mask2D(mask->ShrinkVertically(verticalFactor)));
 			timeFrequencyData.SetMask(i, newMask);
 		}
 	}

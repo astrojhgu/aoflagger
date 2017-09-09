@@ -54,7 +54,7 @@ void SumThresholdTest::VerticalSumThresholdSSE::operator()()
 		real = MitigationTester::CreateTestSet(26, mask1, width, height),
 		imag = MitigationTester::CreateTestSet(26, mask2, width, height);
 	TimeFrequencyData data(Polarization::XX, real, imag);
-	const Image2D* image = data.GetSingleImage().get();
+	Image2DCPtr image = data.GetSingleImage();
 	
 	ThresholdConfig config;
 	config.InitializeLengthsDefault(9);
@@ -68,8 +68,8 @@ void SumThresholdTest::VerticalSumThresholdSSE::operator()()
 		const unsigned length = config.GetHorizontalLength(i);
 		const double threshold = config.GetHorizontalThreshold(i);
 		
-		ThresholdMitigater::VerticalSumThresholdLargeReference(image, mask1.get(), length, threshold);
-		ThresholdMitigater::VerticalSumThresholdLargeSSE(image, mask2.get(), length, threshold);
+		ThresholdMitigater::VerticalSumThresholdLargeReference(image.get(), mask1.get(), length, threshold);
+		ThresholdMitigater::VerticalSumThresholdLargeSSE(image.get(), mask2.get(), length, threshold);
 		
 		if(length != 32) {
 		  std::stringstream s;

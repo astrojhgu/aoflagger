@@ -103,7 +103,7 @@ void ThresholdMitigater::HorizontalSumThresholdLarge(const Image2D* input, Mask2
 			}
 		}
 	}
-	mask->Swap(maskCopy);
+	*mask = std::move(maskCopy);
 }
 
 template<size_t Length>
@@ -153,7 +153,7 @@ void ThresholdMitigater::VerticalSumThresholdLarge(const Image2D* input, Mask2D*
 			}
 		}
 	}
-	mask->Swap(maskCopy);
+	*mask = std::move(maskCopy);
 }
 
 void ThresholdMitigater::HorizontalSumThresholdLargeReference(const Image2D* input, Mask2D* mask, size_t length, num_t threshold)

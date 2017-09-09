@@ -26,7 +26,7 @@ void StatisticalFlagger::DilateFlagsHorizontally(Mask2D* mask, size_t timeSize)
 {
 	if(timeSize != 0)
 	{
-		Mask2DPtr destination = Mask2D::CreateUnsetMaskPtr(mask->Width(), mask->Height());
+		Mask2D destination(Mask2D::MakeUnsetMask(mask->Width(), mask->Height()));
 		if(timeSize > mask->Width()) timeSize = mask->Width();
 		const int intSize = (int) timeSize;
 		
@@ -45,24 +45,24 @@ void StatisticalFlagger::DilateFlagsHorizontally(Mask2D* mask, size_t timeSize)
 					dist = -intSize;
 				if(dist <= intSize)
 				{
-					destination->SetValue(x, y, true);
+					destination.SetValue(x, y, true);
 					dist++;
 				} else {
-					destination->SetValue(x, y, false);
+					destination.SetValue(x, y, false);
 				}
 			}
 			for(size_t x=mask->Width() - timeSize;x<mask->Width();++x)
 			{
 				if(dist <= intSize)
 				{
-					destination->SetValue(x, y, true);
+					destination.SetValue(x, y, true);
 					dist++;
 				} else {
-					destination->SetValue(x, y, false);
+					destination.SetValue(x, y, false);
 				}
 			}
 		}
-		mask->Swap(destination);
+		*mask = std::move(destination);
 	}
 }
 
@@ -70,7 +70,7 @@ void StatisticalFlagger::DilateFlagsVertically(Mask2D* mask, size_t frequencySiz
 {
 	if(frequencySize != 0)
 	{
-		Mask2DPtr destination = Mask2D::CreateUnsetMaskPtr(mask->Width(), mask->Height());
+		Mask2D destination(Mask2D::MakeUnsetMask(mask->Width(), mask->Height()));
 		if(frequencySize > mask->Height()) frequencySize = mask->Height();
 		const int intSize = (int) frequencySize;
 		
@@ -89,24 +89,24 @@ void StatisticalFlagger::DilateFlagsVertically(Mask2D* mask, size_t frequencySiz
 					dist = -intSize;
 				if(dist <= intSize)
 				{
-					destination->SetValue(x, y, true);
+					destination.SetValue(x, y, true);
 					dist++;
 				} else {
-					destination->SetValue(x, y, false);
+					destination.SetValue(x, y, false);
 				}
 			}
 			for(size_t y=mask->Height() - frequencySize;y<mask->Height();++y)
 			{
 				if(dist <= intSize)
 				{
-					destination->SetValue(x, y, true);
+					destination.SetValue(x, y, true);
 					dist++;
 				} else {
-					destination->SetValue(x, y, false);
+					destination.SetValue(x, y, false);
 				}
 			}
 		}
-		mask->Swap(destination);
+		*mask = std::move(destination);
 	}
 }
 

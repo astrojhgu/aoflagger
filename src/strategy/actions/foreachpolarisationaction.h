@@ -208,25 +208,25 @@ namespace rfiStrategy {
 				if(_onStokesI)
 				{
 					performDerivedPolarisation(artifacts, progress, Polarization::StokesI, oldContaminatedData, oldOriginalData, oldRevisedData, changeRevised, 0, 4);
-					mask->Join(artifacts.ContaminatedData().GetSingleMask());
+					mask->Join(*artifacts.ContaminatedData().GetSingleMask());
 				}
 
 				if(_onStokesQ)
 				{
 					performDerivedPolarisation(artifacts, progress, Polarization::StokesQ, oldContaminatedData, oldOriginalData, oldRevisedData, changeRevised, 1, 4);
-					mask->Join(artifacts.ContaminatedData().GetSingleMask());
+					mask->Join(*artifacts.ContaminatedData().GetSingleMask());
 				}
 
 				if(_onStokesU)
 				{
 					performDerivedPolarisation(artifacts, progress, Polarization::StokesU, oldContaminatedData, oldOriginalData, oldRevisedData, changeRevised, 2, 4);
-					mask->Join(artifacts.ContaminatedData().GetSingleMask());
+					mask->Join(*artifacts.ContaminatedData().GetSingleMask());
 				}
 
 				if(_onStokesV)
 				{
 					performDerivedPolarisation(artifacts, progress, Polarization::StokesV, oldContaminatedData, oldOriginalData, oldRevisedData, changeRevised, 3, 4);
-					mask->Join(artifacts.ContaminatedData().GetSingleMask());
+					mask->Join(*artifacts.ContaminatedData().GetSingleMask());
 				}
 				
 				oldContaminatedData.SetGlobalMask(mask);

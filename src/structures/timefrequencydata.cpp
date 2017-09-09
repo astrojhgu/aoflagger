@@ -191,23 +191,23 @@ void TimeFrequencyData::JoinMask(const TimeFrequencyData &other)
 	{
 		for(size_t i=0;i<MaskCount();++i)
 		{
-			Mask2DPtr mask(new Mask2D(*GetMask(i)));
-			mask->Join(other.GetMask(i));
-			SetMask(i, mask);
+			Mask2D mask(*GetMask(i));
+			mask.Join(*other.GetMask(i));
+			SetMask(i, Mask2DPtr(new Mask2D(mask)));
 		}
 	} else if(other.MaskCount() == 1)
 	{
 		for(size_t i=0;i<MaskCount();++i)
 		{
-			Mask2DPtr mask(new Mask2D(*GetMask(i)));
-			mask->Join(other.GetMask(0));
-			SetMask(i, mask);
+			Mask2D mask(*GetMask(i));
+			mask.Join(*other.GetMask(0));
+			SetMask(i, Mask2DPtr(new Mask2D(mask)));
 		}
 	} else if(MaskCount() == 1)
 	{
-		Mask2DPtr mask(new Mask2D(*GetMask(0)));
-		mask->Join(other.GetSingleMask());
-		SetMask(0, mask);
+		Mask2D mask(*GetMask(0));
+		mask.Join(*other.GetSingleMask());
+		SetMask(0, Mask2DPtr(new Mask2D(mask)));
 	}	else if(MaskCount() == 0 && _data.size() == other._data.size())
 	{
 		for(size_t i=0; i!=_data.size(); ++i)

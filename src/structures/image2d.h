@@ -16,6 +16,10 @@
 typedef std::shared_ptr<class Image2D> Image2DPtr;
 typedef std::shared_ptr<const class Image2D> Image2DCPtr;
 
+void swap(Image2D& left, Image2D& right);
+void swap(Image2D& left, Image2D&& right);
+void swap(Image2D&& left, Image2D& right);
+
 /**
  * This class represents a two dimensional single-valued (=gray scale) image. It can be
  * read from and written to a @c .fits file and written to a @c .png file. A new Image2D can
@@ -26,6 +30,34 @@ class Image2D {
 		Image2D(const Image2D& source);
 		
 		Image2D(Image2D&& source);
+		
+		Image2D& operator=(const Image2D& rhs);
+		
+		Image2D& operator=(Image2D&& rhs);
+		
+		static Image2D MakeUnsetImage(size_t width, size_t height)
+		{
+			return Image2D(width, height);
+		}
+		
+		static Image2D MakeUnsetImage(size_t width, size_t height, size_t widthCapacity)
+		{
+			return Image2D(width, height, widthCapacity);
+		}
+		
+		static Image2D MakeSetImage(size_t width, size_t height, num_t initialValue)
+		{
+			Image2D image(width, height);
+			image.SetAll(initialValue);
+			return image;
+		}
+		
+		static Image2D MakeSetImage(size_t width, size_t height, num_t initialValue, size_t widthCapacity)
+		{
+			Image2D image(width, height, widthCapacity);
+			image.SetAll(initialValue);
+			return image;
+		}
 		
 		/**
 		 * Creates an image containing unset values.
@@ -186,19 +218,19 @@ class Image2D {
 		 * @param y y-coordinate
 		 * @return The value.
 		 */
-		inline num_t Value(size_t x, size_t y) const { return _dataPtr[y][x]; }
+		num_t Value(size_t x, size_t y) const { return _dataPtr[y][x]; }
 		
 		/**
 		 * Get the width of the image.
 		 * @return Width of the image.
 		 */
-		inline size_t Width() const { return _width; }
+		size_t Width() const { return _width; }
 		
 		/**
 		 * Get the height of the image.
 		 * @return Height of the image.
 		 */
-		inline size_t Height() const { return _height; }
+		size_t Height() const { return _height; }
 		
 		/**
 		 * Change a value at a specific position.
@@ -206,7 +238,7 @@ class Image2D {
 		 * @param y y-coordinate of value to change.
 		 * @param newValue New value.
 		 */
-		inline void SetValue(size_t x, size_t y, num_t newValue)
+		void SetValue(size_t x, size_t y, num_t newValue)
 		{
 			_dataPtr[y][x] = newValue;
 		}
@@ -219,7 +251,7 @@ class Image2D {
 
 		void SetAll(num_t value);
 		
-		inline void AddValue(size_t x, size_t y, num_t addValue)
+		void AddValue(size_t x, size_t y, num_t addValue)
 		{
 			_dataPtr[y][x] += addValue;
 		}
@@ -332,43 +364,20 @@ class Image2D {
 		/**
 		 * Flips the image round the diagonal, i.e., x becomes y and y becomes x.
 		 */
-		Image2DPtr CreateXYFlipped() const
+		Image2D CreateXYFlipped() const
 		{
-			Image2D *image = new Image2D(_height, _width);
+			Image2D image(_height, _width);
 			for(unsigned y=0;y<_height;++y)
 			{
 				for(unsigned x=0;x<_width;++x)
-					image->_dataPtr[x][y] = _dataPtr[y][x];
+					image._dataPtr[x][y] = _dataPtr[y][x];
 			}
-			return Image2DPtr(image);
+			return image;
 		}
 		
 		void SwapXY()
 		{
-			Image2DPtr swapped = CreateXYFlipped();
-			Swap(swapped);
-		}
-		
-		/**
-		 * Swaps the contents of the two masks. This can be used as a move assignment operator, as it
-		 * only swaps pointers; hence it is fast.
-		 */
-		void Swap(Image2D &source)
-		{
-			std::swap(source._width, _width);
-			std::swap(source._stride, _stride);
-			std::swap(source._height, _height);
-			std::swap(source._dataPtr, _dataPtr);
-			std::swap(source._dataConsecutive, _dataConsecutive);
-		}
-		
-		/**
-		 * Swaps the contents of the two masks. This can be used as a move assignment operator, as it
-		 * only swaps pointers; hence it is fast.
-		 */
-		void Swap(const Image2DPtr &source)
-		{
-			Swap(*source);
+			*this = CreateXYFlipped();
 		}
 		
 		/**
@@ -488,16 +497,47 @@ class Image2D {
 		void ResizeWithoutReallocation(size_t newWidth);
 		
 	private:
+		friend void swap(Image2D&, Image2D&);
+		friend void swap(Image2D&, Image2D&&);
+		friend void swap(Image2D&&, Image2D&);
+		
 		Image2D(size_t width, size_t height) :
 			Image2D(width, height, width)
 		{ }
 		Image2D(size_t width, size_t height, size_t widthCapacity);
 		
-		Image2D& operator=(const Image2D&) = delete;
+		void allocate();
 		
 		size_t _width, _height;
 		size_t _stride;
 		num_t **_dataPtr, *_dataConsecutive;
 };
+
+inline void swap(Image2D& left, Image2D& right)
+{
+	std::swap(left._width, right._width);
+	std::swap(left._stride, right._stride);
+	std::swap(left._height, right._height);
+	std::swap(left._dataPtr, right._dataPtr);
+	std::swap(left._dataConsecutive, right._dataConsecutive);
+}
+
+inline void swap(Image2D& left, Image2D&& right)
+{
+	std::swap(left._width, right._width);
+	std::swap(left._stride, right._stride);
+	std::swap(left._height, right._height);
+	std::swap(left._dataPtr, right._dataPtr);
+	std::swap(left._dataConsecutive, right._dataConsecutive);
+}
+
+inline void swap(Image2D&& left, Image2D& right)
+{
+	std::swap(left._width, right._width);
+	std::swap(left._stride, right._stride);
+	std::swap(left._height, right._height);
+	std::swap(left._dataPtr, right._dataPtr);
+	std::swap(left._dataConsecutive, right._dataConsecutive);
+}
 
 #endif

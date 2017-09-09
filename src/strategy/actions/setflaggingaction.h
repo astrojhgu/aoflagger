@@ -95,7 +95,7 @@ namespace rfiStrategy {
 					}
 					case OrOriginal: {
 						Mask2DPtr mask(new Mask2D(*artifacts.ContaminatedData().GetSingleMask()));
-						mask->Join(artifacts.OriginalData().GetSingleMask());
+						mask->Join(*artifacts.OriginalData().GetSingleMask());
 						artifacts.ContaminatedData().SetGlobalMask(mask);
 						break;
 					}
