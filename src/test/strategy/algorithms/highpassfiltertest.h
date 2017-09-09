@@ -61,7 +61,7 @@ inline void HighPassFilterTest::TestFilter::operator()()
 	fitMethod.Initialize(data);
 	for(size_t i=0;i<fitMethod.TaskCount();++i)
 		fitMethod.PerformFit(i);
-	Image2DCPtr fitResult = Image2D::CreateFromDiff(testImage, fitMethod.Background().GetSingleImage());
+	Image2DPtr fitResult(new Image2D(Image2D::MakeFromDiff(*testImage, *fitMethod.Background().GetSingleImage())));
 	
 	// High-pass filter
 	HighPassFilter filter;
@@ -88,7 +88,7 @@ inline void HighPassFilterTest::TestSmallImageFilter::operator()()
 	fitMethod.Initialize(data);
 	for(size_t i=0;i<fitMethod.TaskCount();++i)
 		fitMethod.PerformFit(i);
-	Image2DCPtr fitResult = Image2D::CreateFromDiff(testImage, fitMethod.Background().GetSingleImage());
+	Image2DCPtr fitResult(new Image2D(Image2D::MakeFromDiff(*testImage, *fitMethod.Background().GetSingleImage())));
 	
 	// High-pass filter
 	HighPassFilter filter;

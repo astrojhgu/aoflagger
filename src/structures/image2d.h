@@ -152,11 +152,8 @@ class Image2D {
 		 * @return The new created image. Should be deleted by the caller.
 		 * @throws FitsIOException if the images do not match in size.
 		 */
-		static Image2D *CreateFromSum(const Image2D &imageA, const Image2D &imageB);
-		static Image2DPtr CreateFromSum(const Image2DCPtr &imageA, const Image2DCPtr &imageB)
-		{
-			return Image2DPtr(CreateFromSum(*imageA, *imageB));
-		}
+		static Image2D MakeFromSum(const Image2D &imageA, const Image2D &imageB);
+		
 		/**
 		 * Creates a new image by subtracting two images of the same size.
 		 * @param imageA first image.
@@ -164,11 +161,7 @@ class Image2D {
 		 * @return The new created image. Should be deleted by the caller.
 		 * @throws FitsIOException if the images do not match in size.
 		 */
-		static Image2D *CreateFromDiff(const Image2D &imageA, const Image2D &imageB);
-		static Image2DPtr CreateFromDiff(const Image2DCPtr &imageA, const Image2DCPtr &imageB)
-		{
-			return Image2DPtr(CreateFromDiff(*imageA, *imageB));
-		}
+		static Image2D MakeFromDiff(const Image2D &imageA, const Image2D &imageB);
 
 		/**
 		 * Retrieves the average value of the image.
@@ -314,7 +307,7 @@ class Image2D {
 		* @return The new created image. Should be deleted by the caller.
 		* @throws FitsIOException if something goes wrong during reading the .fits file.
 		*/
-		static Image2D *CreateFromFits(class FitsFile &file, int imageNumber);
+		static Image2D MakeFromFits(class FitsFile &file, int imageNumber);
 
 		/**
 		* Number of images that can be read from the current HUD block
@@ -384,44 +377,44 @@ class Image2D {
 		 * Resample the image horizontally by decreasing the width
 		 * with an integer factor.
 		 */
-		Image2DPtr ShrinkHorizontally(size_t factor) const;
+		Image2D ShrinkHorizontally(size_t factor) const;
 
 		/**
 		 * Resample the image vertically by decreasing the height
 		 * with an integer factor.
 		 */
-		Image2DPtr ShrinkVertically(size_t factor) const;
+		Image2D ShrinkVertically(size_t factor) const;
 
 		/**
 		 * Resample the image horizontally by increasing the width
 		 * with an integer factor.
 		 */
-		Image2DPtr EnlargeHorizontally(size_t factor, size_t newWidth) const;
+		Image2D EnlargeHorizontally(size_t factor, size_t newWidth) const;
 
 		/**
 		 * Resample the image vertically by increasing the width
 		 * with an integer factor.
 		 */
-		Image2DPtr EnlargeVertically(size_t factor, size_t newHeight) const;
+		Image2D EnlargeVertically(size_t factor, size_t newHeight) const;
 
-		Image2DPtr Trim(size_t startX, size_t startY, size_t endX, size_t endY) const;
+		Image2D Trim(size_t startX, size_t startY, size_t endX, size_t endY) const;
 		
 		void SetTrim(size_t startX, size_t startY, size_t endX, size_t endY);
 		
 		/**
 		 * Copies source onto this image at the given position
 		 */
-		void CopyFrom(const Image2DCPtr &source, size_t destX, size_t destY)
+		void CopyFrom(const Image2D& source, size_t destX, size_t destY)
 		{
 			size_t
-				x2 = source->_width + destX,
-				y2 = source->_height + destY;
+				x2 = source._width + destX,
+				y2 = source._height + destY;
 			if(x2 > _width) x2 = _width;
 			if(y2 > _height) y2 = _height;
 			for(size_t y=destY;y<y2;++y)
 			{
 				for(size_t x=destX;x<x2;++x)
-					SetValue(x, y, source->Value(x-destX, y-destY));
+					SetValue(x, y, source.Value(x-destX, y-destY));
 			}
 		}
 		
@@ -437,7 +430,7 @@ class Image2D {
 		 * 
 		 * @see Stride()
 		 */
-		inline num_t *ValuePtr(unsigned x, unsigned y)
+		num_t *ValuePtr(unsigned x, unsigned y)
 		{
 			return &_dataPtr[y][x];
 		}
@@ -454,17 +447,17 @@ class Image2D {
 		 * 
 		 * @see Stride()
 		 */
-		inline const num_t *ValuePtr(unsigned x, unsigned y) const
+		const num_t *ValuePtr(unsigned x, unsigned y) const
 		{
 			return &_dataPtr[y][x];
 		}
 		
-		inline num_t *Data()
+		num_t *Data()
 		{
 			return _dataConsecutive;
 		}
 		
-		inline const num_t *Data() const
+		const num_t *Data() const
 		{
 			return _dataConsecutive;
 		}
@@ -477,7 +470,7 @@ class Image2D {
 		 * 
 		 * @see ValuePtr(unsigned, unsigned)
 		 */
-		inline size_t Stride() const
+		size_t Stride() const
 		{
 			return _stride;
 		}

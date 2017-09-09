@@ -80,7 +80,7 @@ namespace rfiStrategy {
 			for(size_t i=0;i<imageCount;++i)
 			{
 				Image2DCPtr image = timeFrequencyData.GetImage(i);
-				Image2DPtr newImage = image->ShrinkHorizontally(_timeDecreaseFactor);
+				Image2DPtr newImage(new Image2D(image->ShrinkHorizontally(_timeDecreaseFactor)));
 				timeFrequencyData.SetImage(i, newImage);
 			}
 			size_t maskCount = timeFrequencyData.MaskCount();
@@ -121,7 +121,7 @@ namespace rfiStrategy {
 		for(size_t i=0;i<imageCount;++i)
 		{
 			Image2DCPtr image = timeFrequencyData.GetImage(i);
-			Image2DPtr newImage = image->ShrinkVertically(_frequencyDecreaseFactor);
+			Image2DPtr newImage(new Image2D(image->ShrinkVertically(_frequencyDecreaseFactor)));
 			timeFrequencyData.SetImage(i, newImage);
 		}
 		size_t maskCount = timeFrequencyData.MaskCount();
@@ -143,7 +143,7 @@ namespace rfiStrategy {
 			for(size_t i=0;i<imageCount;++i)
 			{
 				Image2DCPtr image = changedData.GetImage(i);
-				Image2DPtr newImage = image->EnlargeHorizontally(_timeDecreaseFactor, originalData.ImageWidth());
+				Image2DPtr newImage(new Image2D(image->EnlargeHorizontally(_timeDecreaseFactor, originalData.ImageWidth())));
 				originalData.SetImage(i, newImage);
 			}
 		}
@@ -171,7 +171,7 @@ namespace rfiStrategy {
 			for(size_t i=0;i<imageCount;++i)
 			{
 				Image2DCPtr image = changedData.GetImage(i);
-				Image2DPtr newImage = image->EnlargeVertically(_frequencyDecreaseFactor, originalData.ImageHeight());
+				Image2DPtr newImage(new Image2D(image->EnlargeVertically(_frequencyDecreaseFactor, originalData.ImageHeight())));
 				originalData.SetImage(i, newImage);
 			}
 		}

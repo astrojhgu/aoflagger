@@ -598,9 +598,7 @@ void MitigationTester::SubtractBackground(Image2DPtr image)
 	fittedImage.Initialize(data);
 	for(unsigned i=0;i<fittedImage.TaskCount();++i)
 		fittedImage.PerformFit(i);
-	Image2D *diff = Image2D::CreateFromDiff(*image, *fittedImage.Background().GetSingleImage());
-	image->SetValues(*diff);
-	delete diff;
+	*image = Image2D::MakeFromDiff(*image, *fittedImage.Background().GetSingleImage());
 	for(unsigned y=0;y<image->Height();++y) {
 		for(unsigned x=0;x<image->Width();++x) {
 			image->AddValue(x, y, 1.0); 

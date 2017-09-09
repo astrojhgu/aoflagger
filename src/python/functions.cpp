@@ -34,22 +34,22 @@ void enlarge(const Data& input, Data& destination, size_t horizontalFactor, size
 	{
 		for(size_t i=0;i<imageCount;++i)
 		{
-			Image2DCPtr image = timeFrequencyData.GetImage(i);
-			Image2DPtr newImage = image->EnlargeHorizontally(horizontalFactor, newWidth);
+			Image2DPtr newImage(new Image2D(
+				timeFrequencyData.GetImage(i)->EnlargeHorizontally(horizontalFactor, newWidth)));
 			timeFrequencyData.SetImage(i, newImage);
 		}
 	}
 	
 	for(size_t i=0;i<imageCount;++i)
 	{
-		Image2DCPtr image = timeFrequencyData.GetImage(i);
 		if(verticalFactor > 1)
 		{
-			Image2DPtr newImage = image->EnlargeVertically(verticalFactor, newHeight);
+			Image2DPtr newImage(new Image2D(
+				timeFrequencyData.GetImage(i)->EnlargeVertically(verticalFactor, newHeight)));
 			destination.TFData().SetImage(i, newImage);
 		}
 		else {
-			destination.TFData().SetImage(i, image);
+			destination.TFData().SetImage(i, timeFrequencyData.GetImage(i));
 		}
 	}
 }
@@ -115,14 +115,12 @@ Data shrink(const Data& data, size_t horizontalFactor, size_t verticalFactor)
 	{
 		for(size_t i=0;i<imageCount;++i)
 		{
-			Image2DCPtr image = timeFrequencyData.GetImage(i);
-			Image2DPtr newImage = image->ShrinkHorizontally(horizontalFactor);
+			Image2DPtr newImage(new Image2D(timeFrequencyData.GetImage(i)->ShrinkHorizontally(horizontalFactor)));
 			timeFrequencyData.SetImage(i, newImage);
 		}
 		for(size_t i=0;i<maskCount;++i)
 		{
-			Mask2DCPtr mask = timeFrequencyData.GetMask(i);
-			Mask2DPtr newMask(new Mask2D(mask->ShrinkHorizontally(horizontalFactor)));
+			Mask2DPtr newMask(new Mask2D(timeFrequencyData.GetMask(i)->ShrinkHorizontally(horizontalFactor)));
 			timeFrequencyData.SetMask(i, newMask);
 		}
 	}
@@ -131,14 +129,12 @@ Data shrink(const Data& data, size_t horizontalFactor, size_t verticalFactor)
 	{
 		for(size_t i=0;i<imageCount;++i)
 		{
-			Image2DCPtr image = timeFrequencyData.GetImage(i);
-			Image2DPtr newImage = image->ShrinkVertically(verticalFactor);
+			Image2DPtr newImage(new Image2D(timeFrequencyData.GetImage(i)->ShrinkVertically(verticalFactor)));
 			timeFrequencyData.SetImage(i, newImage);
 		}
 		for(size_t i=0;i<maskCount;++i)
 		{
-			Mask2DCPtr mask = timeFrequencyData.GetMask(i);
-			Mask2DPtr newMask(new Mask2D(mask->ShrinkVertically(verticalFactor)));
+			Mask2DPtr newMask(new Mask2D(timeFrequencyData.GetMask(i)->ShrinkVertically(verticalFactor)));
 			timeFrequencyData.SetMask(i, newMask);
 		}
 	}

@@ -67,11 +67,11 @@ class TimeFrequencyData
 		}
 		
 		TimeFrequencyData(
-			     ComplexRepresentation complexRepresentation,
+			ComplexRepresentation complexRepresentation,
 			PolarizationEnum* polarizations,
 			size_t polarizationCount,
 			Image2DCPtr* images) :
-				    _complexRepresentation(complexRepresentation)
+				_complexRepresentation(complexRepresentation)
 		{
 			_data.reserve(polarizationCount);
 			if(complexRepresentation == ComplexParts)
@@ -89,7 +89,7 @@ class TimeFrequencyData
 			PolarizationEnum* polarizations,
 			size_t polarizationCount,
 			Image2DCPtr* realImages, Image2DCPtr* imaginaryImages) :
-				    _complexRepresentation(ComplexParts)
+				_complexRepresentation(ComplexParts)
 		{
 			_data.reserve(polarizationCount);
 			for(size_t p=0; p!=polarizationCount; p++)
@@ -100,7 +100,7 @@ class TimeFrequencyData
 			PolarizationEnum* polarizations,
 			size_t polarizationCount,
 			Image2DPtr* realImages, Image2DPtr* imaginaryImages) :
-				    _complexRepresentation(ComplexParts)
+				_complexRepresentation(ComplexParts)
 		{
 			_data.reserve(polarizationCount);
 			for(size_t p=0; p!=polarizationCount; p++)
@@ -108,7 +108,7 @@ class TimeFrequencyData
 		}
 		
 		static TimeFrequencyData FromLinear(
-			     ComplexRepresentation complexRepresentation,
+			ComplexRepresentation complexRepresentation,
 			const Image2DCPtr& xx,
 			const Image2DCPtr& xy,
 			const Image2DCPtr& yx,
@@ -459,9 +459,9 @@ class TimeFrequencyData
 			{
 				if(_data[i]._images[0] == nullptr)
 					throw BadUsageException("Can't subtract TFs with unset image data");
-				_data[i]._images[0] = Image2D::CreateFromDiff(_data[i]._images[0], rhs._data[i]._images[0]);
+				_data[i]._images[0].reset(new Image2D(Image2D::MakeFromDiff(*_data[i]._images[0], *rhs._data[i]._images[0])));
 				if(_data[i]._images[1])
-					_data[i]._images[1] = Image2D::CreateFromDiff(_data[i]._images[1], rhs._data[i]._images[1]);
+					_data[i]._images[1].reset(new Image2D(Image2D::MakeFromDiff(*_data[i]._images[1], *rhs._data[i]._images[1])));
 			}
 		}
 
@@ -478,9 +478,9 @@ class TimeFrequencyData
 			{
 				if(_data[i]._images[0] == nullptr)
 					throw BadUsageException("Can't subtract TFs with unset image data");
-				_data[i]._images[0] = Image2D::CreateFromDiff(lhs._data[i]._images[0], _data[i]._images[0]);
+				_data[i]._images[0].reset(new Image2D(Image2D::MakeFromDiff(*lhs._data[i]._images[0], *_data[i]._images[0])));
 				if(_data[i]._images[1])
-					_data[i]._images[1] = Image2D::CreateFromDiff(lhs._data[i]._images[1], _data[i]._images[1]);
+					_data[i]._images[1].reset(new Image2D(Image2D::MakeFromDiff(*lhs._data[i]._images[1], *_data[i]._images[1])));
 			}
 		}
 
@@ -498,9 +498,9 @@ class TimeFrequencyData
 			{
 				if(lhs._data[i]._images[0] == nullptr)
 					throw BadUsageException("Can't subtract TFs with unset image data");
-				data->_data[i]._images[0] = Image2D::CreateFromDiff(lhs._data[i]._images[0], rhs._data[i]._images[0]);
+				data->_data[i]._images[0].reset(new Image2D(Image2D::MakeFromDiff(*lhs._data[i]._images[0], *rhs._data[i]._images[0])));
 				if(lhs._data[i]._images[1])
-					data->_data[i]._images[1] = Image2D::CreateFromDiff(lhs._data[i]._images[1], rhs._data[i]._images[1]);
+					data->_data[i]._images[1].reset(new Image2D(Image2D::MakeFromDiff(*lhs._data[i]._images[1], *rhs._data[i]._images[1])));
 			}
 			return data;
 		}
@@ -519,9 +519,9 @@ class TimeFrequencyData
 			{
 				if(lhs._data[i]._images[0] == nullptr)
 					throw BadUsageException("Can't add TFs with unset image data");
-				data->_data[i]._images[0] = Image2D::CreateFromSum(lhs._data[i]._images[0], rhs._data[i]._images[0]);
+				data->_data[i]._images[0].reset(new Image2D(Image2D::MakeFromSum(*lhs._data[i]._images[0], *rhs._data[i]._images[0])));
 				if(lhs._data[i]._images[1])
-					data->_data[i]._images[1] = Image2D::CreateFromSum(lhs._data[i]._images[1], rhs._data[i]._images[1]);
+					data->_data[i]._images[1].reset(new Image2D(Image2D::MakeFromSum(*lhs._data[i]._images[1], *rhs._data[i]._images[1])));
 			}
 			return data;
 		}
@@ -655,9 +655,9 @@ class TimeFrequencyData
 			for(PolarizedTimeFrequencyData& data : _data)
 			{
 				if(data._images[0])
-					data._images[0] = data._images[0]->Trim(timeStart, freqStart, timeEnd, freqEnd);
+					data._images[0].reset(new Image2D(data._images[0]->Trim(timeStart, freqStart, timeEnd, freqEnd)));
 				if(data._images[1])
-					data._images[1] = data._images[1]->Trim(timeStart, freqStart, timeEnd, freqEnd);
+					data._images[1].reset(new Image2D(data._images[1]->Trim(timeStart, freqStart, timeEnd, freqEnd)));
 				if(data._flagging)
 					data._flagging.reset(new Mask2D(data._flagging->Trim(timeStart, freqStart, timeEnd, freqEnd)));
 			}
@@ -728,21 +728,21 @@ class TimeFrequencyData
 			{
 				if(_data[i]._images[0])
 				{
-					Image2DPtr image(new Image2D(*_data[i]._images[0]));
-					image->CopyFrom(source._data[i]._images[0], destX, destY);
-					_data[i]._images[0] = std::move(image);
+					Image2D image(*_data[i]._images[0]);
+					image.CopyFrom(*source._data[i]._images[0], destX, destY);
+					_data[i]._images[0].reset(new Image2D(std::move(image)));
 				}
 				if(_data[i]._images[1])
 				{
-					Image2DPtr image(new Image2D(*_data[i]._images[1]));
-					image->CopyFrom(source._data[i]._images[1], destX, destY);
-					_data[i]._images[1] = image;
+					Image2D image(*_data[i]._images[1]);
+					image.CopyFrom(*source._data[i]._images[1], destX, destY);
+					_data[i]._images[1].reset(new Image2D(std::move(image)));
 				}
 				if(_data[i]._flagging)
 				{
-					Mask2DPtr mask(new Mask2D(*_data[i]._flagging));
-					mask->CopyFrom(*source._data[i]._flagging, destX, destY);
-					_data[i]._flagging = std::move(mask);
+					Mask2D mask(*_data[i]._flagging);
+					mask.CopyFrom(*source._data[i]._flagging, destX, destY);
+					_data[i]._flagging.reset(new Mask2D(std::move(mask)));
 				}
 			}
 		}

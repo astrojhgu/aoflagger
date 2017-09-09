@@ -285,9 +285,7 @@ num_t ThresholdConfig::CalculateFalseAlarmRate(size_t resolution, enum Distribut
 		_fitMethod->Initialize(*data);
 		for(unsigned i=0;i<_fitMethod->TaskCount();++i)
 			_fitMethod->PerformFit(i);
-		Image2D *diff = Image2D::CreateFromDiff(*image, *_fitMethod->Background().GetSingleImage());
-		image->SetValues(*diff);
-		delete diff;
+		*image = Image2D::MakeFromDiff(*image, *_fitMethod->Background().GetSingleImage());
 	}
 	Execute(image.get(), mask.get(), true, 1.0L);
 	num_t prob = (num_t) mask->GetCount<true>() / (resolution*resolution);

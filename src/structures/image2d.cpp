@@ -2,6 +2,8 @@
 
 #include "../msio/fitsfile.h"
 
+#include "../util/uvector.h"
+
 #include <algorithm>
 #include <cmath>
 #include <cstring>
@@ -139,26 +141,26 @@ Image2D *Image2D::CreateZeroImage(size_t width, size_t height)
 	return image;
 }
 
-Image2D *Image2D::CreateFromSum(const Image2D &imageA, const Image2D &imageB)
+Image2D Image2D::MakeFromSum(const Image2D &imageA, const Image2D &imageB)
 {
 	if(imageA.Width() != imageB.Width() || imageA.Height() != imageB.Height())
 		throw IOException("Images do not match in size");
-	Image2D *image = new Image2D(imageA.Width(), imageA.Height());
+	Image2D image(imageA.Width(), imageA.Height());
 	const size_t total = imageA._stride * imageA.Height();
 	for(size_t i=0;i<total;++i) {
-		image->_dataConsecutive[i] = imageA._dataConsecutive[i] + imageB._dataConsecutive[i];
+		image._dataConsecutive[i] = imageA._dataConsecutive[i] + imageB._dataConsecutive[i];
 	}
 	return image;
 }
 
-Image2D *Image2D::CreateFromDiff(const Image2D &imageA, const Image2D &imageB)
+Image2D Image2D::MakeFromDiff(const Image2D &imageA, const Image2D &imageB)
 {
 	if(imageA.Width() != imageB.Width() || imageA.Height() != imageB.Height())
 		throw IOException("Images do not match in size");
-	Image2D *image = new Image2D(imageA.Width(), imageA.Height());
+	Image2D image(imageA.Width(), imageA.Height());
 	const float *lhsPtr = &(imageA._dataConsecutive[0]);
 	const float *rhsPtr = &(imageB._dataConsecutive[0]);
-	float *destPtr = &(image->_dataConsecutive[0]);
+	float *destPtr = &(image._dataConsecutive[0]);
 	const float *end = lhsPtr + imageA._stride * imageA._height;
 	while(lhsPtr < end)
 	{
@@ -335,24 +337,22 @@ void Image2D::NormalizeVariance()
 	}
 }
 
-Image2D *Image2D::CreateFromFits(FitsFile &file, int imageNumber)
+Image2D Image2D::MakeFromFits(FitsFile &file, int imageNumber)
 {
 	int dimensions = file.GetCurrentImageDimensionCount();
 	if(dimensions >= 2) {
-		Image2D *image = new Image2D(file.GetCurrentImageSize(1), file.GetCurrentImageSize(2));
-		long bufferSize = (long) image->_width * (long) image->_height;
-		num_t *buffer = new num_t[bufferSize];
-		file.ReadCurrentImageData(bufferSize*imageNumber, buffer, bufferSize, 0.0);
-		num_t *bufferPtr = buffer;
-		for(size_t y=0;y<image->_height;++y)
+		Image2D image(file.GetCurrentImageSize(1), file.GetCurrentImageSize(2));
+		ao::uvector<num_t> buffer(image._width * image._height);
+		file.ReadCurrentImageData(buffer.size()*imageNumber, buffer.data(), buffer.size(), 0.0);
+		num_t *bufferPtr = buffer.data();
+		for(size_t y=0;y<image._height;++y)
 		{
-			for(size_t x=0;x<image->_width;++x)
+			for(size_t x=0;x<image._width;++x)
 			{
-				image->_dataPtr[y][x] = *bufferPtr;
+				image._dataPtr[y][x] = *bufferPtr;
 				++bufferPtr;
 			}
 		}
-		delete[] buffer;
 		
 		return image;
 	} else {
@@ -485,11 +485,11 @@ void Image2D::SubtractAsRHS(const Image2DCPtr &lhs)
 #endif
 }
 
-Image2DPtr Image2D::ShrinkHorizontally(size_t factor) const
+Image2D Image2D::ShrinkHorizontally(size_t factor) const
 {
 	size_t newWidth = (_width + factor - 1) / factor;
 
-	Image2D *newImage = new Image2D(newWidth, _height);
+	Image2D newImage(newWidth, _height);
 
 	for(size_t x=0;x<newWidth;++x)
 	{
@@ -505,17 +505,17 @@ Image2DPtr Image2D::ShrinkHorizontally(size_t factor) const
 				size_t curX = x*factor + binX;
 				sum += Value(curX, y);
 			}
-			newImage->SetValue(x, y, sum / (num_t) binSize);
+			newImage.SetValue(x, y, sum / (num_t) binSize);
 		}
 	}
-	return Image2DPtr(newImage);
+	return newImage;
 }
 
-Image2DPtr Image2D::ShrinkVertically(size_t factor) const
+Image2D Image2D::ShrinkVertically(size_t factor) const
 {
 	size_t newHeight = (_height + factor - 1) / factor;
 
-	Image2D *newImage = new Image2D(_width, newHeight);
+	Image2D newImage(_width, newHeight);
 
 	for(size_t y=0;y<newHeight;++y)
 	{
@@ -531,15 +531,15 @@ Image2DPtr Image2D::ShrinkVertically(size_t factor) const
 				size_t curY = y*factor + binY;
 				sum += Value(x, curY);
 			}
-			newImage->SetValue(x, y, sum / (num_t) binSize);
+			newImage.SetValue(x, y, sum / (num_t) binSize);
 		}
 	}
-	return Image2DPtr(newImage);
+	return newImage;
 }
 
-Image2DPtr Image2D::EnlargeHorizontally(size_t factor, size_t newWidth) const
+Image2D Image2D::EnlargeHorizontally(size_t factor, size_t newWidth) const
 {
-	Image2D *newImage = new Image2D(newWidth, _height);
+	Image2D newImage(newWidth, _height);
 
 	for(size_t x=0;x<newWidth;++x)
 	{
@@ -547,36 +547,36 @@ Image2DPtr Image2D::EnlargeHorizontally(size_t factor, size_t newWidth) const
 
 		for(size_t y=0;y<_height;++y)
 		{
-			newImage->SetValue(x, y, Value(xOld, y));
+			newImage.SetValue(x, y, Value(xOld, y));
 		}
 	}
-	return Image2DPtr(newImage);
+	return newImage;
 }
 
-Image2DPtr Image2D::EnlargeVertically(size_t factor, size_t newHeight) const
+Image2D Image2D::EnlargeVertically(size_t factor, size_t newHeight) const
 {
-	Image2D *newImage = new Image2D(_width, newHeight);
+	Image2D newImage(_width, newHeight);
 
 	for(size_t x=0;x<_width;++x)
 	{
 		for(size_t y=0;y<newHeight;++y)
 		{
 			size_t yOld = y / factor;
-			newImage->SetValue(x, y, Value(x, yOld));
+			newImage.SetValue(x, y, Value(x, yOld));
 		}
 	}
-	return Image2DPtr(newImage);
+	return newImage;
 }
 
-Image2DPtr Image2D::Trim(size_t startX, size_t startY, size_t endX, size_t endY) const
+Image2D Image2D::Trim(size_t startX, size_t startY, size_t endX, size_t endY) const
 {
 	size_t
 		width = endX - startX,
 		height = endY - startY;
-	Image2D *image = new Image2D(width, height);
+	Image2D image(width, height);
 	for(size_t y=startY;y<endY;++y)
 	{
-		num_t *newPtr = image->_dataPtr[y-startY];
+		num_t *newPtr = image._dataPtr[y-startY];
 		num_t *oldPtr = &_dataPtr[y][startX];
 		for(size_t x=startX;x<endX;++x)
 		{
@@ -585,17 +585,12 @@ Image2DPtr Image2D::Trim(size_t startX, size_t startY, size_t endX, size_t endY)
 			++oldPtr;
 		}
 	}
-	return Image2DPtr(image);
+	return image;
 }
 
 void Image2D::SetTrim(size_t startX, size_t startY, size_t endX, size_t endY)
 {
-	Image2DPtr trimmed = Trim(startX, startY, endX, endY);
-	std::swap(trimmed->_dataConsecutive, _dataConsecutive);
-	std::swap(trimmed->_dataPtr, _dataPtr);
-	std::swap(trimmed->_height, _height);
-	std::swap(trimmed->_width, _width);
-	std::swap(trimmed->_stride, _stride);
+	*this = Trim(startX, startY, endX, endY);
 }
 
 /**
