@@ -17,10 +17,7 @@ namespace aoflagger_python
 		
 		Data operator-(const Data& other) const
 		{
-			std::unique_ptr<TimeFrequencyData> diff(
-				TimeFrequencyData::CreateTFDataFromDiff(_tfData, other.TFData())
-			);
-			return Data(*diff);
+			return Data(TimeFrequencyData::MakeFromDiff(_tfData, other.TFData()));
 		}
 		
 		void clear_mask()
@@ -50,10 +47,7 @@ namespace aoflagger_python
 		
 		Data make_complex() const
 		{
-			std::unique_ptr<TimeFrequencyData> newTFData(
-				_tfData.CreateTFDataFromComplexCombination(_tfData, _tfData)
-			);
-			return Data(*newTFData);
+			return Data(_tfData.MakeFromComplexCombination(_tfData, _tfData));
 		}
 		
 		boost::python::list polarizations() const

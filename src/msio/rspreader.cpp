@@ -30,14 +30,12 @@ std::pair<TimeFrequencyData,TimeFrequencyMetaDataPtr> RSPReader::ReadChannelBeam
 	
 	std::pair<TimeFrequencyData,TimeFrequencyMetaDataPtr> data = ReadSingleBeamlet(timestepStart*(unsigned long) 256, timestepEnd*(unsigned long) 256, beamletCount, beamletIndex);
 
-	TimeFrequencyData *allX = data.first.CreateTFData(Polarization::XX);
-	TimeFrequencyData *allY = data.first.CreateTFData(Polarization::YY);
-	Image2DCPtr xr = allX->GetRealPart();
-	Image2DCPtr xi = allX->GetImaginaryPart();
-	Image2DCPtr yr = allY->GetRealPart();
-	Image2DCPtr yi = allY->GetImaginaryPart();
-	delete allX;
-	delete allY;
+	TimeFrequencyData allX = data.first.Make(Polarization::XX);
+	TimeFrequencyData allY = data.first.Make(Polarization::YY);
+	Image2DCPtr xr = allX.GetRealPart();
+	Image2DCPtr xi = allX.GetImaginaryPart();
+	Image2DCPtr yr = allY.GetRealPart();
+	Image2DCPtr yi = allY.GetImaginaryPart();
 	Mask2DCPtr mask = data.first.GetSingleMask();
 	
 	Image2DPtr
@@ -106,14 +104,12 @@ std::pair<TimeFrequencyData,TimeFrequencyMetaDataPtr> RSPReader::ReadSingleBeaml
 	Image2DPtr imaginaryY = Image2D::CreateZeroImagePtr(width, 1);
 	Mask2DPtr mask = Mask2D::CreateUnsetMaskPtr(width, 1);
 	
-	TimeFrequencyData *allX = data.first.CreateTFData(Polarization::XX);
-	TimeFrequencyData *allY = data.first.CreateTFData(Polarization::YY);
-	Image2DCPtr xr = allX->GetRealPart();
-	Image2DCPtr xi = allX->GetImaginaryPart();
-	Image2DCPtr yr = allY->GetRealPart();
-	Image2DCPtr yi = allY->GetImaginaryPart();
-	delete allX;
-	delete allY;
+	TimeFrequencyData allX = data.first.Make(Polarization::XX);
+	TimeFrequencyData allY = data.first.Make(Polarization::YY);
+	Image2DCPtr xr = allX.GetRealPart();
+	Image2DCPtr xi = allX.GetImaginaryPart();
+	Image2DCPtr yr = allY.GetRealPart();
+	Image2DCPtr yi = allY.GetImaginaryPart();
 	Mask2DCPtr maskWithBeamlets = data.first.GetSingleMask();
 	
 	for(unsigned x=0;x<width;++x)

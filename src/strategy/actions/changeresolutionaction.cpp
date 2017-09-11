@@ -98,7 +98,7 @@ namespace rfiStrategy {
 		size_t polCount = data.PolarizationCount();
 		for(size_t i=0;i<polCount;++i)
 		{
-			TimeFrequencyData polData(data.CreateTFDataFromPolarizationIndex(i));
+			TimeFrequencyData polData(data.MakeFromPolarizationIndex(i));
 			const Mask2D* mask = polData.GetSingleMask().get();
 			for(unsigned j=0;j<polData.ImageCount();++j)
 			{

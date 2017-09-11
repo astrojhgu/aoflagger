@@ -35,8 +35,7 @@ class PolarizationStatistics {
 			}
 			for(unsigned i=0;i<polarizationCount;++i)
 			{
-				TimeFrequencyData polData(data.CreateTFDataFromPolarizationIndex(i));
-				Mask2DCPtr mask = polData.GetSingleMask();
+				Mask2DCPtr mask = data.MakeFromPolarizationIndex(i).GetSingleMask();
 				_flaggedCounts[i] += mask->GetCount<true>();
 				_totalCounts[i] += mask->Width() * mask->Height();
 			}

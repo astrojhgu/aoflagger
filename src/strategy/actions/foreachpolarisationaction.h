@@ -163,9 +163,9 @@ namespace rfiStrategy {
 					if(isDirectPolarizationSelected(oldContaminatedData.GetPolarization(polarizationIndex)))
 					{
 						TimeFrequencyData newContaminatedData(
-							oldContaminatedData.CreateTFDataFromPolarizationIndex(polarizationIndex));
+							oldContaminatedData.MakeFromPolarizationIndex(polarizationIndex));
 						TimeFrequencyData newOriginalData(
-							oldOriginalData.CreateTFDataFromPolarizationIndex(polarizationIndex));
+							oldOriginalData.MakeFromPolarizationIndex(polarizationIndex));
 
 						artifacts.SetContaminatedData(newContaminatedData);
 						artifacts.SetOriginalData(newOriginalData);
@@ -174,8 +174,8 @@ namespace rfiStrategy {
 		
 						if(changeRevised)
 						{
-							TimeFrequencyData newRevised( oldRevisedData.CreateTFDataFromPolarizationIndex(polarizationIndex));
-							artifacts.SetRevisedData(newRevised);
+							artifacts.SetRevisedData(
+								oldRevisedData.MakeFromPolarizationIndex(polarizationIndex));
 						}
 		
 						ActionBlock::Perform(artifacts, progress);
@@ -237,23 +237,19 @@ namespace rfiStrategy {
 
 			void performDerivedPolarisation(ArtifactSet &artifacts, ProgressListener &progress, PolarizationEnum polarisation, const TimeFrequencyData &oldContaminatedData, const TimeFrequencyData &oldOriginalData, const TimeFrequencyData &oldRevisedData, bool changeRevised, size_t taskNr, size_t taskCount)
 			{
-				TimeFrequencyData *newContaminatedData =
-					oldContaminatedData.CreateTFData(polarisation);
-				artifacts.SetContaminatedData(*newContaminatedData);
-				progress.OnStartTask(*this, taskNr, taskCount, newContaminatedData->Description());
-				delete newContaminatedData;
+				TimeFrequencyData newContaminatedData =
+					oldContaminatedData.Make(polarisation);
+				artifacts.SetContaminatedData(newContaminatedData);
+				progress.OnStartTask(*this, taskNr, taskCount, newContaminatedData.Description());
 
-				TimeFrequencyData *newOriginalData =
-					oldOriginalData.CreateTFData(polarisation);
-				artifacts.SetOriginalData(*newOriginalData);
-				delete newOriginalData;
-
+				TimeFrequencyData newOriginalData =
+					oldOriginalData.Make(polarisation);
+				artifacts.SetOriginalData(newOriginalData);
 
 				if(changeRevised)
 				{
-					TimeFrequencyData *newRevised = oldRevisedData.CreateTFData(polarisation);
-					artifacts.SetRevisedData(*newRevised);
-					delete newRevised;
+					TimeFrequencyData newRevised = oldRevisedData.Make(polarisation);
+					artifacts.SetRevisedData(newRevised);
 				}
 
 				ActionBlock::Perform(artifacts, progress);

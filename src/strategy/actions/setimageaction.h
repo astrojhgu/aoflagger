@@ -203,10 +203,9 @@ namespace rfiStrategy {
 						summedData->SetMask(artifacts.RevisedData());
 						artifacts.SetRevisedData(*summedData);
 						delete summedData;*/
-						TimeFrequencyData *summedData =
-							TimeFrequencyData::CreateTFDataFromSum(artifacts.OriginalData(), artifacts.RevisedData());
-						artifacts.SetRevisedData(*summedData);
-						delete summedData;
+						TimeFrequencyData summedData =
+							TimeFrequencyData::MakeFromSum(artifacts.OriginalData(), artifacts.RevisedData());
+						artifacts.SetRevisedData(summedData);
 					}
 					break;
 					case Zero:

@@ -152,7 +152,7 @@ namespace rfiStrategy {
 				std::vector<Image2DCPtr> realImages, imaginaryImages;
 				for(size_t i=0;i!=data.PolarizationCount();++i)
 				{
-					TimeFrequencyData polData(data.CreateTFDataFromPolarizationIndex(i));
+					TimeFrequencyData polData(data.MakeFromPolarizationIndex(i));
 					realImages.push_back(polData.GetRealPart());
 					imaginaryImages.push_back(polData.GetImaginaryPart());
 				}

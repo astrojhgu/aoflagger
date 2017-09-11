@@ -91,58 +91,58 @@ TimeFrequencyData TimeFrequencyData::Make(enum ComplexRepresentation phase) cons
 	} else throw BadUsageException("Request for time/frequency data with a phase representation that can not be extracted from the source (source is not complex)");
 }
 
-TimeFrequencyData *TimeFrequencyData::CreateTFDataFromComplexCombination(const TimeFrequencyData &real, const TimeFrequencyData &imaginary)
+TimeFrequencyData TimeFrequencyData::MakeFromComplexCombination(const TimeFrequencyData& real, const TimeFrequencyData& imaginary)
 {
 	if(real.ComplexRepresentation() == ComplexParts ||
 		imaginary.ComplexRepresentation() == ComplexParts)
 		throw BadUsageException("Trying to create complex TF data from incorrect phase representations");
 	if(real.Polarizations() != imaginary.Polarizations())
 		throw BadUsageException("Combining real/imaginary time frequency data from different polarisations");
-	TimeFrequencyData* data = new TimeFrequencyData();
-	data->_data.resize(real._data.size());
-	data->_complexRepresentation = ComplexParts;
+	TimeFrequencyData data;
+	data._data.resize(real._data.size());
+	data._complexRepresentation = ComplexParts;
 	for(size_t i=0; i!=real._data.size(); ++i)
 	{
-		data->_data[i]._polarization = real._data[i]._polarization;
-		data->_data[i]._images[0] = real._data[i]._images[0];
-		data->_data[i]._images[1] = imaginary._data[i]._images[0];
-		data->_data[i]._flagging = real._data[i]._flagging;
+		data._data[i]._polarization = real._data[i]._polarization;
+		data._data[i]._images[0] = real._data[i]._images[0];
+		data._data[i]._images[1] = imaginary._data[i]._images[0];
+		data._data[i]._flagging = real._data[i]._flagging;
 	}
 	return data;
 }
 
-TimeFrequencyData *TimeFrequencyData::CreateTFDataFromPolarizationCombination(const TimeFrequencyData &xx, const TimeFrequencyData &xy, const TimeFrequencyData &yx, const TimeFrequencyData &yy)
+TimeFrequencyData TimeFrequencyData::MakeFromPolarizationCombination(const TimeFrequencyData &xx, const TimeFrequencyData &xy, const TimeFrequencyData &yx, const TimeFrequencyData &yy)
 {
 	if(xx.ComplexRepresentation() != xy.ComplexRepresentation() ||
 		xx.ComplexRepresentation() != yx.ComplexRepresentation() ||
 		xx.ComplexRepresentation() != yy.ComplexRepresentation())
 		throw BadUsageException("Trying to create dipole time frequency combination from data with different phase representations!");
 
-	TimeFrequencyData *data = new TimeFrequencyData();
-	data->_data.resize(4);
-	data->_complexRepresentation = xx._complexRepresentation;
+	TimeFrequencyData data;
+	data._data.resize(4);
+	data._complexRepresentation = xx._complexRepresentation;
 	for(size_t i=0; i!=xx._data.size(); ++i)
 	{
-		data->_data[0] = xx._data[0];
-		data->_data[1] = xy._data[0];
-		data->_data[2] = yx._data[0];
-		data->_data[3] = yy._data[0];
+		data._data[0] = xx._data[0];
+		data._data[1] = xy._data[0];
+		data._data[2] = yx._data[0];
+		data._data[3] = yy._data[0];
 	}
 	return data;
 }
 
-TimeFrequencyData *TimeFrequencyData::CreateTFDataFromPolarizationCombination(const TimeFrequencyData &xx, const TimeFrequencyData &yy)
+TimeFrequencyData TimeFrequencyData::MakeFromPolarizationCombination(const TimeFrequencyData &xx, const TimeFrequencyData &yy)
 {
 	if(xx.ComplexRepresentation() != yy.ComplexRepresentation())
 		throw BadUsageException("Trying to create auto dipole time frequency combination from data with different phase representations!");
 
-	TimeFrequencyData *data = new TimeFrequencyData();
-	data->_data.resize(2);
-	data->_complexRepresentation = xx._complexRepresentation;
+	TimeFrequencyData data;
+	data._data.resize(2);
+	data._complexRepresentation = xx._complexRepresentation;
 	for(size_t i=0; i!=xx._data.size(); ++i)
 	{
-		data->_data[0] = xx._data[0];
-		data->_data[1] = yy._data[0];
+		data._data[0] = xx._data[0];
+		data._data[1] = yy._data[0];
 	}
 	return data;
 }

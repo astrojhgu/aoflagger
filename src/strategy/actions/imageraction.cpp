@@ -19,9 +19,7 @@ namespace rfiStrategy {
 		TimeFrequencyMetaDataCPtr metaData = artifacts.MetaData();
 		if(data.PolarizationCount() > 1)
 		{
-			TimeFrequencyData *tmp = data.CreateTFData(Polarization::StokesI);
-			data = *tmp;
-			delete tmp;
+			data = data.Make(Polarization::StokesI);
 		}
 		
 		bool btPlaneImager = true;
