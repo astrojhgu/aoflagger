@@ -128,24 +128,18 @@ namespace rfiStrategy {
 
 				if(contaminatedRepresentation == TimeFrequencyData::ComplexParts)
 				{
-					TimeFrequencyData *newContaminatedData =
-						artifacts.ContaminatedData().CreateTFData(TimeFrequencyData::AmplitudePart);
-					artifacts.SetContaminatedData(*newContaminatedData);
-					delete newContaminatedData;
+					artifacts.SetContaminatedData(
+						artifacts.ContaminatedData().Make(TimeFrequencyData::AmplitudePart));
 				}
 				if(revisedRepresentation == TimeFrequencyData::ComplexParts)
 				{
-					TimeFrequencyData *newRevisedData =
-						artifacts.RevisedData().CreateTFData(TimeFrequencyData::AmplitudePart);
-					artifacts.SetRevisedData(*newRevisedData);
-					delete newRevisedData;
+					artifacts.SetRevisedData(
+						artifacts.RevisedData().Make(TimeFrequencyData::AmplitudePart));
 				}
 				if(originalRepresentation == TimeFrequencyData::ComplexParts)
 				{
-					TimeFrequencyData *newOriginalData =
-						artifacts.OriginalData().CreateTFData(TimeFrequencyData::AmplitudePart);
-					artifacts.SetOriginalData(*newOriginalData);
-					delete newOriginalData;
+					artifacts.SetOriginalData(
+						artifacts.OriginalData().Make(TimeFrequencyData::AmplitudePart));
 				}
 
 				ActionBlock::Perform(artifacts, listener);
@@ -198,26 +192,19 @@ namespace rfiStrategy {
 
 				if(contaminatedPhase == TimeFrequencyData::ComplexParts || contaminatedPhase == phaseRepresentation)
 				{
-					TimeFrequencyData *newContaminatedData =
-						artifacts.ContaminatedData().CreateTFData(phaseRepresentation);
-					artifacts.SetContaminatedData(*newContaminatedData);
-					delete newContaminatedData;
+					artifacts.SetContaminatedData(
+						artifacts.ContaminatedData().Make(phaseRepresentation));
 					phaseRepresentationIsAvailable = true;
 				}
 				if(revisedPhase == TimeFrequencyData::ComplexParts || revisedPhase == phaseRepresentation)
 				{
-					TimeFrequencyData *newRevisedData =
-						artifacts.RevisedData().CreateTFData(phaseRepresentation);
-					artifacts.SetRevisedData(*newRevisedData);
-					delete newRevisedData;
+					artifacts.SetRevisedData(
+						artifacts.RevisedData().Make(phaseRepresentation));
 					phaseRepresentationIsAvailable = true;
 				}
 				if(originalPhase == TimeFrequencyData::ComplexParts || originalPhase == phaseRepresentation)
 				{
-					TimeFrequencyData *newOriginalData =
-						artifacts.OriginalData().CreateTFData(phaseRepresentation);
-					artifacts.SetOriginalData(*newOriginalData);
-					delete newOriginalData;
+					artifacts.SetOriginalData(artifacts.OriginalData().Make(phaseRepresentation));
 					phaseRepresentationIsAvailable = true;
 				}
 
@@ -238,23 +225,22 @@ namespace rfiStrategy {
 			}
 			void setPart(TimeFrequencyData &changedData, TimeFrequencyData &prevData)
 			{
-				TimeFrequencyData *newData, *otherPart;
+				TimeFrequencyData *newData, otherPart;
 				switch(changedData.ComplexRepresentation())
 				{
 					default:
 					case TimeFrequencyData::RealPart:
-						otherPart = prevData.CreateTFData(TimeFrequencyData::ImaginaryPart);
-						newData = TimeFrequencyData::CreateTFDataFromComplexCombination(changedData, *otherPart);
+						otherPart = prevData.Make(TimeFrequencyData::ImaginaryPart);
+						newData = TimeFrequencyData::CreateTFDataFromComplexCombination(changedData, otherPart);
 						break;
 					case TimeFrequencyData::ImaginaryPart:
-						otherPart = prevData.CreateTFData(TimeFrequencyData::RealPart);
-						newData = TimeFrequencyData::CreateTFDataFromComplexCombination(*otherPart, changedData);
+						otherPart = prevData.Make(TimeFrequencyData::RealPart);
+						newData = TimeFrequencyData::CreateTFDataFromComplexCombination(otherPart, changedData);
 						break;
 				}
 				changedData = *newData;
 				changedData.SetMask(prevData);
 				delete newData;
-				delete otherPart;
 			}
 			
 			bool _onAmplitude, _onPhase, _onReal, _onImaginary;

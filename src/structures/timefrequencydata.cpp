@@ -54,19 +54,19 @@ Mask2DCPtr TimeFrequencyData::GetCombinedMask() const
 	}
 }
 
-TimeFrequencyData* TimeFrequencyData::CreateTFData(enum ComplexRepresentation phase) const
+TimeFrequencyData TimeFrequencyData::Make(enum ComplexRepresentation phase) const
 {
 	if(phase == _complexRepresentation)
-		return new TimeFrequencyData(*this);
+		return TimeFrequencyData(*this);
 	else if(_complexRepresentation == ComplexParts)
 	{
-		TimeFrequencyData* data = new TimeFrequencyData();
-		data->_complexRepresentation = phase;
-		data->_data.resize(_data.size());
+		TimeFrequencyData data;
+		data._complexRepresentation = phase;
+		data._data.resize(_data.size());
 		for(size_t i=0; i!=_data.size(); ++i)
 		{
 			const PolarizedTimeFrequencyData& source = _data[i];
-			PolarizedTimeFrequencyData& dest = data->_data[i];
+			PolarizedTimeFrequencyData& dest = data._data[i];
 			dest._polarization = source._polarization;
 			dest._flagging = source._flagging;
 			switch(phase)

@@ -79,24 +79,20 @@ namespace rfiStrategy {
 						if(_autoAngle)
 							_directionRad = FindStrongestSourceAngle(artifacts, artifacts.ContaminatedData());
 						TimeFrequencyData data = artifacts.ContaminatedData();
-						TimeFrequencyData *realData = data.CreateTFData(TimeFrequencyData::RealPart);
-						TimeFrequencyData *imagData = data.CreateTFData(TimeFrequencyData::ImaginaryPart);
-						Image2DPtr real(new Image2D(*realData->GetSingleImage()));
-						Image2DPtr imaginary(new Image2D(*imagData->GetSingleImage()));
-						delete realData;
-						delete imagData;
+						TimeFrequencyData realData = data.Make(TimeFrequencyData::RealPart);
+						TimeFrequencyData imagData = data.Make(TimeFrequencyData::ImaginaryPart);
+						Image2DPtr real(new Image2D(*realData.GetSingleImage()));
+						Image2DPtr imaginary(new Image2D(*imagData.GetSingleImage()));
 						PerformExtrapolatedSincOperation(artifacts, real, imaginary, listener);
 						newRevisedData = TimeFrequencyData(data.Polarizations()[0], real, imaginary);
 					}
 					break;
 					case FFTSincOperation:
 						TimeFrequencyData data = artifacts.ContaminatedData();
-						TimeFrequencyData *realData = data.CreateTFData(TimeFrequencyData::RealPart);
-						TimeFrequencyData *imagData = data.CreateTFData(TimeFrequencyData::ImaginaryPart);
-						Image2DPtr real(new Image2D(*realData->GetSingleImage()));
-						Image2DPtr imaginary(new Image2D(*imagData->GetSingleImage()));
-						delete realData;
-						delete imagData;
+						TimeFrequencyData realData = data.Make(TimeFrequencyData::RealPart);
+						TimeFrequencyData imagData = data.Make(TimeFrequencyData::ImaginaryPart);
+						Image2DPtr real(new Image2D(*realData.GetSingleImage()));
+						Image2DPtr imaginary(new Image2D(*imagData.GetSingleImage()));
 						PerformFFTSincOperation(artifacts, real, imaginary);
 						newRevisedData = TimeFrequencyData(data.Polarizations()[0], real, imaginary);
 						break;
