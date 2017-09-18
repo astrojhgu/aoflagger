@@ -261,11 +261,9 @@ enum TimeFrequencyData::ComplexRepresentation GrayScalePlotPage::getSelectedPhas
 void GrayScalePlotPage::setToPolarization(TimeFrequencyData &data, PolarizationEnum polarisation)
 {
 	try {
-		TimeFrequencyData* newData = data.CreateTFData(polarisation);
+		data = data.Make(polarisation);
 		if(polarisation == Polarization::StokesI)
-			newData->MultiplyImages(0.5);
-		data = *newData;
-		delete newData;
+			data.MultiplyImages(0.5);
 	} catch(std::exception& e)
 	{
 		// probably a conversion error -- polarisation was not available.
@@ -275,9 +273,7 @@ void GrayScalePlotPage::setToPolarization(TimeFrequencyData &data, PolarizationE
 
 void GrayScalePlotPage::setToPhase(TimeFrequencyData &data, enum TimeFrequencyData::ComplexRepresentation phase)
 {
-	TimeFrequencyData *newData = data.CreateTFData(phase);
-	data = *newData;
-	delete newData;
+	data = data.Make(phase);
 }
 
 Image2DCPtr GrayScalePlotPage::normalizeXAxis(Image2DCPtr input)

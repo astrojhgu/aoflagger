@@ -109,7 +109,7 @@ void Plot2D::render(Cairo::RefPtr<Cairo::Context> cr)
 				_horizontalScale.InitializeNumericTicks(MinX(), MaxX());
 			_horizontalScale.SetUnitsCaption(_customHAxisDescription.empty() ? refPointSet.XUnits() : _customHAxisDescription);
 			_topMargin = 10.0;
-			_horizontalScale.SetPlotDimensions(_width, _height, _topMargin, 0.0);
+			_horizontalScale.SetPlotDimensions(_width, _height, 0.0, _topMargin, false);
 			horiScaleHeight = _horizontalScale.GetHeight(cr);
 			
 			double rightMargin = _horizontalScale.GetRightMargin(cr);
@@ -122,7 +122,7 @@ void Plot2D::render(Cairo::RefPtr<Cairo::Context> cr)
 			_verticalScale.SetPlotDimensions(_width - rightMargin, _height - horiScaleHeight - _topMargin, _topMargin);
 
 			verticalScaleWidth =  _verticalScale.GetWidth(cr);
-			_horizontalScale.SetPlotDimensions(_width - rightMargin, _height - horiScaleHeight, 0.0, verticalScaleWidth);
+			_horizontalScale.SetPlotDimensions(_width - rightMargin, _height - horiScaleHeight, verticalScaleWidth, 0.0, false);
 		}
 		else {
 			verticalScaleWidth = 0.0;
@@ -151,7 +151,7 @@ void Plot2D::render(Cairo::RefPtr<Cairo::Context> cr)
 		if(_showAxes)
 		{
 			_horizontalScale.Draw(cr);
-			_verticalScale.Draw(cr);
+			_verticalScale.Draw(cr, 0.0, 0.0);
 			rightMargin = _horizontalScale.GetRightMargin(cr);
 		} else {
 			rightMargin = 0.0;

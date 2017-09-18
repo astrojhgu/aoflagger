@@ -338,12 +338,12 @@ void ImageWidget::update(Cairo::RefPtr<Cairo::Context> cairo, unsigned width, un
 	if(imageWidth > 30000)
 	{
 		int shrinkFactor = (imageWidth + 29999) / 30000;
-		image = image->ShrinkHorizontally(shrinkFactor);
-		mask = mask->ShrinkHorizontally(shrinkFactor);
+		image = std::make_shared<Image2D>(image->ShrinkHorizontally(shrinkFactor));
+		mask = std::make_shared<Mask2D>(mask->ShrinkHorizontally(shrinkFactor));
 		if(originalMask != 0)
-			originalMask = originalMask->ShrinkHorizontally(shrinkFactor);
+			originalMask = std::make_shared<Mask2D>(originalMask->ShrinkHorizontally(shrinkFactor));
 		if(alternativeMask != 0)
-			alternativeMask = alternativeMask->ShrinkHorizontally(shrinkFactor);
+			alternativeMask = std::make_shared<Mask2D>(alternativeMask->ShrinkHorizontally(shrinkFactor));
 		startX /= shrinkFactor;
 		endX /= shrinkFactor;
 		imageWidth = endX - startX;
@@ -428,7 +428,7 @@ void ImageWidget::update(Cairo::RefPtr<Cairo::Context> cairo, unsigned width, un
 	// not dependent on other dimensions, we give the horizontal scale temporary width/height, so that we can calculate its height:
 	if(_showXYAxes)
 	{
-		_horiScale->SetPlotDimensions(width, height, 0.0, 0.0);
+		_horiScale->SetPlotDimensions(width, height, 0.0, 0.0, false);
 		_bottomBorderSize = _horiScale->GetHeight(cairo);
 		_rightBorderSize = _horiScale->GetRightMargin(cairo);
 	
@@ -441,12 +441,12 @@ void ImageWidget::update(Cairo::RefPtr<Cairo::Context> cairo, unsigned width, un
 	}
 	if(_showColorScale)
 	{
-		_colorScale->SetPlotDimensions(width - _rightBorderSize, height - _topBorderSize, _topBorderSize);
+		_colorScale->SetPlotDimensions(width - _rightBorderSize, height - _topBorderSize, _topBorderSize, false);
 		_rightBorderSize += _colorScale->GetWidth(cairo) + 5.0;
 	}
 	if(_showXYAxes)
 	{
-		_horiScale->SetPlotDimensions(width - _rightBorderSize + 5.0, height -_topBorderSize - _bottomBorderSize, _topBorderSize, 	_vertScale->GetWidth(cairo));
+		_horiScale->SetPlotDimensions(width - _rightBorderSize + 5.0, height -_topBorderSize - _bottomBorderSize, _vertScale->GetWidth(cairo), _topBorderSize, false);
 	}
 
 	class ColorMap *colorMap = createColorMap();
@@ -680,7 +680,7 @@ void ImageWidget::redrawWithoutChanges(Cairo::RefPtr<Cairo::Context> cairo, unsi
 			_colorScale->Draw(cairo);
 		if(_showXYAxes)
 		{
-			_vertScale->Draw(cairo);
+			_vertScale->Draw(cairo, 0.0, 0.0);
 			_horiScale->Draw(cairo);
 		}
 		if(_plotTitle != 0)
@@ -754,8 +754,8 @@ Mask2DCPtr ImageWidget::GetActiveMask() const
 	{
 		if(altActive)
 		{
-			Mask2DPtr mask = Mask2D::CreateCopy(_originalMask); 
-			mask->Join(_alternativeMask);
+			Mask2DPtr mask = std::make_shared<Mask2D>(*_originalMask); 
+			mask->Join(*_alternativeMask);
 			return mask;
 		} else
 			return _originalMask;

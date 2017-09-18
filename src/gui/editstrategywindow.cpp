@@ -19,7 +19,6 @@
 #include "strategyframes/baselineselectionframe.h"
 #include "strategyframes/changeresolutionframe.h"
 #include "strategyframes/cutareaframe.h"
-#include "strategyframes/directionprofileframe.h"
 #include "strategyframes/foreachbaselineframe.h"
 #include "strategyframes/foreachmsframe.h"
 #include "strategyframes/foreachpolarisationframe.h"
@@ -34,13 +33,11 @@
 #include "strategyframes/setflaggingframe.h"
 #include "strategyframes/setimageframe.h"
 #include "strategyframes/slidingwindowfitframe.h"
-#include "strategyframes/spatialcompositionframe.h"
 #include "strategyframes/statisticalflaggingframe.h"
 #include "strategyframes/svdframe.h"
 #include "strategyframes/sumthresholdframe.h"
 #include "strategyframes/timeconvolutionframe.h"
 #include "strategyframes/timeselectionframe.h"
-#include "strategyframes/uvprojectframe.h"
 
 using namespace rfiStrategy;
 
@@ -274,9 +271,6 @@ void EditStrategyWindow::onSelectionChanged()
 				case CutAreaActionType:
 					showRight(new CutAreaFrame(*static_cast<rfiStrategy::CutAreaAction*>(selectedAction), *this));
 					break;
-				case DirectionProfileActionType:
-					showRight(new DirectionProfileFrame(*static_cast<rfiStrategy::DirectionProfileAction*>(selectedAction), *this));
-					break;
 				case FringeStopActionType:
 					showRight(new FringeStoppingFrame(*static_cast<rfiStrategy::FringeStopAction*>(selectedAction), *this));
 					break;
@@ -322,9 +316,6 @@ void EditStrategyWindow::onSelectionChanged()
 				case SetFlaggingActionType:
 					showRight(new SetFlaggingFrame(*static_cast<rfiStrategy::SetFlaggingAction*>(selectedAction), *this));
 					break;
-				case SpatialCompositionActionType:
-					showRight(new SpatialCompositionFrame(*static_cast<rfiStrategy::SpatialCompositionAction*>(selectedAction), *this));
-					break;
 				case StatisticalFlagActionType:
 					showRight(new StatisticalFlaggingFrame(*static_cast<rfiStrategy::StatisticalFlagAction*>(selectedAction), *this));
 					break;
@@ -336,9 +327,6 @@ void EditStrategyWindow::onSelectionChanged()
 					break;
 				case TimeSelectionActionType:
 					showRight(new TimeSelectionFrame(*static_cast<rfiStrategy::TimeSelectionAction*>(selectedAction), *this));
-					break;
-				case UVProjectActionType:
-					showRight(new UVProjectFrame(*static_cast<rfiStrategy::UVProjectAction*>(selectedAction), *this));
 					break;
 				default:
 					break;

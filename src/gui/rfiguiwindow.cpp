@@ -1177,8 +1177,8 @@ void RFIGuiWindow::onSetToOne()
 		TimeFrequencyData data(GetActiveData());
 		std::array<Image2DCPtr, 2> images = data.GetSingleComplexImage();
 		Image2DPtr
-			real = Image2D::CreateCopy(images[0]),
-			imaginary = Image2D::CreateCopy(images[0]);
+			real = std::make_shared<Image2D>(*images[0]),
+			imaginary = std::make_shared<Image2D>(*images[0]);
 		real->SetAll(1.0);
 		imaginary->SetAll(0.0);
 		TimeFrequencyData newData(data.GetPolarization(0), real, imaginary);
@@ -1197,8 +1197,8 @@ void RFIGuiWindow::onSetToI()
 		TimeFrequencyData data(GetActiveData());
 		std::array<Image2DCPtr, 2> images = data.GetSingleComplexImage();
 		Image2DPtr
-			real = Image2D::CreateCopy(images[0]),
-			imaginary = Image2D::CreateCopy(images[0]);
+			real = std::make_shared<Image2D>(*images[0]),
+			imaginary = std::make_shared<Image2D>(*images[0]);
 		real->SetAll(0.0);
 		imaginary->SetAll(1.0);
 		TimeFrequencyData newData(data.GetPolarization(0), real, imaginary);
@@ -1217,8 +1217,8 @@ void RFIGuiWindow::onSetToOnePlusI()
 		TimeFrequencyData data(GetActiveData());
 		std::array<Image2DCPtr, 2> images = data.GetSingleComplexImage();
 		Image2DPtr
-			real = Image2D::CreateCopy(images[0]),
-			imaginary = Image2D::CreateCopy(images[0]);
+			real = std::make_shared<Image2D>(*images[0]),
+			imaginary = std::make_shared<Image2D>(*images[0]);
 		real->SetAll(1.0);
 		imaginary->SetAll(1.0);
 		TimeFrequencyData newData(data.GetPolarization(0), real, imaginary);
@@ -1247,8 +1247,8 @@ void RFIGuiWindow::onShowStats()
 			intersect;
 		if(original != 0 && alternative != 0)
 		{
-			intersect = Mask2D::CreateCopy(original);
-			intersect->Intersect(alternative);
+			intersect = std::make_shared<Mask2D>(*original);
+			intersect->Intersect(*alternative);
 			
 			unsigned intCount = intersect->GetCount<true>();
 			if(intCount != 0)
@@ -1379,9 +1379,8 @@ void RFIGuiWindow::keepPhasePart(enum TimeFrequencyData::ComplexRepresentation p
 	if(HasImage())
 	{
 		try {
-			TimeFrequencyData *newPart =  _timeFrequencyWidget.GetActiveData().CreateTFData(phaseRepresentation);
-			_timeFrequencyWidget.SetNewData(*newPart, _timeFrequencyWidget.GetSelectedMetaData());
-			delete newPart;
+			_timeFrequencyWidget.SetNewData(
+				_timeFrequencyWidget.GetActiveData().Make(phaseRepresentation), _timeFrequencyWidget.GetSelectedMetaData());
 			_timeFrequencyWidget.Update();
 		} catch(std::exception &e)
 		{
@@ -1406,10 +1405,8 @@ void RFIGuiWindow::keepPolarisation(PolarizationEnum polarisation)
 	if(HasImage())
 	{
 		try {
-			TimeFrequencyData *newData =
-				_timeFrequencyWidget.GetActiveData().CreateTFData(polarisation);
-			_timeFrequencyWidget.SetNewData(*newData, _timeFrequencyWidget.GetSelectedMetaData());
-			delete newData;
+			_timeFrequencyWidget.SetNewData(
+				_timeFrequencyWidget.GetActiveData().Make(polarisation), _timeFrequencyWidget.GetSelectedMetaData());
 			_timeFrequencyWidget.Update();
 		} catch(std::exception &e)
 		{
@@ -1584,9 +1581,7 @@ void RFIGuiWindow::onAddToImagePlane()
 			TimeFrequencyData activeData = GetActiveData();
 			if(activeData.PolarizationCount() != 1)
 			{
-				TimeFrequencyData *singlePolarization = activeData.CreateTFData(Polarization::StokesI);
-				activeData = *singlePolarization;
-				delete singlePolarization;
+				activeData = activeData.Make(Polarization::StokesI);
 			}
 			_imagePlaneWindow->AddData(activeData, _timeFrequencyWidget.GetSelectedMetaData());
 		}
@@ -1612,7 +1607,7 @@ void RFIGuiWindow::onSegment()
 {
 	_segmentedImage = SegmentedImage::CreateUnsetPtr(GetOriginalData().ImageWidth(),  GetOriginalData().ImageHeight());
 	Morphology morphology;
-	morphology.SegmentByLengthRatio(GetActiveData().GetSingleMask(), _segmentedImage);
+	morphology.SegmentByLengthRatio(GetActiveData().GetSingleMask().get(), _segmentedImage);
 	_timeFrequencyWidget.SetSegmentedImage(_segmentedImage);
 	Update();
 }
@@ -1690,17 +1685,15 @@ void RFIGuiWindow::onUnrollPhaseButtonPressed()
 {
 	if(HasImage())
 	{
-		TimeFrequencyData *data =
-			GetActiveData().CreateTFData(TimeFrequencyData::PhasePart);
-		for(unsigned i=0;i<data->ImageCount();++i)
+		TimeFrequencyData data = GetActiveData().Make(TimeFrequencyData::PhasePart);
+		for(unsigned i=0;i<data.ImageCount();++i)
 		{
-			Image2DPtr image = Image2D::CreateCopy(data->GetImage(i));
+			Image2DPtr image = std::make_shared<Image2D>(*data.GetImage(i));
 			ThresholdTools::UnrollPhase(image.get());
-			data->SetImage(i, image);
+			data.SetImage(i, image);
 		}
-		_timeFrequencyWidget.SetNewData(*data, _timeFrequencyWidget.GetSelectedMetaData());
+		_timeFrequencyWidget.SetNewData(data, _timeFrequencyWidget.GetSelectedMetaData());
 		_timeFrequencyWidget.Update();
-		delete data;
 	}
 }
 
@@ -1752,10 +1745,8 @@ void RFIGuiWindow::onVertEVD()
 			TimeFrequencyData data = GetActiveData();
 			TimeFrequencyData old(data);
 			VertEVD::Perform(data, true);
-			TimeFrequencyData *diff = TimeFrequencyData::CreateTFDataFromDiff(old, data);
 			_timeFrequencyWidget.SetNewData(data, _timeFrequencyWidget.GetSelectedMetaData());
-			_timeFrequencyWidget.SetRevisedData(*diff);
-			delete diff;
+			_timeFrequencyWidget.SetRevisedData(TimeFrequencyData::MakeFromDiff(old, data));
 			_timeFrequencyWidget.Update();
 		} catch(std::exception &e)
 		{
@@ -1930,10 +1921,8 @@ void RFIGuiWindow::onSubtractDataFromMem()
 {
 	if(HasImage())
 	{
-		TimeFrequencyData activeData = _timeFrequencyWidget.GetActiveData();
-		TimeFrequencyData *diffData = TimeFrequencyData::CreateTFDataFromDiff(_storedData, activeData);
-		_timeFrequencyWidget.SetNewData(*diffData, _storedMetaData);
-		delete diffData;
+		TimeFrequencyData diffData = TimeFrequencyData::MakeFromDiff(_storedData, _timeFrequencyWidget.GetActiveData());
+		_timeFrequencyWidget.SetNewData(diffData, _storedMetaData);
 		_timeFrequencyWidget.Update();
 	}
 }

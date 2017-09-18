@@ -218,7 +218,7 @@ void ImagePlaneWindow::Update()
 	if(_uvPlaneButton.get_active())
 	{
 		if(_imager.HasUV()) {
-			_imageWidget.SetImage(Image2D::CreateCopyPtr(_imager.RealUVImage()));
+			_imageWidget.SetImage(std::make_shared<Image2D>(_imager.RealUVImage()));
 			_imageWidget.Update();
 			_displayingUV = true;
 		}
@@ -229,7 +229,7 @@ void ImagePlaneWindow::Update()
 			_imager.PerformFFT();
 
 		if(_imager.HasFFT()) {
-			_imageWidget.SetImage(Image2D::CreateCopyPtr(_imager.FTReal()));
+			_imageWidget.SetImage(std::make_shared<Image2D>(_imager.FTReal()));
 			_imageWidget.Update();
 			printStats();
 			_displayingUV = false;
@@ -263,7 +263,7 @@ void ImagePlaneWindow::onMemoryMultiplyClicked()
 {
 	if(_memory != 0)
 	{
-		Image2DPtr multiplied = Image2D::CreateCopy(_memory);
+		Image2DPtr multiplied(std::make_shared<Image2D>(*_memory));
 		Image2DCPtr old = _imageWidget.Image();
 		for(size_t y=0;y<multiplied->Height();++y)
 		{
@@ -282,7 +282,7 @@ void ImagePlaneWindow::onMemorySubtractClicked()
 {
 	if(_memory != 0)
 	{
-		Image2DPtr subtracted = Image2D::CreateCopy(_memory);
+		Image2DPtr subtracted(std::make_shared<Image2D>(*_memory));
 		Image2DCPtr old = _imageWidget.Image();
 		for(size_t y=0;y<subtracted->Height();++y)
 		{
@@ -301,7 +301,7 @@ void ImagePlaneWindow::onSqrtClicked()
 {
 	if(_imageWidget.HasImage())
 	{
-		Image2DPtr sqrtImage = Image2D::CreateCopy(_imageWidget.Image());
+		Image2DPtr sqrtImage(std::make_shared<Image2D>(*_imageWidget.Image()));
 		FFTTools::SignedSqrt(sqrtImage);
 		_imageWidget.SetImage(sqrtImage);
 		_imageWidget.Update();

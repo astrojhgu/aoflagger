@@ -54,9 +54,7 @@ void PlotFrame::plot()
 
 void PlotFrame::plotTimeGraph(const TimeFrequencyData &data, const std::string &label, PolarizationEnum polarisation)
 {
-	TimeFrequencyData *convertedData = data.CreateTFData(polarisation);
-	plotTimeGraph(*convertedData, label);
-	delete convertedData;
+	plotTimeGraph(data.Make(polarisation), label);
 }
 
 void PlotFrame::plotTimeGraph(const TimeFrequencyData &data, const std::string &label)

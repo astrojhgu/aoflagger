@@ -35,7 +35,6 @@ namespace rfiStrategy {
 		SetFlaggingActionType,
 		SetImageActionType,
 		SlidingWindowFitActionType,
-		SpatialCompositionActionType,
 		StatisticalFlagActionType,
 		StrategyType,
 		SumThresholdActionType,

@@ -172,7 +172,6 @@ namespace rfiStrategy {
 				break;
 			case ForEachSimulatedBaselineActionType:
 			case ResamplingActionType:
-			case SpatialCompositionActionType:
 				throw std::runtime_error("Strategy contains an action for which saving is not supported");
 				break;
 		}

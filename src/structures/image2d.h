@@ -27,6 +27,8 @@ void swap(Image2D&& left, Image2D& right);
  */
 class Image2D {
 	public:
+		Image2D();
+		
 		Image2D(const Image2D& source);
 		
 		Image2D(Image2D&& source);
@@ -127,7 +129,13 @@ class Image2D {
 		 * @param height Height of the new image.
 		 * @return The new created image. Should be deleted by the caller.
 		 */
+		[[ deprecated("Use the make() functions") ]]
 		static Image2D *CreateZeroImage(size_t width, size_t height);
+		
+		static Image2D MakeZeroImage(size_t width, size_t height)
+		{
+			return MakeSetImage(width, height, 0.0);
+		}
 		
 		/**
 		 * As CreateZeroImage(), but returns a smart pointer instead.
@@ -137,13 +145,16 @@ class Image2D {
 		 */
 		static Image2DPtr CreateZeroImagePtr(size_t width, size_t height)
 		{
-			return Image2DPtr(CreateZeroImage(width, height));
+			// TODO make this more efficient & use make_shared
+			return Image2DPtr(new Image2D(MakeZeroImage(width, height)));
 		}
 
 		/**
 		 * Destructor.
 		 */
 		~Image2D();
+		
+		bool Empty() const { return _width==0 || _height==0; }
 		
 		/**
 		 * Creates a new image by subtracting two images of the same size.

@@ -82,7 +82,7 @@ void RFIGuiController::plotMeanSpectrum(bool weight)
 		else
 			RFIPlots::MakeMeanSpectrumPlot<false>(beforeSet, data, mask, SelectedMetaData());
 
-		mask = Mask2D::CreateCopy(data.GetSingleMask());
+		mask.reset(new Mask2D(*data.GetSingleMask()));
 		if(!mask->AllFalse())
 		{
 			Plot2DPointSet &afterSet = plot.StartLine("Flagged");
@@ -110,7 +110,7 @@ void RFIGuiController::PlotDist()
 		RFIPlots::MakeDistPlot(totalSet, image, mask);
 
 		Plot2DPointSet &uncontaminatedSet = plot.StartLine("Uncontaminated");
-		mask = Mask2D::CreateCopy(activeData.GetSingleMask());
+		mask.reset(new Mask2D(*activeData.GetSingleMask()));
 		RFIPlots::MakeDistPlot(uncontaminatedSet, image, mask);
 
 		mask->Invert();
@@ -129,9 +129,9 @@ void RFIGuiController::PlotLogLogDist()
 		HistogramCollection histograms(activeData.PolarizationCount());
 		for(unsigned p=0;p!=activeData.PolarizationCount();++p)
 		{
-			TimeFrequencyData polData(activeData.CreateTFDataFromPolarizationIndex(p));
+			TimeFrequencyData polData(activeData.MakeFromPolarizationIndex(p));
 			Image2DCPtr image = polData.GetSingleImage();
-			Mask2DCPtr mask = Mask2D::CreateCopy(polData.GetSingleMask());
+			Mask2DCPtr mask = std::make_shared<Mask2D>(*polData.GetSingleMask());
 			histograms.Add(0, 1, p, image, mask);
 		}
 		_rfiGuiWindow.ShowHistogram(histograms);
@@ -152,7 +152,7 @@ void RFIGuiController::PlotPowerSpectrum()
 		Plot2DPointSet &beforeSet = plot.StartLine("Before");
 		RFIPlots::MakePowerSpectrumPlot(beforeSet, image, mask, SelectedMetaData());
 
-		mask = Mask2D::CreateCopy(data.GetSingleMask());
+		mask = std::make_shared<Mask2D>(*data.GetSingleMask());
 		if(!mask->AllFalse())
 		{
 			Plot2DPointSet &afterSet = plot.StartLine("After");
@@ -210,7 +210,7 @@ void RFIGuiController::PlotPowerRMS()
 		Plot2DPointSet &beforeSet = plot.StartLine("Before");
 		RFIPlots::MakeRMSSpectrumPlot(beforeSet, image, mask);
 
-		mask = Mask2D::CreateCopy(activeData.GetSingleMask());
+		mask = std::make_shared<Mask2D>(*activeData.GetSingleMask());
 		if(!mask->AllFalse())
 		{
 			Plot2DPointSet &afterSet = plot.StartLine("After");
@@ -240,7 +240,7 @@ void RFIGuiController::PlotPowerSNR()
 		Plot2DPointSet &totalPlot = plot.StartLine("Total");
 		RFIPlots::MakeSNRSpectrumPlot(totalPlot, image, model, mask);
 
-		mask = Mask2D::CreateCopy(ActiveData().GetSingleMask());
+		mask = std::make_shared<Mask2D>(*ActiveData().GetSingleMask());
 		if(!mask->AllFalse())
 		{
 			Plot2DPointSet &uncontaminatedPlot = plot.StartLine("Uncontaminated");
@@ -269,7 +269,7 @@ void RFIGuiController::PlotPowerTime()
 		Plot2DPointSet &totalPlot = plot.StartLine("Total");
 		RFIPlots::MakePowerTimePlot(totalPlot, image, mask, SelectedMetaData());
 
-		mask = Mask2D::CreateCopy(activeData.GetSingleMask());
+		mask = std::make_shared<Mask2D>(*activeData.GetSingleMask());
 		if(!mask->AllFalse())
 		{
 			Plot2DPointSet &uncontaminatedPlot = plot.StartLine("Uncontaminated");

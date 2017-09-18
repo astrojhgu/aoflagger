@@ -9,6 +9,7 @@
 class HorizontalPlotScale {
 	public:
 		HorizontalPlotScale();
+		~HorizontalPlotScale();
 		void SetPlotDimensions(double plotWidth, double plotHeight, double fromLeft, double fromTop, bool isSecondAxis)
 		{
 			_plotWidth = plotWidth;

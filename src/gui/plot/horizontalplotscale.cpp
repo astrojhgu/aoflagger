@@ -13,6 +13,9 @@ HorizontalPlotScale::HorizontalPlotScale() :
 {
 }
 
+HorizontalPlotScale::~HorizontalPlotScale()
+{ }
+
 double HorizontalPlotScale::GetHeight(Cairo::RefPtr<Cairo::Context> cairo)
 {
 	initializeMetrics(cairo);

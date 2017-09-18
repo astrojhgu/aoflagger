@@ -21,6 +21,15 @@
 #include <xmmintrin.h>
 #endif
 
+Image2D::Image2D() :
+	_width(0),
+	_height(0),
+	_stride(0),
+	_dataPtr(nullptr),
+	_dataConsecutive(nullptr)
+{
+}
+
 Image2D::Image2D(size_t width, size_t height, size_t widthCapacity) :
 	_width(width),
 	_height(height),
@@ -67,7 +76,7 @@ void Image2D::allocate()
 Image2D::Image2D(const Image2D& source) :
 	Image2D(source.Width(), source.Height())
 {
-	memcpy(_dataConsecutive, source._dataConsecutive, _stride * _height * sizeof(num_t));
+	std::copy(source._dataConsecutive, source._dataConsecutive+_stride * _height, _dataConsecutive);
 }
 
 Image2D::Image2D(Image2D&& source) :
