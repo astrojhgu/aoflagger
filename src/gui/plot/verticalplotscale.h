@@ -3,20 +3,22 @@
 
 #include <string>
 #include <vector>
+#include <memory>
 
 #include <gtkmm/drawingarea.h>
 
-#include "tickset.h"
+typedef std::pair<double, std::string> Tick;
 
-class VerticalPlotScale {
+class VerticalPlotScale final {
 	public:
 		VerticalPlotScale();
-		virtual ~VerticalPlotScale();
-		void SetPlotDimensions(double plotWidth, double plotHeight, double topMargin)
+		~VerticalPlotScale();
+		
+		void SetPlotDimensions(double plotWidth, double plotHeight, bool isSecondAxis)
 		{
 			_plotWidth = plotWidth;
 			_plotHeight = plotHeight;
-			_topMargin = topMargin;
+			_isSecondAxis = isSecondAxis;
 			_metricsAreInitialized = false;
 		}
 		
@@ -49,19 +51,23 @@ class VerticalPlotScale {
 			_metricsAreInitialized = false;
 		}
 		
-		void Draw(Cairo::RefPtr<Cairo::Context> cairo, double offsetX=0.0, double offsetY=0.0);
+		void Draw(Cairo::RefPtr<Cairo::Context> cairo, double offsetX, double offsetY);
 		void InitializeNumericTicks(double min, double max);
 		void InitializeLogarithmicTicks(double min, double max);
+		double UnitToAxis(double unitValue) const;
+		double AxisToUnit(double axisValue) const;
+		
 	private:
 		void drawUnits(Cairo::RefPtr<Cairo::Context> cairo, double offsetX, double offsetY);
 		bool ticksFit(Cairo::RefPtr<Cairo::Context> cairo);
 		void initializeMetrics(Cairo::RefPtr<Cairo::Context> cairo); 
-		double getTickYPosition(const Tick &tick);
+		double getTickYPosition(const Tick& tick);
 
-		double _plotWidth, _plotHeight, _topMargin;
+		double _plotWidth, _plotHeight;
+		bool _isSecondAxis;
 		bool _metricsAreInitialized;
-		double _width;
-		class TickSet *_tickSet;
+		double _width, _captionSize;
+		std::unique_ptr<class TickSet> _tickSet;
 		bool _isLogarithmic;
 		bool _drawWithDescription;
 		std::string _unitsCaption;

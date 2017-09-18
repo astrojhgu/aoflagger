@@ -3,7 +3,7 @@
 #include <cmath>
 #include <sstream>
 
-#include "../../structures/date.h"
+#include "date.h"
 
 #ifndef HAVE_EXP10
 #define exp10(x) exp( (2.3025850929940456840179914546844) * (x) )
@@ -15,11 +15,9 @@ class TickSet
 {
 	public:
 		TickSet()
-		{
-		}
+		{ }
 		virtual ~TickSet()
-		{
-		}
+		{ }
 		
 		virtual unsigned Size() const = 0;
 		virtual Tick GetTick(unsigned i) const = 0;
@@ -33,6 +31,13 @@ class TickSet
 		}
 		virtual void Set(unsigned maxSize) = 0;
 		virtual void Reset() = 0;
+		/**
+		 * Returns a value scaled according to the axis.
+		 * Values that are within the min and max will have an axis value of
+		 * 0 to 1.
+		 */
+		virtual double UnitToAxis(double unitValue) const = 0;
+		virtual double AxisToUnit(double axisValue) const = 0;
 	protected:
 	private:
 		
@@ -41,33 +46,42 @@ class TickSet
 class NumericTickSet : public TickSet
 {
 	public:
-		NumericTickSet(double min, double max, unsigned sizeRequest) : _min(min), _max(max), _sizeRequest(sizeRequest)
+		NumericTickSet(double min, double max, unsigned sizeRequest) :
+			_min(min), _max(max), _sizeRequest(sizeRequest)
 		{
 			set(sizeRequest);
 		}
 		
-		virtual unsigned Size() const final override
+		unsigned Size() const final override
 		{
 			return _ticks.size();
 		}
 		
-		virtual Tick GetTick(unsigned i) const final override
+		Tick GetTick(unsigned i) const final override
 		{
 			std::stringstream tickStr;
 			tickStr << _ticks[i];
 			return Tick((_ticks[i] - _min) / (_max - _min), tickStr.str());
 		}
 		
-		virtual void Reset() final override
+		void Reset() final override
 		{
 			_ticks.clear();
 			set(_sizeRequest);
 		}
 		
-		virtual void Set(unsigned maxSize) final override
+		void Set(unsigned maxSize) final override
 		{
 			_ticks.clear();
 			set(maxSize);
+		}
+		double UnitToAxis(double unitValue) const final override
+		{
+			return (unitValue - _min) / (_max - _min);
+		}
+		double AxisToUnit(double axisValue) const final override
+		{
+			return axisValue * (_max - _min) + _min;
 		}
 	private:
 		void set(unsigned sizeRequest)
@@ -153,32 +167,35 @@ class NumericTickSet : public TickSet
 class LogarithmicTickSet : public TickSet
 {
 	public:
-		LogarithmicTickSet(double min, double max, unsigned sizeRequest) : _min(min), _minLog10(log10(min)), _max(max), _maxLog10(log10(max)), _sizeRequest(sizeRequest)
+		LogarithmicTickSet(double min, double max, unsigned sizeRequest) :
+			_min(min), _minLog10(log10(min)),
+			_max(max), _maxLog10(log10(max)),
+			_sizeRequest(sizeRequest)
 		{
 			if(!std::isfinite(min) || !std::isfinite(max))
 				throw std::runtime_error("Invalid (non-finite) range in LogarithmicTickSet");
 			set(sizeRequest);
 		}
 		
-		virtual unsigned Size() const final override
+		unsigned Size() const final override
 		{
 			return _ticks.size();
 		}
 		
-		virtual Tick GetTick(unsigned i) const final override
+		Tick GetTick(unsigned i) const final override
 		{
 			std::stringstream tickStr;
 			tickStr << _ticks[i];
 			return Tick((log10(_ticks[i]) - _minLog10) / (_maxLog10 - _minLog10), tickStr.str());
 		}
 		
-		virtual void Reset() final override
+		void Reset() final override
 		{
 			_ticks.clear();
 			set(_sizeRequest);
 		}
 		
-		virtual void Set(unsigned maxSize) final override
+		void Set(unsigned maxSize) final override
 		{
 			_ticks.clear();
 			set(maxSize);
@@ -197,6 +214,14 @@ class LogarithmicTickSet : public TickSet
 		static double AxisToUnit(double axisValue, double unitMin, double unitMax)
 		{
 			return exp(axisValue * log(unitMax / unitMin)) * unitMin;
+		}
+		double UnitToAxis(double unitValue) const final override
+		{
+			return UnitToAxis(unitValue, _min, _max);
+		}
+		double AxisToUnit(double axisValue) const final override
+		{
+			return AxisToUnit(axisValue, _min, _max);
 		}
 	private:
 		void set(unsigned sizeRequest)
@@ -313,28 +338,30 @@ class TimeTickSet : public TickSet
 			set(sizeRequest);
 		}
 		
-		virtual unsigned Size() const final override
+		unsigned Size() const final override
 		{
 			return _ticks.size();
 		}
 		
-		virtual Tick GetTick(unsigned i) const final override
+		Tick GetTick(unsigned i) const final override
 		{
 			double val = _ticks[i];
 			return Tick((val - _min) / (_max - _min), Date::AipsMJDToTimeString(val));
 		}
 		
-		virtual void Reset() final override
+		void Reset() final override
 		{
 			_ticks.clear();
 			set(_sizeRequest);
 		}
 		
-		virtual void Set(unsigned maxSize) final override
+		void Set(unsigned maxSize) final override
 		{
 			_ticks.clear();
 			set(maxSize);
 		}
+		double UnitToAxis(double) const final override { return 0.0; }
+		double AxisToUnit(double) const final override { return 0.0; }
 	private:
 		void set(unsigned sizeRequest)
 		{
@@ -460,29 +487,32 @@ class TextTickSet : public TickSet
 			set(sizeRequest);
 		}
 		
-		virtual unsigned Size() const final override
+		unsigned Size() const final override
 		{
 			return _ticks.size();
 		}
 		
-		virtual Tick GetTick(unsigned i) const final override
+		Tick GetTick(unsigned i) const final override
 		{
 			const size_t labelIndex = _ticks[i];
 			const double val = (_labels.size() == 1) ? 0.5 : (double) labelIndex / (double) (_labels.size() - 1);
 			return Tick(val, _labels[labelIndex]);
 		}
 		
-		virtual void Reset() final override
+		void Reset() final override
 		{
 			_ticks.clear();
 			set(_sizeRequest);
 		}
 		
-		virtual void Set(unsigned maxSize) final override
+		void Set(unsigned maxSize) final override
 		{
 			_ticks.clear();
 			set(maxSize);
 		}
+		double UnitToAxis(double) const final override { return 0.0; }
+		double AxisToUnit(double) const final override { return 0.0; }
+		
 	private:
 		void set(unsigned sizeRequest)
 		{
