@@ -183,6 +183,21 @@ class LogarithmicTickSet : public TickSet
 			_ticks.clear();
 			set(maxSize);
 		}
+		
+		/**
+		 * Returns a value scaled according to a given axis.
+		 * Values that are within the min and max will have an axis value of
+		 * 0 to 1.
+		 */
+		static double UnitToAxis(double unitValue, double unitMin, double unitMax)
+		{
+			return log(unitValue / unitMin) / log(unitMax / unitMin);
+		}
+		
+		static double AxisToUnit(double axisValue, double unitMin, double unitMax)
+		{
+			return exp(axisValue * log(unitMax / unitMin)) * unitMin;
+		}
 	private:
 		void set(unsigned sizeRequest)
 		{

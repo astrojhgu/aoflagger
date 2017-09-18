@@ -7,6 +7,7 @@
 
 #include <cmath>
 #include <string>
+#include <memory>
 
 /**
  * The ColorMap class turns a value between -1 and 1 into a gradient color scale.
@@ -64,14 +65,14 @@ class ColorMap {
 		 * @return The new create color map. The caller is responsible for @c delete -ing the color map after usage.
 		 * @see GetColorMapsString().
 		 */
-		static ColorMap *CreateColorMap(const std::string &typeStr) throw();
+		static std::unique_ptr<ColorMap> CreateColorMap(const std::string &typeStr) noexcept;
 		/**
 		 * Returns a string containing a description of the color map names. These names can be used to
 		 * create the color map with CreateColorMap().
 		 * @return 
 		 * @see CreateColorMap().
 		 */
-		static const std::string &GetColorMapsString() throw();
+		static const std::string &GetColorMapsString() noexcept;
 	private:
 		static const std::string _colorMapsString;
 };
@@ -225,11 +226,10 @@ class ColdHotMap : public ColorMap {
  */
 class ContrastMap : public ColorMap {
 	private:
-		const ColorMap *_map;
+		const std::unique_ptr<ColorMap> _map;
 	public:
 		explicit ContrastMap(const std::string& type) :
 			_map(CreateColorMap(type)) { }
-		~ContrastMap() { delete _map; }
 		unsigned char ValueToColorR(long double value) const override { return _map->ValueToColorR(value>=0.0 ? sqrt(value) : -sqrt(-value)); }
 		unsigned char ValueToColorG(long double value) const override { return _map->ValueToColorG(value>=0.0 ? sqrt(value) : -sqrt(-value)); }
 		unsigned char ValueToColorB(long double value) const override { return _map->ValueToColorB(value>=0.0 ? sqrt(value) : -sqrt(-value)); }

@@ -683,7 +683,7 @@ class TimeFrequencyData
 			return TimeFrequencyData(_complexRepresentation, _data[index]);
 		}
 		
-		void SetPolarizationData(size_t polarizationIndex, const TimeFrequencyData &data)
+		void SetPolarizationData(size_t polarizationIndex, const TimeFrequencyData& data)
 		{
 			if(data.PolarizationCount() != 1)
 				throw BadUsageException("Trying to set multiple polarizations by single polarization index");

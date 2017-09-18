@@ -113,9 +113,8 @@ void PngFile::SetFromImage(const class Image2D &image, const class ColorMap &col
 
 void PngFile::Save(const Image2D &image, const std::string &filename)
 {
-	ColorMap *colorMap = ColorMap::CreateColorMap("monochrome");
+	std::unique_ptr<ColorMap> colorMap(ColorMap::CreateColorMap("monochrome"));
 	Save(image, filename, *colorMap);
-	delete colorMap;
 }
 
 void PngFile::Save(const Image2D &image, const std::string &filename, const ColorMap &colorMap)

@@ -15,6 +15,9 @@ namespace aoflagger_python
 		Data(const TimeFrequencyData& tfData) : _tfData(tfData)
 		{ }
 		
+		Data(TimeFrequencyData&& tfData) : _tfData(std::move(tfData))
+		{ }
+		
 		Data operator-(const Data& other) const
 		{
 			return Data(TimeFrequencyData::MakeFromDiff(_tfData, other.TFData()));
