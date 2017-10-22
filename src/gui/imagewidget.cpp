@@ -32,10 +32,10 @@ ImageWidget::ImageWidget() :
 	_startVertical(0.0),
 	_endVertical(1.0),
 	_segmentedImage(),
-	_horiScale(0),
-	_vertScale(0),
-	_colorScale(0),
-	_plotTitle(0),
+	_horiScale(),
+	_vertScale(),
+	_colorScale(),
+	_plotTitle(),
 	_scaleOption(NormalScale),
 	_showXYAxes(true),
 	_showColorScale(true),
@@ -81,14 +81,10 @@ void ImageWidget::Clear()
 		_segmentedImage.reset();
 		_image.reset();
 	}
-	delete _horiScale;
-	_horiScale = 0;
-	delete _vertScale;
-	_vertScale = 0;
-	delete _colorScale;
-	_colorScale = 0;
-	delete _plotTitle;
-	_plotTitle = 0;
+	_horiScale.reset();
+	_vertScale.reset();
+	_colorScale.reset();
+	_plotTitle.reset();
 	_isInitialized = false;
 }
 
@@ -352,25 +348,21 @@ void ImageWidget::update(Cairo::RefPtr<Cairo::Context> cairo, unsigned width, un
 	num_t min, max;
 	findMinMax(image.get(), mask.get(), min, max);
 	
-	// If these are not yet created, they are 0, so ok to delete.
-	delete _horiScale;
-	delete _vertScale;
-	delete _colorScale;
-	delete _plotTitle;
+	_horiScale.reset();
+	_vertScale.reset();
+	_colorScale.reset();
+	_plotTitle.reset();
 		
 	if(_showXYAxes)
 	{
-		_vertScale = new VerticalPlotScale();
+		_vertScale.reset(new VerticalPlotScale());
 		_vertScale->SetDrawWithDescription(_showYAxisDescription);
-		_horiScale = new HorizontalPlotScale();
+		_horiScale.reset(new HorizontalPlotScale());
 		_horiScale->SetDrawWithDescription(_showXAxisDescription);
-	} else {
-		_vertScale = 0;
-		_horiScale = 0;
 	}
 	if(_showColorScale)
 	{
-		_colorScale = new ColorScale();
+		_colorScale.reset(new ColorScale());
 		_colorScale->SetDrawWithDescription(_showZAxisDescription);
 	} else {
 		_colorScale = 0;
@@ -416,7 +408,7 @@ void ImageWidget::update(Cairo::RefPtr<Cairo::Context> cairo, unsigned width, un
 
 	if(_showTitle && !actualTitleText().empty())
 	{
-		_plotTitle = new Title();
+		_plotTitle.reset(new Title());
 		_plotTitle->SetText(actualTitleText());
 		_plotTitle->SetPlotDimensions(width, height, 0.0);
 		_topBorderSize = _plotTitle->GetHeight(cairo);
@@ -432,7 +424,7 @@ void ImageWidget::update(Cairo::RefPtr<Cairo::Context> cairo, unsigned width, un
 		_bottomBorderSize = _horiScale->GetHeight(cairo);
 		_rightBorderSize = _horiScale->GetRightMargin(cairo);
 	
-		_vertScale->SetPlotDimensions(width - _rightBorderSize + 5.0, height - _topBorderSize - _bottomBorderSize, _topBorderSize);
+		_vertScale->SetPlotDimensions(width - _rightBorderSize + 5.0, height - _topBorderSize - _bottomBorderSize, false);
 		_leftBorderSize = _vertScale->GetWidth(cairo);
 	} else {
 		_bottomBorderSize = 0.0;

@@ -66,7 +66,7 @@ void VerticalPlotScale::drawUnits(Cairo::RefPtr<Cairo::Context> cairo, double of
 	cairo->set_font_size(_descriptionFontSize);
 	Cairo::TextExtents extents;
 	cairo->get_text_extents(_unitsCaption, extents);
-	double x = _isSecondAxis ? offsetX-2+_width-_captionSize : offsetX+2;
+	double x = _isSecondAxis ? offsetX+2+_width-_captionSize : offsetX+2;
 	cairo->translate(x - extents.y_bearing, offsetY + 0.7 * _plotHeight);
 	cairo->rotate(M_PI * 1.5);
 	cairo->move_to(0.0, 0.0);

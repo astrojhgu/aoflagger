@@ -238,10 +238,10 @@ class ImageWidget : public Gtk::DrawingArea {
 		double _startHorizontal, _endHorizontal;
 		double _startVertical, _endVertical;
 		SegmentedImageCPtr _segmentedImage;
-		class HorizontalPlotScale *_horiScale;
-		class VerticalPlotScale *_vertScale;
-		class ColorScale *_colorScale;
-		class Title *_plotTitle;
+		std::unique_ptr<class HorizontalPlotScale> _horiScale;
+		std::unique_ptr<class VerticalPlotScale> _vertScale;
+		std::unique_ptr<class ColorScale> _colorScale;
+		std::unique_ptr<class Title> _plotTitle;
 		enum ScaleOption _scaleOption;
 		bool _showXYAxes;
 		bool _showColorScale;
