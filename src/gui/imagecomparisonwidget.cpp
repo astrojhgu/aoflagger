@@ -24,6 +24,7 @@ void ImageComparisonWidget::SetNewData(const TimeFrequencyData &data, TimeFreque
 	_revised = _original;
 	_revised.SetImagesToZero();
 	_contaminated = _original;
+	_contaminated.SetNoMask();
 	updateVisualizedImage();
 	
 	SetOriginalMask(data.GetSingleMask());
