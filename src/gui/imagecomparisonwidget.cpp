@@ -105,7 +105,7 @@ void ImageComparisonWidget::updateVisualizedImage()
 	if(image == 0)
 		Clear();
 	else
-		ImageWidget::SetImage(image);
+		HeatMapWidget::SetImage(image);
 } 
 
 void ImageComparisonWidget::ClearBackground()

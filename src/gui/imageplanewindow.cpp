@@ -145,7 +145,7 @@ ImagePlaneWindow::ImagePlaneWindow()
 	_box.pack_start(_imageWidget);
 	_imageWidget.add_events(Gdk::BUTTON_RELEASE_MASK | Gdk::BUTTON_PRESS_MASK);
 	_imageWidget.OnButtonReleasedEvent().connect(sigc::mem_fun(*this, &ImagePlaneWindow::onButtonReleased));
-	_imageWidget.SetRange(ImageWidget::MinMax);
+	_imageWidget.SetRange(HeatMapWidget::MinMax);
 
 	add(_box);
 	_box.show_all();

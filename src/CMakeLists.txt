@@ -79,7 +79,7 @@ set(GUI_FILES
   gui/imagecomparisonwidget.cpp
   gui/imageplanewindow
   gui/imagepropertieswindow.cpp
-  gui/imagewidget.cpp
+  gui/heatmapwidget.cpp
   gui/msoptionwindow.cpp
   gui/plotframe.cpp
   gui/plotwindow.cpp

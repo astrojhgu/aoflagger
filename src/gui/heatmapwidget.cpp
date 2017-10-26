@@ -1,4 +1,4 @@
-#include "imagewidget.h"
+#include "heatmapwidget.h"
 
 #include "../structures/colormap.h"
 #include "../structures/image2d.h"
@@ -18,7 +18,7 @@
 
 #include <boost/algorithm/string.hpp>
 
-ImageWidget::ImageWidget() :
+HeatMapWidget::HeatMapWidget() :
 	_isInitialized(false),
 	_initializedWidth(0),
 	_initializedHeight(0),
@@ -57,19 +57,19 @@ ImageWidget::ImageWidget() :
 
 	add_events(Gdk::POINTER_MOTION_MASK | Gdk::BUTTON_RELEASE_MASK |
 		   Gdk::BUTTON_PRESS_MASK | Gdk::LEAVE_NOTIFY_MASK);
-	signal_motion_notify_event().connect(sigc::mem_fun(*this, &ImageWidget::onMotion));
-	signal_leave_notify_event().connect(sigc::mem_fun(*this, &ImageWidget::onLeave));
-	signal_button_release_event().connect(sigc::mem_fun(*this, &ImageWidget::onButtonReleased));
-	signal_draw().connect(sigc::mem_fun(*this, &ImageWidget::onDraw) );
+	signal_motion_notify_event().connect(sigc::mem_fun(*this, &HeatMapWidget::onMotion));
+	signal_leave_notify_event().connect(sigc::mem_fun(*this, &HeatMapWidget::onLeave));
+	signal_button_release_event().connect(sigc::mem_fun(*this, &HeatMapWidget::onButtonReleased));
+	signal_draw().connect(sigc::mem_fun(*this, &HeatMapWidget::onDraw) );
 }
 
-ImageWidget::~ImageWidget()
+HeatMapWidget::~HeatMapWidget()
 {
 	Clear();
 	delete _highlightConfig;
 }
 
-void ImageWidget::Clear()
+void HeatMapWidget::Clear()
 {
   if(HasImage())
 	{
@@ -88,7 +88,7 @@ void ImageWidget::Clear()
 	_isInitialized = false;
 }
 
-bool ImageWidget::onDraw(const Cairo::RefPtr<Cairo::Context>& cr)
+bool HeatMapWidget::onDraw(const Cairo::RefPtr<Cairo::Context>& cr)
 {
 	if(get_width() == (int) _initializedWidth && get_height() == (int) _initializedHeight)
 		redrawWithoutChanges(get_window()->create_cairo_context(), get_width(), get_height());
@@ -97,7 +97,7 @@ bool ImageWidget::onDraw(const Cairo::RefPtr<Cairo::Context>& cr)
 	return true;
 }
 
-void ImageWidget::ZoomFit()
+void HeatMapWidget::ZoomFit()
 {
 	_startHorizontal = 0.0;
 	_endHorizontal = 1.0;
@@ -106,7 +106,7 @@ void ImageWidget::ZoomFit()
 	_onZoomChanged.emit();
 }
 
-void ImageWidget::ZoomIn()
+void HeatMapWidget::ZoomIn()
 {
 	double distX = (_endHorizontal-_startHorizontal)*0.25;
 	_startHorizontal += distX;
@@ -117,7 +117,7 @@ void ImageWidget::ZoomIn()
 	_onZoomChanged.emit();
 }
 
-void ImageWidget::ZoomInOn(size_t x, size_t y)
+void HeatMapWidget::ZoomInOn(size_t x, size_t y)
 {
 	double xr = double(x) / _image->Width(), yr = double(y) / _image->Height();
 	double distX = (_endHorizontal-_startHorizontal)*0.25;
@@ -149,7 +149,7 @@ void ImageWidget::ZoomInOn(size_t x, size_t y)
 	_onZoomChanged.emit();
 }
 
-void ImageWidget::ZoomOut()
+void HeatMapWidget::ZoomOut()
 {
 	if(!IsZoomedOut())
 	{
@@ -182,7 +182,7 @@ void ImageWidget::ZoomOut()
 	}
 }
 
-void ImageWidget::Update()
+void HeatMapWidget::Update()
 {
 	Glib::RefPtr<Gdk::Window> window = get_window();
 	if(window && get_width() > 0 && get_height() > 0)
@@ -198,7 +198,7 @@ void ImageWidget::Update()
 	}
 }
 
-void ImageWidget::SaveByExtension(const std::string& filename, unsigned width, unsigned height)
+void HeatMapWidget::SaveByExtension(const std::string& filename, unsigned width, unsigned height)
 {
 	const char* eMsg = "Saving image to file failed: could not determine file type from filename extension -- maybe the type is not supported. Supported types are .png, .svg or .pdf.";
 	if(filename.size() < 4)
@@ -214,7 +214,7 @@ void ImageWidget::SaveByExtension(const std::string& filename, unsigned width, u
 	else throw std::runtime_error(eMsg);
 }
 
-void ImageWidget::SavePdf(const std::string &filename, unsigned width, unsigned height)
+void HeatMapWidget::SavePdf(const std::string &filename, unsigned width, unsigned height)
 {
 	if(width == 0 || height == 0)
 	{
@@ -241,7 +241,7 @@ void ImageWidget::SavePdf(const std::string &filename, unsigned width, unsigned 
 	surface->finish();
 }
 
-void ImageWidget::SaveSvg(const std::string &filename, unsigned width, unsigned height)
+void HeatMapWidget::SaveSvg(const std::string &filename, unsigned width, unsigned height)
 {
 	if(width == 0 || height == 0)
 	{
@@ -266,7 +266,7 @@ void ImageWidget::SaveSvg(const std::string &filename, unsigned width, unsigned 
 	surface->finish();
 }
 
-void ImageWidget::SavePng(const std::string &filename, unsigned width, unsigned height)
+void HeatMapWidget::SavePng(const std::string &filename, unsigned width, unsigned height)
 {
 	if(width == 0 || height == 0)
 	{
@@ -290,7 +290,7 @@ void ImageWidget::SavePng(const std::string &filename, unsigned width, unsigned 
 	surface->write_to_png(filename);
 }
 
-void ImageWidget::SaveText(const std::string &filename)
+void HeatMapWidget::SaveText(const std::string &filename)
 {
 	if(HasImage())
 	{
@@ -315,7 +315,7 @@ void ImageWidget::SaveText(const std::string &filename)
 	}
 }
 
-void ImageWidget::update(Cairo::RefPtr<Cairo::Context> cairo, unsigned width, unsigned height)
+void HeatMapWidget::update(Cairo::RefPtr<Cairo::Context> cairo, unsigned width, unsigned height)
 {
 	Mask2DCPtr mask = GetActiveMask(), originalMask = _originalMask, alternativeMask = _alternativeMask;
 	
@@ -564,7 +564,7 @@ void ImageWidget::update(Cairo::RefPtr<Cairo::Context> cairo, unsigned width, un
 	redrawWithoutChanges(cairo, width, height);
 } 
 
-ColorMap *ImageWidget::createColorMap()
+ColorMap *HeatMapWidget::createColorMap()
 {
 	switch(_colorMap) {
 		case BWMap:
@@ -588,7 +588,7 @@ ColorMap *ImageWidget::createColorMap()
 	}
 }
 
-void ImageWidget::findMinMax(const Image2D* image, const Mask2D* mask, num_t &min, num_t &max)
+void HeatMapWidget::findMinMax(const Image2D* image, const Mask2D* mask, num_t &min, num_t &max)
 {
 	switch(_range)
 	{
@@ -641,7 +641,7 @@ void ImageWidget::findMinMax(const Image2D* image, const Mask2D* mask, num_t &mi
 	_min = min;
 }
 
-void ImageWidget::redrawWithoutChanges(Cairo::RefPtr<Cairo::Context> cairo, unsigned width, unsigned height)
+void HeatMapWidget::redrawWithoutChanges(Cairo::RefPtr<Cairo::Context> cairo, unsigned width, unsigned height)
 {
 	cairo->set_source_rgb(1.0, 1.0, 1.0);
 	cairo->set_line_width(1.0);
@@ -680,7 +680,7 @@ void ImageWidget::redrawWithoutChanges(Cairo::RefPtr<Cairo::Context> cairo, unsi
 	}
 }
 
-void ImageWidget::downsampleImageBuffer(unsigned newWidth, unsigned newHeight)
+void HeatMapWidget::downsampleImageBuffer(unsigned newWidth, unsigned newHeight)
 {
 	_imageSurface->flush();
 	const unsigned
@@ -735,7 +735,7 @@ void ImageWidget::downsampleImageBuffer(unsigned newWidth, unsigned newHeight)
 	_imageSurface->mark_dirty();
 }
 
-Mask2DCPtr ImageWidget::GetActiveMask() const
+Mask2DCPtr HeatMapWidget::GetActiveMask() const
 {
 	if(!HasImage())
 		throw std::runtime_error("GetActiveMask() called without image");
@@ -759,7 +759,7 @@ Mask2DCPtr ImageWidget::GetActiveMask() const
 	}
 }
 
-TimeFrequencyMetaDataCPtr ImageWidget::GetSelectedMetaData()
+TimeFrequencyMetaDataCPtr HeatMapWidget::GetSelectedMetaData()
 {
 	TimeFrequencyMetaDataCPtr metaData = _metaData;
 
@@ -785,7 +785,7 @@ TimeFrequencyMetaDataCPtr ImageWidget::GetSelectedMetaData()
 	return metaData;
 }
 
-bool ImageWidget::toUnits(double mouseX, double mouseY, int &posX, int &posY)
+bool HeatMapWidget::toUnits(double mouseX, double mouseY, int &posX, int &posY)
 {
 	const unsigned int
 		startX = (unsigned int) round(_startHorizontal * _image->Width()),
@@ -803,7 +803,7 @@ bool ImageWidget::toUnits(double mouseX, double mouseY, int &posX, int &posY)
 	return inDomain;
 }
 
-bool ImageWidget::onMotion(GdkEventMotion *event)
+bool HeatMapWidget::onMotion(GdkEventMotion *event)
 {
 	if(HasImage())
 	{
@@ -822,7 +822,7 @@ bool ImageWidget::onMotion(GdkEventMotion *event)
 	return true;
 }
 
-bool ImageWidget::onLeave(GdkEventCrossing *event)
+bool HeatMapWidget::onLeave(GdkEventCrossing *event)
 {
 	if(_mouseIsIn)
 	{
@@ -832,7 +832,7 @@ bool ImageWidget::onLeave(GdkEventCrossing *event)
 	return true;
 }
 
-bool ImageWidget::onButtonReleased(GdkEventButton *event)
+bool HeatMapWidget::onButtonReleased(GdkEventButton *event)
 {
 	if(HasImage())
 	{

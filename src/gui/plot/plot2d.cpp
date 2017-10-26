@@ -25,8 +25,6 @@ Plot2D::~Plot2D()
 
 void Plot2D::Clear()
 {
-	for(std::vector<Plot2DPointSet*>::iterator i=_pointSets.begin();i!=_pointSets.end();++i)
-		delete *i;
 	_pointSets.clear();
 	_system.Clear();
 }
@@ -34,8 +32,8 @@ void Plot2D::Clear()
 void Plot2D::Render(Gtk::DrawingArea &drawingArea)
 {
 	_system.Clear();
-	for(std::vector<Plot2DPointSet*>::iterator i=_pointSets.begin();i!=_pointSets.end();++i)
-		_system.AddToSystem(**i);
+	for(std::unique_ptr<Plot2DPointSet>& set : _pointSets)
+		_system.AddToSystem(*set);
 
 	Glib::RefPtr<Gdk::Window> window = drawingArea.get_window();
 	if(window)
@@ -119,7 +117,7 @@ void Plot2D::render(Cairo::RefPtr<Cairo::Context> cr)
 			else
 				_verticalScale.InitializeNumericTicks(MinY(), MaxY());
 			_verticalScale.SetUnitsCaption(_customVAxisDescription.empty() ? refPointSet.YUnits() : _customVAxisDescription);
-			_verticalScale.SetPlotDimensions(_width - rightMargin, _height - horiScaleHeight - _topMargin, _topMargin);
+			_verticalScale.SetPlotDimensions(_width - rightMargin, _height - horiScaleHeight - _topMargin, false);
 
 			verticalScaleWidth =  _verticalScale.GetWidth(cr);
 			_horizontalScale.SetPlotDimensions(_width - rightMargin, _height - horiScaleHeight, verticalScaleWidth, 0.0, false);
@@ -129,7 +127,7 @@ void Plot2D::render(Cairo::RefPtr<Cairo::Context> cr)
 			horiScaleHeight = 0.0;
 		}
 		
-		for(std::vector<Plot2DPointSet*>::iterator i=_pointSets.begin();i!=_pointSets.end();++i)
+		for(std::unique_ptr<Plot2DPointSet>& set : _pointSets)
 		{
 			switch(c)
 			{
@@ -144,7 +142,7 @@ void Plot2D::render(Cairo::RefPtr<Cairo::Context> cr)
 			}
 			c = (c+1)%8;
 
-			render(cr, **i);
+			render(cr, *set);
 		}
 		
 		double rightMargin;

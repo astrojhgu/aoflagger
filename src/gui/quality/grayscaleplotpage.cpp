@@ -41,9 +41,9 @@ GrayScalePlotPage::GrayScalePlotPage() :
 	_imagePropertiesWindow(0)
 {
 	_imageWidget.SetCairoFilter(Cairo::FILTER_NEAREST);
-	_imageWidget.SetColorMap(ImageWidget::HotColdMap);
-	_imageWidget.SetRange(ImageWidget::MinMax);
-	_imageWidget.SetScaleOption(ImageWidget::LogScale);
+	_imageWidget.SetColorMap(HeatMapWidget::HotColdMap);
+	_imageWidget.SetRange(HeatMapWidget::MinMax);
+	_imageWidget.SetScaleOption(HeatMapWidget::LogScale);
 	_imageWidget.SetZAxisDescription("Statistical value");
 	_imageWidget.SetManualZAxisDescription(true);
 	_imageWidget.set_size_request(300, 300);

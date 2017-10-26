@@ -1,5 +1,5 @@
-#ifndef IMAGEWIDGET_H
-#define IMAGEWIDGET_H
+#ifndef HEAT_MAP_WIDGET_H
+#define HEAT_MAP_WIDGET_H
 
 #include <gtkmm/drawingarea.h>
 
@@ -12,14 +12,14 @@
 #include "../structures/timefrequencymetadata.h"
 #include "../structures/segmentedimage.h"
 
-class ImageWidget : public Gtk::DrawingArea {
+class HeatMapWidget : public Gtk::DrawingArea {
 	public:
 		enum TFMap { BWMap, InvertedMap, HotColdMap, RedBlueMap, RedYellowBlueMap, FireMap, BlackRedMap, ViridisMap };
 		enum Range { MinMax, Winsorized, Specified };
 		enum ScaleOption { NormalScale, LogScale, ZeroSymmetricScale };
 		
-		ImageWidget();
-		~ImageWidget();
+		HeatMapWidget();
+		~HeatMapWidget();
 
 		bool ShowOriginalMask() const { return _showOriginalMask; }
 		void SetShowOriginalMask(bool newValue) { _showOriginalMask = newValue; }

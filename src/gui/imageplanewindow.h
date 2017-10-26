@@ -14,7 +14,7 @@
 
 #include "../imaging/uvimager.h"
 
-#include "imagewidget.h"
+#include "heatmapwidget.h"
 
 class ImagePlaneWindow : public Gtk::Window {
 	public:
@@ -27,7 +27,7 @@ class ImagePlaneWindow : public Gtk::Window {
 		void Update();
 	private:
 		UVImager _imager;
-		ImageWidget _imageWidget;
+		HeatMapWidget _imageWidget;
 		Gtk::VBox _box;
 		Gtk::HBox _topBox;
 		Gtk::Button _clearButton;

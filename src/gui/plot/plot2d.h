@@ -22,14 +22,14 @@ class Plot2D : public Plotable {
 		void Clear();
 		Plot2DPointSet &StartLine(const std::string &label, const std::string &xDesc = "x", const std::string &yDesc = "y", bool xIsTime = false, enum Plot2DPointSet::DrawingStyle drawingStyle = Plot2DPointSet::DrawLines)
 		{
-			Plot2DPointSet *newSet = new Plot2DPointSet();
-			newSet->SetLabel(label);
-			newSet->SetXIsTime(xIsTime);
-			newSet->SetXDesc(xDesc);
-			newSet->SetYDesc(yDesc);
-			newSet->SetDrawingStyle(drawingStyle);
-			_pointSets.push_back(newSet);
-			return *newSet;
+			_pointSets.emplace_back(new Plot2DPointSet());
+			Plot2DPointSet& newSet = *_pointSets.back();
+			newSet.SetLabel(label);
+			newSet.SetXIsTime(xIsTime);
+			newSet.SetXDesc(xDesc);
+			newSet.SetYDesc(yDesc);
+			newSet.SetDrawingStyle(drawingStyle);
+			return newSet;
 		}
 		Plot2DPointSet &StartLine(const std::string &label, enum Plot2DPointSet::DrawingStyle drawingStyle)
 		{
@@ -208,7 +208,7 @@ class Plot2D : public Plotable {
 
 		HorizontalPlotScale _horizontalScale;
 		VerticalPlotScale _verticalScale;
-		std::vector<Plot2DPointSet*> _pointSets;
+		std::vector<std::unique_ptr<Plot2DPointSet>> _pointSets;
 		int _width, _height;
 		double _topMargin;
 		System _system;

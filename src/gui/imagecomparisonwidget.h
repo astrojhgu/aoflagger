@@ -10,9 +10,9 @@
 #include "../structures/timefrequencymetadata.h"
 #include "../structures/segmentedimage.h"
 
-#include "imagewidget.h"
+#include "heatmapwidget.h"
 
-class ImageComparisonWidget : public ImageWidget {
+class ImageComparisonWidget : public HeatMapWidget {
 	public:
 		enum TFImage { TFOriginalImage, TFRevisedImage, TFContaminatedImage };
 		ImageComparisonWidget();

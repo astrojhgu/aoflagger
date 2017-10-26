@@ -5,9 +5,9 @@
 #include "gtkmm-compat.h"
 
 #include "imagepropertieswindow.h"
-#include "imagewidget.h"
+#include "heatmapwidget.h"
 
-ImagePropertiesWindow::ImagePropertiesWindow(ImageWidget &imageWidget, const std::string &title) :
+ImagePropertiesWindow::ImagePropertiesWindow(HeatMapWidget &imageWidget, const std::string &title) :
 	Gtk::Window(),
 	_imageWidget(imageWidget),
 	_applyButton("_Apply", true),
@@ -124,14 +124,14 @@ void ImagePropertiesWindow::initColorMapButtons()
 	switch(_imageWidget.GetColorMap())
 	{
 		default:
-		case ImageWidget::BWMap: _grayScaleButton.set_active(true); break;
-		case ImageWidget::InvertedMap: _invGrayScaleButton.set_active(true); break;
-		case ImageWidget::HotColdMap: _hotColdScaleButton.set_active(true); break;
-		case ImageWidget::RedBlueMap: _redBlueScaleButton.set_active(true); break;
-		case ImageWidget::BlackRedMap: _blackRedScaleButton.set_active(true); break;
-		case ImageWidget::RedYellowBlueMap: _redBlueYellowScaleButton.set_active(true); break;
-		case ImageWidget::FireMap: _fireScaleButton.set_active(true); break;
-		case ImageWidget::ViridisMap: _viridisScaleButton.set_active(true); break;
+		case HeatMapWidget::BWMap: _grayScaleButton.set_active(true); break;
+		case HeatMapWidget::InvertedMap: _invGrayScaleButton.set_active(true); break;
+		case HeatMapWidget::HotColdMap: _hotColdScaleButton.set_active(true); break;
+		case HeatMapWidget::RedBlueMap: _redBlueScaleButton.set_active(true); break;
+		case HeatMapWidget::BlackRedMap: _blackRedScaleButton.set_active(true); break;
+		case HeatMapWidget::RedYellowBlueMap: _redBlueYellowScaleButton.set_active(true); break;
+		case HeatMapWidget::FireMap: _fireScaleButton.set_active(true); break;
+		case HeatMapWidget::ViridisMap: _viridisScaleButton.set_active(true); break;
 	}
 
 	_colorMapFrame.add(_colorMapBox);
@@ -160,9 +160,9 @@ void ImagePropertiesWindow::initScaleWidgets()
 	switch(_imageWidget.Range())
 	{
 		default:
-		case ImageWidget::MinMax: _minMaxScaleButton.set_active(true); break;
-		case ImageWidget::Winsorized: _winsorizedScaleButton.set_active(true); break;
-		case ImageWidget::Specified: _specifiedScaleButton.set_active(true); break;
+		case HeatMapWidget::MinMax: _minMaxScaleButton.set_active(true); break;
+		case HeatMapWidget::Winsorized: _winsorizedScaleButton.set_active(true); break;
+		case HeatMapWidget::Specified: _specifiedScaleButton.set_active(true); break;
 	}
 	onScaleChanged();
 
@@ -193,9 +193,9 @@ void ImagePropertiesWindow::initOptionsWidgets()
 	switch(_imageWidget.ScaleOption())
 	{
 		default:
-		case ImageWidget::NormalScale: _normalOptionsButton.set_active(true); break;
-		case ImageWidget::LogScale: _logScaleButton.set_active(true); break;
-		case ImageWidget::ZeroSymmetricScale: _zeroSymmetricButton.set_active(true); break;
+		case HeatMapWidget::NormalScale: _normalOptionsButton.set_active(true); break;
+		case HeatMapWidget::LogScale: _logScaleButton.set_active(true); break;
+		case HeatMapWidget::ZeroSymmetricScale: _zeroSymmetricButton.set_active(true); break;
 	}
 
 	_optionsFrame.add(_optionsBox);
@@ -322,39 +322,39 @@ void ImagePropertiesWindow::updateMinMaxEntries()
 void ImagePropertiesWindow::onApplyClicked()
 {
 	if(_grayScaleButton.get_active())
-		_imageWidget.SetColorMap(ImageWidget::BWMap);
+		_imageWidget.SetColorMap(HeatMapWidget::BWMap);
 	else if(_invGrayScaleButton.get_active())
-		_imageWidget.SetColorMap(ImageWidget::InvertedMap);
+		_imageWidget.SetColorMap(HeatMapWidget::InvertedMap);
 	else if(_hotColdScaleButton.get_active())
-		_imageWidget.SetColorMap(ImageWidget::HotColdMap);
+		_imageWidget.SetColorMap(HeatMapWidget::HotColdMap);
 	else if(_redBlueScaleButton.get_active())
-		_imageWidget.SetColorMap(ImageWidget::RedBlueMap);
+		_imageWidget.SetColorMap(HeatMapWidget::RedBlueMap);
 	else if(_blackRedScaleButton.get_active())
-		_imageWidget.SetColorMap(ImageWidget::BlackRedMap);
+		_imageWidget.SetColorMap(HeatMapWidget::BlackRedMap);
 	else if(_redBlueYellowScaleButton.get_active())
-		_imageWidget.SetColorMap(ImageWidget::RedYellowBlueMap);
+		_imageWidget.SetColorMap(HeatMapWidget::RedYellowBlueMap);
 	else if(_fireScaleButton.get_active())
-		_imageWidget.SetColorMap(ImageWidget::FireMap);
+		_imageWidget.SetColorMap(HeatMapWidget::FireMap);
 	else if(_viridisScaleButton.get_active())
-		_imageWidget.SetColorMap(ImageWidget::ViridisMap);
+		_imageWidget.SetColorMap(HeatMapWidget::ViridisMap);
 	
 	if(_minMaxScaleButton.get_active())
-		_imageWidget.SetRange(ImageWidget::MinMax);
+		_imageWidget.SetRange(HeatMapWidget::MinMax);
 	else if(_winsorizedScaleButton.get_active())
-		_imageWidget.SetRange(ImageWidget::Winsorized);
+		_imageWidget.SetRange(HeatMapWidget::Winsorized);
 	else if(_specifiedScaleButton.get_active())
 	{
-		_imageWidget.SetRange(ImageWidget::Specified);
+		_imageWidget.SetRange(HeatMapWidget::Specified);
 		_imageWidget.SetMin(atof(_scaleMinEntry.get_text().c_str()));
 		_imageWidget.SetMax(atof(_scaleMaxEntry.get_text().c_str()));
 	}
 	
 	if(_normalOptionsButton.get_active())
-		_imageWidget.SetScaleOption(ImageWidget::NormalScale);
+		_imageWidget.SetScaleOption(HeatMapWidget::NormalScale);
 	else if(_logScaleButton.get_active())
-		_imageWidget.SetScaleOption(ImageWidget::LogScale);
+		_imageWidget.SetScaleOption(HeatMapWidget::LogScale);
 	else if(_zeroSymmetricButton.get_active())
-		_imageWidget.SetScaleOption(ImageWidget::ZeroSymmetricScale);
+		_imageWidget.SetScaleOption(HeatMapWidget::ZeroSymmetricScale);
 	
 	if(_bestFilterButton.get_active())
 		_imageWidget.SetCairoFilter(Cairo::FILTER_BEST);

@@ -16,7 +16,7 @@
 
 class ImagePropertiesWindow : public Gtk::Window {
 	public:
-		ImagePropertiesWindow(class ImageWidget &imageWidget, const std::string &title);
+		ImagePropertiesWindow(class HeatMapWidget &imageWidget, const std::string &title);
 		~ImagePropertiesWindow() { }
 	private:
 		void onApplyClicked();
@@ -39,7 +39,7 @@ class ImagePropertiesWindow : public Gtk::Window {
 		
 		void updateMinMaxEntries();
 
-		class ImageWidget &_imageWidget;
+		class HeatMapWidget &_imageWidget;
 
 		Gtk::ButtonBox _bottomButtonBox;
 		Gtk::VBox _topVBox;
