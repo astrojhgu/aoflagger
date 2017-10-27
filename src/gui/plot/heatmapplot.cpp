@@ -48,16 +48,15 @@ HeatMapPlot::HeatMapPlot() :
 	_manualTitle(false),
 	_manualXAxisDescription(false),
 	_manualYAxisDescription(false),
-	_manualZAxisDescription(false)
+	_manualZAxisDescription(false),
+	_highlightConfig(new ThresholdConfig())
 {
-	_highlightConfig = new ThresholdConfig();
 	_highlightConfig->InitializeLengthsSingleSample();
 }
 
 HeatMapPlot::~HeatMapPlot()
 {
 	Clear();
-	delete _highlightConfig;
 }
 
 void HeatMapPlot::Clear()
@@ -66,8 +65,7 @@ void HeatMapPlot::Clear()
 	{
 		_originalMask.reset();
 		_alternativeMask.reset();
-		delete _highlightConfig;
-		_highlightConfig = new ThresholdConfig();
+		_highlightConfig.reset(new ThresholdConfig());
 		_highlightConfig->InitializeLengthsSingleSample();
 		_segmentedImage.reset();
 		_image.reset();
@@ -425,7 +423,7 @@ void HeatMapPlot::update(Cairo::RefPtr<Cairo::Context> cairo, unsigned width, un
 		_horiScale->SetPlotDimensions(width - _rightBorderSize + 5.0, height -_topBorderSize - _bottomBorderSize, _vertScale->GetWidth(cairo), _topBorderSize, false);
 	}
 
-	class ColorMap *colorMap = createColorMap();
+	std::unique_ptr<ColorMap> colorMap(createColorMap());
 	
 	const double
 		minLog10 = min>0.0 ? log10(min) : 0.0,
@@ -510,7 +508,7 @@ void HeatMapPlot::update(Cairo::RefPtr<Cairo::Context> cairo, unsigned width, un
 			rowpointer[xa+3]=a;
 		}
 	}
-	delete colorMap;
+	colorMap.reset();
 
 	if(_segmentedImage != 0)
 	{
@@ -548,25 +546,26 @@ void HeatMapPlot::update(Cairo::RefPtr<Cairo::Context> cairo, unsigned width, un
 	redrawWithoutChanges(cairo, width, height);
 } 
 
-ColorMap *HeatMapPlot::createColorMap()
+std::unique_ptr<ColorMap> HeatMapPlot::createColorMap()
 {
+	using CM=std::unique_ptr<ColorMap>;
 	switch(_colorMap) {
 		case BWMap:
-			return new MonochromeMap();
+			return CM(new MonochromeMap());
 		case InvertedMap:
-			return new class InvertedMap();
+			return CM(new class InvertedMap());
 		case HotColdMap:
-			return new ColdHotMap();
+			return CM(new ColdHotMap());
 		case RedBlueMap:
-			return new class RedBlueMap();
+			return CM(new class RedBlueMap());
 		case RedYellowBlueMap:
-			return new class RedYellowBlueMap();
+			return CM(new class RedYellowBlueMap());
 		case FireMap:
-			return new class FireMap();
+			return CM(new class FireMap());
 		case BlackRedMap:
-			return new class BlackRedMap();
+			return CM(new class BlackRedMap());
 		case ViridisMap:
-			return new class ViridisMap();
+			return CM(new class ViridisMap());
 		default:
 			return 0;
 	}

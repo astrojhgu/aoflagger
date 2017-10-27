@@ -211,7 +211,6 @@ private:
 	Image2DCPtr _image;
 	Mask2DCPtr _originalMask, _alternativeMask;
 	bool _highlighting;
-	class ThresholdConfig *_highlightConfig;
 	double _leftBorderSize, _rightBorderSize, _topBorderSize, _bottomBorderSize;
 
 	double _startHorizontal, _endHorizontal;
@@ -238,11 +237,12 @@ private:
 	bool _manualYAxisDescription;
 	bool _manualZAxisDescription;
 	sigc::signal<void> _onZoomChanged;
+	std::unique_ptr<class ThresholdConfig> _highlightConfig;
 	
 	void findMinMax(const Image2D* image, const Mask2D* mask, num_t &min, num_t &max);
 	void update(Cairo::RefPtr<Cairo::Context> cairo, unsigned width, unsigned height);
 	void downsampleImageBuffer(unsigned newWidth, unsigned newHeight);
-	class ColorMap *createColorMap();
+	std::unique_ptr<class ColorMap> createColorMap();
 	std::string actualTitleText() const
 	{
 		if(_manualTitle)
