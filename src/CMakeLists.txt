@@ -64,6 +64,7 @@ set(GUI_QUALITY_FILES
 
 set(GUI_PLOT_FILES
   gui/plot/colorscale.cpp
+  gui/plot/heatmapplot.cpp
   gui/plot/horizontalplotscale.cpp
   gui/plot/plot2d.cpp
   gui/plot/plotpropertieswindow.cpp

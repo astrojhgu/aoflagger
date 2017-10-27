@@ -1957,6 +1957,7 @@ void RFIGuiWindow::onControllerStateChange()
 
 void RFIGuiWindow::onTFZoomChanged()
 {
+	AOLogger::Info << "Zoom changed.\n";
 	bool s = !_timeFrequencyWidget.IsZoomedOut();
 	bool i = _timeFrequencyWidget.HasImage();
 	_zoomToFitButton->set_sensitive(s && i);
