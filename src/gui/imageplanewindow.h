@@ -27,6 +27,7 @@ class ImagePlaneWindow : public Gtk::Window {
 		void Update();
 	private:
 		UVImager _imager;
+		HeatMapPlot _heatMapPlot;
 		HeatMapWidget _imageWidget;
 		Gtk::VBox _box;
 		Gtk::HBox _topBox;

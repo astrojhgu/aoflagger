@@ -13,7 +13,10 @@
 #include "imagepropertieswindow.h"
 
 ImagePlaneWindow::ImagePlaneWindow()
-  : _imager(512, 512), /*3x1024 */ _clearButton("Clear"),
+  :
+  _imager(512, 512),
+  _imageWidget(&_heatMapPlot),
+  _clearButton("Clear"),
 	_applyWeightsButton("Apply weights"),
 	_refreshCurrentButton("R"),
 	_memoryStoreButton("MS"),
@@ -145,7 +148,7 @@ ImagePlaneWindow::ImagePlaneWindow()
 	_box.pack_start(_imageWidget);
 	_imageWidget.add_events(Gdk::BUTTON_RELEASE_MASK | Gdk::BUTTON_PRESS_MASK);
 	_imageWidget.OnButtonReleasedEvent().connect(sigc::mem_fun(*this, &ImagePlaneWindow::onButtonReleased));
-	_imageWidget.SetRange(HeatMapWidget::MinMax);
+	_heatMapPlot.SetRange(HeatMapPlot::MinMax);
 
 	add(_box);
 	_box.show_all();
@@ -218,7 +221,7 @@ void ImagePlaneWindow::Update()
 	if(_uvPlaneButton.get_active())
 	{
 		if(_imager.HasUV()) {
-			_imageWidget.SetImage(std::make_shared<Image2D>(_imager.RealUVImage()));
+			_heatMapPlot.SetImage(std::make_shared<Image2D>(_imager.RealUVImage()));
 			_imageWidget.Update();
 			_displayingUV = true;
 		}
@@ -229,7 +232,7 @@ void ImagePlaneWindow::Update()
 			_imager.PerformFFT();
 
 		if(_imager.HasFFT()) {
-			_imageWidget.SetImage(std::make_shared<Image2D>(_imager.FTReal()));
+			_heatMapPlot.SetImage(std::make_shared<Image2D>(_imager.FTReal()));
 			_imageWidget.Update();
 			printStats();
 			_displayingUV = false;
@@ -250,12 +253,12 @@ void ImagePlaneWindow::onRefreshCurrentClicked()
 
 void ImagePlaneWindow::onMemoryStoreClicked()
 {
-	_memory = _imageWidget.Image();
+	_memory = _heatMapPlot.Image();
 }
 
 void ImagePlaneWindow::onMemoryRecallClicked()
 {
-	_imageWidget.SetImage(_memory);
+	_heatMapPlot.SetImage(_memory);
 	_imageWidget.Update();
 }
 
@@ -264,7 +267,7 @@ void ImagePlaneWindow::onMemoryMultiplyClicked()
 	if(_memory != 0)
 	{
 		Image2DPtr multiplied(std::make_shared<Image2D>(*_memory));
-		Image2DCPtr old = _imageWidget.Image();
+		Image2DCPtr old = _heatMapPlot.Image();
 		for(size_t y=0;y<multiplied->Height();++y)
 		{
 			for(size_t x=0;x<multiplied->Width();++x)
@@ -272,7 +275,7 @@ void ImagePlaneWindow::onMemoryMultiplyClicked()
 				multiplied->SetValue(x, y, multiplied->Value(x, y) * old->Value(x, y));
 			}
 		}
-		_imageWidget.SetImage(multiplied);
+		_heatMapPlot.SetImage(multiplied);
 		_imageWidget.Update();
 		printStats();
 	}
@@ -283,7 +286,7 @@ void ImagePlaneWindow::onMemorySubtractClicked()
 	if(_memory != 0)
 	{
 		Image2DPtr subtracted(std::make_shared<Image2D>(*_memory));
-		Image2DCPtr old = _imageWidget.Image();
+		Image2DCPtr old = _heatMapPlot.Image();
 		for(size_t y=0;y<subtracted->Height();++y)
 		{
 			for(size_t x=0;x<subtracted->Width();++x)
@@ -291,7 +294,7 @@ void ImagePlaneWindow::onMemorySubtractClicked()
 				subtracted->SetValue(x, y, subtracted->Value(x, y) - old->Value(x, y));
 			}
 		}
-		_imageWidget.SetImage(subtracted);
+		_heatMapPlot.SetImage(subtracted);
 		_imageWidget.Update();
 		printStats();
 	}
@@ -299,11 +302,11 @@ void ImagePlaneWindow::onMemorySubtractClicked()
 
 void ImagePlaneWindow::onSqrtClicked()
 {
-	if(_imageWidget.HasImage())
+	if(_heatMapPlot.HasImage())
 	{
-		Image2DPtr sqrtImage(std::make_shared<Image2D>(*_imageWidget.Image()));
+		Image2DPtr sqrtImage(std::make_shared<Image2D>(*_heatMapPlot.Image()));
 		FFTTools::SignedSqrt(sqrtImage);
-		_imageWidget.SetImage(sqrtImage);
+		_heatMapPlot.SetImage(sqrtImage);
 		_imageWidget.Update();
 		printStats();
 	}
@@ -311,14 +314,14 @@ void ImagePlaneWindow::onSqrtClicked()
 
 void ImagePlaneWindow::onPlotHorizontally()
 {
-	if(_imageWidget.HasImage())
+	if(_heatMapPlot.HasImage())
 	{
 		Plot plot("Image-horizontal-axis.pdf");
 		plot.SetXAxisText("RA index");
 		plot.SetYAxisText("Amplitude");
 		//plot.SetLogScale(false, true);
 		plot.StartLine();
-		Image2DCPtr image = _imageWidget.Image();
+		Image2DCPtr image = _heatMapPlot.Image();
 		for(size_t x=0;x<image->Width();++x)
 		{
 			num_t sum = 0.0;
@@ -335,14 +338,14 @@ void ImagePlaneWindow::onPlotHorizontally()
 
 void ImagePlaneWindow::onPlotVertically()
 {
-	if(_imageWidget.HasImage())
+	if(_heatMapPlot.HasImage())
 	{
 		Plot plot("Image-vertical-axis.pdf");
 		plot.SetXAxisText("Declination index");
 		plot.SetYAxisText("Amplitude");
 		//plot.SetLogScale(false, true);
 		plot.StartLine();
-		Image2DCPtr image = _imageWidget.Image();
+		Image2DCPtr image = _heatMapPlot.Image();
 		for(size_t y=0;y<image->Height();++y)
 		{
 			num_t sum = 0.0;
@@ -359,25 +362,25 @@ void ImagePlaneWindow::onPlotVertically()
 
 void ImagePlaneWindow::printStats()
 {
-	if(_imageWidget.HasImage())
+	if(_heatMapPlot.HasImage())
 	{
-		num_t topLeftRMS = _imageWidget.Image()->GetRMS(0, 0, _imageWidget.Image()->Width()/3, _imageWidget.Image()->Height()/3);
-		std::cout << "RMS=" << _imageWidget.Image()->GetRMS()
-			<< ", max=" << _imageWidget.Image()->GetMaximum()
-			<< ", min=" << _imageWidget.Image()->GetMinimum()
+		num_t topLeftRMS = _heatMapPlot.Image()->GetRMS(0, 0, _heatMapPlot.Image()->Width()/3, _heatMapPlot.Image()->Height()/3);
+		std::cout << "RMS=" << _heatMapPlot.Image()->GetRMS()
+			<< ", max=" << _heatMapPlot.Image()->GetMaximum()
+			<< ", min=" << _heatMapPlot.Image()->GetMinimum()
 			<< ", top left RMS=" << topLeftRMS
-			<< ", SNR=" << _imageWidget.Image()->GetMaximum()/topLeftRMS
+			<< ", SNR=" << _heatMapPlot.Image()->GetMaximum()/topLeftRMS
 			<< std::endl;
 	}
 }
 
 void ImagePlaneWindow::onButtonReleased(size_t x, size_t y)
 {
-	if(_imageWidget.HasImage() && _lastMetaData != 0)
+	if(_heatMapPlot.HasImage() && _lastMetaData != 0)
 	{
 		int 
-			width = _imageWidget.Image()->Width(),
-			height = _imageWidget.Image()->Height();
+			width = _heatMapPlot.Image()->Width(),
+			height = _heatMapPlot.Image()->Height();
 			
 		int left = x - 3, right = x + 3, top = y - 3, bottom = y + 3;
 		if(left < 0) left = 0;
@@ -387,8 +390,8 @@ void ImagePlaneWindow::onButtonReleased(size_t x, size_t y)
 		
 		const BandInfo band = _lastMetaData->Band();
 		num_t frequencyHz = band.channels[band.channels.size()/2].frequencyHz;
-		num_t rms = _imageWidget.Image()->GetRMS(left, top, right-left, bottom-top);
-		num_t max = _imageWidget.Image()->GetMaximum(left, top, right-left, bottom-top);
+		num_t rms = _heatMapPlot.Image()->GetRMS(left, top, right-left, bottom-top);
+		num_t max = _heatMapPlot.Image()->GetMaximum(left, top, right-left, bottom-top);
 		num_t xRel = x-width/2.0, yRel = y-height/2.0;
 		const numl_t
 			dist = sqrtnl(xRel*xRel + yRel*yRel),
@@ -417,8 +420,8 @@ void ImagePlaneWindow::onButtonReleased(size_t x, size_t y)
 
 void ImagePlaneWindow::onAngularTransformButton()
 {
-	Image2DPtr transformedImage = FFTTools::AngularTransform(_imageWidget.Image());
-	_imageWidget.SetImage(transformedImage);
+	Image2DPtr transformedImage = FFTTools::AngularTransform(_heatMapPlot.Image());
+	_heatMapPlot.SetImage(transformedImage);
 	_imageWidget.Update();
 }
 
@@ -452,7 +455,7 @@ void ImagePlaneWindow::onSaveFitsButton()
 	if(dialog.run() == Gtk::RESPONSE_OK)
 	{
 		const std::string filename = dialog.get_filename();
-		Image2DCPtr image = _imageWidget.Image();
+		Image2DCPtr image = _heatMapPlot.Image();
 		image->SaveToFitsFile(filename);
 	}
 }

@@ -24,6 +24,7 @@ BOOST_PYTHON_MODULE(aoflagger)
 	def("enlarge", aoflagger_python::enlarge);
 	def("high_pass_filter", aoflagger_python::high_pass_filter);
 	def("low_pass_filter", aoflagger_python::low_pass_filter);
+	def("save_heat_map", aoflagger_python::save_heat_map);
 	def("scale_invariant_rank_operator", aoflagger_python::scale_invariant_rank_operator);
 	def("shrink", aoflagger_python::shrink);
 	def("sumthreshold", aoflagger_python::sumthreshold);

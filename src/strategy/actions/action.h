@@ -32,6 +32,7 @@ namespace rfiStrategy {
 		PlotActionType,
 		QuickCalibrateActionType,
 		ResamplingActionType,
+		SaveHeatMapActionType,
 		SetFlaggingActionType,
 		SetImageActionType,
 		SlidingWindowFitActionType,

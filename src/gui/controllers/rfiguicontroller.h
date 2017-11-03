@@ -7,12 +7,27 @@
 #include "../../structures/timefrequencymetadata.h"
 
 #include "../../strategy/control/pythonstrategy.h"
+#include "../../strategy/control/types.h"
+
+#include "imagecomparisoncontroller.h"
+
+#include <mutex>
 
 class RFIGuiController
 {
 	public:
-		RFIGuiController(class RFIGuiWindow &rfiGuiWindow, class StrategyController* strategyController);
+		RFIGuiController();
 		~RFIGuiController();
+		
+		void AttachWindow(class RFIGuiWindow* rfiGuiWindow)
+		{
+			_rfiGuiWindow = rfiGuiWindow;
+		}
+		
+		void AttachStrategyControl(class StrategyController* strategyController)
+		{
+			_strategyController = strategyController;
+		}
 		
 		bool AreOriginalFlagsShown() const { return _showOriginalFlags; }
 		void SetShowOriginalFlags(bool showFlags) {
@@ -135,6 +150,31 @@ class RFIGuiController
 		
 		void ExecutePythonStrategy();
 		
+ 		bool HasImageSet() const { return _imageSet != nullptr; }
+ 		
+		void SetImageSet(std::unique_ptr<rfiStrategy::ImageSet> newImageSet, bool loadBaseline);
+		
+		void SetImageSetIndex(std::unique_ptr<rfiStrategy::ImageSetIndex> newImageSetIndex);
+		
+		rfiStrategy::ImageSet &GetImageSet() const { return *_imageSet; }
+		
+		rfiStrategy::ImageSetIndex &GetImageSetIndex() const { return *_imageSetIndex; }
+		
+		void LoadCurrentTFData();
+		
+		std::mutex& IOMutex() { return _ioMutex; }
+		
+		void SetRevisedData(const TimeFrequencyData& data);
+		
+		ImageComparisonController& TFController()
+		{ return _tfController; }
+		
+		void LoadSpatial(const std::string& filename);
+		
+		void LoadSpatialTime(const std::string& filename);
+		
+		void LoadPath(const std::string& filename);
+		
 	private:
 		void plotMeanSpectrum(bool weight);
 		
@@ -142,11 +182,16 @@ class RFIGuiController
 		bool _showPP, _showPQ, _showQP, _showQQ;
 		
 		sigc::signal<void> _signalStateChange;
-		class RFIGuiWindow &_rfiGuiWindow;
+		class RFIGuiWindow *_rfiGuiWindow;
 		class StrategyController* _strategyController;
+		class ImageComparisonController _tfController;
+		std::unique_ptr<class SpatialMatrixMetaData> _spatialMetaData;
 		
 		class PlotManager *_plotManager;
 		PythonStrategy _pythonStrategy;
+		std::unique_ptr<rfiStrategy::ImageSet> _imageSet;
+		std::unique_ptr<rfiStrategy::ImageSetIndex> _imageSetIndex;
+		std::mutex _ioMutex;
 };
 
 #endif

@@ -37,15 +37,17 @@ GrayScalePlotPage::GrayScalePlotPage() :
 	_medianNormButton(_rangeTypeGroup, "Median"),
 	_plotPropertiesButton("Properties..."),
 	_selectStatisticKind(QualityTablesFormatter::VarianceStatistic),
+	_heatMapPlot(),
+	_imageWidget(&_heatMapPlot),
 	_ready(false),
-	_imagePropertiesWindow(0)
+	_imagePropertiesWindow(nullptr)
 {
-	_imageWidget.SetCairoFilter(Cairo::FILTER_NEAREST);
-	_imageWidget.SetColorMap(HeatMapWidget::HotColdMap);
-	_imageWidget.SetRange(HeatMapWidget::MinMax);
-	_imageWidget.SetScaleOption(HeatMapWidget::LogScale);
-	_imageWidget.SetZAxisDescription("Statistical value");
-	_imageWidget.SetManualZAxisDescription(true);
+	_imageWidget.Plot().SetCairoFilter(Cairo::FILTER_NEAREST);
+	_imageWidget.Plot().SetColorMap(HeatMapPlot::HotColdMap);
+	_imageWidget.Plot().SetRange(HeatMapPlot::MinMax);
+	_imageWidget.Plot().SetScaleOption(HeatMapPlot::LogScale);
+	_imageWidget.Plot().SetZAxisDescription("Statistical value");
+	_imageWidget.Plot().SetManualZAxisDescription(true);
 	_imageWidget.set_size_request(300, 300);
 	
 	pack_start(_imageWidget);
@@ -213,11 +215,11 @@ void GrayScalePlotPage::updateImageImpl(QualityTablesFormatter::StatisticKind st
 			if(_normalizeYAxisButton.get_active())
 				image = normalizeYAxis(image);
 			
-			_imageWidget.SetZAxisDescription(StatisticsDerivator::GetDescWithUnits(statisticKind));
-			_imageWidget.SetImage(image);
-			_imageWidget.SetOriginalMask(data.GetSingleMask());
+			_imageWidget.Plot().SetZAxisDescription(StatisticsDerivator::GetDescWithUnits(statisticKind));
+			_imageWidget.Plot().SetImage(image);
+			_imageWidget.Plot().SetOriginalMask(data.GetSingleMask());
 			if(pair.second != 0)
-				_imageWidget.SetMetaData(pair.second);
+				_imageWidget.Plot().SetMetaData(pair.second);
 			_imageWidget.Update();
 		}
 	}

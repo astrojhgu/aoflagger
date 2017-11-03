@@ -59,15 +59,15 @@ class GrayScalePlotPage : public PlotSheet {
 		void onSelectSNR() { _selectStatisticKind = QualityTablesFormatter::SignalToNoiseStatistic; updateImage(); }
 		void onPropertiesClicked();
 		
-		void onSelectMinMaxRange() { _imageWidget.SetRange(HeatMapWidget::MinMax); _imageWidget.Update(); }
-		void onSelectWinsorizedRange() { _imageWidget.SetRange(HeatMapWidget::Winsorized); _imageWidget.Update(); }
-		void onSelectSpecifiedRange() { _imageWidget.SetRange(HeatMapWidget::Specified); _imageWidget.Update(); }
+		void onSelectMinMaxRange() { _imageWidget.Plot().SetRange(HeatMapPlot::MinMax); _imageWidget.Update(); }
+		void onSelectWinsorizedRange() { _imageWidget.Plot().SetRange(HeatMapPlot::Winsorized); _imageWidget.Update(); }
+		void onSelectSpecifiedRange() { _imageWidget.Plot().SetRange(HeatMapPlot::Specified); _imageWidget.Update(); }
 		void onLogarithmicScaleClicked()
 		{
 			if(_logarithmicScaleButton.get_active())
-				_imageWidget.SetScaleOption(HeatMapWidget::LogScale);
+				_imageWidget.Plot().SetScaleOption(HeatMapPlot::LogScale);
 			else
-				_imageWidget.SetScaleOption(HeatMapWidget::NormalScale);
+				_imageWidget.Plot().SetScaleOption(HeatMapPlot::NormalScale);
 			 _imageWidget.Update();
 		}
 		void onNormalizeAxesButtonClicked()
@@ -104,6 +104,7 @@ class GrayScalePlotPage : public PlotSheet {
 		Gtk::ToolButton _plotPropertiesButton;
 		
 		QualityTablesFormatter::StatisticKind _selectStatisticKind;
+		HeatMapPlot _heatMapPlot;
 		HeatMapWidget _imageWidget;
 		
 		bool _ready;

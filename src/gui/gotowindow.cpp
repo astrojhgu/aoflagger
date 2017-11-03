@@ -6,6 +6,8 @@
 
 #include "../strategy/imagesets/msimageset.h"
 
+#include "controllers/rfiguicontroller.h"
+
 #include "rfiguiwindow.h"
 
 GoToWindow::GoToWindow(RFIGuiWindow &rfiGuiWindow) : Gtk::Window(),
@@ -14,7 +16,7 @@ GoToWindow::GoToWindow(RFIGuiWindow &rfiGuiWindow) : Gtk::Window(),
 	_loadButton("Load"),
 	_keepOpenCB("Keep window open"),
 	_rfiGuiWindow(rfiGuiWindow),
-	_imageSet(&static_cast<rfiStrategy::IndexableSet&>(rfiGuiWindow.GetImageSet()))
+	_imageSet(&static_cast<rfiStrategy::IndexableSet&>(rfiGuiWindow.Controller().GetImageSet()))
 {
 	set_default_size(0, 500);
 	_antennaeStore = Gtk::ListStore::create(_antennaModelColumns);
@@ -25,7 +27,7 @@ GoToWindow::GoToWindow(RFIGuiWindow &rfiGuiWindow) : Gtk::Window(),
 		_imageSet->Reader()->Set().GetSequences();
 
 	const rfiStrategy::MSImageSetIndex &setIndex =
-		static_cast<rfiStrategy::MSImageSetIndex&>(_rfiGuiWindow.GetImageSetIndex());
+		static_cast<rfiStrategy::MSImageSetIndex&>(_rfiGuiWindow.Controller().GetImageSetIndex());
 	const unsigned antenna1Index = _imageSet->GetAntenna1(setIndex);
 	const unsigned antenna2Index = _imageSet->GetAntenna2(setIndex);
 	const unsigned bandIndex = _imageSet->GetBand(setIndex);
@@ -179,7 +181,7 @@ void GoToWindow::onLoadClicked()
 		size_t a2Index = a2Row[_antennaModelColumns.antennaIndex];
 		size_t bIndex = bRow[_bandModelColumns.bandIndex];
 		size_t sIndex = sRow[_sequenceModelColumns.sequenceIndex];
-		_rfiGuiWindow.SetImageSetIndex(std::unique_ptr<rfiStrategy::ImageSetIndex>(_imageSet->Index(a1Index, a2Index, bIndex, sIndex)));
+		_rfiGuiWindow.Controller().SetImageSetIndex(std::unique_ptr<rfiStrategy::ImageSetIndex>(_imageSet->Index(a1Index, a2Index, bIndex, sIndex)));
 		if(!_keepOpenCB.get_active())
 			hide();
 	}

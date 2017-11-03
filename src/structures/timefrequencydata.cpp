@@ -182,7 +182,7 @@ void TimeFrequencyData::MultiplyImages(long double factor)
 	}
 }
 
-void TimeFrequencyData::JoinMask(const TimeFrequencyData &other)
+void TimeFrequencyData::JoinMask(const TimeFrequencyData& other)
 {
 	if(other.MaskCount() == 0)
 	{
@@ -197,11 +197,18 @@ void TimeFrequencyData::JoinMask(const TimeFrequencyData &other)
 		}
 	} else if(other.MaskCount() == 1)
 	{
-		for(size_t i=0;i<MaskCount();++i)
+		if(MaskCount() == 0)
 		{
-			Mask2D mask(*GetMask(i));
-			mask.Join(*other.GetMask(0));
-			SetMask(i, Mask2DPtr(new Mask2D(mask)));
+			for(size_t i=0; i!=_data.size(); ++i)
+				_data[i]._flagging = other._data[0]._flagging;
+		}	
+		else {
+			for(size_t i=0;i<MaskCount();++i)
+			{
+				Mask2D mask(*GetMask(i));
+				mask.Join(*other.GetMask(0));
+				SetMask(i, Mask2DPtr(new Mask2D(mask)));
+			}
 		}
 	} else if(MaskCount() == 1)
 	{

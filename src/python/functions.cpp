@@ -9,6 +9,8 @@
 #include "../structures/samplerow.h"
 #include "../structures/timefrequencydata.h"
 
+#include "../gui/plot/heatmapplot.h"
+
 #include <boost/python.hpp>
 
 using namespace boost::python;
@@ -89,6 +91,15 @@ void high_pass_filter(Data& data, size_t kernelWidth, size_t kernelHeight, doubl
 	
 	for(size_t i=0;i<imageCount;++i)
 		data.TFData().SetImage(i, filter.ApplyHighPass(data.TFData().GetImage(i), mask));
+}
+
+void save_heat_map(const char* filename, const Data& data)
+{
+	const TimeFrequencyData tfData = data.TFData();
+	HeatMapPlot plot;
+	plot.SetImage(tfData.GetSingleImage());
+	plot.SetAlternativeMask(tfData.GetSingleMask());
+	plot.SaveByExtension(filename, 800, 500);
 }
 
 void scale_invariant_rank_operator(Data& data, double level_horizontal, double level_vertical)

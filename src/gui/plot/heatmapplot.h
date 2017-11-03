@@ -83,9 +83,9 @@ public:
 	void SetHighlighting(bool newValue) { _highlighting = newValue; }
 	class ThresholdConfig &HighlightConfig() { return *_highlightConfig; }
 
-	bool HasImage() const { return _image != 0; }
+	bool HasImage() const { return _image != nullptr; }
 
-	TimeFrequencyMetaDataCPtr GetSelectedMetaData();
+	TimeFrequencyMetaDataCPtr GetSelectedMetaData() const;
 	const TimeFrequencyMetaDataCPtr& GetFullMetaData() const { return _metaData; }
 	void SetMetaData(TimeFrequencyMetaDataCPtr metaData) { _metaData = metaData; }
 	
@@ -239,7 +239,7 @@ private:
 	sigc::signal<void> _onZoomChanged;
 	std::unique_ptr<class ThresholdConfig> _highlightConfig;
 	
-	void findMinMax(const Image2D* image, const Mask2D* mask, num_t &min, num_t &max);
+	void findMinMax(const Image2D* image, const Mask2D* mask, num_t& min, num_t& max);
 	void update(Cairo::RefPtr<Cairo::Context> cairo, unsigned width, unsigned height);
 	void downsampleImageBuffer(unsigned newWidth, unsigned newHeight);
 	std::unique_ptr<class ColorMap> createColorMap();

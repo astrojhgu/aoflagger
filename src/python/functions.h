@@ -18,11 +18,13 @@ namespace aoflagger_python
 	// them later on (and be renamed).
 	void print_polarization_statistics();
 	
-	Data shrink(const Data& data, size_t horizontalFactor, size_t verticalFactor);
+	void save_heat_map(const char* filename, const Data& data);
 	
 	void scale_invariant_rank_operator(Data& data, double level_horizontal, double level_vertical);
 	
 	void set_flag_function(PyObject* callable);
+	
+	Data shrink(const Data& data, size_t horizontalFactor, size_t verticalFactor);
 	
 	void sumthreshold(Data& data, double thresholdFactor, bool horizontal, bool vertical);
 	

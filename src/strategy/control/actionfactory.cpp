@@ -23,6 +23,7 @@
 #include "../actions/plotaction.h"
 #include "../actions/quickcalibrateaction.h"
 #include "../actions/resamplingaction.h"
+#include "../actions/saveheatmapaction.h"
 #include "../actions/setflaggingaction.h"
 #include "../actions/setimageaction.h"
 #include "../actions/slidingwindowfitaction.h"
@@ -62,6 +63,7 @@ const std::vector<std::string> ActionFactory::GetActionList()
 	list.push_back("Plot");
 	list.push_back("Quickly calibrate");
 	list.push_back("Resample");
+	list.push_back("Save heat map");
 	list.push_back("Set flagging");
 	list.push_back("Set image");
 	list.push_back("Singular value decomposition");
@@ -115,14 +117,14 @@ std::unique_ptr<Action> ActionFactory::CreateAction(const std::string &action)
 		return make<IterationBlock>();
 	else if(action == "Normalize variance")
 		return make<NormalizeVarianceAction>();
-	//else if(action == "Phase adapter")
-	//	return make<Adapter>();
 	else if(action == "Plot")
 		return make<PlotAction>();
 	else if(action == "Quickly calibrate")
 		return make<QuickCalibrateAction>();
 	else if(action == "Resample")
 		return make<ResamplingAction>();
+	else if(action == "Save heat map")
+		return make<SaveHeatMapAction>();
 	else if(action == "Set flagging")
 		return make<SetFlaggingAction>();
 	else if(action == "Set image")

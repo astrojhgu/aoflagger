@@ -72,6 +72,7 @@ set(GUI_PLOT_FILES
   gui/plot/verticalplotscale.cpp)
 
 set(GUI_FILES
+  gui/controllers/imagecomparisoncontroller.cpp
   gui/controllers/rfiguicontroller.cpp
   gui/complexplaneplotwindow.cpp
   gui/editstrategywindow.cpp
@@ -135,6 +136,7 @@ set(STRATEGY_ACTION_FILES
   strategy/actions/imageraction.cpp
   strategy/actions/normalizevarianceaction.cpp
   strategy/actions/plotaction.cpp
+  strategy/actions/saveheatmapaction.cpp
   strategy/actions/slidingwindowfitaction.cpp
   strategy/actions/statisticalflagaction.cpp
   strategy/actions/strategy.cpp
@@ -164,16 +166,12 @@ set(STRATEGY_ALGORITHMS_FILES
   strategy/plots/antennaflagcountplot.cpp
   strategy/plots/frequencyflagcountplot.cpp)
 
-if(GTKMM_FOUND)
 set(STRATEGY_PLOTS_FILES
   strategy/plots/frequencypowerplot.cpp
   strategy/plots/iterationsplot.cpp
   strategy/plots/rfiplots.cpp
   strategy/plots/timeflagcountplot.cpp
   util/multiplot.cpp)
-else()
- set(STRATEGY_PLOTS_FILES)
-endif(GTKMM_FOUND)
 
 set(STRATEGY_CONTROL_FILES
   strategy/control/actionblock.cpp
@@ -238,12 +236,10 @@ set(ALL_LIBRARIES
 	${PYTHON_LIBRARY}
 	${CMAKE_THREAD_LIBS_INIT})
 
-if(GTKMM_FOUND AND GLIBMM_FOUND)
-  message(STATUS "GTKMM found.") 
-  include_directories(${GTKMM_INCLUDE_DIRS} ${GLIBMM_INCLUDE_DIRS})
-  link_directories(${GTKMM_LIBDIR} ${GLIBMM_LIBDIR})
-  set(ALL_LIBRARIES ${ALL_LIBRARIES} ${GTKMM_LIBRARIES} ${GLIBMM_LIBRARIES})
-endif(GTKMM_FOUND AND GLIBMM_FOUND)
+message(STATUS "GTKMM found.") 
+include_directories(${GTKMM_INCLUDE_DIRS} ${GLIBMM_INCLUDE_DIRS})
+link_directories(${GTKMM_LIBDIR} ${GLIBMM_LIBDIR})
+set(ALL_LIBRARIES ${ALL_LIBRARIES} ${GTKMM_LIBRARIES} ${GLIBMM_LIBRARIES})
 
 if(SIGCXX_FOUND)
   message(STATUS "SIGCXX found.") 
@@ -252,7 +248,7 @@ if(SIGCXX_FOUND)
   set(ALL_LIBRARIES ${ALL_LIBRARIES} ${SIGCXX_LIBRARIES})
 endif(SIGCXX_FOUND)
 
-add_library(aoflagger SHARED ${IMAGING_FILES} ${INTERFACE_FILES} ${MSIO_FILES} ${QUALITY_FILES} ${STRATEGY_FILES} ${STRUCTURES_FILES} ${UTIL_FILES} ${PYTHON_FILES})
+add_library(aoflagger SHARED ${GUI_PLOT_FILES} ${IMAGING_FILES} ${INTERFACE_FILES} ${MSIO_FILES} ${QUALITY_FILES} ${STRATEGY_FILES} ${STRUCTURES_FILES} ${UTIL_FILES} ${PYTHON_FILES})
 set_target_properties(aoflagger PROPERTIES SOVERSION 0)
 target_link_libraries(aoflagger ${ALL_LIBRARIES})
 

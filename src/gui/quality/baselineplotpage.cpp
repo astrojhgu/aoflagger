@@ -10,10 +10,10 @@ BaselinePlotPage::BaselinePlotPage() :
 	_antennas(0)
 {
 	grayScaleWidget().OnMouseMovedEvent().connect(sigc::mem_fun(*this, &BaselinePlotPage::onMouseMoved));
-	grayScaleWidget().SetXAxisDescription("Antenna 1 index");
-	grayScaleWidget().SetManualXAxisDescription(true);
-	grayScaleWidget().SetYAxisDescription("Antenna 2 index");
-	grayScaleWidget().SetManualYAxisDescription(true);
+	grayScaleWidget().Plot().SetXAxisDescription("Antenna 1 index");
+	grayScaleWidget().Plot().SetManualXAxisDescription(true);
+	grayScaleWidget().Plot().SetYAxisDescription("Antenna 2 index");
+	grayScaleWidget().Plot().SetManualYAxisDescription(true);
 }
 
 BaselinePlotPage::~BaselinePlotPage()
@@ -99,6 +99,6 @@ void BaselinePlotPage::onMouseMoved(size_t x, size_t y)
 	const QualityTablesFormatter::StatisticKind kind = getSelectedStatisticKind();
 	const std::string &kindName = QualityTablesFormatter::KindToName(kind);
 	
-	text << "Correlation " << antenna1Name << " x " << antenna2Name << ", " << kindName << " = " << grayScaleWidget().Image()->Value(x, y);
+	text << "Correlation " << antenna1Name << " x " << antenna2Name << ", " << kindName << " = " << grayScaleWidget().Plot().Image()->Value(x, y);
 	_signalStatusChange(text.str());
 }

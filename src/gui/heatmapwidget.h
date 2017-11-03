@@ -7,9 +7,9 @@
 
 #include "plot/heatmapplot.h"
 
-class HeatMapWidget : public Gtk::DrawingArea, public HeatMapPlot {
+class HeatMapWidget : public Gtk::DrawingArea {
 public:
-	HeatMapWidget();
+	HeatMapWidget(HeatMapPlot* plot);
 
 	sigc::signal<void, size_t, size_t> &OnMouseMovedEvent() { return _onMouseMoved; }
 	sigc::signal<void> &OnMouseLeaveEvent() { return _onMouseLeft; }
@@ -23,16 +23,18 @@ public:
 	
 	void SavePdf(const std::string &filename)
 	{
-		HeatMapPlot::SavePdf(filename, get_width(), get_height());
+		_plot->SavePdf(filename, get_width(), get_height());
 	}
 	void SaveSvg(const std::string &filename)
 	{
-		HeatMapPlot::SaveSvg(filename, get_width(), get_height());
+		_plot->SaveSvg(filename, get_width(), get_height());
 	}
 	void SavePng(const std::string &filename)
 	{
-		HeatMapPlot::SavePng(filename, get_width(), get_height());
+		_plot->SavePng(filename, get_width(), get_height());
 	}
+	HeatMapPlot& Plot() { return *_plot; }
+	const HeatMapPlot& Plot() const { return *_plot; }
 private:
 	bool onDraw(const Cairo::RefPtr<Cairo::Context>& cr);
 	bool onMotion(GdkEventMotion *event);
@@ -45,6 +47,7 @@ private:
 	sigc::signal<void, size_t, size_t> _onMouseMoved;
 	sigc::signal<void> _onMouseLeft;
 	sigc::signal<void, size_t, size_t> _onButtonReleased;
+	HeatMapPlot* _plot;
 };
 
 #endif

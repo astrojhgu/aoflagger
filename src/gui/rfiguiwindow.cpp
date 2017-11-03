@@ -13,7 +13,6 @@
 #include "../structures/timefrequencydata.h"
 #include "../structures/timefrequencymetadata.h"
 #include "../structures/segmentedimage.h"
-#include "../structures/spatialmatrixmetadata.h"
 
 #include "../strategy/actions/strategy.h"
 
@@ -21,8 +20,6 @@
 #include "../strategy/control/defaultstrategy.h"
 
 #include "../strategy/imagesets/msimageset.h"
-#include "../strategy/imagesets/spatialmsimageset.h"
-#include "../strategy/imagesets/spatialtimeimageset.h"
 
 #include "../strategy/algorithms/baselineselector.h"
 #include "../strategy/algorithms/morphology.h"
@@ -38,6 +35,7 @@
 #include "../strategy/plots/iterationsplot.h"
 #include "../strategy/plots/timeflagcountplot.h"
 
+#include "controllers/imagecomparisoncontroller.h"
 #include "controllers/rfiguicontroller.h"
 
 #include "complexplaneplotwindow.h"
@@ -61,22 +59,26 @@
 
 #include <iostream>
 
-RFIGuiWindow::RFIGuiWindow() : 
-	_controller(new RFIGuiController(*this, this)),
+RFIGuiWindow::RFIGuiWindow(RFIGuiController* controller) : 
+	_controller(controller),
 	_mainVBox(Gtk::ORIENTATION_VERTICAL),
+	_timeFrequencyWidget(&_controller->TFController().Plot()),
 	_plotWindow(new PlotWindow(_controller->PlotManager())),
 	_gaussianTestSets(true)
 {
+	_controller->AttachWindow(this);
+	_controller->AttachStrategyControl(this);
+	
 	createToolbar();
 
 	_mainVBox.pack_start(_timeFrequencyWidget, Gtk::PACK_EXPAND_WIDGET);
 	_timeFrequencyWidget.OnMouseMovedEvent().connect(sigc::mem_fun(*this, &RFIGuiWindow::onTFWidgetMouseMoved));
 	_timeFrequencyWidget.OnMouseLeaveEvent().connect(sigc::mem_fun(*this, &RFIGuiWindow::setSetNameInStatusBar));
 	_timeFrequencyWidget.OnButtonReleasedEvent().connect(sigc::mem_fun(*this, &RFIGuiWindow::onTFWidgetButtonReleased));
-	_timeFrequencyWidget.OnZoomChanged().connect(sigc::mem_fun(*this, &RFIGuiWindow::onTFZoomChanged));
-	_timeFrequencyWidget.SetShowXAxisDescription(false);
-	_timeFrequencyWidget.SetShowYAxisDescription(false);
-	_timeFrequencyWidget.SetShowZAxisDescription(false);
+	_timeFrequencyWidget.Plot().OnZoomChanged().connect(sigc::mem_fun(*this, &RFIGuiWindow::onTFZoomChanged));
+	_timeFrequencyWidget.Plot().SetShowXAxisDescription(false);
+	_timeFrequencyWidget.Plot().SetShowYAxisDescription(false);
+	_timeFrequencyWidget.Plot().SetShowZAxisDescription(false);
 	_timeFrequencyWidget.show();
 
 	_mainVBox.pack_end(_statusbar, Gtk::PACK_SHRINK);
@@ -102,7 +104,6 @@ RFIGuiWindow::RFIGuiWindow() :
 
 RFIGuiWindow::~RFIGuiWindow()
 {
-	std::unique_lock<std::mutex> lock(_ioMutex);
 	while(!_actionGroup->get_actions().empty())
 		_actionGroup->remove(*_actionGroup->get_actions().begin());
 	
@@ -116,13 +117,7 @@ RFIGuiWindow::~RFIGuiWindow()
 	_highlightWindow.reset();
 	_imagePropertiesWindow.reset();
 	
-	// The rfistrategy needs the lock to clean up
-	lock.unlock();
 	_strategy.reset();
-	_imageSetIndex.reset();
-	_imageSet.reset();
-	_spatialMetaData.reset();
-	_controller.reset();
 }
 
 void RFIGuiWindow::onActionDirectoryOpen()
@@ -157,11 +152,7 @@ void RFIGuiWindow::onActionDirectoryOpenForSpatial()
 
   if(result == Gtk::RESPONSE_OK)
 	{
-		std::unique_lock<std::mutex> lock(_ioMutex);
-		std::unique_ptr<rfiStrategy::SpatialMSImageSet> imageSet(new rfiStrategy::SpatialMSImageSet(dialog.get_filename()));
-		imageSet->Initialize();
-		lock.unlock();
-		SetImageSet(std::move(imageSet), true);
+		_controller->LoadSpatial(dialog.get_filename());
 	}
 }
 
@@ -179,11 +170,7 @@ void RFIGuiWindow::onActionDirectoryOpenForST()
 
   if(result == Gtk::RESPONSE_OK)
 	{
-		std::unique_lock<std::mutex> lock(_ioMutex);
-		std::unique_ptr<rfiStrategy::SpatialTimeImageSet> imageSet(new rfiStrategy::SpatialTimeImageSet(dialog.get_filename()));
-		imageSet->Initialize();
-		lock.unlock();
-		SetImageSet(std::move(imageSet), true);
+		_controller->LoadSpatialTime(dialog.get_filename());
 	}
 }
 
@@ -213,28 +200,33 @@ void RFIGuiWindow::OpenPath(const std::string &path)
 		_optionWindow->present();
 	}
 	else {
-		std::unique_lock<std::mutex> lock(_ioMutex);
-		std::unique_ptr<rfiStrategy::ImageSet> imageSet(rfiStrategy::ImageSet::Create(path, DirectReadMode));
-		imageSet->Initialize();
-		lock.unlock();
-		
-		rfiStrategy::DefaultStrategy::TelescopeId telescopeId;
-		unsigned flags;
-		double frequency, timeResolution, frequencyResolution;
-		rfiStrategy::DefaultStrategy::DetermineSettings(*imageSet, telescopeId, flags, frequency, timeResolution, frequencyResolution);
-		Strategy().RemoveAll();
-		rfiStrategy::DefaultStrategy::LoadStrategy(
-			Strategy(),
-			telescopeId,
-			flags | rfiStrategy::DefaultStrategy::FLAG_GUI_FRIENDLY,
-			frequency,
-			timeResolution,
-			frequencyResolution
-		);
-		NotifyChange();
-		
-		SetImageSet(std::move(imageSet), true);
+		_controller->LoadPath(path);
 	}
+}
+
+TimeFrequencyData RFIGuiWindow::GetActiveData() const
+{
+	return _controller->TFController().GetActiveData();
+}
+const TimeFrequencyData &RFIGuiWindow::GetOriginalData() const
+{
+	return _controller->TFController().OriginalData();
+}
+const TimeFrequencyData &RFIGuiWindow::GetContaminatedData() const
+{
+	return _controller->TFController().ContaminatedData();
+}
+class ThresholdConfig &RFIGuiWindow::HighlightConfig()
+{
+	return _controller->TFController().Plot().HighlightConfig();
+}
+void RFIGuiWindow::SetHighlighting(bool newValue)
+{
+	_controller->TFController().Plot().SetHighlighting(newValue);
+}
+TimeFrequencyMetaDataCPtr RFIGuiWindow::SelectedMetaData()
+{
+	return _controller->TFController().Plot().GetSelectedMetaData();
 }
 
 void RFIGuiWindow::onToggleFlags()
@@ -251,59 +243,9 @@ void RFIGuiWindow::onTogglePolarizations()
 	_controller->SetShowQQ(_showQQButton->get_active());
 }
 
-void RFIGuiWindow::loadCurrentTFData()
-{
-	if(_imageSet != 0) {
-		try {
-			std::unique_lock<std::mutex> lock(_ioMutex);
-			_imageSet->AddReadRequest(*_imageSetIndex);
-			_imageSet->PerformReadRequests();
-			std::unique_ptr<rfiStrategy::BaselineData> baseline = _imageSet->GetNextRequested();
-			lock.unlock();
-			
-			_timeFrequencyWidget.SetNewData(baseline->Data(), baseline->MetaData());
-			baseline.reset();
-			
-			_spatialMetaData.reset();
-			rfiStrategy::SpatialMSImageSet* smsImageSet =
-				dynamic_cast<rfiStrategy::SpatialMSImageSet*>(_imageSet.get());
-			if(smsImageSet != nullptr)
-			{
-				_spatialMetaData.reset(new SpatialMatrixMetaData(smsImageSet->SpatialMetaData(*_imageSetIndex)));
-			}
-			// Disable forward/back buttons when only one baseline is available
-			std::unique_ptr<rfiStrategy::ImageSetIndex> firstIndex = _imageSet->StartIndex();
-			firstIndex->Next();
-			bool multipleBaselines = firstIndex->IsValid();
-			firstIndex.reset();
-			_previousButton->set_sensitive(multipleBaselines);
-			_reloadButton->set_sensitive(true);
-			_nextButton->set_sensitive(multipleBaselines);
-			
-			// We store these seperate, as they might access the measurement set. This is
-			// not only faster (the names are used in the onMouse.. events) but also less dangerous,
-			// since the set can be simultaneously accessed by another thread. (thus the io mutex should
-			// be locked before calling below statements).
-			lock.lock();
-			_imageSetName = _imageSet->Name();
-			_imageSetIndexDescription = _imageSetIndex->Description();
-			lock.unlock();
-			
-			_timeFrequencyWidget.SetTitleText(_imageSetIndexDescription);
-			_timeFrequencyWidget.Update();
-			
-			setSetNameInStatusBar();
-		} catch(std::exception &e)
-		{
-			AOLogger::Error << e.what() << '\n';
-			showError(e.what());
-		}
-	}
-}
-
 void RFIGuiWindow::setSetNameInStatusBar()
 {
-  if(HasImageSet()) {
+  if(_controller->HasImageSet()) {
 		_statusbar.pop();
 		_statusbar.push(_imageSetName + ": " + _imageSetIndexDescription);
   }
@@ -311,21 +253,21 @@ void RFIGuiWindow::setSetNameInStatusBar()
 		
 void RFIGuiWindow::onLoadPrevious()
 {
-	if(_imageSet != 0) {
-		std::unique_lock<std::mutex> lock(_ioMutex);
-		_imageSetIndex->Previous();
+	if(_controller->HasImageSet()) {
+		std::unique_lock<std::mutex> lock(_controller->IOMutex());
+		_controller->GetImageSetIndex().Previous();
 		lock.unlock();
-		loadCurrentTFData();
+		_controller->LoadCurrentTFData();
 	}
 }
 
 void RFIGuiWindow::onLoadNext()
 {
-	if(_imageSet != 0) {
-		std::unique_lock<std::mutex> lock(_ioMutex);
-		_imageSetIndex->Next();
+	if(_controller->HasImageSet()) {
+		std::unique_lock<std::mutex> lock(_controller->IOMutex());
+		_controller->GetImageSetIndex().Next();
 		lock.unlock();
-		loadCurrentTFData();
+		_controller->LoadCurrentTFData();
 	}
 }
 
@@ -340,7 +282,7 @@ void RFIGuiWindow::onExecuteStrategyPressed()
 	_progressWindow.reset(new ProgressWindow(*this));
 	_progressWindow->show();
 
-	rfiStrategy::ArtifactSet artifacts(&_ioMutex);
+	rfiStrategy::ArtifactSet artifacts(&_controller->IOMutex());
 
 	artifacts.SetAntennaFlagCountPlot(new AntennaFlagCountPlot());
 	artifacts.SetFrequencyFlagCountPlot(new FrequencyFlagCountPlot());
@@ -356,17 +298,16 @@ void RFIGuiWindow::onExecuteStrategyPressed()
 	{
 		artifacts.SetOriginalData(GetOriginalData());
 		artifacts.SetContaminatedData(GetContaminatedData());
-		TimeFrequencyData *zero = new TimeFrequencyData(GetOriginalData());
-		zero->SetImagesToZero();
-		artifacts.SetRevisedData(*zero);
-		delete zero;
+		TimeFrequencyData zero(GetOriginalData());
+		zero.SetImagesToZero();
+		artifacts.SetRevisedData(zero);
 	}
-	if(_timeFrequencyWidget.GetFullMetaData() != 0)
-			artifacts.SetMetaData(_timeFrequencyWidget.GetFullMetaData());
-	if(HasImageSet())
+	if(_timeFrequencyWidget.Plot().GetFullMetaData() != nullptr)
+			artifacts.SetMetaData(_timeFrequencyWidget.Plot().GetFullMetaData());
+	if(_controller->HasImageSet())
 	{
-		artifacts.SetImageSet(_imageSet.get());
-		artifacts.SetImageSetIndex(_imageSetIndex.get());
+		artifacts.SetImageSet(&_controller->GetImageSet());
+		artifacts.SetImageSetIndex(&_controller->GetImageSetIndex());
 	}
 	_strategy->InitializeAll();
 	try {
@@ -380,18 +321,18 @@ void RFIGuiWindow::onExecuteStrategyPressed()
 void RFIGuiWindow::onExecuteStrategyFinished()
 {
 	rfiStrategy::ArtifactSet *artifacts = _strategy->JoinThread();
-	if(artifacts != 0)
+	if(artifacts != nullptr)
 	{
 		bool update = false;
 		if(!artifacts->RevisedData().IsEmpty())
 		{
-			_timeFrequencyWidget.SetRevisedData(artifacts->RevisedData());
+			_controller->TFController().SetRevisedData(artifacts->RevisedData());
 			update = true;
 		}
 
 		if(!artifacts->ContaminatedData().IsEmpty())
 		{
-			_timeFrequencyWidget.SetContaminatedData(artifacts->ContaminatedData());
+			_controller->TFController().SetContaminatedData(artifacts->ContaminatedData());
 			update = true;
 		}
 		
@@ -430,38 +371,21 @@ void RFIGuiWindow::onExecuteStrategyFinished()
 
 void RFIGuiWindow::onToggleImage()
 {
-	ImageComparisonWidget::TFImage image = ImageComparisonWidget::TFOriginalImage;
+	ImageComparisonController::TFImage image = ImageComparisonController::TFOriginalImage;
 	if(_backgroundImageButton->get_active())
-		image = ImageComparisonWidget::TFRevisedImage;
+		image = ImageComparisonController::TFRevisedImage;
 	else if(_diffImageButton->get_active())
-		image = ImageComparisonWidget::TFContaminatedImage;
-	_timeFrequencyWidget.SetVisualizedImage(image);
+		image = ImageComparisonController::TFContaminatedImage;
+	_controller->TFController().SetVisualizedImage(image);
 	_timeFrequencyWidget.Update();
 }
 
-void RFIGuiWindow::SetImageSet(std::unique_ptr<rfiStrategy::ImageSet> newImageSet, bool loadBaseline)
+void RFIGuiWindow::UpdateImageSetIndex()
 {
-	_imageSetIndex = newImageSet->StartIndex();
-	_imageSet = std::move(newImageSet);
-	
-	if(loadBaseline)
+	if(_controller->HasImageSet())
 	{
-		if(dynamic_cast<rfiStrategy::IndexableSet*>(_imageSet.get()) != 0)
-		{
-			onGoToPressed();
-		} else {
-			loadCurrentTFData();
-		}
-	}
-}
-
-void RFIGuiWindow::SetImageSetIndex(std::unique_ptr<rfiStrategy::ImageSetIndex> newImageSetIndex)
-{
-	if(HasImageSet())
-	{
-		_imageSetIndex = std::move(newImageSetIndex);
-		_imageSetIndexDescription = _imageSetIndex->Description();
-		loadCurrentTFData();
+		_imageSetIndexDescription = _controller->GetImageSetIndex().Description();
+		_controller->LoadCurrentTFData();
 	}
 }
 
@@ -1096,9 +1020,9 @@ void RFIGuiWindow::createToolbar()
 
 void RFIGuiWindow::onClearAltFlagsPressed()
 {
-	TimeFrequencyData& data = _timeFrequencyWidget.ContaminatedData();
+	TimeFrequencyData& data = _controller->TFController().ContaminatedData();
 	data.SetMasksToValue<false>();
-	_timeFrequencyWidget.SetContaminatedData(data);
+	_controller->TFController().SetContaminatedData(data);
 	_timeFrequencyWidget.Update();
 }
 
@@ -1106,8 +1030,8 @@ void RFIGuiWindow::onDifferenceToOriginalPressed()
 {
 	if(HasImage())
 	{
-		TimeFrequencyData data(_timeFrequencyWidget.ContaminatedData());
-		_timeFrequencyWidget.SetNewData(data, _timeFrequencyWidget.GetFullMetaData());
+		TimeFrequencyData data(_controller->TFController().ContaminatedData());
+		_controller->TFController().SetNewData(data, _timeFrequencyWidget.Plot().GetFullMetaData());
 	}
 	if(_originalImageButton->get_active())
 		_timeFrequencyWidget.Update();
@@ -1119,9 +1043,9 @@ void RFIGuiWindow::onBackgroundToOriginalPressed()
 {
 	if(HasImage())
 	{
-		TimeFrequencyData data(_timeFrequencyWidget.RevisedData());
-		_timeFrequencyWidget.ClearBackground();
-		_timeFrequencyWidget.SetNewData(data, _timeFrequencyWidget.GetFullMetaData());
+		TimeFrequencyData data(_controller->TFController().RevisedData());
+		_controller->TFController().ClearBackground();
+		_controller->TFController().SetNewData(data, _timeFrequencyWidget.Plot().GetFullMetaData());
 	}
 	if(_originalImageButton->get_active())
 		_timeFrequencyWidget.Update();
@@ -1143,7 +1067,7 @@ void RFIGuiWindow::onAddStaticFringe()
 			TimeFrequencyMetaDataCPtr metaData = SelectedMetaData();
 			TimeFrequencyData data(GetActiveData());
 			FringeTestCreater::AddStaticFringe(data, metaData, 1.0L);
-			_timeFrequencyWidget.SetNewData(data, metaData);
+			_controller->TFController().SetNewData(data, metaData);
 			_timeFrequencyWidget.Update();
 		}
 	} catch(std::exception &e)
@@ -1162,7 +1086,7 @@ void RFIGuiWindow::onAdd1SigmaFringe()
 			TimeFrequencyData data(GetActiveData());
 			ThresholdTools::MeanAndStdDev(data.GetRealPart().get(), data.GetSingleMask().get(), mean, stddev);
 			FringeTestCreater::AddStaticFringe(data, metaData, stddev);
-			_timeFrequencyWidget.SetNewData(data, _timeFrequencyWidget.GetSelectedMetaData());
+			_controller->TFController().SetNewData(data, _timeFrequencyWidget.Plot().GetSelectedMetaData());
 			_timeFrequencyWidget.Update();
 		}
 	} catch(std::exception &e)
@@ -1183,7 +1107,7 @@ void RFIGuiWindow::onSetToOne()
 		imaginary->SetAll(0.0);
 		TimeFrequencyData newData(data.GetPolarization(0), real, imaginary);
 		newData.SetMask(data);
-		_timeFrequencyWidget.SetNewData(newData, _timeFrequencyWidget.GetSelectedMetaData());
+		_controller->TFController().SetNewData(newData, _timeFrequencyWidget.Plot().GetSelectedMetaData());
 		_timeFrequencyWidget.Update();
 	} catch(std::exception &e)
 	{
@@ -1203,7 +1127,7 @@ void RFIGuiWindow::onSetToI()
 		imaginary->SetAll(1.0);
 		TimeFrequencyData newData(data.GetPolarization(0), real, imaginary);
 		newData.SetMask(data);
-		_timeFrequencyWidget.SetNewData(newData, _timeFrequencyWidget.GetSelectedMetaData());
+		_controller->TFController().SetNewData(newData, _timeFrequencyWidget.Plot().GetSelectedMetaData());
 		_timeFrequencyWidget.Update();
 	} catch(std::exception &e)
 	{
@@ -1223,7 +1147,7 @@ void RFIGuiWindow::onSetToOnePlusI()
 		imaginary->SetAll(1.0);
 		TimeFrequencyData newData(data.GetPolarization(0), real, imaginary);
 		newData.SetMask(data);
-		_timeFrequencyWidget.SetNewData(newData, _timeFrequencyWidget.GetSelectedMetaData());
+		_controller->TFController().SetNewData(newData, _timeFrequencyWidget.Plot().GetSelectedMetaData());
 		_timeFrequencyWidget.Update();
 	} catch(std::exception &e)
 	{
@@ -1233,7 +1157,7 @@ void RFIGuiWindow::onSetToOnePlusI()
 
 void RFIGuiWindow::onShowStats()
 {
-	if(_timeFrequencyWidget.HasImage())
+	if(_timeFrequencyWidget.Plot().HasImage())
 	{
 		TimeFrequencyData activeData = GetActiveData();
 		TimeFrequencyStatistics statistics(activeData);
@@ -1241,8 +1165,8 @@ void RFIGuiWindow::onShowStats()
 		s << "Percentage flagged: " << TimeFrequencyStatistics::FormatRatio(statistics.GetFlaggedRatio()) << "\n";
 			
 		Mask2DCPtr
-			original = _timeFrequencyWidget.OriginalMask(),
-			alternative = _timeFrequencyWidget.AlternativeMask();
+			original = _controller->TFController().Plot().OriginalMask(),
+			alternative = _controller->TFController().Plot().AlternativeMask();
 		Mask2DPtr
 			intersect;
 		if(original != 0 && alternative != 0)
@@ -1379,8 +1303,8 @@ void RFIGuiWindow::keepPhasePart(enum TimeFrequencyData::ComplexRepresentation p
 	if(HasImage())
 	{
 		try {
-			_timeFrequencyWidget.SetNewData(
-				_timeFrequencyWidget.GetActiveData().Make(phaseRepresentation), _timeFrequencyWidget.GetSelectedMetaData());
+			_controller->TFController().SetNewData(
+				_controller->TFController().GetActiveData().Make(phaseRepresentation), _controller->TFController().Plot().GetSelectedMetaData());
 			_timeFrequencyWidget.Update();
 		} catch(std::exception &e)
 		{
@@ -1405,8 +1329,8 @@ void RFIGuiWindow::keepPolarisation(PolarizationEnum polarisation)
 	if(HasImage())
 	{
 		try {
-			_timeFrequencyWidget.SetNewData(
-				_timeFrequencyWidget.GetActiveData().Make(polarisation), _timeFrequencyWidget.GetSelectedMetaData());
+			_controller->TFController().SetNewData(
+				_controller->TFController().GetActiveData().Make(polarisation), _controller->TFController().Plot().GetSelectedMetaData());
 			_timeFrequencyWidget.Update();
 		} catch(std::exception &e)
 		{
@@ -1428,10 +1352,10 @@ void RFIGuiWindow::keepPolarisation(PolarizationEnum polarisation)
 
 void RFIGuiWindow::onGoToPressed()
 {
-	if(HasImageSet())
+	if(_controller->HasImageSet())
 	{
 		rfiStrategy::IndexableSet *msSet =
-			dynamic_cast<rfiStrategy::IndexableSet*>(_imageSet.get());
+			dynamic_cast<rfiStrategy::IndexableSet*>(&_controller->GetImageSet());
 		if(msSet != nullptr)
 		{
 			_gotoWindow.reset(new GoToWindow(*this));
@@ -1444,18 +1368,18 @@ void RFIGuiWindow::onGoToPressed()
 
 void RFIGuiWindow::onReloadPressed()
 {
-	if(HasImageSet())
+	if(_controller->HasImageSet())
 	{
-		loadCurrentTFData();
+		_controller->LoadCurrentTFData();
 	}
 }
 
 void RFIGuiWindow::onLoadLongestBaselinePressed()
 {
-	if(HasImageSet())
+	if(_controller->HasImageSet())
 	{
 		rfiStrategy::MSImageSet *msSet =
-			dynamic_cast<rfiStrategy::MSImageSet*>(_imageSet.get());
+			dynamic_cast<rfiStrategy::MSImageSet*>(&_controller->GetImageSet());
 		if(msSet != nullptr)
 		{
 			double longestSq = 0.0;
@@ -1466,8 +1390,8 @@ void RFIGuiWindow::onLoadLongestBaselinePressed()
 				antennas[a] = msSet->GetAntennaInfo(a);
 			
 			std::unique_ptr<rfiStrategy::ImageSetIndex> index(msSet->StartIndex());
-			size_t band = msSet->GetBand(*_imageSetIndex);
-			size_t sequenceId = msSet->GetSequenceId(*_imageSetIndex);
+			size_t band = msSet->GetBand(_controller->GetImageSetIndex());
+			size_t sequenceId = msSet->GetSequenceId(_controller->GetImageSetIndex());
 			while(index->IsValid())
 			{
 				if(sequenceId == msSet->GetSequenceId(*index) && band == msSet->GetBand(*index))
@@ -1485,7 +1409,7 @@ void RFIGuiWindow::onLoadLongestBaselinePressed()
 				}
 				index->Next();
 			}
-			SetImageSetIndex(std::unique_ptr<rfiStrategy::MSImageSetIndex>(
+			_controller->SetImageSetIndex(std::unique_ptr<rfiStrategy::MSImageSetIndex>(
 				msSet->Index(longestA1, longestA2, band, sequenceId)));
 		}
 	}
@@ -1493,10 +1417,10 @@ void RFIGuiWindow::onLoadLongestBaselinePressed()
 
 void RFIGuiWindow::onLoadShortestBaselinePressed()
 {
-	if(HasImageSet())
+	if(_controller->HasImageSet())
 	{
 		rfiStrategy::MSImageSet *msSet =
-			dynamic_cast<rfiStrategy::MSImageSet*>(_imageSet.get());
+			dynamic_cast<rfiStrategy::MSImageSet*>(&_controller->GetImageSet());
 		if(msSet != nullptr)
 		{
 			double smallestSq = 1e26;
@@ -1507,8 +1431,8 @@ void RFIGuiWindow::onLoadShortestBaselinePressed()
 				antennas[a] = msSet->GetAntennaInfo(a);
 			
 			std::unique_ptr<rfiStrategy::ImageSetIndex> index(msSet->StartIndex());
-			size_t band = msSet->GetBand(*_imageSetIndex);
-			size_t sequenceId = msSet->GetSequenceId(*_imageSetIndex);
+			size_t band = msSet->GetBand(_controller->GetImageSetIndex());
+			size_t sequenceId = msSet->GetSequenceId(_controller->GetImageSetIndex());
 			while(index->IsValid())
 			{
 				if(sequenceId == msSet->GetSequenceId(*index) && band == msSet->GetBand(*index))
@@ -1526,7 +1450,7 @@ void RFIGuiWindow::onLoadShortestBaselinePressed()
 				}
 				index->Next();
 			}
-			SetImageSetIndex(std::unique_ptr<rfiStrategy::MSImageSetIndex>(
+			_controller->SetImageSetIndex(std::unique_ptr<rfiStrategy::MSImageSetIndex>(
 				msSet->Index(smallestA1, smallestA2, band, sequenceId)));
 		}
 	}
@@ -1534,12 +1458,12 @@ void RFIGuiWindow::onLoadShortestBaselinePressed()
 
 void RFIGuiWindow::onTFWidgetMouseMoved(size_t x, size_t y)
 {
-	Image2DCPtr image = _timeFrequencyWidget.Image();
+	Image2DCPtr image = _timeFrequencyWidget.Plot().Image();
 	num_t v = image->Value(x, y);
 	_statusbar.pop();
 	std::stringstream s;
 		s << "x=" << x << ",y=" << y << ",value=" << v;
-	TimeFrequencyMetaDataCPtr metaData =_timeFrequencyWidget.GetFullMetaData();
+	TimeFrequencyMetaDataCPtr metaData =_timeFrequencyWidget.Plot().GetFullMetaData();
 	if(metaData != 0)
 	{
 		if(metaData->HasObservationTimes() && metaData->HasBand())
@@ -1576,17 +1500,15 @@ void RFIGuiWindow::onSetAndShowImagePlane()
 void RFIGuiWindow::onAddToImagePlane()
 {
 	try {
-		if(_timeFrequencyWidget.GetFullMetaData() != 0 && _timeFrequencyWidget.GetFullMetaData()->HasUVW())
+		if(_timeFrequencyWidget.Plot().GetFullMetaData() != 0 && _timeFrequencyWidget.Plot().GetFullMetaData()->HasUVW())
 		{
 			TimeFrequencyData activeData = GetActiveData();
 			if(activeData.PolarizationCount() != 1)
 			{
 				activeData = activeData.Make(Polarization::StokesI);
 			}
-			_imagePlaneWindow->AddData(activeData, _timeFrequencyWidget.GetSelectedMetaData());
+			_imagePlaneWindow->AddData(activeData, _timeFrequencyWidget.Plot().GetSelectedMetaData());
 		}
-		else if(_spatialMetaData != nullptr)
-			_imagePlaneWindow->AddData(GetActiveData(), _spatialMetaData.get());
 		else
 			showError("No meta data found.");
 	}  catch(std::exception &e)
@@ -1599,7 +1521,7 @@ void RFIGuiWindow::onMultiplyData()
 {
 	TimeFrequencyData data(GetActiveData());
 	data.MultiplyImages(2.0L);
-	_timeFrequencyWidget.SetNewData(data, _timeFrequencyWidget.GetSelectedMetaData());
+	_controller->TFController().SetNewData(data, _timeFrequencyWidget.Plot().GetSelectedMetaData());
 	_timeFrequencyWidget.Update();
 }
 
@@ -1608,7 +1530,7 @@ void RFIGuiWindow::onSegment()
 	_segmentedImage = SegmentedImage::CreateUnsetPtr(GetOriginalData().ImageWidth(),  GetOriginalData().ImageHeight());
 	Morphology morphology;
 	morphology.SegmentByLengthRatio(GetActiveData().GetSingleMask().get(), _segmentedImage);
-	_timeFrequencyWidget.SetSegmentedImage(_segmentedImage);
+	_timeFrequencyWidget.Plot().SetSegmentedImage(_segmentedImage);
 	Update();
 }
 
@@ -1618,7 +1540,7 @@ void RFIGuiWindow::onCluster()
 	{
 		Morphology morphology;
 		morphology.Cluster(_segmentedImage);
-	_timeFrequencyWidget.SetSegmentedImage(_segmentedImage);
+	_timeFrequencyWidget.Plot().SetSegmentedImage(_segmentedImage);
 		Update();
 	}
 }
@@ -1629,7 +1551,7 @@ void RFIGuiWindow::onClassify()
 	{
 		Morphology morphology;
 		morphology.Classify(_segmentedImage);
-		_timeFrequencyWidget.SetSegmentedImage(_segmentedImage);
+		_timeFrequencyWidget.Plot().SetSegmentedImage(_segmentedImage);
 		Update();
 	}
 }
@@ -1640,7 +1562,7 @@ void RFIGuiWindow::onRemoveSmallSegments()
 	{
 		Morphology morphology;
 		morphology.RemoveSmallSegments(_segmentedImage, 4);
-	_timeFrequencyWidget.SetSegmentedImage(_segmentedImage);
+	_timeFrequencyWidget.Plot().SetSegmentedImage(_segmentedImage);
 		Update();
 	}
 }
@@ -1692,7 +1614,7 @@ void RFIGuiWindow::onUnrollPhaseButtonPressed()
 			ThresholdTools::UnrollPhase(image.get());
 			data.SetImage(i, image);
 		}
-		_timeFrequencyWidget.SetNewData(data, _timeFrequencyWidget.GetSelectedMetaData());
+		_controller->TFController().SetNewData(data, _timeFrequencyWidget.Plot().GetSelectedMetaData());
 		_timeFrequencyWidget.Update();
 	}
 }
@@ -1733,7 +1655,7 @@ void RFIGuiWindow::loadDefaultModel(DefaultModels::Distortion distortion, bool w
 	TimeFrequencyData data = pair.first;
 	TimeFrequencyMetaDataCPtr metaData = pair.second;
 	
-	_timeFrequencyWidget.SetNewData(data, metaData);
+	_controller->TFController().SetNewData(data, metaData);
 	_timeFrequencyWidget.Update();
 }
 
@@ -1745,8 +1667,8 @@ void RFIGuiWindow::onVertEVD()
 			TimeFrequencyData data = GetActiveData();
 			TimeFrequencyData old(data);
 			VertEVD::Perform(data, true);
-			_timeFrequencyWidget.SetNewData(data, _timeFrequencyWidget.GetSelectedMetaData());
-			_timeFrequencyWidget.SetRevisedData(TimeFrequencyData::MakeFromDiff(old, data));
+			_controller->TFController().SetNewData(data, _timeFrequencyWidget.Plot().GetSelectedMetaData());
+			_controller->TFController().SetRevisedData(TimeFrequencyData::MakeFromDiff(old, data));
 			_timeFrequencyWidget.Update();
 		} catch(std::exception &e)
 		{
@@ -1789,7 +1711,7 @@ void RFIGuiWindow::onApplyTimeProfile()
 			}
 			data.SetImage(i, output);
 		}
-		_timeFrequencyWidget.SetNewData(data, _timeFrequencyWidget.GetSelectedMetaData());
+		_controller->TFController().SetNewData(data, _timeFrequencyWidget.Plot().GetSelectedMetaData());
 		_timeFrequencyWidget.Update();
 	}
 }
@@ -1828,7 +1750,7 @@ void RFIGuiWindow::onApplyVertProfile()
 			}
 			data.SetImage(i, output);
 		}
-		_timeFrequencyWidget.SetNewData(data, _timeFrequencyWidget.GetSelectedMetaData());
+		_controller->TFController().SetNewData(data, _timeFrequencyWidget.Plot().GetSelectedMetaData());
 		_timeFrequencyWidget.Update();
 	}
 }
@@ -1861,7 +1783,7 @@ void RFIGuiWindow::onUseTimeProfile(bool inverse)
 				}
 				data.SetImage(i, output);
 			}
-			_timeFrequencyWidget.SetNewData(data, _timeFrequencyWidget.GetSelectedMetaData());
+			_controller->TFController().SetNewData(data, _timeFrequencyWidget.Plot().GetSelectedMetaData());
 			_timeFrequencyWidget.Update();
 		}
 	}
@@ -1896,7 +1818,7 @@ void RFIGuiWindow::onUseVertProfile(bool inverse)
 				}
 				data.SetImage(i, output);
 			}
-			_timeFrequencyWidget.SetNewData(data, _timeFrequencyWidget.GetSelectedMetaData());
+			_controller->TFController().SetNewData(data, _timeFrequencyWidget.Plot().GetSelectedMetaData());
 			_timeFrequencyWidget.Update();
 		}
 	}
@@ -1906,14 +1828,14 @@ void RFIGuiWindow::onStoreData()
 {
 	if(HasImage())
 	{
-		_storedData = _timeFrequencyWidget.GetActiveData();
-		_storedMetaData = _timeFrequencyWidget.GetSelectedMetaData();
+		_storedData = _controller->TFController().GetActiveData();
+		_storedMetaData = _controller->TFController().Plot().GetSelectedMetaData();
 	}
 }
 
 void RFIGuiWindow::onRecallData()
 {
-	_timeFrequencyWidget.SetNewData(_storedData, _storedMetaData);
+	_controller->TFController().SetNewData(_storedData, _storedMetaData);
 	_timeFrequencyWidget.Update();
 }
 
@@ -1921,8 +1843,8 @@ void RFIGuiWindow::onSubtractDataFromMem()
 {
 	if(HasImage())
 	{
-		TimeFrequencyData diffData = TimeFrequencyData::MakeFromDiff(_storedData, _timeFrequencyWidget.GetActiveData());
-		_timeFrequencyWidget.SetNewData(diffData, _storedMetaData);
+		TimeFrequencyData diffData = TimeFrequencyData::MakeFromDiff(_storedData, _controller->TFController().GetActiveData());
+		_controller->TFController().SetNewData(diffData, _storedMetaData);
 		_timeFrequencyWidget.Update();
 	}
 }
@@ -1938,16 +1860,16 @@ void RFIGuiWindow::onControllerStateChange()
 		connection.block();
 	
 	_originalFlagsButton->set_active(_controller->AreOriginalFlagsShown());
-	_timeFrequencyWidget.SetShowOriginalMask(_controller->AreOriginalFlagsShown());
+	_timeFrequencyWidget.Plot().SetShowOriginalMask(_controller->AreOriginalFlagsShown());
 	
 	_altFlagsButton->set_active(_controller->AreAlternativeFlagsShown());
-	_timeFrequencyWidget.SetShowAlternativeMask(_controller->AreAlternativeFlagsShown());
+	_timeFrequencyWidget.Plot().SetShowAlternativeMask(_controller->AreAlternativeFlagsShown());
 	
 	_showPPButton->set_active(_controller->IsPPShown());
 	_showPQButton->set_active(_controller->IsPQShown());
 	_showQPButton->set_active(_controller->IsQPShown());
 	_showQQButton->set_active(_controller->IsQQShown());
-	_timeFrequencyWidget.SetVisualizedPolarization(_controller->IsPPShown(), _controller->IsPQShown(), _controller->IsQPShown(), _controller->IsQQShown());
+	_controller->TFController().SetVisualizedPolarization(_controller->IsPPShown(), _controller->IsPQShown(), _controller->IsQPShown(), _controller->IsQQShown());
 	
 	for(sigc::connection& connection : _toggleConnections)
 		connection.unblock();
@@ -1955,11 +1877,30 @@ void RFIGuiWindow::onControllerStateChange()
 	_timeFrequencyWidget.Update();
 }
 
+void RFIGuiWindow::onZoomFit() {
+	_timeFrequencyWidget.Plot().ZoomFit();
+	_timeFrequencyWidget.Update();
+}
+
+void RFIGuiWindow::onZoomIn()
+{ 
+	if(_timeFrequencyWidget.IsMouseInImage())
+		_timeFrequencyWidget.Plot().ZoomInOn(_timeFrequencyWidget.MouseX(), _timeFrequencyWidget.MouseY());
+	else
+		_timeFrequencyWidget.Plot().ZoomIn();
+	_timeFrequencyWidget.Update();
+}
+
+void RFIGuiWindow::onZoomOut() {
+	_timeFrequencyWidget.Plot().ZoomOut(); 
+	_timeFrequencyWidget.Update();
+}
+
 void RFIGuiWindow::onTFZoomChanged()
 {
 	AOLogger::Info << "Zoom changed.\n";
-	bool s = !_timeFrequencyWidget.IsZoomedOut();
-	bool i = _timeFrequencyWidget.HasImage();
+	bool s = !_timeFrequencyWidget.Plot().IsZoomedOut();
+	bool i = _timeFrequencyWidget.Plot().HasImage();
 	_zoomToFitButton->set_sensitive(s && i);
 	_zoomOutButton->set_sensitive(s && i);
 	_zoomInButton->set_sensitive(i);
@@ -1986,4 +1927,15 @@ void RFIGuiWindow::onHelpAbout()
 void RFIGuiWindow::onExecutePythonStrategy()
 {
 	_controller->ExecutePythonStrategy();
+}
+
+void RFIGuiWindow::SetBaselineInfo(bool multipleBaselines, const std::string& name, const std::string& description)
+{
+	_previousButton->set_sensitive(multipleBaselines);
+	_reloadButton->set_sensitive(true);
+	_nextButton->set_sensitive(multipleBaselines);
+	_imageSetName = name;
+	_imageSetIndexDescription = description;
+	setSetNameInStatusBar();
+	_timeFrequencyWidget.Update();
 }

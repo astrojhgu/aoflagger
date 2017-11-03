@@ -703,7 +703,7 @@ Mask2DCPtr HeatMapPlot::GetActiveMask() const
 	}
 }
 
-TimeFrequencyMetaDataCPtr HeatMapPlot::GetSelectedMetaData()
+TimeFrequencyMetaDataCPtr HeatMapPlot::GetSelectedMetaData() const
 {
 	TimeFrequencyMetaDataCPtr metaData = _metaData;
 
