@@ -34,8 +34,8 @@ namespace rfiStrategy {
 			ActionBlock::Perform(artifacts, progress);
 		} else
 		{
-			ImageSet *imageSet = artifacts.ImageSet();
-			MSImageSet *msImageSet = dynamic_cast<MSImageSet*>(imageSet);
+			ImageSet& imageSet = artifacts.ImageSet();
+			MSImageSet* msImageSet = dynamic_cast<MSImageSet*>(&imageSet);
 			if(msImageSet != 0)
 			{
 				// Check memory usage
@@ -66,7 +66,7 @@ namespace rfiStrategy {
 					_threadCount = maxThreads;
 				}
 			}
-			if(dynamic_cast<FilterBankSet*>(imageSet) != 0 && _threadCount != 1)
+			if(dynamic_cast<FilterBankSet*>(&imageSet) != nullptr && _threadCount != 1)
 			{
 				AOLogger::Info << "This is a Filterbank set -- disabling multi-threading\n";
 				_threadCount = 1;
@@ -107,7 +107,7 @@ namespace rfiStrategy {
 			_nextIndex = 0;
 			
 			// Count the baselines that are to be processed
-			std::unique_ptr<ImageSetIndex> iteratorIndex = imageSet->StartIndex();
+			std::unique_ptr<ImageSetIndex> iteratorIndex = imageSet.StartIndex();
 			while(iteratorIndex->IsValid())
 			{
 				if(IsBaselineSelected(*iteratorIndex))
@@ -118,7 +118,7 @@ namespace rfiStrategy {
 			AOLogger::Debug << "Will process " << _baselineCount << " baselines.\n";
 			
 			// Initialize thread data and threads
-			_loopIndex = imageSet->StartIndex();
+			_loopIndex = imageSet.StartIndex();
 			_progressTaskNo = new int[_threadCount];
 			_progressTaskCount = new int[_threadCount];
 			progress.OnStartTask(*this, 0, 1, "Initializing");
@@ -155,10 +155,10 @@ namespace rfiStrategy {
 
 	bool ForEachBaselineAction::IsBaselineSelected(ImageSetIndex &index)
 	{
-		ImageSet *imageSet = _artifacts->ImageSet();
-		IndexableSet *msImageSet = dynamic_cast<IndexableSet*>(imageSet);
+		ImageSet& imageSet = _artifacts->ImageSet();
+		IndexableSet* msImageSet = dynamic_cast<IndexableSet*>(&imageSet);
 		size_t a1id, a2id;
-		if(msImageSet != 0)
+		if(msImageSet != nullptr)
 		{
 			a1id = msImageSet->GetAntenna1(index);
 			a2id = msImageSet->GetAntenna2(index);
@@ -178,7 +178,10 @@ namespace rfiStrategy {
 		// For SD/BHFits/QS files, we want to select everything -- it's confusing
 		// if the default option "only flag cross correlations" would also
 		// hold for sdfits files.
-		if(dynamic_cast<FitsImageSet*>(imageSet)!=0 || dynamic_cast<BHFitsImageSet*>(imageSet)!=0 || dynamic_cast<FilterBankSet*>(imageSet)!=0 || dynamic_cast<QualityStatImageSet*>(imageSet)!=0)
+		if(dynamic_cast<FitsImageSet*>(&imageSet)!=0
+			|| dynamic_cast<BHFitsImageSet*>(&imageSet)!=0
+			|| dynamic_cast<FilterBankSet*>(&imageSet)!=0
+			|| dynamic_cast<QualityStatImageSet*>(&imageSet)!=0)
 			return true;
 
 		switch(_selection)
@@ -237,7 +240,7 @@ namespace rfiStrategy {
 	void ForEachBaselineAction::PerformFunction::operator()()
 	{
 		std::unique_lock<std::mutex> ioLock(_action._artifacts->IOMutex());
-		std::unique_ptr<ImageSet> privateImageSet = _action._artifacts->ImageSet()->Clone();
+		std::unique_ptr<ImageSet> privateImageSet = _action._artifacts->ImageSet().Clone();
 		ioLock.unlock();
 
 		try {
@@ -259,11 +262,10 @@ namespace rfiStrategy {
 	
 				newArtifacts.SetOriginalData(baseline->Data());
 				newArtifacts.SetContaminatedData(baseline->Data());
-				TimeFrequencyData *zero = new TimeFrequencyData(baseline->Data());
-				zero->SetImagesToZero();
-				newArtifacts.SetRevisedData(*zero);
-				delete zero;
-				newArtifacts.SetImageSetIndex(&baseline->Index());
+				TimeFrequencyData zero(baseline->Data());
+				zero.SetImagesToZero();
+				newArtifacts.SetRevisedData(zero);
+				newArtifacts.SetImageSetIndex(baseline->Index().Clone());
 				newArtifacts.SetMetaData(baseline->MetaData());
 
 				_action.ActionBlock::Perform(newArtifacts, *this);
@@ -305,8 +307,8 @@ namespace rfiStrategy {
 		bool finished = false;
 		size_t threadCount = _action.mathThreadCount();
 		size_t minRecommendedBufferSize, maxRecommendedBufferSize;
-		MSImageSet *msImageSet = dynamic_cast<MSImageSet*>(_action._artifacts->ImageSet());
-		if(msImageSet != 0)
+		MSImageSet* msImageSet = dynamic_cast<MSImageSet*>(&_action._artifacts->ImageSet());
+		if(msImageSet != nullptr)
 		{
 			minRecommendedBufferSize = msImageSet->Reader()->GetMinRecommendedBufferSize(threadCount);
 			maxRecommendedBufferSize = msImageSet->Reader()->GetMaxRecommendedBufferSize(threadCount) - _action.GetBaselinesInBufferCount();
@@ -330,7 +332,7 @@ namespace rfiStrategy {
 				std::unique_ptr<ImageSetIndex> index = _action.GetNextIndex();
 				if(index != nullptr)
 				{
-					_action._artifacts->ImageSet()->AddReadRequest(*index);
+					_action._artifacts->ImageSet().AddReadRequest(*index);
 					++requestedCount;
 				} else {
 					finished = true;
@@ -340,12 +342,12 @@ namespace rfiStrategy {
 			
 			if(requestedCount > 0)
 			{
-				_action._artifacts->ImageSet()->PerformReadRequests();
+				_action._artifacts->ImageSet().PerformReadRequests();
 				watch.Pause();
 				
 				for(size_t i=0;i<requestedCount;++i)
 				{
-					std::unique_ptr<BaselineData> baseline = _action._artifacts->ImageSet()->GetNextRequested();
+					std::unique_ptr<BaselineData> baseline = _action._artifacts->ImageSet().GetNextRequested();
 					
 					std::lock_guard<std::mutex> bufferLock(_action._mutex);
 					_action._baselineBuffer.emplace(std::move(baseline));

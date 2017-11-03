@@ -308,11 +308,11 @@ int main(int argc, char **argv)
 		overallStrategy.Add(std::move(fomAction));
 
 		rfiStrategy::ArtifactSet artifacts(&ioMutex);
-		artifacts.SetAntennaFlagCountPlot(new AntennaFlagCountPlot());
-		artifacts.SetFrequencyFlagCountPlot(new FrequencyFlagCountPlot());
-		artifacts.SetTimeFlagCountPlot(new TimeFlagCountPlot());
-		artifacts.SetPolarizationStatistics(new PolarizationStatistics());
-		artifacts.SetBaselineSelectionInfo(new rfiStrategy::BaselineSelector());
+		artifacts.SetAntennaFlagCountPlot(std::unique_ptr<AntennaFlagCountPlot>(new AntennaFlagCountPlot()));
+		artifacts.SetFrequencyFlagCountPlot(std::unique_ptr<FrequencyFlagCountPlot>(new FrequencyFlagCountPlot()));
+		artifacts.SetTimeFlagCountPlot(std::unique_ptr<TimeFlagCountPlot>(new TimeFlagCountPlot()));
+		artifacts.SetPolarizationStatistics(std::unique_ptr<PolarizationStatistics>(new PolarizationStatistics()));
+		artifacts.SetBaselineSelectionInfo(std::unique_ptr<rfiStrategy::BaselineSelector>(new rfiStrategy::BaselineSelector()));
 		
 		ConsoleProgressHandler progress;
 
@@ -323,22 +323,16 @@ int main(int argc, char **argv)
 		rfiStrategy::ArtifactSet *set = overallStrategy.JoinThread();
 		overallStrategy.FinishAll();
 
-		set->AntennaFlagCountPlot()->Report();
-		set->FrequencyFlagCountPlot()->Report();
-		set->PolarizationStatistics()->Report();
-
-		delete set->AntennaFlagCountPlot();
-		delete set->FrequencyFlagCountPlot();
-		delete set->TimeFlagCountPlot();
-		delete set->PolarizationStatistics();
-		delete set->BaselineSelectionInfo();
+		set->AntennaFlagCountPlot().Report();
+		set->FrequencyFlagCountPlot().Report();
+		set->PolarizationStatistics().Report();
 
 		delete set;
 
 		AOLogger::Debug << "Time: " << watch.ToString() << "\n";
 		
 		return RETURN_SUCCESS;
-	} catch(std::exception &exception)
+	} catch(std::exception& exception)
 	{
 		std::cerr
 			<< "An unhandled exception occured: " << exception.what() << '\n'

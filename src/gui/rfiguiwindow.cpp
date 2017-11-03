@@ -284,14 +284,14 @@ void RFIGuiWindow::onExecuteStrategyPressed()
 
 	rfiStrategy::ArtifactSet artifacts(&_controller->IOMutex());
 
-	artifacts.SetAntennaFlagCountPlot(new AntennaFlagCountPlot());
-	artifacts.SetFrequencyFlagCountPlot(new FrequencyFlagCountPlot());
-	artifacts.SetFrequencyPowerPlot(new FrequencyPowerPlot());
-	artifacts.SetTimeFlagCountPlot(new TimeFlagCountPlot());
-	artifacts.SetIterationsPlot(new IterationsPlot());
+	artifacts.SetAntennaFlagCountPlot(std::unique_ptr<AntennaFlagCountPlot>(new AntennaFlagCountPlot()));
+	artifacts.SetFrequencyFlagCountPlot(std::unique_ptr<FrequencyFlagCountPlot>(new FrequencyFlagCountPlot()));
+	artifacts.SetFrequencyPowerPlot(std::unique_ptr<FrequencyPowerPlot>(new FrequencyPowerPlot()));
+	artifacts.SetTimeFlagCountPlot(std::unique_ptr<TimeFlagCountPlot>(new TimeFlagCountPlot()));
+	artifacts.SetIterationsPlot(std::unique_ptr<IterationsPlot>(new IterationsPlot()));
 	
-	artifacts.SetPolarizationStatistics(new PolarizationStatistics());
-	artifacts.SetBaselineSelectionInfo(new rfiStrategy::BaselineSelector());
+	artifacts.SetPolarizationStatistics(std::unique_ptr<PolarizationStatistics>(new PolarizationStatistics()));
+	artifacts.SetBaselineSelectionInfo(std::unique_ptr<rfiStrategy::BaselineSelector>(new rfiStrategy::BaselineSelector()));
 	artifacts.SetImager(_imagePlaneWindow->GetImager());
 
 	if(HasImage())
@@ -306,8 +306,8 @@ void RFIGuiWindow::onExecuteStrategyPressed()
 			artifacts.SetMetaData(_timeFrequencyWidget.Plot().GetFullMetaData());
 	if(_controller->HasImageSet())
 	{
-		artifacts.SetImageSet(&_controller->GetImageSet());
-		artifacts.SetImageSetIndex(&_controller->GetImageSetIndex());
+		artifacts.SetImageSet(_controller->GetImageSet().Clone());
+		artifacts.SetImageSetIndex(_controller->GetImageSetIndex().Clone());
 	}
 	_strategy->InitializeAll();
 	try {
@@ -341,26 +341,19 @@ void RFIGuiWindow::onExecuteStrategyFinished()
 		
 		_imagePlaneWindow->Update();
 		
-		if(artifacts->AntennaFlagCountPlot()->HasData())
-			artifacts->AntennaFlagCountPlot()->MakePlot();
-		if(artifacts->FrequencyFlagCountPlot()->HasData())
-			artifacts->FrequencyFlagCountPlot()->MakePlot();
-		if(artifacts->FrequencyPowerPlot()->HasData())
-			artifacts->FrequencyPowerPlot()->MakePlot();
-		if(artifacts->TimeFlagCountPlot()->HasData())
-			artifacts->TimeFlagCountPlot()->MakePlot();
-		if(artifacts->PolarizationStatistics()->HasData())
-			artifacts->PolarizationStatistics()->Report();
-		if(artifacts->IterationsPlot()->HasData())
-			artifacts->IterationsPlot()->MakePlot();
-
-		delete artifacts->AntennaFlagCountPlot();
-		delete artifacts->FrequencyFlagCountPlot();
-		delete artifacts->FrequencyPowerPlot();
-		delete artifacts->TimeFlagCountPlot();
-		delete artifacts->PolarizationStatistics();
-		delete artifacts->BaselineSelectionInfo();
-		delete artifacts->IterationsPlot();
+		if(artifacts->AntennaFlagCountPlot().HasData())
+			artifacts->AntennaFlagCountPlot().MakePlot();
+		if(artifacts->FrequencyFlagCountPlot().HasData())
+			artifacts->FrequencyFlagCountPlot().MakePlot();
+		if(artifacts->FrequencyPowerPlot().HasData())
+			artifacts->FrequencyPowerPlot().MakePlot();
+		if(artifacts->TimeFlagCountPlot().HasData())
+			artifacts->TimeFlagCountPlot().MakePlot();
+		if(artifacts->PolarizationStatistics().HasData())
+			artifacts->PolarizationStatistics().Report();
+		if(artifacts->IterationsPlot().HasData())
+			artifacts->IterationsPlot().MakePlot();
+		
 		delete artifacts;
 	}
 	if(_closeExecuteFrameButton->get_active())

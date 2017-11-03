@@ -394,11 +394,11 @@ namespace aoflagger {
 	{
 		std::mutex mutex;
 		rfiStrategy::ArtifactSet artifacts(&mutex);
-		ProgressListener* listener;
+		std::unique_ptr<ProgressListener> listener;
 		if(_statusListener == 0)
-			listener = new ErrorListener();
+			listener.reset(new ErrorListener());
 		else
-			listener = new ForwardingListener(_statusListener);
+			listener.reset(new ForwardingListener(_statusListener));
 		
 		Mask2DPtr mask = Mask2D::CreateSetMaskPtr<false>(input.Width(), input.Height());
 		TimeFrequencyData inputData, revisedData;
@@ -445,14 +445,12 @@ namespace aoflagger {
 		artifacts.SetOriginalData(inputData);
 		artifacts.SetContaminatedData(inputData);
 		artifacts.SetRevisedData(revisedData);
-		artifacts.SetPolarizationStatistics(new PolarizationStatistics());
-		artifacts.SetBaselineSelectionInfo(new rfiStrategy::BaselineSelector());
+		artifacts.SetPolarizationStatistics(std::unique_ptr<PolarizationStatistics>(new PolarizationStatistics()));
+		artifacts.SetBaselineSelectionInfo(std::unique_ptr<rfiStrategy::BaselineSelector>(new rfiStrategy::BaselineSelector()));
 		
 		strategy._data->strategyPtr->Perform(artifacts, *listener);
 		
-		delete artifacts.BaselineSelectionInfo();
-		delete artifacts.PolarizationStatistics();
-		delete listener;
+		listener.reset();
 		
 		FlagMask flagMask;
 		mask.reset(new Mask2D(*artifacts.ContaminatedData().GetSingleMask()));

@@ -100,8 +100,8 @@ void ForEachMSAction::Perform(ArtifactSet &artifacts, ProgressListener &progress
 			}
 				
 			std::unique_ptr<ImageSetIndex> index(imageSet->StartIndex());
-			artifacts.SetImageSet(&*imageSet);
-			artifacts.SetImageSetIndex(&*index);
+			artifacts.SetImageSet(std::move(imageSet));
+			artifacts.SetImageSetIndex(std::move(index));
 
 			InitializeAll();
 			
@@ -110,8 +110,6 @@ void ForEachMSAction::Perform(ArtifactSet &artifacts, ProgressListener &progress
 			FinishAll();
 			
 			artifacts.SetNoImageSet();
-			index.reset();
-			imageSet.reset();
 
 			if(isMS)
 				writeHistory(*i);

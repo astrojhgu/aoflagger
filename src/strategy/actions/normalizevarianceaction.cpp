@@ -30,9 +30,9 @@ void NormalizeVarianceAction::initializeStdDevs(ArtifactSet &artifacts)
 	{
 		if(!artifacts.HasImageSet())
 			throw std::runtime_error("Normalize variance called without image set");
-		ImageSet *imageSet = artifacts.ImageSet();
-		MSImageSet *msImageSet = dynamic_cast<MSImageSet*>(imageSet);
-		if(msImageSet == 0)
+		ImageSet& imageSet = artifacts.ImageSet();
+		MSImageSet* msImageSet = dynamic_cast<MSImageSet*>(&imageSet);
+		if(msImageSet == nullptr)
 			throw std::runtime_error("Normalize variance actions needs measurement set");
 		std::string filename = msImageSet->Reader()->Set().Path();
 		QualityTablesFormatter qtables(filename);

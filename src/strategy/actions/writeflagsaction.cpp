@@ -32,7 +32,7 @@ namespace rfiStrategy {
 		{
 			_ioMutex = &artifacts.IOMutex();
 			std::unique_lock<std::mutex> iolock(*_ioMutex);
-			_imageSet = artifacts.ImageSet()->Clone();
+			_imageSet = artifacts.ImageSet().Clone();
 			iolock.unlock();
 			_isFinishing = false;
 			FlushFunction flushFunction;
@@ -47,7 +47,7 @@ namespace rfiStrategy {
 			Mask2DCPtr mask = artifacts.ContaminatedData().GetMask(i);
 			masks.push_back(mask);
 		}
-		BufferItem newItem(masks, *artifacts.ImageSetIndex());
+		BufferItem newItem(masks, artifacts.ImageSetIndex());
 		pushInBuffer(newItem);
 	}
 

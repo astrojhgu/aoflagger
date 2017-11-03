@@ -12,10 +12,10 @@ namespace rfiStrategy {
 	void ImagerAction::Perform(ArtifactSet &artifacts, ProgressListener &progress)
 	{
 		std::lock_guard<std::mutex> lock(_imagerMutex);
-		UVImager *imager = artifacts.Imager();
-		if(imager == 0)
+		UVImager& imager = artifacts.Imager();
+		if(!artifacts.HasImager())
 			throw BadUsageException("No imager available to create image.");
-		TimeFrequencyData &data = artifacts.ContaminatedData();
+		TimeFrequencyData& data = artifacts.ContaminatedData();
 		TimeFrequencyMetaDataCPtr metaData = artifacts.MetaData();
 		if(data.PolarizationCount() > 1)
 		{
@@ -46,13 +46,13 @@ namespace rfiStrategy {
 						data[ch] = std::complex<ImagerNumeric>(inputReal->Value(t, ch), inputImag->Value(t, ch));
 				}
 				
-				btImager.Image(uvw.u, uvw.v, uvw.w, band.channels[0].frequencyHz, band.channels[1].frequencyHz-band.channels[0].frequencyHz, channelCount, &(data[0]), imager->FTReal());
+				btImager.Image(uvw.u, uvw.v, uvw.w, band.channels[0].frequencyHz, band.channels[1].frequencyHz-band.channels[0].frequencyHz, channelCount, &(data[0]), imager.FTReal());
 			}
 		} else {
 			progress.OnStartTask(*this, 0, 1, "Imaging baseline");
 			for(size_t y=0;y<data.ImageHeight();++y)
 			{
-				imager->Image(data, metaData, y);
+				imager.Image(data, metaData, y);
 				progress.OnProgress(*this, y, data.ImageHeight());
 			}
 			progress.OnEndTask(*this);

@@ -177,6 +177,7 @@ set(STRATEGY_CONTROL_FILES
   strategy/control/actionblock.cpp
   strategy/control/actioncontainer.cpp
   strategy/control/actionfactory.cpp
+  strategy/control/artifactset.cpp
   strategy/control/defaultstrategy.cpp
   strategy/control/pythonstrategy.cpp
   strategy/control/strategyreader.cpp

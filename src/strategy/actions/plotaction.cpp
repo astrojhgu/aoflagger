@@ -52,14 +52,14 @@ namespace rfiStrategy {
 
 	void PlotAction::plotAntennaFlagCounts(ArtifactSet &artifacts)
 	{
-		if(artifacts.AntennaFlagCountPlot() == 0)
+		if(!artifacts.HasAntennaFlagCountPlot())
 			throw BadUsageException("No antenna flag count plot in the artifact set");
 		
 		if(artifacts.HasMetaData() && artifacts.MetaData()->HasAntenna1() && artifacts.MetaData()->HasAntenna2())
 		{
 			TimeFrequencyData &data = artifacts.ContaminatedData();
 			TimeFrequencyMetaDataCPtr meta = artifacts.MetaData();
-			artifacts.AntennaFlagCountPlot()->Add(data, meta);
+			artifacts.AntennaFlagCountPlot().Add(data, meta);
 		} else {
 			AOLogger::Warn << "The strategy contains an action that makes an antenna plot, but the image set did not provide meta data.\n"
 				"Plot will not be made.\n";
@@ -68,60 +68,45 @@ namespace rfiStrategy {
 
 	void PlotAction::plotFrequencyFlagCounts(ArtifactSet &artifacts)
 	{
-		if(artifacts.FrequencyFlagCountPlot() == 0)
+		if(!artifacts.HasAntennaFlagCountPlot())
 			throw BadUsageException("No frequency flag count plot in the artifact set");
 
 		TimeFrequencyData &data = artifacts.ContaminatedData();
 		TimeFrequencyMetaDataCPtr meta = artifacts.MetaData();
-		artifacts.FrequencyFlagCountPlot()->Add(data, meta);
+		artifacts.FrequencyFlagCountPlot().Add(data, meta);
 	}
 
 	void PlotAction::plotFrequencyPower(ArtifactSet &artifacts)
 	{
-		if(artifacts.FrequencyPowerPlot() == 0)
-			throw BadUsageException("No frequency power plot in the artifact set");
-
 		TimeFrequencyData &data = artifacts.ContaminatedData();
 		TimeFrequencyMetaDataCPtr meta = artifacts.MetaData();
-		artifacts.FrequencyPowerPlot()->Add(data, meta);
+		artifacts.FrequencyPowerPlot().Add(data, meta);
 	}
 
 	void PlotAction::plotTimeFlagCounts(ArtifactSet &artifacts)
 	{
-		if(artifacts.TimeFlagCountPlot() == 0)
-			throw BadUsageException("No time flag count plot in the artifact set");
-
 		TimeFrequencyData &data = artifacts.ContaminatedData();
 		TimeFrequencyMetaDataCPtr meta = artifacts.MetaData();
-		artifacts.TimeFlagCountPlot()->Add(data, meta);
+		artifacts.TimeFlagCountPlot().Add(data, meta);
 	}
 
 	void PlotAction::plotSpectrumPerBaseline(ArtifactSet &artifacts)
 	{
-		if(artifacts.FrequencyPowerPlot() == 0)
-			throw BadUsageException("No frequency power plot in the artifact set");
-
 		TimeFrequencyData &data = artifacts.ContaminatedData();
 		TimeFrequencyMetaDataCPtr meta = artifacts.MetaData();
-		artifacts.FrequencyPowerPlot()->SetLogYAxis(_logYAxis);
-		artifacts.FrequencyPowerPlot()->StartNewLine(meta->Antenna1().name + " x " + meta->Antenna2().name);
-		artifacts.FrequencyPowerPlot()->Add(data, meta);
+		artifacts.FrequencyPowerPlot().SetLogYAxis(_logYAxis);
+		artifacts.FrequencyPowerPlot().StartNewLine(meta->Antenna1().name + " x " + meta->Antenna2().name);
+		artifacts.FrequencyPowerPlot().Add(data, meta);
 	}
 
 	void PlotAction::plotPolarizationFlagCounts(ArtifactSet &artifacts)
 	{
-		if(artifacts.PolarizationStatistics() == 0)
-			throw BadUsageException("No polarization statistics in the artifact set");
-
 		TimeFrequencyData &data = artifacts.ContaminatedData();
-		artifacts.PolarizationStatistics()->Add(data);
+		artifacts.PolarizationStatistics().Add(data);
 	}
 
 	void PlotAction::plotBaselineRMS(ArtifactSet &artifacts)
 	{
-		if(artifacts.PolarizationStatistics() == 0)
-			throw BadUsageException("No polarization statistics in the artifact set");
-
 		TimeFrequencyData &data = artifacts.ContaminatedData();
 		TimeFrequencyMetaDataCPtr metaData = artifacts.MetaData();
 		double rms = 0.0;
@@ -143,10 +128,9 @@ namespace rfiStrategy {
 	
 	void PlotAction::plotIterations(class ArtifactSet &artifacts)
 	{
-		class IterationsPlot *plot = artifacts.IterationsPlot();
-		if(plot != 0)
+		if(artifacts.HasIterationsPlot())
 		{
-			plot->Add(artifacts.ContaminatedData(), artifacts.MetaData());
+			artifacts.IterationsPlot().Add(artifacts.ContaminatedData(), artifacts.MetaData());
 		}
 	}
 

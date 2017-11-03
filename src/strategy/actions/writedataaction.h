@@ -21,8 +21,8 @@ namespace rfiStrategy {
 			virtual void Perform(class ArtifactSet &artifacts, ProgressListener &) final override
 			{
 				std::unique_lock<std::mutex> lock(artifacts.IOMutex());
-				ImageSet &set = *artifacts.ImageSet();
-				set.PerformWriteDataTask(*artifacts.ImageSetIndex(), artifacts.RevisedData());
+				ImageSet& set = artifacts.ImageSet();
+				set.PerformWriteDataTask(artifacts.ImageSetIndex(), artifacts.RevisedData());
 			}
 
 			virtual ActionType Type() const final override

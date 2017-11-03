@@ -23,7 +23,7 @@ class ImagePlaneWindow : public Gtk::Window {
 
 		void AddData(const TimeFrequencyData &data, TimeFrequencyMetaDataCPtr metaData);
 		void AddData(const TimeFrequencyData &data, class SpatialMatrixMetaData *spatialMetaData);
-		UVImager *GetImager() throw() { return &_imager; }
+		UVImager *GetImager() { return &_imager; }
 		void Update();
 	private:
 		UVImager _imager;
