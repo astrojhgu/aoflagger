@@ -6,6 +6,7 @@ VerticalPlotScale::VerticalPlotScale() :
 	_plotHeight(0.0),
 	_isSecondAxis(false),
 	_metricsAreInitialized(false), _width(0.0),
+	_captionSize(0.0),
 	_tickSet(), _isLogarithmic(false), _drawWithDescription(true),
 	_unitsCaption("y"),
 	_descriptionFontSize(14), _tickValuesFontSize(14)
@@ -51,7 +52,7 @@ void VerticalPlotScale::Draw(Cairo::RefPtr<Cairo::Context> cairo, double offsetX
 			textX = _width - extents.width - 4.0 - _captionSize;
 		else
 			textX = -extents.width - 8.0;
-		cairo->move_to(x + textX, y - extents.height/2  - extents.y_bearing + offsetY);
+		cairo->move_to(x + textX, y - extents.height/2 - extents.y_bearing + offsetY);
 		cairo->show_text(tick.second);
 	}
 	cairo->stroke();
@@ -117,6 +118,9 @@ void VerticalPlotScale::initializeMetrics(Cairo::RefPtr<Cairo::Context> cairo)
 				cairo->get_text_extents(_unitsCaption, extents);
 				_captionSize = extents.height;
 				_width += _captionSize;
+			}
+			else {
+				_captionSize = 0.0;
 			}
 			_metricsAreInitialized = true;
 		}
