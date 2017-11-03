@@ -186,4 +186,3 @@ void GoToWindow::onLoadClicked()
 			hide();
 	}
 }
-

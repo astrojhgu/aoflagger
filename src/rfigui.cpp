@@ -129,7 +129,7 @@ static void run(int argc, char *argv[])
 			if(interactive)
 				window->OpenPath(filenames[0]);
 			else
-				controller.Open(filenames[0], DirectReadMode, true, dataColumnName, false, 4, false, true, false);
+				controller.Open(filenames[0], DirectReadMode, true, dataColumnName, false, 4, true, false);
 		}
 		
 		if(!savedBaselines.empty())

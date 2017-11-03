@@ -134,7 +134,8 @@ class RFIGuiController
 		void PlotTimeScatterComparison();
 		void PlotSingularValues();
 		
-		void Open(const std::string& filename, BaselineIOMode ioMode, bool readUVW, const std::string& dataColumn, bool subtractModel, size_t polCountToRead, bool loadBaseline, bool loadStrategy, bool combineSPW);
+		void Open(const std::string& filename, BaselineIOMode ioMode, bool readUVW, const std::string& dataColumn, bool subtractModel, size_t polCountToRead, bool loadStrategy, bool combineSPW);
+		
 		void OpenTestSet(unsigned index, bool gaussianTestSets);
 		
 		bool IsImageLoaded() const;
@@ -152,7 +153,7 @@ class RFIGuiController
 		
  		bool HasImageSet() const { return _imageSet != nullptr; }
  		
-		void SetImageSet(std::unique_ptr<rfiStrategy::ImageSet> newImageSet, bool loadBaseline);
+		void SetImageSet(std::unique_ptr<rfiStrategy::ImageSet> newImageSet);
 		
 		void SetImageSetIndex(std::unique_ptr<rfiStrategy::ImageSetIndex> newImageSetIndex);
 		

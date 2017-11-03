@@ -348,7 +348,7 @@ void RFIGuiController::PlotSingularValues()
 	}
 }
 
-void RFIGuiController::Open(const std::string& filename, BaselineIOMode ioMode, bool readUVW, const std::string& dataColumn, bool subtractModel, size_t polCountToRead, bool loadBaseline, bool loadStrategy, bool combineSPW)
+void RFIGuiController::Open(const std::string& filename, BaselineIOMode ioMode, bool readUVW, const std::string& dataColumn, bool subtractModel, size_t polCountToRead, bool loadStrategy, bool combineSPW)
 {
 	AOLogger::Info << "Opening " << filename << '\n';
 	try
@@ -398,7 +398,7 @@ void RFIGuiController::Open(const std::string& filename, BaselineIOMode ioMode, 
 			_strategyController->NotifyChange();
 		}
 	
-		SetImageSet(std::move(imageSet), loadBaseline);
+		SetImageSet(std::move(imageSet));
 		
 	} catch(std::exception &e)
 	{
@@ -440,7 +440,7 @@ void RFIGuiController::ExecutePythonStrategy()
 	_rfiGuiWindow->GetTimeFrequencyWidget().Update();
 }
 
-void RFIGuiController::SetImageSet(std::unique_ptr<rfiStrategy::ImageSet> newImageSet, bool loadBaseline)
+void RFIGuiController::SetImageSet(std::unique_ptr<rfiStrategy::ImageSet> newImageSet)
 {
 	_imageSetIndex = newImageSet->StartIndex();
 	_imageSet = std::move(newImageSet);
@@ -455,15 +455,16 @@ void RFIGuiController::SetImageSet(std::unique_ptr<rfiStrategy::ImageSet> newIma
 void RFIGuiController::SetImageSetIndex(std::unique_ptr<rfiStrategy::ImageSetIndex> newImageSetIndex)
 {
 	_imageSetIndex = std::move(newImageSetIndex);
+	LoadCurrentTFData();
 }
 
 void RFIGuiController::LoadCurrentTFData()
 {
 	if(HasImageSet()) {
 		std::unique_lock<std::mutex> lock(_ioMutex);
-		GetImageSet().AddReadRequest(GetImageSetIndex());
-		GetImageSet().PerformReadRequests();
-		std::unique_ptr<rfiStrategy::BaselineData> baseline = GetImageSet().GetNextRequested();
+		_imageSet->AddReadRequest(*_imageSetIndex);
+		_imageSet->PerformReadRequests();
+		std::unique_ptr<rfiStrategy::BaselineData> baseline = _imageSet->GetNextRequested();
 		lock.unlock();
 		
 		_tfController.SetNewData(baseline->Data(), baseline->MetaData());
@@ -471,7 +472,7 @@ void RFIGuiController::LoadCurrentTFData()
 		
 		_spatialMetaData.reset();
 		rfiStrategy::SpatialMSImageSet* smsImageSet =
-			dynamic_cast<rfiStrategy::SpatialMSImageSet*>(&GetImageSet());
+			dynamic_cast<rfiStrategy::SpatialMSImageSet*>(_imageSet.get());
 		if(smsImageSet != nullptr)
 		{
 			_spatialMetaData.reset(new SpatialMatrixMetaData(smsImageSet->SpatialMetaData(GetImageSetIndex())));
@@ -524,7 +525,7 @@ void RFIGuiController::LoadPath(const std::string& filename)
 	);
 	_strategyController->NotifyChange();
 	
-	SetImageSet(std::move(imageSet), true);
+	SetImageSet(std::move(imageSet));
 }
 
 void RFIGuiController::LoadSpatial(const std::string& filename)
@@ -533,7 +534,7 @@ void RFIGuiController::LoadSpatial(const std::string& filename)
 	std::unique_ptr<rfiStrategy::SpatialMSImageSet> imageSet(new rfiStrategy::SpatialMSImageSet(filename));
 	imageSet->Initialize();
 	lock.unlock();
-	SetImageSet(std::move(imageSet), true);
+	SetImageSet(std::move(imageSet));
 }
 
 void RFIGuiController::LoadSpatialTime(const std::string& filename)
@@ -542,5 +543,5 @@ void RFIGuiController::LoadSpatialTime(const std::string& filename)
 	std::unique_ptr<rfiStrategy::SpatialTimeImageSet> imageSet(new rfiStrategy::SpatialTimeImageSet(filename));
 	imageSet->Initialize();
 	lock.unlock();
-	SetImageSet(std::move(imageSet), true);
+	SetImageSet(std::move(imageSet));
 }
