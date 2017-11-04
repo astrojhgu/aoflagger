@@ -18,7 +18,13 @@ namespace rfiStrategy {
 
 ArtifactSet::~ArtifactSet()
 { }
-	
+
+ArtifactSet::Data::Data()
+{ }
+
+ArtifactSet::Data::~Data()
+{ }
+
 void ArtifactSet::SetImageSet(std::unique_ptr<class ImageSet> imageSet)
 {
 	_data->_imageSet = std::move(imageSet);

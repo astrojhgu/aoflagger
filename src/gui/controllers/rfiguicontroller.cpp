@@ -477,11 +477,6 @@ void RFIGuiController::LoadCurrentTFData()
 		{
 			_spatialMetaData.reset(new SpatialMatrixMetaData(smsImageSet->SpatialMetaData(GetImageSetIndex())));
 		}
-		// Disable forward/back buttons when only one baseline is available
-		std::unique_ptr<rfiStrategy::ImageSetIndex> firstIndex = GetImageSet().StartIndex();
-		firstIndex->Next();
-		bool multipleBaselines = firstIndex->IsValid();
-		firstIndex.reset();
 		
 		// We store these seperate, as they might access the measurement set. This is
 		// not only faster (the names are used in the onMouse.. events) but also less dangerous,
@@ -494,7 +489,17 @@ void RFIGuiController::LoadCurrentTFData()
 		lock.unlock();
 		
 		_tfController.Plot().SetTitleText(description);
-		_rfiGuiWindow->SetBaselineInfo(multipleBaselines, name, description);
+		
+		if(_rfiGuiWindow != nullptr)
+		{
+			// Disable forward/back buttons when only one baseline is available
+			std::unique_ptr<rfiStrategy::ImageSetIndex> firstIndex = _imageSet->StartIndex();
+			firstIndex->Next();
+			bool multipleBaselines = firstIndex->IsValid();
+			firstIndex.reset();
+			
+			_rfiGuiWindow->SetBaselineInfo(multipleBaselines, name, description);
+		}
 	}
 }
 

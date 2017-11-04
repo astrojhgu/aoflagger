@@ -25,6 +25,7 @@ namespace rfiStrategy {
 			_metaData(),
 			_sensitivity(1.0L),
 			_projectedDirectionRad(0.0L),
+			_data(new Data()),
 			_ioMutex(ioMutex),
 			_horizontalProfile(),
 			_verticalProfile()
@@ -167,6 +168,7 @@ namespace rfiStrategy {
 			class UVImager* _imager;
 			
 			struct Data {
+				Data();
 				~Data();
 				std::unique_ptr<class ImageSet> _imageSet;
 				std::unique_ptr<class ImageSetIndex> _imageSetIndex;
