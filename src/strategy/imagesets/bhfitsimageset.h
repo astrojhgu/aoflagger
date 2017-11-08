@@ -30,7 +30,7 @@ namespace rfiStrategy {
 			std::unique_ptr<BHFitsImageSetIndex> index( new BHFitsImageSetIndex(imageSet()) );
 			index->_imageIndex = _imageIndex;
 			index->_isValid = _isValid;
-			return index;
+			return std::move(index);
 		}
 		private:
 			size_t _imageIndex;

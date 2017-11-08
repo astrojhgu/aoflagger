@@ -35,7 +35,7 @@ namespace rfiStrategy {
 				std::unique_ptr<MSImageSetIndex> index(new MSImageSetIndex(imageSet()));
 				index->_sequenceIndex = _sequenceIndex;
 				index->_isValid = _isValid;
-				return index;
+				return std::move(index);
 			}
 			size_t SequenceIndex() const { return _sequenceIndex; }
 		private:
