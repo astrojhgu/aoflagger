@@ -22,7 +22,7 @@ namespace rfiStrategy {
 			{
 				std::unique_ptr<SingleImageSetIndex> index( new SingleImageSetIndex(imageSet(), _description) );
 				index->_valid = _valid;
-				return std::move(index);
+				return index;
 			}
 		private:
 			bool _valid;

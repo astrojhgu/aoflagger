@@ -31,7 +31,7 @@ namespace rfiStrategy {
 			index->_band = _band;
 			index->_field = _field;
 			index->_isValid = _isValid;
-			return std::move(index);
+			return index;
 		}
 		private:
 			size_t _baselineIndex, _band, _field;

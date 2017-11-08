@@ -73,7 +73,7 @@ namespace rfiStrategy {
 			newSet->_msImageSet = _msImageSet->CloneMSImageSet();
 			newSet->_joinedSequences = _joinedSequences;
 			newSet->_nChannels = _nChannels;
-			return std::move(newSet);
+			return newSet;
 		}
 
 		virtual std::unique_ptr<ImageSetIndex> StartIndex() override final

@@ -39,7 +39,7 @@ namespace rfiStrategy {
 					newIndex( new SpatialTimeImageSetIndex(imageSet()) );
 				newIndex->_channelIndex = _channelIndex;
 				newIndex->_isValid = _isValid;
-				return std::move(newIndex);
+				return newIndex;
 			}
 		private:
 			inline class SpatialTimeImageSet &STMSSet() const;
