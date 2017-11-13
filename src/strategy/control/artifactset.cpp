@@ -27,18 +27,18 @@ ArtifactSet::Data::~Data()
 
 void ArtifactSet::SetImageSet(std::unique_ptr<class ImageSet> imageSet)
 {
-	_data->_imageSet = std::move(imageSet);
+	_imageSet = std::move(imageSet);
 }
 
 void ArtifactSet::SetNoImageSet()
 { 
-	_data->_imageSet.reset();
-	_data->_imageSetIndex.reset(); 
+	_imageSet.reset();
+	_imageSetIndex.reset(); 
 }
 
 void ArtifactSet::SetImageSetIndex(std::unique_ptr<class ImageSetIndex> imageSetIndex)
 {
-	_data->_imageSetIndex = std::move(imageSetIndex);
+	_imageSetIndex = std::move(imageSetIndex);
 }
 
 void ArtifactSet::SetImager(class UVImager* imager)

@@ -54,7 +54,7 @@ void ForEachMSAction::Perform(ArtifactSet &artifacts, ProgressListener &progress
 			bool isMS = dynamic_cast<MSImageSet*>(&*imageSet) != 0;
 			if(isMS)
 			{ 
-				MSImageSet *msImageSet = static_cast<MSImageSet*>(&*imageSet);
+				MSImageSet* msImageSet = static_cast<MSImageSet*>(imageSet.get());
 				msImageSet->SetDataColumnName(_dataColumnName);
 				msImageSet->SetSubtractModel(_subtractModel);
 				msImageSet->SetReadUVW(_readUVW);

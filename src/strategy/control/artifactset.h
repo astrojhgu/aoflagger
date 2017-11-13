@@ -26,6 +26,8 @@ namespace rfiStrategy {
 			_sensitivity(1.0L),
 			_projectedDirectionRad(0.0L),
 			_data(new Data()),
+			_imageSet(),
+			_imageSetIndex(),
 			_ioMutex(ioMutex),
 			_horizontalProfile(),
 			_verticalProfile()
@@ -68,18 +70,18 @@ namespace rfiStrategy {
 			const TimeFrequencyData &ContaminatedData() const { return _contaminatedData; }
 			TimeFrequencyData &ContaminatedData() { return _contaminatedData; }
 
-			class ImageSet& ImageSet() const { return *_data->_imageSet; }
+			class ImageSet& ImageSet() const { return *_imageSet; }
 			void SetImageSet(std::unique_ptr<class ImageSet> imageSet);
 			void SetNoImageSet();
 			
-			class ImageSetIndex& ImageSetIndex() const { return *_data->_imageSetIndex; }
+			class ImageSetIndex& ImageSetIndex() const { return *_imageSetIndex; }
 			void SetImageSetIndex(std::unique_ptr<class ImageSetIndex> imageSetIndex);
 
 			class UVImager& Imager() const { return *_imager; }
 			void SetImager(class UVImager* imager);
 			
-			bool HasImageSet() const { return _data->_imageSet != nullptr; }
-			bool HasImageSetIndex() const { return _data->_imageSetIndex != nullptr; }
+			bool HasImageSet() const { return _imageSet != nullptr; }
+			bool HasImageSetIndex() const { return _imageSetIndex != nullptr; }
 			bool HasImager() const { return _imager != nullptr; }
 			bool HasMetaData() const { return _metaData != nullptr; }
 			
@@ -170,8 +172,6 @@ namespace rfiStrategy {
 			struct Data {
 				Data();
 				~Data();
-				std::unique_ptr<class ImageSet> _imageSet;
-				std::unique_ptr<class ImageSetIndex> _imageSetIndex;
 				std::unique_ptr<class AntennaFlagCountPlot> _antennaFlagCountPlot;
 				std::unique_ptr<class FrequencyFlagCountPlot> _frequencyFlagCountPlot;
 				std::unique_ptr<class FrequencyPowerPlot> _frequencyPowerPlot;
@@ -184,6 +184,8 @@ namespace rfiStrategy {
 			};
 			
 			std::shared_ptr<Data> _data;
+			std::shared_ptr<class ImageSet> _imageSet;
+			std::shared_ptr<class ImageSetIndex> _imageSetIndex;
 			std::mutex *_ioMutex;
 			
 			std::vector<num_t> _horizontalProfile, _verticalProfile;
