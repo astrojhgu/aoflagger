@@ -6,14 +6,11 @@
 #include "../actions/changeresolutionaction.h"
 #include "../actions/combineflagresultsaction.h"
 #include "../actions/cutareaaction.h"
-#include "../actions/directionalcleanaction.h"
-#include "../actions/directionprofileaction.h"
 #include "../actions/eigenvalueverticalaction.h"
 #include "../actions/foreachbaselineaction.h"
 #include "../actions/foreachcomplexcomponentaction.h"
 #include "../actions/foreachmsaction.h"
 #include "../actions/foreachpolarisationaction.h"
-#include "../actions/fouriertransformaction.h"
 #include "../actions/frequencyconvolutionaction.h"
 #include "../actions/frequencyselectionaction.h"
 #include "../actions/fringestopaction.h"
@@ -32,7 +29,6 @@
 #include "../actions/sumthresholdaction.h"
 #include "../actions/timeconvolutionaction.h"
 #include "../actions/timeselectionaction.h"
-#include "../actions/uvprojectaction.h"
 #include "../actions/writedataaction.h"
 #include "../actions/writeflagsaction.h"
 
@@ -99,13 +95,7 @@ namespace rfiStrategy {
 			case CutAreaActionType:
 				writeCutAreaAction(static_cast<const CutAreaAction&>(action));
 				break;
-			case DirectionalCleanActionType:
-				writeDirectionalCleanAction(static_cast<const DirectionalCleanAction&>(action));
-				break;
-			case DirectionProfileActionType:
-				writeDirectionProfileAction(static_cast<const DirectionProfileAction&>(action));
-				break;
-				case EigenValueVerticalActionType:
+			case EigenValueVerticalActionType:
 				writeEigenValueVerticalAction(static_cast<const EigenValueVerticalAction&>(action));
 				break;
 			case ForEachBaselineActionType:
@@ -119,9 +109,6 @@ namespace rfiStrategy {
 				break;
 			case ForEachPolarisationBlockType:
 				writeForEachPolarisationBlock(static_cast<const ForEachPolarisationBlock&>(action));
-				break;
-			case FourierTransformActionType:
-				writeFourierTransformAction(static_cast<const FourierTransformAction&>(action));
 				break;
 			case FrequencyConvolutionActionType:
 				writeFrequencyConvolutionAction(static_cast<const FrequencyConvolutionAction&>(action));
@@ -177,9 +164,6 @@ namespace rfiStrategy {
 			case TimeSelectionActionType:
 				writeTimeSelectionAction(static_cast<const TimeSelectionAction&>(action));
 				break;
-			case UVProjectActionType:
-				writeUVProjectAction(static_cast<const UVProjectAction&>(action));
-				break;
 			case WriteDataActionType:
 				writeWriteDataAction(static_cast<const WriteDataAction&>(action));
 				break;
@@ -188,7 +172,6 @@ namespace rfiStrategy {
 				break;
 			case ForEachSimulatedBaselineActionType:
 			case ResamplingActionType:
-			case SpatialCompositionActionType:
 				throw std::runtime_error("Strategy contains an action for which saving is not supported");
 				break;
 		}
@@ -252,22 +235,6 @@ namespace rfiStrategy {
 		Write<int>("top-channels", action.TopChannels());
 		Write<int>("bottom-channels", action.BottomChannels());
 		writeContainerItems(action);
-	}
-
-	void StrategyWriter::writeDirectionalCleanAction(const DirectionalCleanAction &action)
-	{
-		Attribute("type", "DirectionalCleanAction");
-		Write<double>("limiting-distance", action.LimitingDistance());
-		Write<int>("channel-convolution-size", action.ChannelConvolutionSize());
-		Write<double>("attenuation-of-center", action.AttenuationOfCenter());
-		Write<bool>("make-plot", action.MakePlot());
-	}
-
-	void StrategyWriter::writeDirectionProfileAction(const DirectionProfileAction &action)
-	{
-		Attribute("type", "DirectionProfileAction");
-		Write<int>("axis", (int) action.Axis());
-		Write<int>("profile-action", (int) action.ProfileAction());
 	}
 
   void StrategyWriter::writeEigenValueVerticalAction(const EigenValueVerticalAction &)
@@ -424,8 +391,9 @@ namespace rfiStrategy {
 		Attribute("type", "StatisticalFlagAction");
 		Write<size_t>("enlarge-frequency-size", action.EnlargeFrequencySize());
 		Write<size_t>("enlarge-time-size", action.EnlargeTimeSize());
-		Write<num_t>("max-contaminated-frequencies-ratio", action.MaxContaminatedFrequenciesRatio());
-		Write<num_t>("max-contaminated-times-ratio", action.MaxContaminatedTimesRatio());
+		Write<num_t>("min-available-frequencies-ratio", action.MinAvailableFrequenciesRatio());
+		Write<num_t>("min-available-times-ratio", action.MinAvailableTimesRatio());
+		Write<num_t>("min-available-tf-ratio", action.MinAvailableTFRatio());
 		Write<num_t>("minimum-good-frequency-ratio", action.MinimumGoodFrequencyRatio());
 		Write<num_t>("minimum-good-time-ratio", action.MinimumGoodTimeRatio());
 	}
@@ -468,17 +436,6 @@ namespace rfiStrategy {
 		Write<double>("threshold", action.Threshold());
 	}
 
-	void StrategyWriter::writeUVProjectAction(const UVProjectAction &action)
-	{
-		Attribute("type", "UVProjectAction");
-		Write<numl_t>("direction-rad", action.DirectionRad());
-		Write<numl_t>("eta-parameter", action.EtaParameter());
-		Write<num_t>("dest-resolution-factor", action.DestResolutionFactor());
-		Write<bool>("reverse", action.Reverse());
-		Write<bool>("on-revised", action.OnRevised());
-		Write<bool>("on-contaminated", action.OnContaminated());
-	}
-	
 	void StrategyWriter::writeWriteDataAction(const WriteDataAction &)
 	{
 		Attribute("type", "WriteDataAction");

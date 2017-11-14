@@ -106,13 +106,13 @@ class BaselineStatisticsMap : public Serializable
 			return _polarizationCount;
 		}
 		
-		virtual void Serialize(std::ostream &stream) const
+		virtual void Serialize(std::ostream &stream) const final override
 		{
 			SerializeToUInt32(stream, _polarizationCount);
 			serializeOuterMap(stream, _map);
 		}
 		
-		virtual void Unserialize(std::istream &stream)
+		virtual void Unserialize(std::istream &stream) final override
 		{
 			_map.clear();
 			_polarizationCount = UnserializeUInt32(stream);

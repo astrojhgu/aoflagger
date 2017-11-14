@@ -9,6 +9,8 @@
 #include "../structures/samplerow.h"
 #include "../structures/timefrequencydata.h"
 
+#include "../gui/plot/heatmapplot.h"
+
 #include "../strategy/algorithms/polarizationstatistics.h"
 
 #include <boost/python.hpp>
@@ -36,8 +38,8 @@ void enlarge(const Data& input, Data& destination, size_t horizontalFactor, size
 	{
 		for(size_t i=0;i<imageCount;++i)
 		{
-			Image2DCPtr image = timeFrequencyData.GetImage(i);
-			Image2DPtr newImage = image->EnlargeHorizontally(horizontalFactor, newWidth);
+			Image2DPtr newImage(new Image2D(
+				timeFrequencyData.GetImage(i)->EnlargeHorizontally(horizontalFactor, newWidth)));
 			timeFrequencyData.SetImage(i, newImage);
 		}
 	}
@@ -47,11 +49,12 @@ void enlarge(const Data& input, Data& destination, size_t horizontalFactor, size
 		Image2DCPtr image = timeFrequencyData.GetImage(i);
 		if(verticalFactor > 1)
 		{
-			Image2DPtr newImage = image->EnlargeVertically(verticalFactor, newHeight);
+			Image2DPtr newImage(new Image2D(
+				timeFrequencyData.GetImage(i)->EnlargeVertically(verticalFactor, newHeight)));
 			destination.TFData().SetImage(i, newImage);
 		}
 		else {
-			destination.TFData().SetImage(i, image);
+			destination.TFData().SetImage(i, timeFrequencyData.GetImage(i));
 		}
 	}
 }
@@ -93,6 +96,15 @@ void high_pass_filter(Data& data, size_t kernelWidth, size_t kernelHeight, doubl
 		data.TFData().SetImage(i, filter.ApplyHighPass(data.TFData().GetImage(i), mask));
 }
 
+void save_heat_map(const char* filename, const Data& data)
+{
+	const TimeFrequencyData tfData = data.TFData();
+	HeatMapPlot plot;
+	plot.SetImage(tfData.GetSingleImage());
+	plot.SetAlternativeMask(tfData.GetSingleMask());
+	plot.SaveByExtension(filename, 800, 500);
+}
+
 void print_polarization_statistics(const Data& data)
 {
 	PolarizationStatistics statistics;
@@ -102,10 +114,10 @@ void print_polarization_statistics(const Data& data)
 
 void scale_invariant_rank_operator(Data& data, double level_horizontal, double level_vertical)
 {
-	Mask2DPtr mask = Mask2D::CreateCopy(data.TFData().GetSingleMask());
+	Mask2DPtr mask(new Mask2D(*data.TFData().GetSingleMask()));
 	
-	SIROperator::OperateHorizontally(mask, level_horizontal);
-	SIROperator::OperateVertically(mask, level_vertical);
+	SIROperator::OperateHorizontally(mask.get(), level_horizontal);
+	SIROperator::OperateVertically(mask.get(), level_vertical);
 	data.TFData().SetGlobalMask(mask);
 }
 
@@ -124,14 +136,12 @@ Data shrink(const Data& data, size_t horizontalFactor, size_t verticalFactor)
 	{
 		for(size_t i=0;i<imageCount;++i)
 		{
-			Image2DCPtr image = timeFrequencyData.GetImage(i);
-			Image2DPtr newImage = image->ShrinkHorizontally(horizontalFactor);
+			Image2DPtr newImage(new Image2D(timeFrequencyData.GetImage(i)->ShrinkHorizontally(horizontalFactor)));
 			timeFrequencyData.SetImage(i, newImage);
 		}
 		for(size_t i=0;i<maskCount;++i)
 		{
-			Mask2DCPtr mask = timeFrequencyData.GetMask(i);
-			Mask2DPtr newMask = mask->ShrinkHorizontally(horizontalFactor);
+			Mask2DPtr newMask(new Mask2D(timeFrequencyData.GetMask(i)->ShrinkHorizontally(horizontalFactor)));
 			timeFrequencyData.SetMask(i, newMask);
 		}
 	}
@@ -140,14 +150,12 @@ Data shrink(const Data& data, size_t horizontalFactor, size_t verticalFactor)
 	{
 		for(size_t i=0;i<imageCount;++i)
 		{
-			Image2DCPtr image = timeFrequencyData.GetImage(i);
-			Image2DPtr newImage = image->ShrinkVertically(verticalFactor);
+			Image2DPtr newImage(new Image2D(timeFrequencyData.GetImage(i)->ShrinkVertically(verticalFactor)));
 			timeFrequencyData.SetImage(i, newImage);
 		}
 		for(size_t i=0;i<maskCount;++i)
 		{
-			Mask2DCPtr mask = timeFrequencyData.GetMask(i);
-			Mask2DPtr newMask = mask->ShrinkVertically(verticalFactor);
+			Mask2DPtr newMask(new Mask2D(timeFrequencyData.GetMask(i)->ShrinkVertically(verticalFactor)));
 			timeFrequencyData.SetMask(i, newMask);
 		}
 	}
@@ -167,9 +175,9 @@ void sumthreshold(Data& data, double thresholdFactor, bool horizontal, bool vert
 	if(data.TFData().PolarizationCount() != 1)
 		throw std::runtime_error("Input data in sum_threshold has wrong format");
 	
-	Mask2DPtr mask = Mask2D::CreateCopy(data.TFData().GetSingleMask());
+	Mask2DPtr mask(new Mask2D(*data.TFData().GetSingleMask()));
 	Image2DCPtr image = data.TFData().GetSingleImage();
-	thresholdConfig.Execute(image, mask, false, thresholdFactor);
+	thresholdConfig.Execute(image.get(), mask.get(), false, thresholdFactor);
 	data.TFData().SetGlobalMask(mask);
 }
 
@@ -177,10 +185,10 @@ void threshold_channel_rms(Data& data, double threshold, bool thresholdLowValues
 {
 	Image2DCPtr image = data.TFData().GetSingleImage();
 	SampleRowPtr channels = SampleRow::CreateEmpty(image->Height());
-	Mask2DPtr mask = Mask2D::CreateCopy(data.TFData().GetSingleMask());
+	Mask2DPtr mask(new Mask2D(*data.TFData().GetSingleMask()));
 	for(size_t y=0;y<image->Height();++y)
 	{
-		SampleRowPtr row = SampleRow::CreateFromRowWithMissings(image, mask, y);
+		SampleRowPtr row = SampleRow::CreateFromRowWithMissings(image.get(), mask.get(), y);
 		channels->SetValue(y, row->RMSWithMissings());
 	}
 	bool change;
@@ -206,10 +214,10 @@ void threshold_timestep_rms(Data& data, double threshold)
 {
 	Image2DCPtr image = data.TFData().GetSingleImage();
 	SampleRowPtr timesteps = SampleRow::CreateEmpty(image->Width());
-	Mask2DPtr mask = Mask2D::CreateCopy(data.TFData().GetSingleMask());
+	Mask2DPtr mask(new Mask2D(*data.TFData().GetSingleMask()));
 	for(size_t x=0;x<image->Width();++x)
 	{
-		SampleRowPtr row = SampleRow::CreateFromColumnWithMissings(image, mask, x);
+		SampleRowPtr row = SampleRow::CreateFromColumnWithMissings(image.get(), mask.get(), x);
 		timesteps->SetValue(x, row->RMSWithMissings());
 	}
 	bool change;

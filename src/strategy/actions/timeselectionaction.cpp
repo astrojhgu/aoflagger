@@ -20,10 +20,10 @@ void TimeSelectionAction::AutomaticSelection(ArtifactSet &artifacts)
 {
 	Image2DCPtr image = artifacts.ContaminatedData().GetSingleImage();
 	SampleRowPtr timesteps = SampleRow::CreateEmpty(image->Width());
-	Mask2DPtr mask = Mask2D::CreateCopy(artifacts.ContaminatedData().GetSingleMask());
+	Mask2DPtr mask(new Mask2D(*artifacts.ContaminatedData().GetSingleMask()));
 	for(size_t x=0;x<image->Width();++x)
 	{
-		SampleRowPtr row = SampleRow::CreateFromColumnWithMissings(image, mask, x);
+		SampleRowPtr row = SampleRow::CreateFromColumnWithMissings(image.get(), mask.get(), x);
 		timesteps->SetValue(x, row->RMSWithMissings());
 	}
 	bool change;

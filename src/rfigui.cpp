@@ -2,6 +2,7 @@
 
 #include "gui/rfiguiwindow.h"
 
+#include "gui/controllers/imagecomparisoncontroller.h"
 #include "gui/controllers/rfiguicontroller.h"
 
 #include "util/aologger.h"
@@ -107,10 +108,17 @@ static void run(int argc, char *argv[])
 	
 	// We have to 'lie' about argc to create(..), because of a bug in older gtkmms.
 	int altArgc = 1;
-	Glib::RefPtr<Gtk::Application> app = Gtk::Application::create(altArgc, argv, "", Gio::APPLICATION_HANDLES_OPEN);
-	RFIGuiWindow window;
+	AOLogger::Info << "Opening controller.\n";
+	RFIGuiController controller;
+	Glib::RefPtr<Gtk::Application> app;
+	std::unique_ptr<RFIGuiWindow> window;
 	if(interactive)
-		window.present();
+	{
+		app = Gtk::Application::create(altArgc, argv, "", Gio::APPLICATION_HANDLES_OPEN);
+		AOLogger::Info << "Opening main window.\n";
+		window.reset(new RFIGuiWindow(&controller));
+		window->present();
+	}
 	
 	try {
 		
@@ -119,29 +127,31 @@ static void run(int argc, char *argv[])
 			if(filenames.size() > 1)
 				throw std::runtime_error("Error: multiple input paths specified; RFIGui can only handle one path.\n");
 			if(interactive)
-				window.OpenPath(filenames[0]);
+				window->OpenPath(filenames[0]);
 			else
-				window.Controller().Open(filenames[0], DirectReadMode, true, dataColumnName, false, 4, false, true);
+				controller.Open(filenames[0], DirectReadMode, true, dataColumnName, false, 4, true, false);
 		}
 		
 		if(!savedBaselines.empty())
 		{
-			rfiStrategy::MSImageSet* imageSet =
-				dynamic_cast<rfiStrategy::MSImageSet*>(&window.GetImageSet());
-			if(imageSet == 0)
+			rfiStrategy::IndexableSet* imageSet =
+				dynamic_cast<rfiStrategy::IndexableSet*>(&controller.GetImageSet());
+			if(imageSet == nullptr)
 				throw std::runtime_error("Option -save-baseline can only be used for measurement sets.\n");
-			window.GetTimeFrequencyWidget().SetShowXAxisDescription(true);
-			window.GetTimeFrequencyWidget().SetShowYAxisDescription(true);
-			window.GetTimeFrequencyWidget().SetShowZAxisDescription(true);
-			for(std::set<SavedBaseline>::const_iterator i=savedBaselines.begin(); i!=savedBaselines.end(); ++i)
+			HeatMapPlot& plot = controller.TFController().Plot();
+			plot.SetShowXAxisDescription(true);
+			plot.SetShowYAxisDescription(true);
+			plot.SetShowZAxisDescription(true);
+			for(const SavedBaseline& b : savedBaselines)
 			{
-				window.SetImageSetIndex(imageSet->Index(i->a1Index, i->a2Index, i->bandIndex, i->sequenceIndex));
-				window.GetTimeFrequencyWidget().SaveByExtension(i->filename, 800, 480);
+				controller.SetImageSetIndex(std::unique_ptr<rfiStrategy::ImageSetIndex>(
+					imageSet->Index(b.a1Index, b.a2Index, b.bandIndex, b.sequenceIndex)));
+				plot.SaveByExtension(b.filename, 800, 480);
 			}
 		}
 		
 		if(interactive)
-			app->run(window);
+			app->run(*window);
 	} catch(const std::exception& e)
 	{
 		AOLogger::Error <<

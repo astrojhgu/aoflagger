@@ -1,24 +1,23 @@
-#include "imagewidget.h"
+#include "heatmapplot.h"
 
-#include "../structures/colormap.h"
-#include "../structures/image2d.h"
-
-#include "../strategy/algorithms/thresholdconfig.h"
-#include "../strategy/algorithms/thresholdtools.h"
-
-#include "../util/aologger.h"
-
-#include "plot/colorscale.h"
-#include "plot/horizontalplotscale.h"
-#include "plot/verticalplotscale.h"
-#include "plot/title.h"
+#include "colorscale.h"
+#include "horizontalplotscale.h"
+#include "verticalplotscale.h"
+#include "title.h"
 
 #include <iostream>
 #include <fstream>
 
+#include "../../structures/colormap.h"
+
+#include "../../strategy/algorithms/thresholdconfig.h"
+#include "../../strategy/algorithms/thresholdtools.h"
+
+#include "../../util/aologger.h"
+
 #include <boost/algorithm/string.hpp>
 
-ImageWidget::ImageWidget() :
+HeatMapPlot::HeatMapPlot() :
 	_isInitialized(false),
 	_initializedWidth(0),
 	_initializedHeight(0),
@@ -32,10 +31,10 @@ ImageWidget::ImageWidget() :
 	_startVertical(0.0),
 	_endVertical(1.0),
 	_segmentedImage(),
-	_horiScale(0),
-	_vertScale(0),
-	_colorScale(0),
-	_plotTitle(0),
+	_horiScale(),
+	_vertScale(),
+	_colorScale(),
+	_plotTitle(),
 	_scaleOption(NormalScale),
 	_showXYAxes(true),
 	_showColorScale(true),
@@ -50,58 +49,74 @@ ImageWidget::ImageWidget() :
 	_manualXAxisDescription(false),
 	_manualYAxisDescription(false),
 	_manualZAxisDescription(false),
-	_mouseIsIn(false)
+	_highlightConfig(new ThresholdConfig())
 {
-	_highlightConfig = new ThresholdConfig();
 	_highlightConfig->InitializeLengthsSingleSample();
-
-	add_events(Gdk::POINTER_MOTION_MASK | Gdk::BUTTON_RELEASE_MASK |
-		   Gdk::BUTTON_PRESS_MASK | Gdk::LEAVE_NOTIFY_MASK);
-	signal_motion_notify_event().connect(sigc::mem_fun(*this, &ImageWidget::onMotion));
-	signal_leave_notify_event().connect(sigc::mem_fun(*this, &ImageWidget::onLeave));
-	signal_button_release_event().connect(sigc::mem_fun(*this, &ImageWidget::onButtonReleased));
-	signal_draw().connect(sigc::mem_fun(*this, &ImageWidget::onDraw) );
 }
 
-ImageWidget::~ImageWidget()
+HeatMapPlot::~HeatMapPlot()
 {
 	Clear();
-	delete _highlightConfig;
 }
 
-void ImageWidget::Clear()
+void HeatMapPlot::Clear()
 {
   if(HasImage())
 	{
 		_originalMask.reset();
 		_alternativeMask.reset();
-		delete _highlightConfig;
-		_highlightConfig = new ThresholdConfig();
+		_highlightConfig.reset(new ThresholdConfig());
 		_highlightConfig->InitializeLengthsSingleSample();
 		_segmentedImage.reset();
 		_image.reset();
 	}
-	delete _horiScale;
-	_horiScale = 0;
-	delete _vertScale;
-	_vertScale = 0;
-	delete _colorScale;
-	_colorScale = 0;
-	delete _plotTitle;
-	_plotTitle = 0;
+	_horiScale.reset();
+	_vertScale.reset();
+	_colorScale.reset();
+	_plotTitle.reset();
 	_isInitialized = false;
 }
 
-bool ImageWidget::onDraw(const Cairo::RefPtr<Cairo::Context>& cr)
+void HeatMapPlot::redrawWithoutChanges(Cairo::RefPtr<Cairo::Context> cairo, unsigned width, unsigned height)
 {
-	if(get_width() == (int) _initializedWidth && get_height() == (int) _initializedHeight)
-		redrawWithoutChanges(get_window()->create_cairo_context(), get_width(), get_height());
-	else
-		Update();
-	return true;
+	cairo->set_source_rgb(1.0, 1.0, 1.0);
+	cairo->set_line_width(1.0);
+	cairo->rectangle(0, 0, width, height);
+	cairo->fill();
+		
+	if(_isInitialized) {
+		int
+			destWidth = width - (int) floor(_leftBorderSize + _rightBorderSize),
+			destHeight = height - (int) floor(_topBorderSize + _bottomBorderSize),
+			sourceWidth = _imageSurface->get_width(),
+			sourceHeight = _imageSurface->get_height();
+		cairo->save();
+		cairo->translate((int) round(_leftBorderSize), (int) round(_topBorderSize));
+		cairo->scale((double) destWidth / (double) sourceWidth, (double) destHeight / (double) sourceHeight);
+		Cairo::RefPtr<Cairo::SurfacePattern> pattern = Cairo::SurfacePattern::create(_imageSurface);
+		pattern->set_filter(_cairoFilter);
+		cairo->set_source(pattern);
+		cairo->rectangle(0, 0, sourceWidth, sourceHeight);
+		cairo->clip();
+		cairo->paint();
+		cairo->restore();
+		cairo->set_source_rgb(0.0, 0.0, 0.0);
+		cairo->rectangle(round(_leftBorderSize), round(_topBorderSize), destWidth, destHeight);
+		cairo->stroke();
+
+		if(_showColorScale)
+			_colorScale->Draw(cairo);
+		if(_showXYAxes)
+		{
+			_vertScale->Draw(cairo, 0.0, 0.0);
+			_horiScale->Draw(cairo);
+		}
+		if(_plotTitle != 0)
+			_plotTitle->Draw(cairo);
+	}
 }
 
-void ImageWidget::ZoomFit()
+void HeatMapPlot::ZoomFit()
 {
 	_startHorizontal = 0.0;
 	_endHorizontal = 1.0;
@@ -110,7 +125,7 @@ void ImageWidget::ZoomFit()
 	_onZoomChanged.emit();
 }
 
-void ImageWidget::ZoomIn()
+void HeatMapPlot::ZoomIn()
 {
 	double distX = (_endHorizontal-_startHorizontal)*0.25;
 	_startHorizontal += distX;
@@ -121,7 +136,7 @@ void ImageWidget::ZoomIn()
 	_onZoomChanged.emit();
 }
 
-void ImageWidget::ZoomInOn(size_t x, size_t y)
+void HeatMapPlot::ZoomInOn(size_t x, size_t y)
 {
 	double xr = double(x) / _image->Width(), yr = double(y) / _image->Height();
 	double distX = (_endHorizontal-_startHorizontal)*0.25;
@@ -153,7 +168,7 @@ void ImageWidget::ZoomInOn(size_t x, size_t y)
 	_onZoomChanged.emit();
 }
 
-void ImageWidget::ZoomOut()
+void HeatMapPlot::ZoomOut()
 {
 	if(!IsZoomedOut())
 	{
@@ -186,23 +201,22 @@ void ImageWidget::ZoomOut()
 	}
 }
 
-void ImageWidget::Update()
+void HeatMapPlot::Draw(Cairo::RefPtr<Cairo::Context> cairo, unsigned width, unsigned height, bool isInvalidated)
 {
-	Glib::RefPtr<Gdk::Window> window = get_window();
-	if(window && get_width() > 0 && get_height() > 0)
-	{
+	if(!isInvalidated && width == _initializedWidth && height == _initializedHeight)
+		redrawWithoutChanges(cairo, width, height);
+	else {
 		if(HasImage())
 		{
-			update(window->create_cairo_context(), get_width(), get_height());
-			window->invalidate(false);
+			update(cairo, width, height);
 		}
 		else {
-			redrawWithoutChanges(window->create_cairo_context(), get_width(), get_height());
+			redrawWithoutChanges(cairo, width, height);
 		}
 	}
 }
 
-void ImageWidget::SaveByExtension(const std::string& filename, unsigned width, unsigned height)
+void HeatMapPlot::SaveByExtension(const std::string& filename, unsigned width, unsigned height)
 {
 	const char* eMsg = "Saving image to file failed: could not determine file type from filename extension -- maybe the type is not supported. Supported types are .png, .svg or .pdf.";
 	if(filename.size() < 4)
@@ -218,20 +232,8 @@ void ImageWidget::SaveByExtension(const std::string& filename, unsigned width, u
 	else throw std::runtime_error(eMsg);
 }
 
-void ImageWidget::SavePdf(const std::string &filename, unsigned width, unsigned height)
+void HeatMapPlot::SavePdf(const std::string &filename, unsigned width, unsigned height)
 {
-	if(width == 0 || height == 0)
-	{
-		if(is_visible())
-		{
-			width = get_width();
-			height = get_height();
-		}
-		else {
-			width = 640;
-			height = 480;
-		}
-	}
 	Cairo::RefPtr<Cairo::PdfSurface> surface = Cairo::PdfSurface::create(filename, width, height);
 	Cairo::RefPtr<Cairo::Context> cairo = Cairo::Context::create(surface);
 	if(HasImage())
@@ -245,20 +247,8 @@ void ImageWidget::SavePdf(const std::string &filename, unsigned width, unsigned 
 	surface->finish();
 }
 
-void ImageWidget::SaveSvg(const std::string &filename, unsigned width, unsigned height)
+void HeatMapPlot::SaveSvg(const std::string &filename, unsigned width, unsigned height)
 {
-	if(width == 0 || height == 0)
-	{
-		if(is_visible())
-		{
-			width = get_width();
-			height = get_height();
-		}
-		else {
-			width = 640;
-			height = 480;
-		}
-	}
 	Cairo::RefPtr<Cairo::SvgSurface> surface = Cairo::SvgSurface::create(filename, width, height);
 	Cairo::RefPtr<Cairo::Context> cairo = Cairo::Context::create(surface);
 	if(HasImage())
@@ -270,20 +260,8 @@ void ImageWidget::SaveSvg(const std::string &filename, unsigned width, unsigned 
 	surface->finish();
 }
 
-void ImageWidget::SavePng(const std::string &filename, unsigned width, unsigned height)
+void HeatMapPlot::SavePng(const std::string &filename, unsigned width, unsigned height)
 {
-	if(width == 0 || height == 0)
-	{
-		if(is_visible())
-		{
-			width = get_width();
-			height = get_height();
-		}
-		else {
-			width = 640;
-			height = 480;
-		}
-	}
 	Cairo::RefPtr<Cairo::ImageSurface> surface = Cairo::ImageSurface::create(Cairo::FORMAT_ARGB32, width, height);
 	Cairo::RefPtr<Cairo::Context> cairo = Cairo::Context::create(surface);
 	if(HasImage())
@@ -294,16 +272,15 @@ void ImageWidget::SavePng(const std::string &filename, unsigned width, unsigned 
 	surface->write_to_png(filename);
 }
 
-void ImageWidget::SaveText(const std::string &filename)
+void HeatMapPlot::SaveText(const std::string &filename)
 {
 	if(HasImage())
 	{
-		Image2DCPtr image = _image;
 		unsigned int
-			startX = (unsigned int) round(_startHorizontal * image->Width()),
-			startY = (unsigned int) round(_startVertical * image->Height()),
-			endX = (unsigned int) round(_endHorizontal * image->Width()),
-			endY = (unsigned int) round(_endVertical * image->Height());
+			startX = (unsigned int) round(_startHorizontal * _image->Width()),
+			startY = (unsigned int) round(_startVertical * _image->Height()),
+			endX = (unsigned int) round(_endHorizontal * _image->Width()),
+			endY = (unsigned int) round(_endVertical * _image->Height());
 		size_t
 			imageWidth = endX - startX,
 			imageHeight = endY - startY;
@@ -314,64 +291,60 @@ void ImageWidget::SaveText(const std::string &filename)
 		{
 			for(size_t x=startX; x!=endX; ++x)
 			{
-				file << image->Value(x, y) << '\n';
+				file << _image->Value(x, y) << '\n';
 			}
 		}
 	}
 }
 
-void ImageWidget::update(Cairo::RefPtr<Cairo::Context> cairo, unsigned width, unsigned height)
+void HeatMapPlot::update(Cairo::RefPtr<Cairo::Context> cairo, unsigned width, unsigned height)
 {
-	Image2DCPtr image = _image;
 	Mask2DCPtr mask = GetActiveMask(), originalMask = _originalMask, alternativeMask = _alternativeMask;
 	
 	unsigned int
-		startX = (unsigned int) round(_startHorizontal * image->Width()),
-		startY = (unsigned int) round(_startVertical * image->Height()),
-		endX = (unsigned int) round(_endHorizontal * image->Width()),
-		endY = (unsigned int) round(_endVertical * image->Height()),
+		startX = (unsigned int) round(_startHorizontal * _image->Width()),
+		startY = (unsigned int) round(_startVertical * _image->Height()),
+		endX = (unsigned int) round(_endHorizontal * _image->Width()),
+		endY = (unsigned int) round(_endVertical * _image->Height()),
 		startTimestep = startX,
 		endTimestep = endX;
 	size_t
 		imageWidth = endX - startX,
 		imageHeight = endY - startY;
 		
+	Image2DCPtr image = _image;
 	if(imageWidth > 30000)
 	{
 		int shrinkFactor = (imageWidth + 29999) / 30000;
-		image = image->ShrinkHorizontally(shrinkFactor);
-		mask = mask->ShrinkHorizontally(shrinkFactor);
+		image = std::make_shared<Image2D>(image->ShrinkHorizontally(shrinkFactor));
+		mask = std::make_shared<Mask2D>(mask->ShrinkHorizontally(shrinkFactor));
 		if(originalMask != 0)
-			originalMask = originalMask->ShrinkHorizontally(shrinkFactor);
+			originalMask = std::make_shared<Mask2D>(originalMask->ShrinkHorizontally(shrinkFactor));
 		if(alternativeMask != 0)
-			alternativeMask = alternativeMask->ShrinkHorizontally(shrinkFactor);
+			alternativeMask = std::make_shared<Mask2D>(alternativeMask->ShrinkHorizontally(shrinkFactor));
 		startX /= shrinkFactor;
 		endX /= shrinkFactor;
 		imageWidth = endX - startX;
 	}
 
 	num_t min, max;
-	findMinMax(image, mask, min, max);
+	findMinMax(image.get(), mask.get(), min, max);
 	
-	// If these are not yet created, they are 0, so ok to delete.
-	delete _horiScale;
-	delete _vertScale;
-	delete _colorScale;
-	delete _plotTitle;
+	_horiScale.reset();
+	_vertScale.reset();
+	_colorScale.reset();
+	_plotTitle.reset();
 		
 	if(_showXYAxes)
 	{
-		_vertScale = new VerticalPlotScale();
+		_vertScale.reset(new VerticalPlotScale());
 		_vertScale->SetDrawWithDescription(_showYAxisDescription);
-		_horiScale = new HorizontalPlotScale();
+		_horiScale.reset(new HorizontalPlotScale());
 		_horiScale->SetDrawWithDescription(_showXAxisDescription);
-	} else {
-		_vertScale = 0;
-		_horiScale = 0;
 	}
 	if(_showColorScale)
 	{
-		_colorScale = new ColorScale();
+		_colorScale.reset(new ColorScale());
 		_colorScale->SetDrawWithDescription(_showZAxisDescription);
 	} else {
 		_colorScale = 0;
@@ -417,7 +390,7 @@ void ImageWidget::update(Cairo::RefPtr<Cairo::Context> cairo, unsigned width, un
 
 	if(_showTitle && !actualTitleText().empty())
 	{
-		_plotTitle = new Title();
+		_plotTitle.reset(new Title());
 		_plotTitle->SetText(actualTitleText());
 		_plotTitle->SetPlotDimensions(width, height, 0.0);
 		_topBorderSize = _plotTitle->GetHeight(cairo);
@@ -429,11 +402,11 @@ void ImageWidget::update(Cairo::RefPtr<Cairo::Context> cairo, unsigned width, un
 	// not dependent on other dimensions, we give the horizontal scale temporary width/height, so that we can calculate its height:
 	if(_showXYAxes)
 	{
-		_horiScale->SetPlotDimensions(width, height, 0.0, 0.0);
+		_horiScale->SetPlotDimensions(width, height, 0.0, 0.0, false);
 		_bottomBorderSize = _horiScale->GetHeight(cairo);
 		_rightBorderSize = _horiScale->GetRightMargin(cairo);
 	
-		_vertScale->SetPlotDimensions(width - _rightBorderSize + 5.0, height - _topBorderSize - _bottomBorderSize, _topBorderSize);
+		_vertScale->SetPlotDimensions(width - _rightBorderSize + 5.0, height - _topBorderSize - _bottomBorderSize, false);
 		_leftBorderSize = _vertScale->GetWidth(cairo);
 	} else {
 		_bottomBorderSize = 0.0;
@@ -442,15 +415,15 @@ void ImageWidget::update(Cairo::RefPtr<Cairo::Context> cairo, unsigned width, un
 	}
 	if(_showColorScale)
 	{
-		_colorScale->SetPlotDimensions(width - _rightBorderSize, height - _topBorderSize, _topBorderSize);
+		_colorScale->SetPlotDimensions(width - _rightBorderSize, height - _topBorderSize, _topBorderSize, false);
 		_rightBorderSize += _colorScale->GetWidth(cairo) + 5.0;
 	}
 	if(_showXYAxes)
 	{
-		_horiScale->SetPlotDimensions(width - _rightBorderSize + 5.0, height -_topBorderSize - _bottomBorderSize, _topBorderSize, 	_vertScale->GetWidth(cairo));
+		_horiScale->SetPlotDimensions(width - _rightBorderSize + 5.0, height -_topBorderSize - _bottomBorderSize, _vertScale->GetWidth(cairo), _topBorderSize, false);
 	}
 
-	class ColorMap *colorMap = createColorMap();
+	std::unique_ptr<ColorMap> colorMap(createColorMap());
 	
 	const double
 		minLog10 = min>0.0 ? log10(min) : 0.0,
@@ -485,7 +458,7 @@ void ImageWidget::update(Cairo::RefPtr<Cairo::Context> cairo, unsigned width, un
 	if(_highlighting)
 	{
 		highlightMask = Mask2D::CreateSetMaskPtr<false>(image->Width(), image->Height());
-		_highlightConfig->Execute(image, highlightMask, true, 10.0);
+		_highlightConfig->Execute(image.get(), highlightMask.get(), true, 10.0);
 	}
 	const bool
 		originalActive = _showOriginalMask && originalMask != 0,
@@ -535,7 +508,7 @@ void ImageWidget::update(Cairo::RefPtr<Cairo::Context> cairo, unsigned width, un
 			rowpointer[xa+3]=a;
 		}
 	}
-	delete colorMap;
+	colorMap.reset();
 
 	if(_segmentedImage != 0)
 	{
@@ -573,31 +546,32 @@ void ImageWidget::update(Cairo::RefPtr<Cairo::Context> cairo, unsigned width, un
 	redrawWithoutChanges(cairo, width, height);
 } 
 
-ColorMap *ImageWidget::createColorMap()
+std::unique_ptr<ColorMap> HeatMapPlot::createColorMap()
 {
+	using CM=std::unique_ptr<ColorMap>;
 	switch(_colorMap) {
 		case BWMap:
-			return new MonochromeMap();
+			return CM(new MonochromeMap());
 		case InvertedMap:
-			return new class InvertedMap();
+			return CM(new class InvertedMap());
 		case HotColdMap:
-			return new ColdHotMap();
+			return CM(new ColdHotMap());
 		case RedBlueMap:
-			return new class RedBlueMap();
+			return CM(new class RedBlueMap());
 		case RedYellowBlueMap:
-			return new class RedYellowBlueMap();
+			return CM(new class RedYellowBlueMap());
 		case FireMap:
-			return new class FireMap();
+			return CM(new class FireMap());
 		case BlackRedMap:
-			return new class BlackRedMap();
+			return CM(new class BlackRedMap());
 		case ViridisMap:
-			return new class ViridisMap();
+			return CM(new class ViridisMap());
 		default:
 			return 0;
 	}
 }
 
-void ImageWidget::findMinMax(Image2DCPtr image, Mask2DCPtr mask, num_t &min, num_t &max)
+void HeatMapPlot::findMinMax(const Image2D* image, const Mask2D* mask, num_t &min, num_t &max)
 {
 	switch(_range)
 	{
@@ -650,46 +624,7 @@ void ImageWidget::findMinMax(Image2DCPtr image, Mask2DCPtr mask, num_t &min, num
 	_min = min;
 }
 
-void ImageWidget::redrawWithoutChanges(Cairo::RefPtr<Cairo::Context> cairo, unsigned width, unsigned height)
-{
-	cairo->set_source_rgb(1.0, 1.0, 1.0);
-	cairo->set_line_width(1.0);
-	cairo->rectangle(0, 0, width, height);
-	cairo->fill();
-		
-	if(_isInitialized) {
-		int
-			destWidth = width - (int) floor(_leftBorderSize + _rightBorderSize),
-			destHeight = height - (int) floor(_topBorderSize + _bottomBorderSize),
-			sourceWidth = _imageSurface->get_width(),
-			sourceHeight = _imageSurface->get_height();
-		cairo->save();
-		cairo->translate((int) round(_leftBorderSize), (int) round(_topBorderSize));
-		cairo->scale((double) destWidth / (double) sourceWidth, (double) destHeight / (double) sourceHeight);
-		Cairo::RefPtr<Cairo::SurfacePattern> pattern = Cairo::SurfacePattern::create(_imageSurface);
-		pattern->set_filter(_cairoFilter);
-		cairo->set_source(pattern);
-		cairo->rectangle(0, 0, sourceWidth, sourceHeight);
-		cairo->clip();
-		cairo->paint();
-		cairo->restore();
-		cairo->set_source_rgb(0.0, 0.0, 0.0);
-		cairo->rectangle(round(_leftBorderSize), round(_topBorderSize), destWidth, destHeight);
-		cairo->stroke();
-
-		if(_showColorScale)
-			_colorScale->Draw(cairo);
-		if(_showXYAxes)
-		{
-			_vertScale->Draw(cairo);
-			_horiScale->Draw(cairo);
-		}
-		if(_plotTitle != 0)
-			_plotTitle->Draw(cairo);
-	}
-}
-
-void ImageWidget::downsampleImageBuffer(unsigned newWidth, unsigned newHeight)
+void HeatMapPlot::downsampleImageBuffer(unsigned newWidth, unsigned newHeight)
 {
 	_imageSurface->flush();
 	const unsigned
@@ -744,7 +679,7 @@ void ImageWidget::downsampleImageBuffer(unsigned newWidth, unsigned newHeight)
 	_imageSurface->mark_dirty();
 }
 
-Mask2DCPtr ImageWidget::GetActiveMask() const
+Mask2DCPtr HeatMapPlot::GetActiveMask() const
 {
 	if(!HasImage())
 		throw std::runtime_error("GetActiveMask() called without image");
@@ -755,8 +690,8 @@ Mask2DCPtr ImageWidget::GetActiveMask() const
 	{
 		if(altActive)
 		{
-			Mask2DPtr mask = Mask2D::CreateCopy(_originalMask); 
-			mask->Join(_alternativeMask);
+			Mask2DPtr mask = std::make_shared<Mask2D>(*_originalMask); 
+			mask->Join(*_alternativeMask);
 			return mask;
 		} else
 			return _originalMask;
@@ -768,7 +703,7 @@ Mask2DCPtr ImageWidget::GetActiveMask() const
 	}
 }
 
-TimeFrequencyMetaDataCPtr ImageWidget::GetSelectedMetaData()
+TimeFrequencyMetaDataCPtr HeatMapPlot::GetSelectedMetaData() const
 {
 	TimeFrequencyMetaDataCPtr metaData = _metaData;
 
@@ -794,7 +729,7 @@ TimeFrequencyMetaDataCPtr ImageWidget::GetSelectedMetaData()
 	return metaData;
 }
 
-bool ImageWidget::toUnits(double mouseX, double mouseY, int &posX, int &posY)
+bool HeatMapPlot::ConvertToUnits(double mouseX, double mouseY, int &posX, int &posY) const
 {
 	const unsigned int
 		startX = (unsigned int) round(_startHorizontal * _image->Width()),
@@ -804,50 +739,12 @@ bool ImageWidget::toUnits(double mouseX, double mouseY, int &posX, int &posY)
 	const unsigned
 		width = endX - startX,
 		height = endY - startY;
-	posX = (int) round((mouseX - _leftBorderSize) * width / (get_width() - _rightBorderSize - _leftBorderSize) - 0.5);
-	posY = (int) round((mouseY - _topBorderSize) * height / (get_height() - _bottomBorderSize - _topBorderSize) - 0.5);
+	posX = (int) round((mouseX - _leftBorderSize) * width / (_initializedWidth - _rightBorderSize - _leftBorderSize) - 0.5);
+	posY = (int) round((mouseY - _topBorderSize) * height / (_initializedHeight - _bottomBorderSize - _topBorderSize) - 0.5);
 	bool inDomain = posX >= 0 && posY >= 0 && posX < (int) width && posY < (int) height;
 	posX += startX;
 	posY = endY - posY - 1;
 	return inDomain;
 }
 
-bool ImageWidget::onMotion(GdkEventMotion *event)
-{
-	if(HasImage())
-	{
-		int posX, posY;
-		if(toUnits(event->x, event->y, posX, posY))
-		{
-			_mouseX = posX;
-			_mouseY = posY;
-			_mouseIsIn = true;
-			_onMouseMoved(posX, posY);
-		} else if(_mouseIsIn) {
-			_onMouseLeft();
-			_mouseIsIn = false;
-		}
-	}
-	return true;
-}
 
-bool ImageWidget::onLeave(GdkEventCrossing *event)
-{
-	if(_mouseIsIn)
-	{
-		_onMouseLeft();
-		_mouseIsIn = false;
-	}
-	return true;
-}
-
-bool ImageWidget::onButtonReleased(GdkEventButton *event)
-{
-	if(HasImage())
-	{
-		int posX, posY;
-		if(toUnits(event->x, event->y, posX, posY))
-			_onButtonReleased(posX, posY);
-	}
-	return true;
-}

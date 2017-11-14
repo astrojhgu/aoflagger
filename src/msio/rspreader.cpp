@@ -30,14 +30,12 @@ std::pair<TimeFrequencyData,TimeFrequencyMetaDataPtr> RSPReader::ReadChannelBeam
 	
 	std::pair<TimeFrequencyData,TimeFrequencyMetaDataPtr> data = ReadSingleBeamlet(timestepStart*(unsigned long) 256, timestepEnd*(unsigned long) 256, beamletCount, beamletIndex);
 
-	TimeFrequencyData *allX = data.first.CreateTFData(Polarization::XX);
-	TimeFrequencyData *allY = data.first.CreateTFData(Polarization::YY);
-	Image2DCPtr xr = allX->GetRealPart();
-	Image2DCPtr xi = allX->GetImaginaryPart();
-	Image2DCPtr yr = allY->GetRealPart();
-	Image2DCPtr yi = allY->GetImaginaryPart();
-	delete allX;
-	delete allY;
+	TimeFrequencyData allX = data.first.Make(Polarization::XX);
+	TimeFrequencyData allY = data.first.Make(Polarization::YY);
+	Image2DCPtr xr = allX.GetRealPart();
+	Image2DCPtr xi = allX.GetImaginaryPart();
+	Image2DCPtr yr = allY.GetRealPart();
+	Image2DCPtr yi = allY.GetImaginaryPart();
 	Mask2DCPtr mask = data.first.GetSingleMask();
 	
 	Image2DPtr
@@ -52,18 +50,18 @@ std::pair<TimeFrequencyData,TimeFrequencyMetaDataPtr> RSPReader::ReadChannelBeam
 	for(unsigned long timestep = 0;timestep < timestepEnd-timestepStart;++timestep)
 	{
 		unsigned long timestepIndex = timestep * 256;
-		SampleRowPtr realX = SampleRow::CreateFromRow(xr, timestepIndex, 256, 0);
-		SampleRowPtr imaginaryX = SampleRow::CreateFromRow(xi, timestepIndex, 256, 0);
-		SampleRowPtr realY = SampleRow::CreateFromRow(yr, timestepIndex, 256, 0);
-		SampleRowPtr imaginaryY = SampleRow::CreateFromRow(yi, timestepIndex, 256, 0);
+		SampleRowPtr realX = SampleRow::CreateFromRow(xr.get(), timestepIndex, 256, 0);
+		SampleRowPtr imaginaryX = SampleRow::CreateFromRow(xi.get(), timestepIndex, 256, 0);
+		SampleRowPtr realY = SampleRow::CreateFromRow(yr.get(), timestepIndex, 256, 0);
+		SampleRowPtr imaginaryY = SampleRow::CreateFromRow(yi.get(), timestepIndex, 256, 0);
 		
 		FFTTools::FFT(realX, imaginaryX);
 		FFTTools::FFT(realY, imaginaryY);
 		
-		realX->SetVerticalImageValues(outXR, timestep);
-		imaginaryX->SetVerticalImageValues(outXI, timestep);
-		realY->SetVerticalImageValues(outYR, timestep);
-		imaginaryY->SetVerticalImageValues(outYI, timestep);
+		realX->SetVerticalImageValues(outXR.get(), timestep);
+		imaginaryX->SetVerticalImageValues(outXI.get(), timestep);
+		realY->SetVerticalImageValues(outYR.get(), timestep);
+		imaginaryY->SetVerticalImageValues(outYI.get(), timestep);
 		
 		observationTimes.push_back(data.second->ObservationTimes()[timestepIndex + 256/2]);
 
@@ -106,14 +104,12 @@ std::pair<TimeFrequencyData,TimeFrequencyMetaDataPtr> RSPReader::ReadSingleBeaml
 	Image2DPtr imaginaryY = Image2D::CreateZeroImagePtr(width, 1);
 	Mask2DPtr mask = Mask2D::CreateUnsetMaskPtr(width, 1);
 	
-	TimeFrequencyData *allX = data.first.CreateTFData(Polarization::XX);
-	TimeFrequencyData *allY = data.first.CreateTFData(Polarization::YY);
-	Image2DCPtr xr = allX->GetRealPart();
-	Image2DCPtr xi = allX->GetImaginaryPart();
-	Image2DCPtr yr = allY->GetRealPart();
-	Image2DCPtr yi = allY->GetImaginaryPart();
-	delete allX;
-	delete allY;
+	TimeFrequencyData allX = data.first.Make(Polarization::XX);
+	TimeFrequencyData allY = data.first.Make(Polarization::YY);
+	Image2DCPtr xr = allX.GetRealPart();
+	Image2DCPtr xi = allX.GetImaginaryPart();
+	Image2DCPtr yr = allY.GetRealPart();
+	Image2DCPtr yi = allY.GetImaginaryPart();
 	Mask2DCPtr maskWithBeamlets = data.first.GetSingleMask();
 	
 	for(unsigned x=0;x<width;++x)

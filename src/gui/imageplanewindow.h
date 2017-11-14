@@ -14,7 +14,7 @@
 
 #include "../imaging/uvimager.h"
 
-#include "imagewidget.h"
+#include "heatmapwidget.h"
 
 class ImagePlaneWindow : public Gtk::Window {
 	public:
@@ -23,11 +23,12 @@ class ImagePlaneWindow : public Gtk::Window {
 
 		void AddData(const TimeFrequencyData &data, TimeFrequencyMetaDataCPtr metaData);
 		void AddData(const TimeFrequencyData &data, class SpatialMatrixMetaData *spatialMetaData);
-		UVImager *GetImager() throw() { return &_imager; }
+		UVImager *GetImager() { return &_imager; }
 		void Update();
 	private:
 		UVImager _imager;
-		ImageWidget _imageWidget;
+		HeatMapPlot _heatMapPlot;
+		HeatMapWidget _imageWidget;
 		Gtk::VBox _box;
 		Gtk::HBox _topBox;
 		Gtk::Button _clearButton;

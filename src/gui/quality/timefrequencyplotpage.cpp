@@ -9,8 +9,8 @@ TimeFrequencyPlotPage::TimeFrequencyPlotPage() :
 	_statCollection(0)
 {
 	grayScaleWidget().OnMouseMovedEvent().connect(sigc::mem_fun(*this, &TimeFrequencyPlotPage::onMouseMoved));
-	grayScaleWidget().SetXAxisDescription("Time index");
-	grayScaleWidget().SetYAxisDescription("Frequency index");
+	grayScaleWidget().Plot().SetXAxisDescription("Time index");
+	grayScaleWidget().Plot().SetYAxisDescription("Frequency index");
 }
 
 TimeFrequencyPlotPage::~TimeFrequencyPlotPage()
@@ -26,11 +26,11 @@ std::pair<TimeFrequencyData, TimeFrequencyMetaDataCPtr> TimeFrequencyPlotPage::c
 		std::pair<TimeFrequencyData, TimeFrequencyMetaDataCPtr> data = derivator.CreateTFData(kind);
 		if(data.second == 0)
 		{
-			grayScaleWidget().SetXAxisDescription("Time index");
-			grayScaleWidget().SetYAxisDescription("Frequency index");
+			grayScaleWidget().Plot().SetXAxisDescription("Time index");
+			grayScaleWidget().Plot().SetYAxisDescription("Frequency index");
 		} else {
-			grayScaleWidget().SetXAxisDescription("Time");
-			grayScaleWidget().SetYAxisDescription("Frequency (MHz)");
+			grayScaleWidget().Plot().SetXAxisDescription("Time");
+			grayScaleWidget().Plot().SetYAxisDescription("Frequency (MHz)");
 		}
 		return data;
 	} else {
@@ -45,6 +45,6 @@ void TimeFrequencyPlotPage::onMouseMoved(size_t x, size_t y)
 	const QualityTablesFormatter::StatisticKind kind = getSelectedStatisticKind();
 	const std::string &kindName = QualityTablesFormatter::KindToName(kind);
 	
-	text << kindName << " = " << grayScaleWidget().Image()->Value(x, y) << " (" << x << ", " << y << ")";
+	text << kindName << " = " << grayScaleWidget().Plot().Image()->Value(x, y) << " (" << x << ", " << y << ")";
 	_signalStatusChange(text.str());
 }

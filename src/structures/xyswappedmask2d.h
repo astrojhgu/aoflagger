@@ -1,8 +1,6 @@
 #ifndef XYSWAPPEDMASK2D_H
 #define XYSWAPPEDMASK2D_H
 
-#include <boost/shared_ptr.hpp>
-
 #include "mask2d.h"
 
 /**

@@ -25,8 +25,6 @@ Plot2D::~Plot2D()
 
 void Plot2D::Clear()
 {
-	for(std::vector<Plot2DPointSet*>::iterator i=_pointSets.begin();i!=_pointSets.end();++i)
-		delete *i;
 	_pointSets.clear();
 	_system.Clear();
 }
@@ -34,8 +32,8 @@ void Plot2D::Clear()
 void Plot2D::Render(Gtk::DrawingArea &drawingArea)
 {
 	_system.Clear();
-	for(std::vector<Plot2DPointSet*>::iterator i=_pointSets.begin();i!=_pointSets.end();++i)
-		_system.AddToSystem(**i);
+	for(std::unique_ptr<Plot2DPointSet>& set : _pointSets)
+		_system.AddToSystem(*set);
 
 	Glib::RefPtr<Gdk::Window> window = drawingArea.get_window();
 	if(window)
@@ -109,7 +107,7 @@ void Plot2D::render(Cairo::RefPtr<Cairo::Context> cr)
 				_horizontalScale.InitializeNumericTicks(MinX(), MaxX());
 			_horizontalScale.SetUnitsCaption(_customHAxisDescription.empty() ? refPointSet.XUnits() : _customHAxisDescription);
 			_topMargin = 10.0;
-			_horizontalScale.SetPlotDimensions(_width, _height, _topMargin, 0.0);
+			_horizontalScale.SetPlotDimensions(_width, _height, 0.0, _topMargin, false);
 			horiScaleHeight = _horizontalScale.GetHeight(cr);
 			
 			double rightMargin = _horizontalScale.GetRightMargin(cr);
@@ -119,17 +117,17 @@ void Plot2D::render(Cairo::RefPtr<Cairo::Context> cr)
 			else
 				_verticalScale.InitializeNumericTicks(MinY(), MaxY());
 			_verticalScale.SetUnitsCaption(_customVAxisDescription.empty() ? refPointSet.YUnits() : _customVAxisDescription);
-			_verticalScale.SetPlotDimensions(_width - rightMargin, _height - horiScaleHeight - _topMargin, _topMargin);
+			_verticalScale.SetPlotDimensions(_width - rightMargin, _height - horiScaleHeight - _topMargin, false);
 
 			verticalScaleWidth =  _verticalScale.GetWidth(cr);
-			_horizontalScale.SetPlotDimensions(_width - rightMargin, _height - horiScaleHeight, 0.0, verticalScaleWidth);
+			_horizontalScale.SetPlotDimensions(_width - rightMargin, _height - horiScaleHeight, verticalScaleWidth, 0.0, false);
 		}
 		else {
 			verticalScaleWidth = 0.0;
 			horiScaleHeight = 0.0;
 		}
 		
-		for(std::vector<Plot2DPointSet*>::iterator i=_pointSets.begin();i!=_pointSets.end();++i)
+		for(std::unique_ptr<Plot2DPointSet>& set : _pointSets)
 		{
 			switch(c)
 			{
@@ -144,14 +142,14 @@ void Plot2D::render(Cairo::RefPtr<Cairo::Context> cr)
 			}
 			c = (c+1)%8;
 
-			render(cr, **i);
+			render(cr, *set);
 		}
 		
 		double rightMargin;
 		if(_showAxes)
 		{
 			_horizontalScale.Draw(cr);
-			_verticalScale.Draw(cr);
+			_verticalScale.Draw(cr, 0.0, 0.0);
 			rightMargin = _horizontalScale.GetRightMargin(cr);
 		} else {
 			rightMargin = 0.0;
@@ -199,6 +197,9 @@ void Plot2D::render(Cairo::RefPtr<Cairo::Context> cr, Plot2DPointSet &pointSet)
 	
 	const double plotWidth = _width - rightMargin - plotLeftMargin;
 	const double plotHeight = _height - bottomMargin - _topMargin;
+	
+	cr->rectangle(plotLeftMargin, _topMargin, plotWidth, plotHeight);
+	cr->clip();
 	
 	double
 		minXLog10 = log10(xLeft),
@@ -321,4 +322,5 @@ void Plot2D::render(Cairo::RefPtr<Cairo::Context> cr, Plot2DPointSet &pointSet)
 		cr->line_to(plotWidth + plotLeftMargin, yMax * plotHeight / (yMax - yMin) + _topMargin);
 		cr->stroke();
 	}
+	cr->reset_clip();
 }

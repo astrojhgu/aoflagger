@@ -7,6 +7,7 @@
 #include "../../msio/fitsfile.h"
 #include "../../structures/image2d.h"
 #include "../../structures/timefrequencydata.h"
+#include "../../structures/timefrequencymetadata.h"
 
 #include "../../util/aologger.h"
 
@@ -40,9 +41,9 @@ namespace rfiStrategy {
 	{
 	}
 	
-	FitsImageSet *FitsImageSet::Copy()
+	std::unique_ptr<ImageSet> FitsImageSet::Clone()
 	{
-		return new FitsImageSet(*this);
+		return std::unique_ptr<FitsImageSet>(new FitsImageSet(*this));
 	}
 
 	void FitsImageSet::Initialize()
@@ -75,8 +76,10 @@ namespace rfiStrategy {
 			// sdfits
 			
 			_baselines.push_back(std::pair<size_t,size_t>(0, 0));
-			_antennaInfos.push_back(AntennaInfo());
-			
+      AntennaInfo antenna;
+      antenna.id = 0;
+			_antennaInfos.push_back(antenna);
+      
 			// find number of bands
 			_file->MoveToHDU(2);
 			int ifColumn = _file->GetTableColumnIndex("IF");
@@ -141,9 +144,14 @@ namespace rfiStrategy {
 			_currentBandIndex = fitsIndex._band;
 			int bandNumber = _bandIndexToNumber[fitsIndex._band];
 			metaData->SetBand(_bandInfos[bandNumber]);
+      metaData->SetAntenna1(_antennaInfos[_baselines[_currentBaselineIndex].first]);
+      metaData->SetAntenna2(_antennaInfos[_baselines[_currentBaselineIndex].second]);
 			AOLogger::Debug << "Loaded metadata for: " << Date::AipsMJDToString(metaData->ObservationTimes()[0]) << ", band " << bandNumber << " (" << Frequency::ToString(_bandInfos[bandNumber].channels[0].frequencyHz) << " - " << Frequency::ToString(_bandInfos[bandNumber].channels.rbegin()->frequencyHz) << ")\n";
-
 		}
+		else {
+      metaData->SetAntenna1(_antennaInfos[0]);
+      metaData->SetAntenna2(_antennaInfos[0]);
+    }
 		return BaselineData(data, metaData, index);
 	}
 
@@ -302,6 +310,7 @@ namespace rfiStrategy {
 			_file->ReadTableCell(i, 1, name);
 			_file->ReadTableCell(i, 2, pos, 3);
 			info.name = name;
+      info.id = _antennaInfos.size();
 			info.position.x = pos[0];
 			info.position.y = pos[1];
 			info.position.z = pos[2];
@@ -455,7 +464,7 @@ namespace rfiStrategy {
 		for(int p=0;p<polarizationCount;++p)
 		{
 			images[p]->SetTrim(0, 0, timeIndex, images[p]->Height());
-			masks[p] = masks[p]->Trim(0, 0, timeIndex, images[p]->Height());
+			masks[p].reset(new Mask2D(masks[p]->Trim(0, 0, timeIndex, images[p]->Height())));
 		}
 		observationTimes.resize(timeIndex);
 		metaData.SetObservationTimes(observationTimes);

@@ -2,8 +2,7 @@
 #define LocalFitMethod_H
 
 #include <string>
-
-#include <boost/thread/mutex.hpp>
+#include <mutex>
 
 #include "../../structures/image2d.h"
 #include "../../structures/mask2d.h"
@@ -93,7 +92,6 @@ class LocalFitMethod final : public SurfaceFitMethod {
 		unsigned _hSquareSize, _vSquareSize;
 		num_t **_weights;
 		long double _hKernelSize, _vKernelSize;
-		boost::mutex _mutex;
 		enum Method _method;
 };
 

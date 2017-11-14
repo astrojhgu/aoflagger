@@ -24,7 +24,7 @@ namespace rfiStrategy {
 			~DirectionProfileAction()
 			{
 			}
-			virtual std::string Description()
+			virtual std::string Description() final override
 			{
 				std::string s;
 				if(_axis == VerticalAxis)
@@ -40,7 +40,7 @@ namespace rfiStrategy {
 				}
 			}
 
-			virtual void Perform(class ArtifactSet &artifacts, class ProgressListener &)
+			virtual void Perform(class ArtifactSet &artifacts, class ProgressListener &) final override
 			{
 				TimeFrequencyData data(artifacts.ContaminatedData());
 				if(data.PolarizationCount()!=1)
@@ -71,7 +71,7 @@ namespace rfiStrategy {
 				}
 			}
 
-			virtual ActionType Type() const { return DirectionProfileActionType; }
+			virtual ActionType Type() const final override { return DirectionProfileActionType; }
 			
 			enum Axis Axis() const { return _axis; }
 			void SetAxis(enum Axis axis) { _axis = axis; }

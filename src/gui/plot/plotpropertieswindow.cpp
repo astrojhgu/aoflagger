@@ -8,7 +8,7 @@
 #include "plot2d.h"
 #include "plotwidget.h"
 
-#include "../imagewidget.h"
+#include "../heatmapwidget.h"
 
 PlotPropertiesWindow::PlotPropertiesWindow(Plot2D &plot, const std::string &title) :
 	Gtk::Window(),

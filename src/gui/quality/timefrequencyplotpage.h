@@ -6,7 +6,7 @@
 #include <gtkmm/frame.h>
 #include <gtkmm/radiobutton.h>
 
-#include "../imagewidget.h"
+#include "../heatmapwidget.h"
 
 #include "../../quality/qualitytablesformatter.h"
 
@@ -32,7 +32,7 @@ class TimeFrequencyPlotPage : public GrayScalePlotPage {
 		}
 		
 	protected:
-		virtual std::pair<TimeFrequencyData, TimeFrequencyMetaDataCPtr> constructImage(QualityTablesFormatter::StatisticKind kind);
+		virtual std::pair<TimeFrequencyData, TimeFrequencyMetaDataCPtr> constructImage(QualityTablesFormatter::StatisticKind kind) final override;
 	private:
 		void onMouseMoved(size_t x, size_t y);
 		

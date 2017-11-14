@@ -6,7 +6,7 @@
 #include <gtkmm/frame.h>
 #include <gtkmm/radiobutton.h>
 
-#include "../imagewidget.h"
+#include "../heatmapwidget.h"
 
 #include "../../quality/qualitytablesformatter.h"
 

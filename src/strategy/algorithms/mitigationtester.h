@@ -42,7 +42,7 @@ class MitigationTester{
 			else if(gaussian==0)
 				return CreateRayleighData(width, height);
 			else
-				return Image2D::CreateZeroImage(width, height);
+				return new Image2D(Image2D::MakeZeroImage(width, height));
 		}
 
 		static void AddBroadbandLine(Image2DPtr data, Mask2DPtr rfi, double lineStrength, size_t startTime, size_t duration)

@@ -22,14 +22,12 @@ namespace rfiStrategy {
 		TimeFrequencyData newRevisedData = mitigater.Background();
 		newRevisedData.SetMask(artifacts.RevisedData());
 
-		TimeFrequencyData *contaminatedData =
-			TimeFrequencyData::CreateTFDataFromDiff(artifacts.ContaminatedData(), newRevisedData);
-		contaminatedData->SetMask(artifacts.ContaminatedData());
+		TimeFrequencyData contaminatedData =
+			TimeFrequencyData::MakeFromDiff(artifacts.ContaminatedData(), newRevisedData);
+		contaminatedData.SetMask(artifacts.ContaminatedData());
 
 		artifacts.SetRevisedData(newRevisedData);
-		artifacts.SetContaminatedData(*contaminatedData);
-
-		delete contaminatedData;
+		artifacts.SetContaminatedData(contaminatedData);
 	}
 
 } // namespace rfiStrategy

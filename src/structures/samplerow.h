@@ -1,16 +1,16 @@
 #ifndef SAMPLEROW_H
 #define SAMPLEROW_H
 
+#include <algorithm>
 #include <limits>
 #include <cmath>
-
-#include <boost/shared_ptr.hpp>
+#include <memory>
 
 #include "image2d.h"
 #include "mask2d.h"
 
-typedef boost::shared_ptr<class SampleRow> SampleRowPtr;
-typedef boost::shared_ptr<const class SampleRow> SampleRowCPtr;
+typedef std::shared_ptr<class SampleRow> SampleRowPtr;
+typedef std::shared_ptr<const class SampleRow> SampleRowCPtr;
 
 #include "../strategy/algorithms/convolutions.h"
 
@@ -30,21 +30,21 @@ class SampleRow {
 				row->_values[i] = 0.0;
 			return SampleRowPtr(row);
 		}
-		static SampleRowPtr CreateFromRow(Image2DCPtr image, size_t y)
+		static SampleRowPtr CreateFromRow(const Image2D* image, size_t y)
 		{
 			SampleRow *row = new SampleRow(image->Width());
 			for(size_t x=0;x<image->Width();++x)
 				row->_values[x] = image->Value(x, y);
 			return SampleRowPtr(row);
 		}
-		static SampleRowPtr CreateFromRow(Image2DCPtr image, size_t xStart, size_t length, size_t y)
+		static SampleRowPtr CreateFromRow(const Image2D* image, size_t xStart, size_t length, size_t y)
 		{
 			SampleRow *row = new SampleRow(length);
 			for(size_t x=0;x<length;++x)
 				row->_values[x] = image->Value(x+xStart, y);
 			return SampleRowPtr(row);
 		}
-		static SampleRowPtr CreateFromRowWithMissings(Image2DCPtr image, Mask2DCPtr mask, size_t y)
+		static SampleRowPtr CreateFromRowWithMissings(const Image2D* image, const Mask2D* mask, size_t y)
 		{
 			SampleRow *row = new SampleRow(image->Width());
 			for(size_t x=0;x<image->Width();++x)
@@ -56,7 +56,7 @@ class SampleRow {
 			}
 			return SampleRowPtr(row);
 		}
-		static SampleRowPtr CreateAmplitudeFromRow(Image2DCPtr real, Image2DCPtr imaginary, size_t y)
+		static SampleRowPtr CreateAmplitudeFromRow(const Image2D* real, const Image2D* imaginary, size_t y)
 		{
 			SampleRow *row = new SampleRow(real->Width());
 			for(size_t x=0;x<real->Width();++x)
@@ -65,14 +65,14 @@ class SampleRow {
 			}
 			return SampleRowPtr(row);
 		}
-		static SampleRowPtr CreateFromColumn(Image2DCPtr image, size_t x)
+		static SampleRowPtr CreateFromColumn(const Image2D* image, size_t x)
 		{
 			SampleRow *row = new SampleRow(image->Height());
 			for(size_t y=0;y<image->Height();++y)
 				row->_values[y] = image->Value(x, y);
 			return SampleRowPtr(row);
 		}
-		static SampleRowPtr CreateFromColumnWithMissings(Image2DCPtr image, Mask2DCPtr mask, size_t x)
+		static SampleRowPtr CreateFromColumnWithMissings(const Image2D* image, const Mask2D* mask, size_t x)
 		{
 			SampleRow *row = new SampleRow(image->Height());
 			for(size_t y=0;y<image->Height();++y)
@@ -84,7 +84,7 @@ class SampleRow {
 			}
 			return SampleRowPtr(row);
 		}
-		static SampleRowPtr CreateFromRowSum(Image2DCPtr image, size_t yStart, size_t yEnd)
+		static SampleRowPtr CreateFromRowSum(const Image2D* image, size_t yStart, size_t yEnd)
 		{
 			if(yEnd > yStart) {
 				SampleRowPtr row = CreateFromRow(image, yStart);
@@ -98,7 +98,7 @@ class SampleRow {
 				return CreateZero(image->Width());
 			}
 		}
-		static SampleRowPtr CreateFromColumnSum(Image2DCPtr image, size_t xStart, size_t xEnd)
+		static SampleRowPtr CreateFromColumnSum(const Image2D* image, size_t xStart, size_t xEnd)
 		{
 			if(xEnd > xStart) {
 				SampleRowPtr row = CreateFromColumn(image, xStart);
@@ -121,28 +121,28 @@ class SampleRow {
 			return SampleRowPtr(new SampleRow(*this));
 		}
 		
-		void SetHorizontalImageValues(Image2DPtr image, unsigned y) const
+		void SetHorizontalImageValues(Image2D* image, unsigned y) const
 		{
 			for(size_t i=0;i<_size;++i)
 			{
 				image->SetValue(i, y, _values[i]);
 			}
 		}
-		void SetHorizontalImageValues(Image2DPtr image, unsigned xStart, unsigned y) const
+		void SetHorizontalImageValues(Image2D* image, unsigned xStart, unsigned y) const
 		{
 			for(size_t i=0;i<_size;++i)
 			{
 				image->SetValue(i+xStart, y, _values[i]);
 			}
 		}
-		void SetVerticalImageValues(Image2DPtr image, unsigned x) const
+		void SetVerticalImageValues(Image2D* image, unsigned x) const
 		{
 			for(size_t i=0;i<_size;++i)
 			{
 				image->SetValue(x, i, _values[i]);
 			}
 		}
-		void SetVerticalImageValues(Image2DPtr image, unsigned x, unsigned yStart) const
+		void SetVerticalImageValues(Image2D* image, unsigned x, unsigned yStart) const
 		{
 			for(size_t i=0;i<_size;++i)
 			{

@@ -3,8 +3,7 @@
 
 #include <sstream>
 #include <iostream>
-
-#include <boost/thread/mutex.hpp>
+#include <mutex>
 
 class AOLogger
 {
@@ -23,7 +22,7 @@ class AOLogger
 				}
 				LogWriter &operator<<(const std::string &str)
 				{
-					boost::mutex::scoped_lock lock(_mutex);
+					std::lock_guard<std::mutex> lock(_mutex);
 					if(_useLogger)
 					{
 						size_t start = 0, end;
@@ -46,7 +45,7 @@ class AOLogger
 				}
 				LogWriter &operator<<(const char c)
 				{
-					boost::mutex::scoped_lock lock(_mutex);
+					std::lock_guard<std::mutex> lock(_mutex);
 					if(_useLogger)
 					{
 						if(c == '\n')
@@ -63,7 +62,7 @@ class AOLogger
 				template<typename S>
 				LogWriter &operator<<(const S &str)
 				{
-					boost::mutex::scoped_lock lock(_mutex);
+					std::lock_guard<std::mutex> lock(_mutex);
 					if(_useLogger)
 					{
 						_buffer << str;
@@ -75,7 +74,7 @@ class AOLogger
 				{
 					if((int) _coutLevel <= (int) Level)
 					{
-						boost::mutex::scoped_lock lock(_mutex);
+						std::lock_guard<std::mutex> lock(_mutex);
 						if(ToStdErr)
 							std::cerr.flush();
 						else
@@ -84,13 +83,13 @@ class AOLogger
 				}
 				void SetUseLogger(bool useLogger)
 				{
-					boost::mutex::scoped_lock lock(_mutex);
+					std::lock_guard<std::mutex> lock(_mutex);
 					_useLogger = useLogger;
 				}
 			private:
 				bool _useLogger;
 				std::stringstream _buffer;
-				boost::mutex _mutex;
+				std::mutex _mutex;
 
 				void Log(const std::string &str)
 				{

@@ -8,13 +8,17 @@
 #include "../baseexception.h"
 #include "types.h"
 
-#include <boost/shared_ptr.hpp>
+#include <memory>
 
 #include <exception>
 #include <cmath>
 
-typedef boost::shared_ptr<class Image2D> Image2DPtr;
-typedef boost::shared_ptr<const class Image2D> Image2DCPtr;
+typedef std::shared_ptr<class Image2D> Image2DPtr;
+typedef std::shared_ptr<const class Image2D> Image2DCPtr;
+
+void swap(Image2D& left, Image2D& right);
+void swap(Image2D& left, Image2D&& right);
+void swap(Image2D&& left, Image2D& right);
 
 /**
  * This class represents a two dimensional single-valued (=gray scale) image. It can be
@@ -23,6 +27,39 @@ typedef boost::shared_ptr<const class Image2D> Image2DCPtr;
  */
 class Image2D {
 	public:
+		Image2D();
+		
+		Image2D(const Image2D& source);
+		
+		Image2D(Image2D&& source);
+		
+		Image2D& operator=(const Image2D& rhs);
+		
+		Image2D& operator=(Image2D&& rhs);
+		
+		static Image2D MakeUnsetImage(size_t width, size_t height)
+		{
+			return Image2D(width, height);
+		}
+		
+		static Image2D MakeUnsetImage(size_t width, size_t height, size_t widthCapacity)
+		{
+			return Image2D(width, height, widthCapacity);
+		}
+		
+		static Image2D MakeSetImage(size_t width, size_t height, num_t initialValue)
+		{
+			Image2D image(width, height);
+			image.SetAll(initialValue);
+			return image;
+		}
+		
+		static Image2D MakeSetImage(size_t width, size_t height, num_t initialValue, size_t widthCapacity)
+		{
+			Image2D image(width, height, widthCapacity);
+			image.SetAll(initialValue);
+			return image;
+		}
 		
 		/**
 		 * Creates an image containing unset values.
@@ -92,7 +129,13 @@ class Image2D {
 		 * @param height Height of the new image.
 		 * @return The new created image. Should be deleted by the caller.
 		 */
+		[[ deprecated("Use the make() functions") ]]
 		static Image2D *CreateZeroImage(size_t width, size_t height);
+		
+		static Image2D MakeZeroImage(size_t width, size_t height)
+		{
+			return MakeSetImage(width, height, 0.0);
+		}
 		
 		/**
 		 * As CreateZeroImage(), but returns a smart pointer instead.
@@ -102,13 +145,16 @@ class Image2D {
 		 */
 		static Image2DPtr CreateZeroImagePtr(size_t width, size_t height)
 		{
-			return Image2DPtr(CreateZeroImage(width, height));
+			// TODO make this more efficient & use make_shared
+			return Image2DPtr(new Image2D(MakeZeroImage(width, height)));
 		}
 
 		/**
 		 * Destructor.
 		 */
 		~Image2D();
+		
+		bool Empty() const { return _width==0 || _height==0; }
 		
 		/**
 		 * Creates a new image by subtracting two images of the same size.
@@ -117,11 +163,8 @@ class Image2D {
 		 * @return The new created image. Should be deleted by the caller.
 		 * @throws FitsIOException if the images do not match in size.
 		 */
-		static Image2D *CreateFromSum(const Image2D &imageA, const Image2D &imageB);
-		static Image2DPtr CreateFromSum(const Image2DCPtr &imageA, const Image2DCPtr &imageB)
-		{
-			return Image2DPtr(CreateFromSum(*imageA, *imageB));
-		}
+		static Image2D MakeFromSum(const Image2D &imageA, const Image2D &imageB);
+		
 		/**
 		 * Creates a new image by subtracting two images of the same size.
 		 * @param imageA first image.
@@ -129,21 +172,7 @@ class Image2D {
 		 * @return The new created image. Should be deleted by the caller.
 		 * @throws FitsIOException if the images do not match in size.
 		 */
-		static Image2D *CreateFromDiff(const Image2D &imageA, const Image2D &imageB);
-		static Image2DPtr CreateFromDiff(const Image2DCPtr &imageA, const Image2DCPtr &imageB)
-		{
-			return Image2DPtr(CreateFromDiff(*imageA, *imageB));
-		}
-
-		static Image2D *CreateCopy(const Image2D &image);
-		static Image2DPtr CreateCopy(const Image2DCPtr &image)
-		{
-			return Image2DPtr(CreateCopy(*image));
-		}
-		static Image2DPtr CreateCopyPtr(const Image2D &image)
-		{
-			return Image2DPtr(CreateCopy(image));
-		}
+		static Image2D MakeFromDiff(const Image2D &imageA, const Image2D &imageB);
 
 		/**
 		 * Retrieves the average value of the image.
@@ -193,19 +222,19 @@ class Image2D {
 		 * @param y y-coordinate
 		 * @return The value.
 		 */
-		inline num_t Value(size_t x, size_t y) const { return _dataPtr[y][x]; }
+		num_t Value(size_t x, size_t y) const { return _dataPtr[y][x]; }
 		
 		/**
 		 * Get the width of the image.
 		 * @return Width of the image.
 		 */
-		inline size_t Width() const { return _width; }
+		size_t Width() const { return _width; }
 		
 		/**
 		 * Get the height of the image.
 		 * @return Height of the image.
 		 */
-		inline size_t Height() const { return _height; }
+		size_t Height() const { return _height; }
 		
 		/**
 		 * Change a value at a specific position.
@@ -213,7 +242,7 @@ class Image2D {
 		 * @param y y-coordinate of value to change.
 		 * @param newValue New value.
 		 */
-		inline void SetValue(size_t x, size_t y, num_t newValue)
+		void SetValue(size_t x, size_t y, num_t newValue)
 		{
 			_dataPtr[y][x] = newValue;
 		}
@@ -226,7 +255,7 @@ class Image2D {
 
 		void SetAll(num_t value);
 		
-		inline void AddValue(size_t x, size_t y, num_t addValue)
+		void AddValue(size_t x, size_t y, num_t addValue)
 		{
 			_dataPtr[y][x] += addValue;
 		}
@@ -289,7 +318,7 @@ class Image2D {
 		* @return The new created image. Should be deleted by the caller.
 		* @throws FitsIOException if something goes wrong during reading the .fits file.
 		*/
-		static Image2D *CreateFromFits(class FitsFile &file, int imageNumber);
+		static Image2D MakeFromFits(class FitsFile &file, int imageNumber);
 
 		/**
 		* Number of images that can be read from the current HUD block
@@ -339,87 +368,64 @@ class Image2D {
 		/**
 		 * Flips the image round the diagonal, i.e., x becomes y and y becomes x.
 		 */
-		Image2DPtr CreateXYFlipped() const
+		Image2D CreateXYFlipped() const
 		{
-			Image2D *image = new Image2D(_height, _width);
+			Image2D image(_height, _width);
 			for(unsigned y=0;y<_height;++y)
 			{
 				for(unsigned x=0;x<_width;++x)
-					image->_dataPtr[x][y] = _dataPtr[y][x];
+					image._dataPtr[x][y] = _dataPtr[y][x];
 			}
-			return Image2DPtr(image);
+			return image;
 		}
 		
 		void SwapXY()
 		{
-			Image2DPtr swapped = CreateXYFlipped();
-			Swap(swapped);
-		}
-		
-		/**
-		 * Swaps the contents of the two masks. This can be used as a move assignment operator, as it
-		 * only swaps pointers; hence it is fast.
-		 */
-		void Swap(Image2D &source)
-		{
-			std::swap(source._width, _width);
-			std::swap(source._stride, _stride);
-			std::swap(source._height, _height);
-			std::swap(source._dataPtr, _dataPtr);
-			std::swap(source._dataConsecutive, _dataConsecutive);
-		}
-		
-		/**
-		 * Swaps the contents of the two masks. This can be used as a move assignment operator, as it
-		 * only swaps pointers; hence it is fast.
-		 */
-		void Swap(const Image2DPtr &source)
-		{
-			Swap(*source);
+			*this = CreateXYFlipped();
 		}
 		
 		/**
 		 * Resample the image horizontally by decreasing the width
 		 * with an integer factor.
 		 */
-		Image2DPtr ShrinkHorizontally(size_t factor) const;
+		Image2D ShrinkHorizontally(size_t factor) const;
 
 		/**
 		 * Resample the image vertically by decreasing the height
 		 * with an integer factor.
 		 */
-		Image2DPtr ShrinkVertically(size_t factor) const;
+		Image2D ShrinkVertically(size_t factor) const;
 
 		/**
 		 * Resample the image horizontally by increasing the width
 		 * with an integer factor.
 		 */
-		Image2DPtr EnlargeHorizontally(size_t factor, size_t newWidth) const;
+		Image2D EnlargeHorizontally(size_t factor, size_t newWidth) const;
 
 		/**
 		 * Resample the image vertically by increasing the width
 		 * with an integer factor.
 		 */
-		Image2DPtr EnlargeVertically(size_t factor, size_t newHeight) const;
+		Image2D EnlargeVertically(size_t factor, size_t newHeight) const;
 
-		Image2DPtr Trim(size_t startX, size_t startY, size_t endX, size_t endY) const;
+		Image2D Trim(size_t startX, size_t startY, size_t endX, size_t endY) const;
 		
 		void SetTrim(size_t startX, size_t startY, size_t endX, size_t endY);
 		
 		/**
 		 * Copies source onto this image at the given position
 		 */
-		void CopyFrom(const Image2DCPtr &source, size_t destX, size_t destY)
+		void CopyFrom(const Image2D& source, size_t destX, size_t destY)
 		{
 			size_t
-				x2 = source->_width + destX,
-				y2 = source->_height + destY;
+				x2 = source._width + destX,
+				y2 = source._height + destY;
 			if(x2 > _width) x2 = _width;
 			if(y2 > _height) y2 = _height;
 			for(size_t y=destY;y<y2;++y)
 			{
 				for(size_t x=destX;x<x2;++x)
-					SetValue(x, y, source->Value(x-destX, y-destY));
+					SetValue(x, y, source.Value(x-destX, y-destY));
 			}
 		}
 		
@@ -435,7 +441,7 @@ class Image2D {
 		 * 
 		 * @see Stride()
 		 */
-		inline num_t *ValuePtr(unsigned x, unsigned y)
+		num_t *ValuePtr(unsigned x, unsigned y)
 		{
 			return &_dataPtr[y][x];
 		}
@@ -452,17 +458,17 @@ class Image2D {
 		 * 
 		 * @see Stride()
 		 */
-		inline const num_t *ValuePtr(unsigned x, unsigned y) const
+		const num_t *ValuePtr(unsigned x, unsigned y) const
 		{
 			return &_dataPtr[y][x];
 		}
 		
-		inline num_t *Data()
+		num_t *Data()
 		{
 			return _dataConsecutive;
 		}
 		
-		inline const num_t *Data() const
+		const num_t *Data() const
 		{
 			return _dataConsecutive;
 		}
@@ -475,7 +481,7 @@ class Image2D {
 		 * 
 		 * @see ValuePtr(unsigned, unsigned)
 		 */
-		inline size_t Stride() const
+		size_t Stride() const
 		{
 			return _stride;
 		}
@@ -495,15 +501,47 @@ class Image2D {
 		void ResizeWithoutReallocation(size_t newWidth);
 		
 	private:
-		Image2D(size_t width, size_t height);
+		friend void swap(Image2D&, Image2D&);
+		friend void swap(Image2D&, Image2D&&);
+		friend void swap(Image2D&&, Image2D&);
+		
+		Image2D(size_t width, size_t height) :
+			Image2D(width, height, width)
+		{ }
 		Image2D(size_t width, size_t height, size_t widthCapacity);
 		
-		Image2D(const Image2D&) = delete;
-		Image2D& operator=(const Image2D&) = delete;
+		void allocate();
 		
 		size_t _width, _height;
 		size_t _stride;
 		num_t **_dataPtr, *_dataConsecutive;
 };
+
+inline void swap(Image2D& left, Image2D& right)
+{
+	std::swap(left._width, right._width);
+	std::swap(left._stride, right._stride);
+	std::swap(left._height, right._height);
+	std::swap(left._dataPtr, right._dataPtr);
+	std::swap(left._dataConsecutive, right._dataConsecutive);
+}
+
+inline void swap(Image2D& left, Image2D&& right)
+{
+	std::swap(left._width, right._width);
+	std::swap(left._stride, right._stride);
+	std::swap(left._height, right._height);
+	std::swap(left._dataPtr, right._dataPtr);
+	std::swap(left._dataConsecutive, right._dataConsecutive);
+}
+
+inline void swap(Image2D&& left, Image2D& right)
+{
+	std::swap(left._width, right._width);
+	std::swap(left._stride, right._stride);
+	std::swap(left._height, right._height);
+	std::swap(left._dataPtr, right._dataPtr);
+	std::swap(left._dataConsecutive, right._dataConsecutive);
+}
 
 #endif

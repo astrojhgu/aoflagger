@@ -1,8 +1,9 @@
 #ifndef GUI_IMAGESET_H
 #define GUI_IMAGESET_H
 
-#include <string>
 #include <cstring>
+#include <string>
+#include <memory>
 #include <vector>
 
 #include "../../structures/types.h"
@@ -21,9 +22,17 @@ namespace rfiStrategy {
 			virtual void Next() = 0;
 			virtual std::string Description() const = 0;
 			virtual bool IsValid() const = 0;
-			virtual ImageSetIndex *Copy() const = 0;
-			void Reattach(ImageSet &imageSet) { _set = &imageSet; }
+			virtual std::unique_ptr<ImageSetIndex> Clone() const = 0;
+			void Reattach(ImageSet &imageSet) {
+				_set = &imageSet;
+				reattach();
+			}
 		protected:
+			virtual void reattach() { }
+			ImageSetIndex(const ImageSetIndex&) = default;
+			ImageSetIndex(ImageSetIndex&&) = default;
+			ImageSetIndex& operator=(const ImageSetIndex&) = default;
+			ImageSetIndex& operator=(ImageSetIndex&&) = default;
 			ImageSet &imageSet() const { return *_set; }
 		private:
 			class ImageSet *_set;
@@ -32,42 +41,35 @@ namespace rfiStrategy {
 	class BaselineData {
 		public:
 			BaselineData(const TimeFrequencyData& data, const TimeFrequencyMetaDataCPtr& metaData, const ImageSetIndex &index)
-			: _data(data), _metaData(metaData), _index(index.Copy())
+			: _data(data), _metaData(metaData), _index(index.Clone())
 			{
 			}
 			explicit BaselineData(const ImageSetIndex &index)
-			: _data(), _metaData(), _index(index.Copy())
+			: _data(), _metaData(), _index(index.Clone())
 			{
 			}
 			BaselineData(const TimeFrequencyData& data, const TimeFrequencyMetaDataCPtr& metaData)
-			: _data(data), _metaData(metaData), _index(0)
+			: _data(data), _metaData(metaData), _index()
 			{
 			}
 			explicit BaselineData(const TimeFrequencyMetaDataCPtr& metaData)
-			: _data(), _metaData(metaData), _index(0)
+			: _data(), _metaData(metaData), _index()
 			{
 			}
 			BaselineData()
-			: _data(), _metaData(), _index(0)
+			: _data(), _metaData(), _index()
 			{
 			}
 			BaselineData(const BaselineData& source)
-			: _data(source._data), _metaData(source._metaData), _index(0)
+			: _data(source._data), _metaData(source._metaData), _index()
 			{
-				if(source._index != 0) _index = source._index->Copy();
-			}
-			~BaselineData()
-			{
-				if(_index != 0)
-					delete _index;
+				if(source._index != nullptr) _index = source._index->Clone();
 			}
 			BaselineData& operator=(const BaselineData &source)
 			{
-				if(_index != 0)
-					delete _index;
 				_data = source._data;
 				_metaData = source._metaData;
-				_index = source._index->Copy();
+				_index = source._index->Clone();
 				return *this;
 			}
 			const TimeFrequencyData &Data() const { return _data; }
@@ -80,23 +82,21 @@ namespace rfiStrategy {
 			ImageSetIndex &Index() { return *_index; }
 			void SetIndex(const ImageSetIndex &newIndex)
 			{
-				if(_index != 0)
-					delete _index;
-				_index = newIndex.Copy();
+				_index = newIndex.Clone();
 			}
 		
 		private:
 			TimeFrequencyData _data;
 			TimeFrequencyMetaDataCPtr _metaData;
-			ImageSetIndex *_index;
+			std::unique_ptr<ImageSetIndex> _index;
 	};
 	
 	class ImageSet {
 		public:
 			virtual ~ImageSet() { };
-			virtual ImageSet *Copy() = 0;
+			virtual std::unique_ptr<ImageSet> Clone() = 0;
 
-			virtual ImageSetIndex *StartIndex() = 0;
+			virtual std::unique_ptr<ImageSetIndex> StartIndex() = 0;
 			
 			/**
 			 * Initialize is used to initialize the image set after it has been created and
@@ -106,7 +106,25 @@ namespace rfiStrategy {
 			virtual void Initialize() = 0;
 			virtual std::string Name() = 0;
 			virtual std::string File() = 0;
-			static class ImageSet *Create(const std::string &file, BaselineIOMode ioMode, bool readUVW=false);
+			
+			virtual void AddReadRequest(const ImageSetIndex &index) = 0;
+			virtual void PerformReadRequests() = 0;
+			virtual std::unique_ptr<BaselineData> GetNextRequested() = 0;
+			
+			virtual void AddWriteFlagsTask(const ImageSetIndex &/*index*/, std::vector<Mask2DCPtr> &/*flags*/)
+			{
+				throw std::runtime_error("Not implemented");
+			}
+			virtual void PerformWriteFlagsTask()
+			{
+				throw std::runtime_error("Not implemented");
+			}
+			virtual void PerformWriteDataTask(const ImageSetIndex &/*index*/, std::vector<Image2DCPtr> /*_realImages*/, std::vector<Image2DCPtr> /*_imaginaryImages*/)
+			{
+				throw std::runtime_error("Not implemented");
+			}
+			
+			static class ImageSet *Create(const std::string &file, BaselineIOMode ioMode);
 			static bool IsFitsFile(const std::string &file);
 			static bool IsBHFitsFile(const std::string &file);
 			static bool IsRCPRawFile(const std::string &file);
@@ -121,10 +139,6 @@ namespace rfiStrategy {
 			static bool IsFilterBankFile(const std::string& file);
 			static bool IsQualityStatSet(const std::string& file);
 
-			virtual void AddReadRequest(const ImageSetIndex &index) = 0;
-			virtual void PerformReadRequests() = 0;
-			virtual BaselineData *GetNextRequested() = 0;
-			
 			void AddWriteFlagsTask(const ImageSetIndex &index, const TimeFrequencyData &data)
 			{
 				std::vector<Mask2DCPtr> flags;
@@ -132,30 +146,17 @@ namespace rfiStrategy {
 					flags.push_back(data.GetMask(i));
 				AddWriteFlagsTask(index, flags);
 			}
-			virtual void AddWriteFlagsTask(const ImageSetIndex &/*index*/, std::vector<Mask2DCPtr> &/*flags*/)
-			{
-				throw std::runtime_error("Not implemented");
-			}
-			virtual void PerformWriteFlagsTask()
-			{
-				throw std::runtime_error("Not implemented");
-			}
 
 			void PerformWriteDataTask(const ImageSetIndex &index, const TimeFrequencyData &data)
 			{
 				std::vector<Image2DCPtr> realImages, imaginaryImages;
 				for(size_t i=0;i!=data.PolarizationCount();++i)
 				{
-					TimeFrequencyData *polData = data.CreateTFDataFromPolarizationIndex(i);
-					realImages.push_back(polData->GetRealPart());
-					imaginaryImages.push_back(polData->GetImaginaryPart());
-					delete polData;
+					TimeFrequencyData polData(data.MakeFromPolarizationIndex(i));
+					realImages.push_back(polData.GetRealPart());
+					imaginaryImages.push_back(polData.GetImaginaryPart());
 				}
 				PerformWriteDataTask(index, realImages, imaginaryImages);
-			}
-			virtual void PerformWriteDataTask(const ImageSetIndex &/*index*/, std::vector<Image2DCPtr> /*_realImages*/, std::vector<Image2DCPtr> /*_imaginaryImages*/)
-			{
-				throw std::runtime_error("Not implemented");
 			}
 	};
 

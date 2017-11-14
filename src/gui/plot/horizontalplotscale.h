@@ -9,13 +9,14 @@
 class HorizontalPlotScale {
 	public:
 		HorizontalPlotScale();
-		virtual ~HorizontalPlotScale();
-		void SetPlotDimensions(double plotWidth, double plotHeight, double topMargin, double verticalScaleWidth)
+		~HorizontalPlotScale();
+		void SetPlotDimensions(double plotWidth, double plotHeight, double fromLeft, double fromTop, bool isSecondAxis)
 		{
 			_plotWidth = plotWidth;
 			_plotHeight = plotHeight;
-			_topMargin = topMargin;
-			_verticalScaleWidth = verticalScaleWidth;
+			_fromLeft = fromLeft;
+			_fromTop = fromTop;
+			_isSecondAxis = isSecondAxis;
 			_metricsAreInitialized = false;
 		}
 		double GetHeight(Cairo::RefPtr<Cairo::Context> cairo);
@@ -50,20 +51,22 @@ class HorizontalPlotScale {
 			_rotateUnits = rotate;
 			_metricsAreInitialized = false;
 		}
+		double UnitToAxis(double unitValue) const;
+		double AxisToUnit(double axisValue) const;
 	private:
-		void drawUnits(Cairo::RefPtr<Cairo::Context> cairo);
+		void drawDescription(Cairo::RefPtr<Cairo::Context> cairo);
 		bool ticksFit(Cairo::RefPtr<Cairo::Context> cairo);
 		void initializeMetrics(Cairo::RefPtr<Cairo::Context> cairo); 
 
-		double _plotWidth, _plotHeight, _topMargin, _verticalScaleWidth;
+		double _plotWidth, _plotHeight, _fromLeft, _fromTop;
 		bool _metricsAreInitialized;
 		double _height, _rightMargin;
-		class TickSet *_tickSet;
+		std::unique_ptr<class TickSet> _tickSet;
 		bool _drawWithDescription;
 		std::string _unitsCaption;
 		double _descriptionFontSize;
 		double _tickValuesFontSize;
-		bool _rotateUnits, _isLogarithmic;
+		bool _rotateUnits, _isLogarithmic, _isSecondAxis;
 };
 
 #endif

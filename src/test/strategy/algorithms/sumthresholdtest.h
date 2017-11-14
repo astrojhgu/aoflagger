@@ -68,8 +68,8 @@ void SumThresholdTest::VerticalSumThresholdSSE::operator()()
 		const unsigned length = config.GetHorizontalLength(i);
 		const double threshold = config.GetHorizontalThreshold(i);
 		
-		ThresholdMitigater::VerticalSumThresholdLargeReference(image, mask1, length, threshold);
-		ThresholdMitigater::VerticalSumThresholdLargeSSE(image, mask2, length, threshold);
+		ThresholdMitigater::VerticalSumThresholdLargeReference(image.get(), mask1.get(), length, threshold);
+		ThresholdMitigater::VerticalSumThresholdLargeSSE(image.get(), mask2.get(), length, threshold);
 		
 		if(length != 32) {
 		  std::stringstream s;
@@ -111,8 +111,8 @@ void SumThresholdTest::HorizontalSumThresholdSSE::operator()()
 		const unsigned length = config.GetHorizontalLength(i);
 		const double threshold = config.GetHorizontalThreshold(i);
 		
-		ThresholdMitigater::HorizontalSumThresholdLargeReference(image, mask1, length, threshold);
-		ThresholdMitigater::HorizontalSumThresholdLargeSSE(image, mask2, length, threshold);
+		ThresholdMitigater::HorizontalSumThresholdLargeReference(image.get(), mask1.get(), length, threshold);
+		ThresholdMitigater::HorizontalSumThresholdLargeSSE(image.get(), mask2.get(), length, threshold);
 		
 		std::stringstream s;
 		s << "Equal SSE and reference masks produced by SumThreshold length " << length << ", threshold " << threshold;
@@ -139,14 +139,14 @@ void SumThresholdTest::Stability::operator()()
 	for(unsigned i=0;i<9;++i)
 	{
 		const unsigned length = config.GetHorizontalLength(i);
-		ThresholdMitigater::HorizontalSumThresholdLargeSSE(realA, maskA, length, 1.0);
-		ThresholdMitigater::VerticalSumThresholdLargeSSE(realA, maskA, length, 1.0);
-		ThresholdMitigater::HorizontalSumThresholdLargeSSE(realA, maskB, length, 1.0);
-		ThresholdMitigater::VerticalSumThresholdLargeSSE(realA, maskB, length, 1.0);
-		ThresholdMitigater::HorizontalSumThresholdLargeSSE(realA, maskC, length, 1.0);
-		ThresholdMitigater::VerticalSumThresholdLargeSSE(realA, maskC, length, 1.0);
-		ThresholdMitigater::HorizontalSumThresholdLargeSSE(realA, maskD, length, 1.0);
-		ThresholdMitigater::VerticalSumThresholdLargeSSE(realA, maskD, length, 1.0);
+		ThresholdMitigater::HorizontalSumThresholdLargeSSE(realA.get(), maskA.get(), length, 1.0);
+		ThresholdMitigater::VerticalSumThresholdLargeSSE(realA.get(), maskA.get(), length, 1.0);
+		ThresholdMitigater::HorizontalSumThresholdLargeSSE(realA.get(), maskB.get(), length, 1.0);
+		ThresholdMitigater::VerticalSumThresholdLargeSSE(realA.get(), maskB.get(), length, 1.0);
+		ThresholdMitigater::HorizontalSumThresholdLargeSSE(realA.get(), maskC.get(), length, 1.0);
+		ThresholdMitigater::VerticalSumThresholdLargeSSE(realA.get(), maskC.get(), length, 1.0);
+		ThresholdMitigater::HorizontalSumThresholdLargeSSE(realA.get(), maskD.get(), length, 1.0);
+		ThresholdMitigater::VerticalSumThresholdLargeSSE(realA.get(), maskD.get(), length, 1.0);
 	}
 }
 #endif // __SSE__

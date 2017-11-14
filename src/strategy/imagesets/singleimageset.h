@@ -14,13 +14,13 @@ namespace rfiStrategy {
 		public:
 			SingleImageSetIndex(ImageSet &set, const std::string& description) : ImageSetIndex(set), _valid(true), _description(description) { }
 			virtual ~SingleImageSetIndex() { }
-			virtual void Previous() { _valid = false; }
-			virtual void Next() { _valid = false; }
-			virtual std::string Description() const { return _description; }
-			virtual bool IsValid() const { return _valid; }
-			virtual ImageSetIndex *Copy() const
+			virtual void Previous() final override { _valid = false; }
+			virtual void Next() final override { _valid = false; }
+			virtual std::string Description() const final override { return _description; }
+			virtual bool IsValid() const final override { return _valid; }
+			virtual std::unique_ptr<ImageSetIndex> Clone() const final override
 			{
-				SingleImageSetIndex *index = new SingleImageSetIndex(imageSet(), _description);
+				std::unique_ptr<SingleImageSetIndex> index( new SingleImageSetIndex(imageSet(), _description) );
 				index->_valid = _valid;
 				return index;
 			}
@@ -31,25 +31,24 @@ namespace rfiStrategy {
 	
 	class SingleImageSet : public ImageSet {
 		public:
-			SingleImageSet() : ImageSet(), _readCount(0), _lastRead(0), _writeFlagsIndex(0)
+			SingleImageSet() : ImageSet(), _readCount(0), _lastRead(nullptr), _writeFlagsIndex()
 			{
 			}
 			
 			virtual ~SingleImageSet()
 			{
-				delete _writeFlagsIndex;
 				delete _lastRead;
 			}
 
-			virtual ImageSetIndex *StartIndex()
+			virtual std::unique_ptr<ImageSetIndex> StartIndex() override
 			{
-				return new SingleImageSetIndex(*this, Name());
+				return std::unique_ptr<ImageSetIndex>(new SingleImageSetIndex(*this, Name()));
 			}
 			
-			virtual std::string Name() = 0;
-			virtual std::string File() = 0;
+			virtual std::string Name() override = 0;
+			virtual std::string File() override = 0;
 			
-			virtual void AddReadRequest(const ImageSetIndex &)
+			virtual void AddReadRequest(const ImageSetIndex &) override
 			{
 				if(_lastRead != 0)
 				{
@@ -60,18 +59,18 @@ namespace rfiStrategy {
 					++_readCount;
 				}
 			}
-			virtual void PerformReadRequests()
+			virtual void PerformReadRequests() override
 			{
 				_lastRead = Read();
 				_lastRead->SetIndex(SingleImageSetIndex(*this, Name()));
 			}
-			virtual BaselineData *GetNextRequested()
+			virtual std::unique_ptr<BaselineData> GetNextRequested() override
 			{
 				if(_readCount == 0)
 					throw std::runtime_error("All data reads have already been requested");
 				if(_lastRead == 0)
 					throw std::runtime_error("GetNextRequested() was called before PerformReadRequests()");
-				return new BaselineData(*_lastRead);
+				return std::unique_ptr<BaselineData>(new BaselineData(*_lastRead));
 			}
 			
 			virtual BaselineData *Read() = 0;
@@ -81,28 +80,26 @@ namespace rfiStrategy {
 				throw std::runtime_error("Flag writing is not implemented for this file (SingleImageSet)");
 			}
 			
-			virtual void AddWriteFlagsTask(const ImageSetIndex &index, std::vector<Mask2DCPtr> &flags)
+			virtual void AddWriteFlagsTask(const ImageSetIndex& index, std::vector<Mask2DCPtr>& flags) override
 			{
-				delete _writeFlagsIndex;
-				_writeFlagsIndex = index.Copy();
+				_writeFlagsIndex = index.Clone();
 				_writeFlagsMasks = flags;
 			}
 			
-			virtual void PerformWriteFlagsTask()
+			virtual void PerformWriteFlagsTask() override
 			{
-				if(_writeFlagsIndex == 0)
+				if(_writeFlagsIndex == nullptr)
 					throw std::runtime_error("Nothing to write");
 				
 				Write(_writeFlagsMasks);
 				
-				delete _writeFlagsIndex;
-				_writeFlagsIndex = 0;
+				_writeFlagsIndex.reset();
 			}
 			
 		private:
 			int _readCount;
 			BaselineData *_lastRead;
-			ImageSetIndex *_writeFlagsIndex;
+			std::unique_ptr<ImageSetIndex> _writeFlagsIndex;
 			std::vector<Mask2DCPtr> _writeFlagsMasks;
 	};
 

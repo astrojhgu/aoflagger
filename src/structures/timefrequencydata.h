@@ -67,11 +67,11 @@ class TimeFrequencyData
 		}
 		
 		TimeFrequencyData(
-			     ComplexRepresentation complexRepresentation,
+			ComplexRepresentation complexRepresentation,
 			PolarizationEnum* polarizations,
 			size_t polarizationCount,
 			Image2DCPtr* images) :
-				    _complexRepresentation(complexRepresentation)
+				_complexRepresentation(complexRepresentation)
 		{
 			_data.reserve(polarizationCount);
 			if(complexRepresentation == ComplexParts)
@@ -89,7 +89,7 @@ class TimeFrequencyData
 			PolarizationEnum* polarizations,
 			size_t polarizationCount,
 			Image2DCPtr* realImages, Image2DCPtr* imaginaryImages) :
-				    _complexRepresentation(ComplexParts)
+				_complexRepresentation(ComplexParts)
 		{
 			_data.reserve(polarizationCount);
 			for(size_t p=0; p!=polarizationCount; p++)
@@ -100,7 +100,7 @@ class TimeFrequencyData
 			PolarizationEnum* polarizations,
 			size_t polarizationCount,
 			Image2DPtr* realImages, Image2DPtr* imaginaryImages) :
-				    _complexRepresentation(ComplexParts)
+				_complexRepresentation(ComplexParts)
 		{
 			_data.reserve(polarizationCount);
 			for(size_t p=0; p!=polarizationCount; p++)
@@ -108,7 +108,7 @@ class TimeFrequencyData
 		}
 		
 		static TimeFrequencyData FromLinear(
-			     ComplexRepresentation complexRepresentation,
+			ComplexRepresentation complexRepresentation,
 			const Image2DCPtr& xx,
 			const Image2DCPtr& xy,
 			const Image2DCPtr& yx,
@@ -214,7 +214,7 @@ class TimeFrequencyData
 				throw BadUsageException("Not implemented");
 			if(_data[0]._images[0] == nullptr || _data[0]._images[1] == nullptr)
 				throw BadUsageException("Requesting non-existing image");
-			return std::array<Image2DCPtr,2>{ _data[0]._images[0], _data[0]._images[1] };
+			return std::array<Image2DCPtr,2>{{ _data[0]._images[0], _data[0]._images[1] }};
 		}
 		
 		void Set(PolarizationEnum polarizationType,
@@ -266,7 +266,7 @@ class TimeFrequencyData
 				_data[p]._flagging = maskPerPolarization[p];
 		}
 
-		void SetIndividualPolarizationMasks(const Mask2DCPtr &maskA, const Mask2DCPtr &maskB)
+		void SetIndividualPolarizationMasks(const Mask2DCPtr& maskA, const Mask2DCPtr& maskB)
 		{
 			if(_data.size() != 2)
 				throw BadUsageException("Trying to set two individual mask in non-matching time frequency data");
@@ -274,7 +274,7 @@ class TimeFrequencyData
 			_data[1]._flagging = maskB;
 		}
 
-		void SetIndividualPolarizationMasks(const Mask2DCPtr &maskA, const Mask2DCPtr &maskB, const Mask2DCPtr &maskC, const Mask2DCPtr &maskD)
+		void SetIndividualPolarizationMasks(const Mask2DCPtr& maskA, const Mask2DCPtr& maskB, const Mask2DCPtr& maskC, const Mask2DCPtr& maskD)
 		{
 			if(_data.size() != 4)
 				throw BadUsageException("Trying to set four individual mask in non-matching time frequency data");
@@ -284,16 +284,7 @@ class TimeFrequencyData
 			_data[3]._flagging = maskD;
 		}
 
-		TimeFrequencyData Make(ComplexRepresentation representation) const
-		{
-			// TODO this should be more efficient
-			TimeFrequencyData* data = CreateTFData(representation);
-			TimeFrequencyData data2(*data);
-			delete data;
-			return data2;
-		}
-		
-		TimeFrequencyData *CreateTFData(ComplexRepresentation complexRepresentation) const;
+		TimeFrequencyData Make(ComplexRepresentation representation) const;
 		
 		TimeFrequencyData Make(PolarizationEnum polarization) const
 		{
@@ -386,11 +377,6 @@ class TimeFrequencyData
 			return newData;
 		}
 
-		TimeFrequencyData *CreateTFData(PolarizationEnum polarization) const
-		{
-			return new TimeFrequencyData(Make(polarization));
-		}
-
 		Image2DCPtr GetRealPart() const
 		{
 			if(_data.size() != 1)
@@ -459,9 +445,9 @@ class TimeFrequencyData
 			{
 				if(_data[i]._images[0] == nullptr)
 					throw BadUsageException("Can't subtract TFs with unset image data");
-				_data[i]._images[0] = Image2D::CreateFromDiff(_data[i]._images[0], rhs._data[i]._images[0]);
+				_data[i]._images[0].reset(new Image2D(Image2D::MakeFromDiff(*_data[i]._images[0], *rhs._data[i]._images[0])));
 				if(_data[i]._images[1])
-					_data[i]._images[1] = Image2D::CreateFromDiff(_data[i]._images[1], rhs._data[i]._images[1]);
+					_data[i]._images[1].reset(new Image2D(Image2D::MakeFromDiff(*_data[i]._images[1], *rhs._data[i]._images[1])));
 			}
 		}
 
@@ -478,13 +464,13 @@ class TimeFrequencyData
 			{
 				if(_data[i]._images[0] == nullptr)
 					throw BadUsageException("Can't subtract TFs with unset image data");
-				_data[i]._images[0] = Image2D::CreateFromDiff(lhs._data[i]._images[0], _data[i]._images[0]);
+				_data[i]._images[0].reset(new Image2D(Image2D::MakeFromDiff(*lhs._data[i]._images[0], *_data[i]._images[0])));
 				if(_data[i]._images[1])
-					_data[i]._images[1] = Image2D::CreateFromDiff(lhs._data[i]._images[1], _data[i]._images[1]);
+					_data[i]._images[1].reset(new Image2D(Image2D::MakeFromDiff(*lhs._data[i]._images[1], *_data[i]._images[1])));
 			}
 		}
 
-		static TimeFrequencyData *CreateTFDataFromDiff(const TimeFrequencyData &lhs, const TimeFrequencyData &rhs)
+		static TimeFrequencyData MakeFromDiff(const TimeFrequencyData& lhs, const TimeFrequencyData& rhs)
 		{
 			if(lhs._data.size() != rhs._data.size() || lhs._complexRepresentation != rhs._complexRepresentation)
 			{
@@ -493,19 +479,19 @@ class TimeFrequencyData
 					<< lhs._data.size() << " vs. " << rhs._data.size() << ")";
 				throw BadUsageException(s.str());
 			}
-			TimeFrequencyData *data = new TimeFrequencyData(lhs);
+			TimeFrequencyData data(lhs);
 			for(size_t i=0;i<lhs._data.size();++i)
 			{
 				if(lhs._data[i]._images[0] == nullptr)
 					throw BadUsageException("Can't subtract TFs with unset image data");
-				data->_data[i]._images[0] = Image2D::CreateFromDiff(lhs._data[i]._images[0], rhs._data[i]._images[0]);
+				data._data[i]._images[0].reset(new Image2D(Image2D::MakeFromDiff(*lhs._data[i]._images[0], *rhs._data[i]._images[0])));
 				if(lhs._data[i]._images[1])
-					data->_data[i]._images[1] = Image2D::CreateFromDiff(lhs._data[i]._images[1], rhs._data[i]._images[1]);
+					data._data[i]._images[1].reset(new Image2D(Image2D::MakeFromDiff(*lhs._data[i]._images[1], *rhs._data[i]._images[1])));
 			}
 			return data;
 		}
 
-		static TimeFrequencyData *CreateTFDataFromSum(const TimeFrequencyData &lhs, const TimeFrequencyData &rhs)
+		static TimeFrequencyData MakeFromSum(const TimeFrequencyData& lhs, const TimeFrequencyData& rhs)
 		{
 			if(lhs._data.size() != rhs._data.size() || lhs._complexRepresentation != rhs._complexRepresentation)
 			{
@@ -514,14 +500,14 @@ class TimeFrequencyData
 					<< lhs._data.size() << " vs. " << rhs._data.size() << ")";
 				throw BadUsageException(s.str());
 			}
-			TimeFrequencyData *data = new TimeFrequencyData(lhs);
+			TimeFrequencyData data(lhs);
 			for(size_t i=0;i<lhs._data.size();++i)
 			{
 				if(lhs._data[i]._images[0] == nullptr)
 					throw BadUsageException("Can't add TFs with unset image data");
-				data->_data[i]._images[0] = Image2D::CreateFromSum(lhs._data[i]._images[0], rhs._data[i]._images[0]);
+				data._data[i]._images[0].reset(new Image2D(Image2D::MakeFromSum(*lhs._data[i]._images[0], *rhs._data[i]._images[0])));
 				if(lhs._data[i]._images[1])
-					data->_data[i]._images[1] = Image2D::CreateFromSum(lhs._data[i]._images[1], rhs._data[i]._images[1]);
+					data._data[i]._images[1].reset(new Image2D(Image2D::MakeFromSum(*lhs._data[i]._images[1], *rhs._data[i]._images[1])));
 			}
 			return data;
 		}
@@ -543,7 +529,7 @@ class TimeFrequencyData
 			return masks; 
 		}
 
-		const Image2DCPtr &GetImage(size_t imageIndex) const
+		const Image2DCPtr& GetImage(size_t imageIndex) const
 		{
 			size_t index = 0;
 			for(const PolarizedTimeFrequencyData& data : _data)
@@ -563,7 +549,7 @@ class TimeFrequencyData
 			}
 			throw BadUsageException("Invalid image index in GetImage()");
 		}
-		const Mask2DCPtr &GetMask(size_t maskIndex) const
+		const Mask2DCPtr& GetMask(size_t maskIndex) const
 		{
 			size_t index = 0;
 			for(const PolarizedTimeFrequencyData& data : _data)
@@ -579,7 +565,7 @@ class TimeFrequencyData
 			msg << "Invalid mask index of " << maskIndex << " in GetMask(): mask count is " << MaskCount();
 			throw BadUsageException(msg.str());
 		}
-		void SetImage(size_t imageIndex, const Image2DCPtr &image)
+		void SetImage(size_t imageIndex, const Image2DCPtr& image)
 		{
 			size_t index = 0;
 			for(PolarizedTimeFrequencyData& data : _data)
@@ -622,16 +608,16 @@ class TimeFrequencyData
 			}
 			throw BadUsageException("Invalid mask index in SetMask()");
 		}
-		void SetMask(const TimeFrequencyData &source)
+		void SetMask(const TimeFrequencyData& source)
 		{
 			source.CopyFlaggingTo(this);
 		}
 
-		static TimeFrequencyData *CreateTFDataFromComplexCombination(const TimeFrequencyData &real, const TimeFrequencyData &imaginary);
+		static TimeFrequencyData MakeFromComplexCombination(const TimeFrequencyData &real, const TimeFrequencyData &imaginary);
 
-		static TimeFrequencyData *CreateTFDataFromPolarizationCombination(const TimeFrequencyData &xx, const TimeFrequencyData &xy, const TimeFrequencyData &yx, const TimeFrequencyData &yy);
+		static TimeFrequencyData MakeFromPolarizationCombination(const TimeFrequencyData &xx, const TimeFrequencyData &xy, const TimeFrequencyData &yx, const TimeFrequencyData &yy);
 
-		static TimeFrequencyData *CreateTFDataFromPolarizationCombination(const TimeFrequencyData &xx, const TimeFrequencyData &yy);
+		static TimeFrequencyData MakeFromPolarizationCombination(const TimeFrequencyData &xx, const TimeFrequencyData &yy);
 
 		void SetImagesToZero();
 		template<bool Value>
@@ -655,11 +641,11 @@ class TimeFrequencyData
 			for(PolarizedTimeFrequencyData& data : _data)
 			{
 				if(data._images[0])
-					data._images[0] = data._images[0]->Trim(timeStart, freqStart, timeEnd, freqEnd);
+					data._images[0].reset(new Image2D(data._images[0]->Trim(timeStart, freqStart, timeEnd, freqEnd)));
 				if(data._images[1])
-					data._images[1] = data._images[1]->Trim(timeStart, freqStart, timeEnd, freqEnd);
+					data._images[1].reset(new Image2D(data._images[1]->Trim(timeStart, freqStart, timeEnd, freqEnd)));
 				if(data._flagging)
-					data._flagging = data._flagging->Trim(timeStart, freqStart, timeEnd, freqEnd);
+					data._flagging.reset(new Mask2D(data._flagging->Trim(timeStart, freqStart, timeEnd, freqEnd)));
 			}
 		}
 		
@@ -692,12 +678,12 @@ class TimeFrequencyData
 			return _data.size();
 		}
 		
-		TimeFrequencyData *CreateTFDataFromPolarizationIndex(size_t index) const
+		TimeFrequencyData MakeFromPolarizationIndex(size_t index) const
 		{
-			return new TimeFrequencyData(_complexRepresentation, _data[index]);
+			return TimeFrequencyData(_complexRepresentation, _data[index]);
 		}
 		
-		void SetPolarizationData(size_t polarizationIndex, const TimeFrequencyData &data)
+		void SetPolarizationData(size_t polarizationIndex, const TimeFrequencyData& data)
 		{
 			if(data.PolarizationCount() != 1)
 				throw BadUsageException("Trying to set multiple polarizations by single polarization index");
@@ -728,21 +714,21 @@ class TimeFrequencyData
 			{
 				if(_data[i]._images[0])
 				{
-					Image2DPtr image = Image2D::CreateCopy(_data[i]._images[0]);
-					image->CopyFrom(source._data[i]._images[0], destX, destY);
-					_data[i]._images[0] = image;
+					Image2D image(*_data[i]._images[0]);
+					image.CopyFrom(*source._data[i]._images[0], destX, destY);
+					_data[i]._images[0].reset(new Image2D(std::move(image)));
 				}
 				if(_data[i]._images[1])
 				{
-					Image2DPtr image = Image2D::CreateCopy(_data[i]._images[1]);
-					image->CopyFrom(source._data[i]._images[1], destX, destY);
-					_data[i]._images[1] = image;
+					Image2D image(*_data[i]._images[1]);
+					image.CopyFrom(*source._data[i]._images[1], destX, destY);
+					_data[i]._images[1].reset(new Image2D(std::move(image)));
 				}
 				if(_data[i]._flagging)
 				{
-					Mask2DPtr mask = Mask2D::CreateCopy(_data[i]._flagging);
-					mask->CopyFrom(source._data[i]._flagging, destX, destY);
-					_data[i]._flagging = mask;
+					Mask2D mask(*_data[i]._flagging);
+					mask.CopyFrom(*source._data[i]._flagging, destX, destY);
+					_data[i]._flagging.reset(new Mask2D(std::move(mask)));
 				}
 			}
 		}

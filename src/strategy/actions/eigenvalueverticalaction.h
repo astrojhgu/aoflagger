@@ -19,12 +19,12 @@ namespace rfiStrategy {
 			~EigenValueVerticalAction()
 			{
 			}
-			virtual std::string Description()
+			virtual std::string Description() final override
 			{
 				return "Eigen value decomposition (vertical)";
 			}
 
-			virtual void Perform(class ArtifactSet &artifacts, class ProgressListener &)
+			virtual void Perform(class ArtifactSet &artifacts, class ProgressListener &) final override
 			{
 				TimeFrequencyData &data = artifacts.ContaminatedData();
 				if(data.PolarizationCount()!=1)
@@ -34,7 +34,7 @@ namespace rfiStrategy {
 				VertEVD::Perform(data, _timeIntegrated);
 			}
 
-			virtual ActionType Type() const { return EigenValueVerticalActionType; }
+			virtual ActionType Type() const final override { return EigenValueVerticalActionType; }
 		private:
 			bool _timeIntegrated;
 	};

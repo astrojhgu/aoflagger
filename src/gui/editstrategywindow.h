@@ -15,13 +15,15 @@
 
 #include "../strategy/control/types.h"
 
+#include <memory>
+
 class EditStrategyWindow : public Gtk::Window
 {
 	public:
 		explicit EditStrategyWindow(class StrategyController &strategyController);
 		~EditStrategyWindow();
 
-		void AddAction(rfiStrategy::Action *newAction);
+		void AddAction(std::unique_ptr<rfiStrategy::Action> newAction);
 		void UpdateAction(rfiStrategy::Action *action);
 	private:
 		rfiStrategy::Action *GetSelectedAction();
@@ -58,7 +60,7 @@ class EditStrategyWindow : public Gtk::Window
 			_rightFrame->show();
 		}
 		Gtk::TreeModel::Row findActionRow(rfiStrategy::Action *action);
-		void addContainerBetween(rfiStrategy::ActionContainer &root, rfiStrategy::ActionContainer *newContainer);
+		void addContainerBetween(rfiStrategy::ActionContainer &root, std::unique_ptr<rfiStrategy::ActionContainer> newContainer);
 
 		class ModelColumns : public Gtk::TreeModelColumnRecord
 		{

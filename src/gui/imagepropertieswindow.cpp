@@ -5,9 +5,9 @@
 #include "gtkmm-compat.h"
 
 #include "imagepropertieswindow.h"
-#include "imagewidget.h"
+#include "heatmapwidget.h"
 
-ImagePropertiesWindow::ImagePropertiesWindow(ImageWidget &imageWidget, const std::string &title) :
+ImagePropertiesWindow::ImagePropertiesWindow(HeatMapWidget &imageWidget, const std::string &title) :
 	Gtk::Window(),
 	_imageWidget(imageWidget),
 	_applyButton("_Apply", true),
@@ -121,17 +121,17 @@ void ImagePropertiesWindow::initColorMapButtons()
 	_viridisScaleButton.set_group(group);
 	_colorMapBox.pack_start(_viridisScaleButton);
 	
-	switch(_imageWidget.GetColorMap())
+	switch(_imageWidget.Plot().GetColorMap())
 	{
 		default:
-		case ImageWidget::BWMap: _grayScaleButton.set_active(true); break;
-		case ImageWidget::InvertedMap: _invGrayScaleButton.set_active(true); break;
-		case ImageWidget::HotColdMap: _hotColdScaleButton.set_active(true); break;
-		case ImageWidget::RedBlueMap: _redBlueScaleButton.set_active(true); break;
-		case ImageWidget::BlackRedMap: _blackRedScaleButton.set_active(true); break;
-		case ImageWidget::RedYellowBlueMap: _redBlueYellowScaleButton.set_active(true); break;
-		case ImageWidget::FireMap: _fireScaleButton.set_active(true); break;
-		case ImageWidget::ViridisMap: _viridisScaleButton.set_active(true); break;
+		case HeatMapPlot::BWMap: _grayScaleButton.set_active(true); break;
+		case HeatMapPlot::InvertedMap: _invGrayScaleButton.set_active(true); break;
+		case HeatMapPlot::HotColdMap: _hotColdScaleButton.set_active(true); break;
+		case HeatMapPlot::RedBlueMap: _redBlueScaleButton.set_active(true); break;
+		case HeatMapPlot::BlackRedMap: _blackRedScaleButton.set_active(true); break;
+		case HeatMapPlot::RedYellowBlueMap: _redBlueYellowScaleButton.set_active(true); break;
+		case HeatMapPlot::FireMap: _fireScaleButton.set_active(true); break;
+		case HeatMapPlot::ViridisMap: _viridisScaleButton.set_active(true); break;
 	}
 
 	_colorMapFrame.add(_colorMapBox);
@@ -157,12 +157,12 @@ void ImagePropertiesWindow::initScaleWidgets()
 	_specifiedScaleButton.set_group(group);
 	_specifiedScaleButton.signal_clicked().connect(sigc::mem_fun(*this, &ImagePropertiesWindow::onScaleChanged));
 	
-	switch(_imageWidget.Range())
+	switch(_imageWidget.Plot().Range())
 	{
 		default:
-		case ImageWidget::MinMax: _minMaxScaleButton.set_active(true); break;
-		case ImageWidget::Winsorized: _winsorizedScaleButton.set_active(true); break;
-		case ImageWidget::Specified: _specifiedScaleButton.set_active(true); break;
+		case HeatMapPlot::MinMax: _minMaxScaleButton.set_active(true); break;
+		case HeatMapPlot::Winsorized: _winsorizedScaleButton.set_active(true); break;
+		case HeatMapPlot::Specified: _specifiedScaleButton.set_active(true); break;
 	}
 	onScaleChanged();
 
@@ -190,12 +190,12 @@ void ImagePropertiesWindow::initOptionsWidgets()
 	_optionsBox.pack_start(_zeroSymmetricButton);
 	_zeroSymmetricButton.set_group(group);
 	
-	switch(_imageWidget.ScaleOption())
+	switch(_imageWidget.Plot().ScaleOption())
 	{
 		default:
-		case ImageWidget::NormalScale: _normalOptionsButton.set_active(true); break;
-		case ImageWidget::LogScale: _logScaleButton.set_active(true); break;
-		case ImageWidget::ZeroSymmetricScale: _zeroSymmetricButton.set_active(true); break;
+		case HeatMapPlot::NormalScale: _normalOptionsButton.set_active(true); break;
+		case HeatMapPlot::LogScale: _logScaleButton.set_active(true); break;
+		case HeatMapPlot::ZeroSymmetricScale: _zeroSymmetricButton.set_active(true); break;
 	}
 
 	_optionsFrame.add(_optionsBox);
@@ -213,7 +213,7 @@ void ImagePropertiesWindow::initFilterWidgets()
 	_filterBox.pack_start(_nearestFilterButton);
 	_nearestFilterButton.set_group(group);
 
-	switch(_imageWidget.CairoFilter())
+	switch(_imageWidget.Plot().CairoFilter())
 	{
 		default:
 		case Cairo::FILTER_BEST:    _bestFilterButton.set_active(true); break;
@@ -252,52 +252,52 @@ void ImagePropertiesWindow::initZoomWidgets()
 void ImagePropertiesWindow::initAxisWidgets()
 {
 	
-	_showXYAxes.set_active(_imageWidget.ShowXYAxes());
+	_showXYAxes.set_active(_imageWidget.Plot().ShowXYAxes());
 	_axesGeneralBox.pack_start(_showXYAxes);
 
-	_showColorScale.set_active(_imageWidget.ShowColorScale());
+	_showColorScale.set_active(_imageWidget.Plot().ShowColorScale());
 	_axesGeneralBox.pack_start(_showColorScale);
 	
 	_axesHBox.pack_start(_axesGeneralBox);
 	
-	_showTitleButton.set_active(_imageWidget.ShowTitle());
+	_showTitleButton.set_active(_imageWidget.Plot().ShowTitle());
 	_titleBox.pack_start(_showTitleButton);
-	_manualTitle.set_active(_imageWidget.ManualTitle());
+	_manualTitle.set_active(_imageWidget.Plot().ManualTitle());
 	_titleBox.pack_start(_manualTitle);
-	_titleEntry.set_text(_imageWidget.ManualTitleText());
+	_titleEntry.set_text(_imageWidget.Plot().ManualTitleText());
 	_titleBox.pack_start(_titleEntry);
 	
 	_axesVisibilityBox.pack_start(_titleBox);
 	
-	_showXAxisDescriptionButton.set_active(_imageWidget.ShowXAxisDescription());
+	_showXAxisDescriptionButton.set_active(_imageWidget.Plot().ShowXAxisDescription());
 	_xAxisBox.pack_start(_showXAxisDescriptionButton);
 	
-	_manualXAxisDescription.set_active(_imageWidget.ManualXAxisDescription());
+	_manualXAxisDescription.set_active(_imageWidget.Plot().ManualXAxisDescription());
 	_xAxisBox.pack_start(_manualXAxisDescription);
 	
-	_xAxisDescriptionEntry.set_text(_imageWidget.XAxisDescription());
+	_xAxisDescriptionEntry.set_text(_imageWidget.Plot().XAxisDescription());
 	_xAxisBox.pack_start(_xAxisDescriptionEntry);
 	
 	_axesVisibilityBox.pack_start(_xAxisBox);
 	
-	_showYAxisDescriptionButton.set_active(_imageWidget.ShowYAxisDescription());
+	_showYAxisDescriptionButton.set_active(_imageWidget.Plot().ShowYAxisDescription());
 	_yAxisBox.pack_start(_showYAxisDescriptionButton);
 	
-	_manualYAxisDescription.set_active(_imageWidget.ManualYAxisDescription());
+	_manualYAxisDescription.set_active(_imageWidget.Plot().ManualYAxisDescription());
 	_yAxisBox.pack_start(_manualYAxisDescription);
 	
-	_yAxisDescriptionEntry.set_text(_imageWidget.YAxisDescription());
+	_yAxisDescriptionEntry.set_text(_imageWidget.Plot().YAxisDescription());
 	_yAxisBox.pack_start(_yAxisDescriptionEntry);
 	
 	_axesVisibilityBox.pack_start(_yAxisBox);
 	
-	_showZAxisDescriptionButton.set_active(_imageWidget.ShowZAxisDescription());
+	_showZAxisDescriptionButton.set_active(_imageWidget.Plot().ShowZAxisDescription());
 	_zAxisBox.pack_start(_showZAxisDescriptionButton);
 	
-	_manualZAxisDescription.set_active(_imageWidget.ManualZAxisDescription());
+	_manualZAxisDescription.set_active(_imageWidget.Plot().ManualZAxisDescription());
 	_zAxisBox.pack_start(_manualZAxisDescription);
 	
-	_zAxisDescriptionEntry.set_text(_imageWidget.ZAxisDescription());
+	_zAxisDescriptionEntry.set_text(_imageWidget.Plot().ZAxisDescription());
 	_zAxisBox.pack_start(_zAxisDescriptionEntry);
 	
 	_axesVisibilityBox.pack_start(_zAxisBox);
@@ -311,55 +311,55 @@ void ImagePropertiesWindow::initAxisWidgets()
 void ImagePropertiesWindow::updateMinMaxEntries()
 {
 	std::stringstream minStr;
-	minStr << _imageWidget.Min();
+	minStr << _imageWidget.Plot().Min();
 	_scaleMinEntry.set_text(minStr.str());
 	
 	std::stringstream maxStr;
-	maxStr << _imageWidget.Max();
+	maxStr << _imageWidget.Plot().Max();
 	_scaleMaxEntry.set_text(maxStr.str());
 }
 
 void ImagePropertiesWindow::onApplyClicked()
 {
 	if(_grayScaleButton.get_active())
-		_imageWidget.SetColorMap(ImageWidget::BWMap);
+		_imageWidget.Plot().SetColorMap(HeatMapPlot::BWMap);
 	else if(_invGrayScaleButton.get_active())
-		_imageWidget.SetColorMap(ImageWidget::InvertedMap);
+		_imageWidget.Plot().SetColorMap(HeatMapPlot::InvertedMap);
 	else if(_hotColdScaleButton.get_active())
-		_imageWidget.SetColorMap(ImageWidget::HotColdMap);
+		_imageWidget.Plot().SetColorMap(HeatMapPlot::HotColdMap);
 	else if(_redBlueScaleButton.get_active())
-		_imageWidget.SetColorMap(ImageWidget::RedBlueMap);
+		_imageWidget.Plot().SetColorMap(HeatMapPlot::RedBlueMap);
 	else if(_blackRedScaleButton.get_active())
-		_imageWidget.SetColorMap(ImageWidget::BlackRedMap);
+		_imageWidget.Plot().SetColorMap(HeatMapPlot::BlackRedMap);
 	else if(_redBlueYellowScaleButton.get_active())
-		_imageWidget.SetColorMap(ImageWidget::RedYellowBlueMap);
+		_imageWidget.Plot().SetColorMap(HeatMapPlot::RedYellowBlueMap);
 	else if(_fireScaleButton.get_active())
-		_imageWidget.SetColorMap(ImageWidget::FireMap);
+		_imageWidget.Plot().SetColorMap(HeatMapPlot::FireMap);
 	else if(_viridisScaleButton.get_active())
-		_imageWidget.SetColorMap(ImageWidget::ViridisMap);
+		_imageWidget.Plot().SetColorMap(HeatMapPlot::ViridisMap);
 	
 	if(_minMaxScaleButton.get_active())
-		_imageWidget.SetRange(ImageWidget::MinMax);
+		_imageWidget.Plot().SetRange(HeatMapPlot::MinMax);
 	else if(_winsorizedScaleButton.get_active())
-		_imageWidget.SetRange(ImageWidget::Winsorized);
+		_imageWidget.Plot().SetRange(HeatMapPlot::Winsorized);
 	else if(_specifiedScaleButton.get_active())
 	{
-		_imageWidget.SetRange(ImageWidget::Specified);
-		_imageWidget.SetMin(atof(_scaleMinEntry.get_text().c_str()));
-		_imageWidget.SetMax(atof(_scaleMaxEntry.get_text().c_str()));
+		_imageWidget.Plot().SetRange(HeatMapPlot::Specified);
+		_imageWidget.Plot().SetMin(atof(_scaleMinEntry.get_text().c_str()));
+		_imageWidget.Plot().SetMax(atof(_scaleMaxEntry.get_text().c_str()));
 	}
 	
 	if(_normalOptionsButton.get_active())
-		_imageWidget.SetScaleOption(ImageWidget::NormalScale);
+		_imageWidget.Plot().SetScaleOption(HeatMapPlot::NormalScale);
 	else if(_logScaleButton.get_active())
-		_imageWidget.SetScaleOption(ImageWidget::LogScale);
+		_imageWidget.Plot().SetScaleOption(HeatMapPlot::LogScale);
 	else if(_zeroSymmetricButton.get_active())
-		_imageWidget.SetScaleOption(ImageWidget::ZeroSymmetricScale);
+		_imageWidget.Plot().SetScaleOption(HeatMapPlot::ZeroSymmetricScale);
 	
 	if(_bestFilterButton.get_active())
-		_imageWidget.SetCairoFilter(Cairo::FILTER_BEST);
+		_imageWidget.Plot().SetCairoFilter(Cairo::FILTER_BEST);
 	else if(_nearestFilterButton.get_active())
-		_imageWidget.SetCairoFilter(Cairo::FILTER_NEAREST);
+		_imageWidget.Plot().SetCairoFilter(Cairo::FILTER_NEAREST);
 	
 	double
 		timeStart = _hStartScale.get_value(),
@@ -367,32 +367,32 @@ void ImagePropertiesWindow::onApplyClicked()
 		freqStart = _vStartScale.get_value(),
 		freqEnd = _vStopScale.get_value();
 		
-	_imageWidget.SetHorizontalDomain(timeStart, timeEnd);
-	_imageWidget.SetVerticalDomain(freqStart, freqEnd);
+	_imageWidget.Plot().SetHorizontalDomain(timeStart, timeEnd);
+	_imageWidget.Plot().SetVerticalDomain(freqStart, freqEnd);
 		
-	_imageWidget.SetShowTitle(_showTitleButton.get_active());
-	_imageWidget.SetManualTitle(_manualTitle.get_active());
+	_imageWidget.Plot().SetShowTitle(_showTitleButton.get_active());
+	_imageWidget.Plot().SetManualTitle(_manualTitle.get_active());
 	if(_manualTitle.get_active())
-		_imageWidget.SetManualTitleText(_titleEntry.get_text());
+		_imageWidget.Plot().SetManualTitleText(_titleEntry.get_text());
 	
-	_imageWidget.SetShowXYAxes(_showXYAxes.get_active());
-	_imageWidget.SetShowXAxisDescription(_showXAxisDescriptionButton.get_active());
-	_imageWidget.SetShowYAxisDescription(_showYAxisDescriptionButton.get_active());
-	_imageWidget.SetShowZAxisDescription(_showZAxisDescriptionButton.get_active());
+	_imageWidget.Plot().SetShowXYAxes(_showXYAxes.get_active());
+	_imageWidget.Plot().SetShowXAxisDescription(_showXAxisDescriptionButton.get_active());
+	_imageWidget.Plot().SetShowYAxisDescription(_showYAxisDescriptionButton.get_active());
+	_imageWidget.Plot().SetShowZAxisDescription(_showZAxisDescriptionButton.get_active());
 	
-	_imageWidget.SetManualXAxisDescription(_manualXAxisDescription.get_active());
+	_imageWidget.Plot().SetManualXAxisDescription(_manualXAxisDescription.get_active());
 	if(_manualXAxisDescription.get_active())
-		_imageWidget.SetXAxisDescription(_xAxisDescriptionEntry.get_text());
+		_imageWidget.Plot().SetXAxisDescription(_xAxisDescriptionEntry.get_text());
 	
-	_imageWidget.SetManualYAxisDescription(_manualYAxisDescription.get_active());
+	_imageWidget.Plot().SetManualYAxisDescription(_manualYAxisDescription.get_active());
 	if(_manualYAxisDescription.get_active())
-		_imageWidget.SetYAxisDescription(_yAxisDescriptionEntry.get_text());
+		_imageWidget.Plot().SetYAxisDescription(_yAxisDescriptionEntry.get_text());
 	
-	_imageWidget.SetManualZAxisDescription(_manualZAxisDescription.get_active());
+	_imageWidget.Plot().SetManualZAxisDescription(_manualZAxisDescription.get_active());
 	if(_manualZAxisDescription.get_active())
-		_imageWidget.SetZAxisDescription(_zAxisDescriptionEntry.get_text());
+		_imageWidget.Plot().SetZAxisDescription(_zAxisDescriptionEntry.get_text());
 	
-	_imageWidget.SetShowColorScale(_showColorScale.get_active());
+	_imageWidget.Plot().SetShowColorScale(_showColorScale.get_active());
 	
 	_imageWidget.Update();
 	
@@ -406,7 +406,7 @@ void ImagePropertiesWindow::onCloseClicked()
 
 void ImagePropertiesWindow::onExportClicked()
 {
-	if(_imageWidget.HasImage())
+	if(_imageWidget.Plot().HasImage())
 	{
 		Gtk::FileChooserDialog dialog("Specify image filename", Gtk::FILE_CHOOSER_ACTION_SAVE);
 		dialog.set_transient_for(*this);
@@ -453,7 +453,7 @@ void ImagePropertiesWindow::onExportClicked()
 
 void ImagePropertiesWindow::onExportDataClicked()
 {
-	if(_imageWidget.HasImage())
+	if(_imageWidget.Plot().HasImage())
 	{
 		Gtk::FileChooserDialog dialog("Specify data filename", Gtk::FILE_CHOOSER_ACTION_SAVE);
 		dialog.set_transient_for(*this);
@@ -472,7 +472,7 @@ void ImagePropertiesWindow::onExportDataClicked()
 
 		if(result == Gtk::RESPONSE_OK)
 		{
-			_imageWidget.SaveText(dialog.get_filename());
+			_imageWidget.Plot().SaveText(dialog.get_filename());
 		}
 	}
 }

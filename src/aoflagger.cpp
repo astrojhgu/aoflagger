@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <mutex>
 
 #include <libgen.h>
 
@@ -31,13 +32,13 @@
 
 class ConsoleProgressHandler : public ProgressListener {
 	private:
-		boost::mutex _mutex;
+		std::mutex _mutex;
 		
 	public:
 		
-		virtual void OnStartTask(const rfiStrategy::Action &action, size_t taskNo, size_t taskCount, const std::string &description, size_t weight)
+		virtual void OnStartTask(const rfiStrategy::Action &action, size_t taskNo, size_t taskCount, const std::string &description, size_t weight) final override
 		{
-			boost::mutex::scoped_lock lock(_mutex);
+			std::lock_guard<std::mutex> lock(_mutex);
 			ProgressListener::OnStartTask(action, taskNo, taskCount, description, weight);
 			
 			double totalProgress = TotalProgress();
@@ -50,19 +51,19 @@ class ConsoleProgressHandler : public ProgressListener {
 			AOLogger::Progress << description << "...\n";
 		}
 		
-		virtual void OnEndTask(const rfiStrategy::Action &action)
+		virtual void OnEndTask(const rfiStrategy::Action &action) final override
 		{
-			boost::mutex::scoped_lock lock(_mutex);
+			std::lock_guard<std::mutex> lock(_mutex);
 			
 			ProgressListener::OnEndTask(action);
 		}
 
-		virtual void OnProgress(const rfiStrategy::Action &action, size_t i, size_t j)
+		virtual void OnProgress(const rfiStrategy::Action &action, size_t i, size_t j) final override
 		{
 			ProgressListener::OnProgress(action, i, j);
 		}
 
-		virtual void OnException(const rfiStrategy::Action &, std::exception &thrownException) 
+		virtual void OnException(const rfiStrategy::Action &, std::exception &thrownException) final override
 		{
 			AOLogger::Error <<
 				"An exception occured during execution of the strategy!\n"
@@ -117,6 +118,7 @@ int main(int argc, char **argv)
 		"  -column <name> specify column to flag\n"
 		"  -bands <list> comma separated list of (zero-indexed) band ids to process\n"
 		"  -fields <list> comma separated list of (zero-indexed) field ids to process\n"
+		"  -combine-spws Join all SPWs together in frequency direction before flagging\n"
 		"\n"
 		"This tool supports at least the Casa measurement set, the SDFITS and Filterbank formats. See\n"
 		"the documentation for support of other file types.\n";
@@ -137,6 +139,7 @@ int main(int argc, char **argv)
 	Parameter<bool> logVerbose;
 	Parameter<bool> skipFlagged;
 	Parameter<std::string> dataColumn;
+	Parameter<bool> combineSPWs;
 	std::set<size_t> bands, fields;
 
 	size_t parameterIndex = 1;
@@ -208,6 +211,10 @@ int main(int argc, char **argv)
 			++parameterIndex;
 			NumberList::ParseIntList(argv[parameterIndex], fields);
 		}
+		else if(flag == "combine-spws")
+		{
+			combineSPWs = true;
+		}
 		else
 		{
 			AOLogger::Init(basename(argv[0]));
@@ -229,9 +236,9 @@ int main(int argc, char **argv)
 
 		Stopwatch watch(true);
 
-		boost::mutex ioMutex;
+		std::mutex ioMutex;
 		
-		rfiStrategy::ForEachMSAction *fomAction = new rfiStrategy::ForEachMSAction();
+		std::unique_ptr<rfiStrategy::ForEachMSAction> fomAction(new rfiStrategy::ForEachMSAction());
 		if(readMode.IsSet())
 			fomAction->SetIOMode(readMode);
 		if(readUVW.IsSet())
@@ -242,6 +249,8 @@ int main(int argc, char **argv)
 			fomAction->Bands() = bands;
 		if(!fields.empty())
 			fomAction->Fields() = fields;
+		if(combineSPWs.IsSet())
+			fomAction->SetCombineSPWs(combineSPWs);
 		std::stringstream commandLineStr;
 		commandLineStr << argv[0];
 		for(int i=1;i<argc;++i)
@@ -261,7 +270,7 @@ int main(int argc, char **argv)
 		{
 			fomAction->SetLoadOptimizedStrategy(false);
 			rfiStrategy::StrategyReader reader;
-			rfiStrategy::Strategy *subStrategy;
+			std::unique_ptr<rfiStrategy::Strategy> subStrategy;
 			try {
 				AOLogger::Debug << "Opening strategy file '" << strategyFile.Value() << "'\n";
 				subStrategy = reader.CreateStrategyFromFile(strategyFile);
@@ -279,31 +288,31 @@ int main(int argc, char **argv)
 			if(!rfiStrategy::DefaultStrategy::StrategyContainsAction(*subStrategy, rfiStrategy::ForEachBaselineActionType) &&
 				!rfiStrategy::DefaultStrategy::StrategyContainsAction(*subStrategy, rfiStrategy::WriteFlagsActionType))
 			{
-				rfiStrategy::DefaultStrategy::EncapsulateSingleStrategy(*fomAction, subStrategy, rfiStrategy::DefaultStrategy::GENERIC_TELESCOPE);
+				rfiStrategy::DefaultStrategy::EncapsulateSingleStrategy(*fomAction, std::move(subStrategy), rfiStrategy::DefaultStrategy::GENERIC_TELESCOPE);
 				AOLogger::Info << "Modified single-baseline strategy so it will execute strategy on all baselines and write flags.\n";
 			}
 			else {
-				fomAction->Add(subStrategy);
+				fomAction->Add(std::move(subStrategy));
 			}
 			if(threadCount.IsSet())
 				rfiStrategy::Strategy::SetThreadCount(*fomAction, threadCount);
 		}
 		else {
 			fomAction->SetLoadOptimizedStrategy(true);
-			fomAction->Add(new rfiStrategy::Strategy()); // This helps the progress reader to determine progress
+			fomAction->Add(std::unique_ptr<rfiStrategy::Strategy>(new rfiStrategy::Strategy())); // This helps the progress reader to determine progress
 			if(threadCount.IsSet())
 				fomAction->SetLoadStrategyThreadCount(threadCount);
 		}
 		
 		rfiStrategy::Strategy overallStrategy;
-		overallStrategy.Add(fomAction);
+		overallStrategy.Add(std::move(fomAction));
 
 		rfiStrategy::ArtifactSet artifacts(&ioMutex);
-		artifacts.SetAntennaFlagCountPlot(new AntennaFlagCountPlot());
-		artifacts.SetFrequencyFlagCountPlot(new FrequencyFlagCountPlot());
-		artifacts.SetTimeFlagCountPlot(new TimeFlagCountPlot());
-		artifacts.SetPolarizationStatistics(new PolarizationStatistics());
-		artifacts.SetBaselineSelectionInfo(new rfiStrategy::BaselineSelector());
+		artifacts.SetAntennaFlagCountPlot(std::unique_ptr<AntennaFlagCountPlot>(new AntennaFlagCountPlot()));
+		artifacts.SetFrequencyFlagCountPlot(std::unique_ptr<FrequencyFlagCountPlot>(new FrequencyFlagCountPlot()));
+		artifacts.SetTimeFlagCountPlot(std::unique_ptr<TimeFlagCountPlot>(new TimeFlagCountPlot()));
+		artifacts.SetPolarizationStatistics(std::unique_ptr<PolarizationStatistics>(new PolarizationStatistics()));
+		artifacts.SetBaselineSelectionInfo(std::unique_ptr<rfiStrategy::BaselineSelector>(new rfiStrategy::BaselineSelector()));
 		
 		ConsoleProgressHandler progress;
 
@@ -314,22 +323,16 @@ int main(int argc, char **argv)
 		rfiStrategy::ArtifactSet *set = overallStrategy.JoinThread();
 		overallStrategy.FinishAll();
 
-		set->AntennaFlagCountPlot()->Report();
-		set->FrequencyFlagCountPlot()->Report();
-		set->PolarizationStatistics()->Report();
-
-		delete set->AntennaFlagCountPlot();
-		delete set->FrequencyFlagCountPlot();
-		delete set->TimeFlagCountPlot();
-		delete set->PolarizationStatistics();
-		delete set->BaselineSelectionInfo();
+		set->AntennaFlagCountPlot().Report();
+		set->FrequencyFlagCountPlot().Report();
+		set->PolarizationStatistics().Report();
 
 		delete set;
 
 		AOLogger::Debug << "Time: " << watch.ToString() << "\n";
 		
 		return RETURN_SUCCESS;
-	} catch(std::exception &exception)
+	} catch(std::exception& exception)
 	{
 		std::cerr
 			<< "An unhandled exception occured: " << exception.what() << '\n'

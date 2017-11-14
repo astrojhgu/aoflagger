@@ -15,12 +15,13 @@ class ColorScale {
 		virtual ~ColorScale()
 		{
 		}
-		void SetPlotDimensions(double plotWidth, double plotHeight, double topMargin)
+		void SetPlotDimensions(double plotWidth, double plotHeight, double topMargin, bool textOnLeft)
 		{
 			_plotWidth = plotWidth;
 			_plotHeight = plotHeight;
 			_topMargin = topMargin;
 			_width = 0.0;
+			_textOnLeft = textOnLeft;
 		}
 		double GetWidth(Cairo::RefPtr<Cairo::Context> cairo)
 		{
@@ -80,7 +81,8 @@ class ColorScale {
 		void initWidth(Cairo::RefPtr<Cairo::Context> cairo);
 		
 		double _plotWidth, _plotHeight, _topMargin;
-		double _scaleWidth, _width;
+		double _scaleWidth, _width, _textHeight;
+		bool _textOnLeft;
 		double _min, _max;
 		class VerticalPlotScale _verticalPlotScale;
 		std::map<double, ColorValue> _colorValues;

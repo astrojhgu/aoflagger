@@ -16,8 +16,6 @@
 #include "../../util/ffttools.h"
 #include "../../util/progresslistener.h"
 
-#include <boost/concept_check.hpp>
-
 namespace rfiStrategy {
 
 	class TimeConvolutionAction : public Action
@@ -28,7 +26,7 @@ namespace rfiStrategy {
 			TimeConvolutionAction() : Action(), _operation(IterativeExtrapolatedSincOperation), _sincSize(32.0), _directionRad(M_PI*(-86.7/180.0)), _etaParameter(0.2), _autoAngle(true), _isSincScaleInSamples(false), _alwaysRemove(false), _useHammingWindow(false), _iterations(1), _channelAveragingSize(4)
 			{
 			}
-			virtual std::string Description()
+			virtual std::string Description() final override
 			{
 				switch(_operation)
 				{
@@ -58,8 +56,8 @@ namespace rfiStrategy {
 						break;
 				}
 			}
-			virtual ActionType Type() const { return TimeConvolutionActionType; }
-			virtual void Perform(ArtifactSet &artifacts, class ProgressListener &listener)
+			virtual ActionType Type() const final override { return TimeConvolutionActionType; }
+			virtual void Perform(ArtifactSet &artifacts, class ProgressListener &listener) final override
 			{
 				Image2DCPtr newImage;
 				TimeFrequencyData newRevisedData;
@@ -81,24 +79,20 @@ namespace rfiStrategy {
 						if(_autoAngle)
 							_directionRad = FindStrongestSourceAngle(artifacts, artifacts.ContaminatedData());
 						TimeFrequencyData data = artifacts.ContaminatedData();
-						TimeFrequencyData *realData = data.CreateTFData(TimeFrequencyData::RealPart);
-						TimeFrequencyData *imagData = data.CreateTFData(TimeFrequencyData::ImaginaryPart);
-						Image2DPtr real = Image2D::CreateCopy(realData->GetSingleImage());
-						Image2DPtr imaginary = Image2D::CreateCopy(imagData->GetSingleImage());
-						delete realData;
-						delete imagData;
+						TimeFrequencyData realData = data.Make(TimeFrequencyData::RealPart);
+						TimeFrequencyData imagData = data.Make(TimeFrequencyData::ImaginaryPart);
+						Image2DPtr real(new Image2D(*realData.GetSingleImage()));
+						Image2DPtr imaginary(new Image2D(*imagData.GetSingleImage()));
 						PerformExtrapolatedSincOperation(artifacts, real, imaginary, listener);
 						newRevisedData = TimeFrequencyData(data.Polarizations()[0], real, imaginary);
 					}
 					break;
 					case FFTSincOperation:
 						TimeFrequencyData data = artifacts.ContaminatedData();
-						TimeFrequencyData *realData = data.CreateTFData(TimeFrequencyData::RealPart);
-						TimeFrequencyData *imagData = data.CreateTFData(TimeFrequencyData::ImaginaryPart);
-						Image2DPtr real = Image2D::CreateCopy(realData->GetSingleImage());
-						Image2DPtr imaginary = Image2D::CreateCopy(imagData->GetSingleImage());
-						delete realData;
-						delete imagData;
+						TimeFrequencyData realData = data.Make(TimeFrequencyData::RealPart);
+						TimeFrequencyData imagData = data.Make(TimeFrequencyData::ImaginaryPart);
+						Image2DPtr real(new Image2D(*realData.GetSingleImage()));
+						Image2DPtr imaginary(new Image2D(*imagData.GetSingleImage()));
 						PerformFFTSincOperation(artifacts, real, imaginary);
 						newRevisedData = TimeFrequencyData(data.Polarizations()[0], real, imaginary);
 						break;
@@ -111,12 +105,11 @@ namespace rfiStrategy {
 
 				newRevisedData.SetMask(artifacts.RevisedData());
 
-				TimeFrequencyData *contaminatedData =
-					TimeFrequencyData::CreateTFDataFromDiff(artifacts.ContaminatedData(), newRevisedData);
-				contaminatedData->SetMask(artifacts.ContaminatedData());
+				TimeFrequencyData contaminatedData =
+					TimeFrequencyData::MakeFromDiff(artifacts.ContaminatedData(), newRevisedData);
+				contaminatedData.SetMask(artifacts.ContaminatedData());
 				artifacts.SetRevisedData(newRevisedData);
-				artifacts.SetContaminatedData(*contaminatedData);
-				delete contaminatedData;
+				artifacts.SetContaminatedData(contaminatedData);
 			}
 			
 			enum Operation Operation() const { return _operation; }

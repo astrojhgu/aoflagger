@@ -6,7 +6,7 @@
 #include <gtkmm/toolbutton.h>
 #include <gtkmm/separatortoolitem.h>
 
-#include "../imagewidget.h"
+#include "../heatmapwidget.h"
 
 #include "../../quality/qualitytablesformatter.h"
 
@@ -37,7 +37,7 @@ class GrayScalePlotPage : public PlotSheet {
 		
 		void updateImage();
 		
-		ImageWidget &grayScaleWidget() { return _imageWidget; }
+		HeatMapWidget &grayScaleWidget() { return _imageWidget; }
 	private:
 		void updateImageImpl(QualityTablesFormatter::StatisticKind statisticKind, PolarizationEnum polarisation, enum TimeFrequencyData::ComplexRepresentation phase);
 		
@@ -59,15 +59,15 @@ class GrayScalePlotPage : public PlotSheet {
 		void onSelectSNR() { _selectStatisticKind = QualityTablesFormatter::SignalToNoiseStatistic; updateImage(); }
 		void onPropertiesClicked();
 		
-		void onSelectMinMaxRange() { _imageWidget.SetRange(ImageWidget::MinMax); _imageWidget.Update(); }
-		void onSelectWinsorizedRange() { _imageWidget.SetRange(ImageWidget::Winsorized); _imageWidget.Update(); }
-		void onSelectSpecifiedRange() { _imageWidget.SetRange(ImageWidget::Specified); _imageWidget.Update(); }
+		void onSelectMinMaxRange() { _imageWidget.Plot().SetRange(HeatMapPlot::MinMax); _imageWidget.Update(); }
+		void onSelectWinsorizedRange() { _imageWidget.Plot().SetRange(HeatMapPlot::Winsorized); _imageWidget.Update(); }
+		void onSelectSpecifiedRange() { _imageWidget.Plot().SetRange(HeatMapPlot::Specified); _imageWidget.Update(); }
 		void onLogarithmicScaleClicked()
 		{
 			if(_logarithmicScaleButton.get_active())
-				_imageWidget.SetScaleOption(ImageWidget::LogScale);
+				_imageWidget.Plot().SetScaleOption(HeatMapPlot::LogScale);
 			else
-				_imageWidget.SetScaleOption(ImageWidget::NormalScale);
+				_imageWidget.Plot().SetScaleOption(HeatMapPlot::NormalScale);
 			 _imageWidget.Update();
 		}
 		void onNormalizeAxesButtonClicked()
@@ -104,7 +104,8 @@ class GrayScalePlotPage : public PlotSheet {
 		Gtk::ToolButton _plotPropertiesButton;
 		
 		QualityTablesFormatter::StatisticKind _selectStatisticKind;
-		ImageWidget _imageWidget;
+		HeatMapPlot _heatMapPlot;
+		HeatMapWidget _imageWidget;
 		
 		bool _ready;
 		

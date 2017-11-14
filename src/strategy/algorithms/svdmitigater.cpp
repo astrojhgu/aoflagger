@@ -149,20 +149,20 @@ void SVDMitigater::Compose()
 
 #ifdef HAVE_GTKMM
 
-void SVDMitigater::CreateSingularValueGraph(const TimeFrequencyData &data, Plot2D &plot)
+void SVDMitigater::CreateSingularValueGraph(const TimeFrequencyData& data, Plot2D& plot)
 {
 	size_t polarisationCount = data.PolarizationCount();
 	plot.SetTitle("Distribution of singular values");
 	plot.SetLogarithmicYAxis(true);
 	for(size_t i=0;i<polarisationCount;++i)
 	{
-		TimeFrequencyData *polarizationData = data.CreateTFDataFromPolarizationIndex(i);
+		TimeFrequencyData polarizationData(data.MakeFromPolarizationIndex(i));
 		SVDMitigater svd;
-		svd.Initialize(*polarizationData);
+		svd.Initialize(polarizationData);
 		svd.Decompose();
 		size_t minmn = svd._m<svd._n ? svd._m : svd._n;
 		
-		Plot2DPointSet &pointSet = plot.StartLine(polarizationData->Description());
+		Plot2DPointSet &pointSet = plot.StartLine(polarizationData.Description());
 		pointSet.SetXDesc("Singular value index");
 		pointSet.SetYDesc("Singular value");
 		

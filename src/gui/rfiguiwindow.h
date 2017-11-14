@@ -2,9 +2,7 @@
 #define MSWINDOW_H
 
 #include <set>
-
-#include <boost/smart_ptr/scoped_ptr.hpp>
-#include <boost/thread/mutex.hpp>
+#include <memory>
 
 #include <gtkmm/actiongroup.h>
 #include <gtkmm/box.h>
@@ -30,68 +28,44 @@
 
 class RFIGuiWindow : public Gtk::Window, private StrategyController {
 	public:
-		RFIGuiWindow();
+		RFIGuiWindow(class RFIGuiController* controller);
 		~RFIGuiWindow();
 
-		void SetImageSet(rfiStrategy::ImageSet *newImageSet, bool loadBaseline);
-		void SetImageSetIndex(rfiStrategy::ImageSetIndex *newImageSetIndex);
-		rfiStrategy::ImageSet &GetImageSet() const { return *_imageSet; }
-		rfiStrategy::ImageSetIndex &GetImageSetIndex() const { return *_imageSetIndex; }
-		void SetRevisedData(const TimeFrequencyData &data)
-		{
-			_timeFrequencyWidget.SetRevisedData(data);
-		}
 		void Update()
 		{
 			_timeFrequencyWidget.Update();
 		}
- 		bool HasImageSet() const { return _imageSet != 0; }
-		bool HasImage() const { return _timeFrequencyWidget.HasImage(); }
+		bool HasImage() const { return _timeFrequencyWidget.Plot().HasImage(); }
 		Mask2DCPtr Mask() const { return GetOriginalData().GetSingleMask(); }
 		Mask2DCPtr AltMask() const { return GetContaminatedData().GetSingleMask(); }
 		
-		TimeFrequencyData GetActiveData() const
-		{
-			return _timeFrequencyWidget.GetActiveData();
-		}
-		const TimeFrequencyData &GetOriginalData() const
-		{
-			return _timeFrequencyWidget.OriginalData();
-		}
-		const TimeFrequencyData &GetContaminatedData() const
-		{
-			return _timeFrequencyWidget.ContaminatedData();
-		}
+		TimeFrequencyData GetActiveData() const;
+		const TimeFrequencyData &GetOriginalData() const;
+		const TimeFrequencyData &GetContaminatedData() const;
 
 		class ImageComparisonWidget &GetTimeFrequencyWidget()
 		{
 			return _timeFrequencyWidget;
 		}
 		
-		class ThresholdConfig &HighlightConfig()
-		{
-			return _timeFrequencyWidget.HighlightConfig();
-		}
-		void SetHighlighting(bool newValue)
-		{
-			_timeFrequencyWidget.SetHighlighting(newValue);
-		}
-		TimeFrequencyMetaDataCPtr SelectedMetaData()
-		{
-			return _timeFrequencyWidget.GetSelectedMetaData();
-		}
+		class ThresholdConfig &HighlightConfig();
+		void SetHighlighting(bool newValue);
+		TimeFrequencyMetaDataCPtr SelectedMetaData();
 		
 		void onExecuteStrategyFinished();
 		void OpenPath(const std::string &path);
 		void ShowHistogram(class HistogramCollection &histogramCollection);
 		
 		class RFIGuiController& Controller() { return *_controller; }
+		
+		void UpdateImageSetIndex();
+		void OpenGotoWindow() { onGoToPressed(); }
+		void SetBaselineInfo(bool multipleBaselines, const std::string& name, const std::string& description);
 	private:
-		rfiStrategy::Strategy &Strategy() { return *_strategy; }
-		void SetStrategy(rfiStrategy::Strategy *newStrategy);
+		rfiStrategy::Strategy &Strategy() final override { return *_strategy; }
+		void SetStrategy(std::unique_ptr<rfiStrategy::Strategy> newStrategy) final override;
 
 		void createToolbar();
-		void loadCurrentTFData();
 
 		void onLoadPrevious();
 		void onLoadNext();
@@ -104,22 +78,9 @@ class RFIGuiWindow : public Gtk::Window, private StrategyController {
 		void onActionDirectoryOpenForSpatial();
 		void onActionDirectoryOpenForST();
 		void onTFZoomChanged();
-		void onZoomFit() {
-			_timeFrequencyWidget.ZoomFit();
-			_timeFrequencyWidget.Update();
-		}
-		void onZoomIn()
-		{ 
-			if(_timeFrequencyWidget.IsMouseInImage())
-				_timeFrequencyWidget.ZoomInOn(_timeFrequencyWidget.MouseX(), _timeFrequencyWidget.MouseY());
-			else
-				_timeFrequencyWidget.ZoomIn();
-			_timeFrequencyWidget.Update();
-		}
-		void onZoomOut() {
-			_timeFrequencyWidget.ZoomOut(); 
-			_timeFrequencyWidget.Update();
-		}
+		void onZoomFit();
+		void onZoomIn();
+		void onZoomOut();
 		void onShowImagePlane();
 		void onSetAndShowImagePlane();
 		void onAddToImagePlane();
@@ -242,7 +203,7 @@ class RFIGuiWindow : public Gtk::Window, private StrategyController {
 		
 		void onExecutePythonStrategy();
 		
-		class RFIGuiController *_controller;
+		class RFIGuiController* _controller;
 		
 		Gtk::Box _mainVBox;
 		Gtk::Paned _panedArea;
@@ -267,25 +228,21 @@ class RFIGuiWindow : public Gtk::Window, private StrategyController {
 			_gaussianTestSetsButton, _rayleighTestSetsButton, _zeroTestSetsButton,
 			_ncpSetButton, _b1834SetButton, _emptySetButton,
 			_sim16ChannelsButton, _sim64ChannelsButton, _sim256ChannelsButton;
-		class ImagePlaneWindow *_imagePlaneWindow;
-		class HistogramWindow *_histogramWindow;
-		Gtk::Window
-			*_optionWindow, *_editStrategyWindow,
-			*_gotoWindow,
-			*_progressWindow, *_highlightWindow,
-			*_plotComplexPlaneWindow, *_imagePropertiesWindow;
+		std::unique_ptr<class ImagePlaneWindow> _imagePlaneWindow;
+		std::unique_ptr<class HistogramWindow> _histogramWindow;
+		std::unique_ptr<class PlotWindow> _plotWindow;
+		std::unique_ptr<Gtk::Window>
+			_optionWindow, _editStrategyWindow,
+			_gotoWindow,
+			_progressWindow, _highlightWindow,
+			_plotComplexPlaneWindow, _imagePropertiesWindow;
 
-		rfiStrategy::ImageSet *_imageSet;
-		rfiStrategy::ImageSetIndex *_imageSetIndex;
-		rfiStrategy::Strategy *_strategy;
+		std::unique_ptr<rfiStrategy::Strategy> _strategy;
 		int _gaussianTestSets;
-		boost::mutex _ioMutex;
 		SegmentedImagePtr _segmentedImage;
-		class SpatialMatrixMetaData *_spatialMetaData;
 		std::vector<double> _horProfile, _vertProfile;
 		TimeFrequencyData _storedData;
 		TimeFrequencyMetaDataCPtr _storedMetaData;
-		class PlotWindow *_plotWindow;
 };
 
 #endif

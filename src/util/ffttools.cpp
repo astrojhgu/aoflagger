@@ -320,8 +320,8 @@ void FFTTools::CreateDynamicHorizontalFFTImage(Image2DPtr real, Image2DPtr imagi
 	const size_t width = real->Width();
 	if(real->Height() == 0 || width == 0) return;
 	SampleRowPtr
-		realRow = SampleRow::CreateFromRowSum(real, 0, real->Height()),
-		imaginaryRow = SampleRow::CreateFromRowSum(imaginary, 0, imaginary->Height());
+		realRow = SampleRow::CreateFromRowSum(real.get(), 0, real->Height()),
+		imaginaryRow = SampleRow::CreateFromRowSum(imaginary.get(), 0, imaginary->Height());
 
 	Image2DPtr
 		destReal = Image2D::CreateUnsetImagePtr(real->Width(), real->Height()),

@@ -34,7 +34,7 @@ class MSOptionWindow : public Gtk::Window {
 		Gtk::Entry _otherColumnEntry;
 		Gtk::RadioButton _allDipolePolarisationButton, _autoDipolePolarisationButton, _stokesIPolarisationButton;
 		Gtk::RadioButton _directReadButton, _indirectReadButton, _memoryReadButton;
-		Gtk::CheckButton _readUVWButton, _loadOptimizedStrategy;
+		Gtk::CheckButton _combineSPWsButton, _readUVWButton, _loadOptimizedStrategy;
 };
 
 #endif

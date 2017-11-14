@@ -17,9 +17,9 @@ class DirectBaselineReader : public BaselineReader {
 		explicit DirectBaselineReader(const std::string &msFile);
 		~DirectBaselineReader();
 
-		virtual void PerformReadRequests();
-		virtual void PerformFlagWriteRequests();
-		virtual void PerformDataWriteTask(std::vector<Image2DCPtr> /*_realImages*/, std::vector<Image2DCPtr> /*_imaginaryImages*/, int /*antenna1*/, int /*antenna2*/, int /*spectralWindow*/, unsigned /*sequenceId*/)
+		virtual void PerformReadRequests() final override;
+		virtual void PerformFlagWriteRequests() final override;
+		virtual void PerformDataWriteTask(std::vector<Image2DCPtr> /*_realImages*/, std::vector<Image2DCPtr> /*_imaginaryImages*/, int /*antenna1*/, int /*antenna2*/, int /*spectralWindow*/, unsigned /*sequenceId*/) final override
 		{
 			throw std::runtime_error("The direct baseline reader can not write data back to file: use the indirect reader");
 		}

@@ -3,8 +3,7 @@
 
 #include <string>
 #include <vector>
-
-#include <boost/thread.hpp>
+#include <thread>
 
 #include "../../structures/timefrequencydata.h"
 
@@ -30,7 +29,7 @@ namespace rfiStrategy {
 				delete artifacts;
 			}
 
-			virtual std::string Description() { return "Strategy"; }
+			virtual std::string Description() final override { return "Strategy"; }
 
 			static void SetThreadCount(ActionContainer &strategy, size_t threadCount);
 			static void SetDataColumnName(Strategy &strategy, const std::string &dataColumnName);
@@ -40,7 +39,7 @@ namespace rfiStrategy {
 
 			static void SyncAll(ActionContainer &root);
 
-			virtual void Perform(class ArtifactSet &artifacts, class ProgressListener &listener)
+			virtual void Perform(class ArtifactSet &artifacts, class ProgressListener &listener) final override
 			{
 				listener.OnStartTask(*this, 0, 1, "strategy");
 				try {
@@ -51,7 +50,7 @@ namespace rfiStrategy {
 				}
 				listener.OnEndTask(*this);
 			}
-			virtual ActionType Type() const { return StrategyType; }
+			virtual ActionType Type() const final override { return StrategyType; }
 		protected:
 		private:
 			/** Copying prohibited */
@@ -70,7 +69,7 @@ namespace rfiStrategy {
 				void operator()();
 			} *_threadFunc;
 
-			boost::thread *_thread;
+			std::thread *_thread;
 	};
 }
 

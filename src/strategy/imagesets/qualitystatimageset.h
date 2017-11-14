@@ -30,12 +30,12 @@ public:
 			_filename = p.parent_path().string();
 	}
 	
-	virtual std::string Name()
+	virtual std::string Name() final override
 	{ return File(); }
-	virtual std::string File()
+	virtual std::string File() final override
 	{ return _filename; }
 	
-	virtual BaselineData *Read()
+	BaselineData *Read() final override
 	{
 		QualityTablesFormatter formatter(_filename);
 		StatisticsCollection statCollection;
@@ -63,15 +63,15 @@ public:
 		return baselineData;
 	}
 	
-	virtual ImageSet *Copy()
+	virtual std::unique_ptr<ImageSet> Clone() final override
 	{
-		return new QualityStatImageSet(_filename);
+		return std::unique_ptr<ImageSet>(new QualityStatImageSet(_filename));
 	}
 	
-	virtual void Initialize()
+	virtual void Initialize() final override
 	{ }
 	
-	virtual void Write(const std::vector<Mask2DCPtr>& flags)
+	virtual void Write(const std::vector<Mask2DCPtr>& flags) final override
 	{
 		std::vector<Mask2DCPtr> flagsCopy(flags);
 		casacore::MeasurementSet ms(_filename, casacore::Table::Update);

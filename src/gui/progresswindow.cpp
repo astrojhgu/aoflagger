@@ -62,7 +62,7 @@ void ProgressWindow::UpdateProgress()
 		_started = true;
 	}
 
-	boost::mutex::scoped_lock lock(_mutex);
+	std::unique_lock<std::mutex> lock(_mutex);
 
 	if(_exceptionOccured)
 	{
@@ -118,7 +118,7 @@ void ProgressWindow::UpdateProgress()
 
 void ProgressWindow::OnStartTask(const rfiStrategy::Action &action, size_t taskNo, size_t taskCount, const std::string &description, size_t weight)
 {
-  boost::mutex::scoped_lock lock(_mutex);
+	std::unique_lock<std::mutex> lock(_mutex);
 	ProgressListener::OnStartTask(action, taskNo, taskCount, description, weight);
 	std::stringstream str;
 	str << "[" << taskNo << "/" << taskCount << "] " << description;
@@ -132,7 +132,7 @@ void ProgressWindow::OnStartTask(const rfiStrategy::Action &action, size_t taskN
 
 void ProgressWindow::OnEndTask(const rfiStrategy::Action &action)
 {
-  boost::mutex::scoped_lock lock(_mutex);
+	std::unique_lock<std::mutex> lock(_mutex);
 	_tasks.pop_back();
 	_ratios.pop_back();
 	_progress = TotalProgress();
@@ -144,7 +144,7 @@ void ProgressWindow::OnEndTask(const rfiStrategy::Action &action)
 
 void ProgressWindow::OnProgress(const rfiStrategy::Action &action, size_t progress, size_t maxProgress)
 {
-  boost::mutex::scoped_lock lock(_mutex);
+	std::unique_lock<std::mutex> lock(_mutex);
 	ProgressListener::OnProgress(action, progress, maxProgress);
 	_progress = TotalProgress();
 	lock.unlock();
@@ -154,7 +154,7 @@ void ProgressWindow::OnProgress(const rfiStrategy::Action &action, size_t progre
 
 void ProgressWindow::OnException(const rfiStrategy::Action &, std::exception &thrownException)
 {
-  boost::mutex::scoped_lock lock(_mutex);
+	std::unique_lock<std::mutex> lock(_mutex);
 	_exceptionOccured = true;
 	_exceptionDescription = thrownException.what();
 	_exceptionType = typeid(thrownException).name();

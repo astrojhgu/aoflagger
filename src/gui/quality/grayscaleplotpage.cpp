@@ -37,15 +37,17 @@ GrayScalePlotPage::GrayScalePlotPage() :
 	_medianNormButton(_rangeTypeGroup, "Median"),
 	_plotPropertiesButton("Properties..."),
 	_selectStatisticKind(QualityTablesFormatter::VarianceStatistic),
+	_heatMapPlot(),
+	_imageWidget(&_heatMapPlot),
 	_ready(false),
-	_imagePropertiesWindow(0)
+	_imagePropertiesWindow(nullptr)
 {
-	_imageWidget.SetCairoFilter(Cairo::FILTER_NEAREST);
-	_imageWidget.SetColorMap(ImageWidget::HotColdMap);
-	_imageWidget.SetRange(ImageWidget::MinMax);
-	_imageWidget.SetScaleOption(ImageWidget::LogScale);
-	_imageWidget.SetZAxisDescription("Statistical value");
-	_imageWidget.SetManualZAxisDescription(true);
+	_imageWidget.Plot().SetCairoFilter(Cairo::FILTER_NEAREST);
+	_imageWidget.Plot().SetColorMap(HeatMapPlot::HotColdMap);
+	_imageWidget.Plot().SetRange(HeatMapPlot::MinMax);
+	_imageWidget.Plot().SetScaleOption(HeatMapPlot::LogScale);
+	_imageWidget.Plot().SetZAxisDescription("Statistical value");
+	_imageWidget.Plot().SetManualZAxisDescription(true);
 	_imageWidget.set_size_request(300, 300);
 	
 	pack_start(_imageWidget);
@@ -213,11 +215,11 @@ void GrayScalePlotPage::updateImageImpl(QualityTablesFormatter::StatisticKind st
 			if(_normalizeYAxisButton.get_active())
 				image = normalizeYAxis(image);
 			
-			_imageWidget.SetZAxisDescription(StatisticsDerivator::GetDescWithUnits(statisticKind));
-			_imageWidget.SetImage(image);
-			_imageWidget.SetOriginalMask(data.GetSingleMask());
+			_imageWidget.Plot().SetZAxisDescription(StatisticsDerivator::GetDescWithUnits(statisticKind));
+			_imageWidget.Plot().SetImage(image);
+			_imageWidget.Plot().SetOriginalMask(data.GetSingleMask());
 			if(pair.second != 0)
-				_imageWidget.SetMetaData(pair.second);
+				_imageWidget.Plot().SetMetaData(pair.second);
 			_imageWidget.Update();
 		}
 	}
@@ -261,11 +263,9 @@ enum TimeFrequencyData::ComplexRepresentation GrayScalePlotPage::getSelectedPhas
 void GrayScalePlotPage::setToPolarization(TimeFrequencyData &data, PolarizationEnum polarisation)
 {
 	try {
-		TimeFrequencyData* newData = data.CreateTFData(polarisation);
+		data = data.Make(polarisation);
 		if(polarisation == Polarization::StokesI)
-			newData->MultiplyImages(0.5);
-		data = *newData;
-		delete newData;
+			data.MultiplyImages(0.5);
 	} catch(std::exception& e)
 	{
 		// probably a conversion error -- polarisation was not available.
@@ -275,9 +275,7 @@ void GrayScalePlotPage::setToPolarization(TimeFrequencyData &data, PolarizationE
 
 void GrayScalePlotPage::setToPhase(TimeFrequencyData &data, enum TimeFrequencyData::ComplexRepresentation phase)
 {
-	TimeFrequencyData *newData = data.CreateTFData(phase);
-	data = *newData;
-	delete newData;
+	data = data.Make(phase);
 }
 
 Image2DCPtr GrayScalePlotPage::normalizeXAxis(Image2DCPtr input)
@@ -285,7 +283,7 @@ Image2DCPtr GrayScalePlotPage::normalizeXAxis(Image2DCPtr input)
 	Image2DPtr output = Image2D::CreateUnsetImagePtr(input->Width(), input->Height());
 	for(size_t x=0;x<input->Width();++x)
 	{
-		SampleRowPtr row = SampleRow::CreateFromColumn(input, x);
+		SampleRowPtr row = SampleRow::CreateFromColumn(input.get(), x);
 		num_t norm;
 		if(_meanNormButton.get_active())
 			norm = 1.0 / row->MeanWithMissings();
@@ -304,7 +302,7 @@ Image2DCPtr GrayScalePlotPage::normalizeYAxis(Image2DCPtr input)
 	Image2DPtr output = Image2D::CreateUnsetImagePtr(input->Width(), input->Height());
 	for(size_t y=0;y<input->Height();++y)
 	{
-		SampleRowPtr row = SampleRow::CreateFromRow(input, y);
+		SampleRowPtr row = SampleRow::CreateFromRow(input.get(), y);
 		num_t norm;
 		if(_meanNormButton.get_active())
 			norm = 1.0 / row->MeanWithMissings();

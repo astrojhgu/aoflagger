@@ -1,20 +1,19 @@
 #include "verticalplotscale.h"
+#include "tickset.h"
 
 VerticalPlotScale::VerticalPlotScale() :
-	_plotWidth(0.0), _plotHeight(0.0),
-	_topMargin(0.0),
+	_plotWidth(0.0),
+	_plotHeight(0.0),
+	_isSecondAxis(false),
 	_metricsAreInitialized(false), _width(0.0),
-	_tickSet(0), _isLogarithmic(false), _drawWithDescription(true),
+	_captionSize(0.0),
+	_tickSet(), _isLogarithmic(false), _drawWithDescription(true),
 	_unitsCaption("y"),
 	_descriptionFontSize(14), _tickValuesFontSize(14)
-{
-}
+{ }
 
 VerticalPlotScale::~VerticalPlotScale()
-{
-	if(_tickSet != 0)
-		delete _tickSet;
-}
+{ }
 
 double VerticalPlotScale::GetTextHeight(Cairo::RefPtr<Cairo::Context> cairo)
 {
@@ -23,21 +22,37 @@ double VerticalPlotScale::GetTextHeight(Cairo::RefPtr<Cairo::Context> cairo)
 	return extents.height;
 }
 
+double VerticalPlotScale::UnitToAxis(double unitValue) const
+{
+	return _tickSet->UnitToAxis(unitValue);
+}
+
+double VerticalPlotScale::AxisToUnit(double axisValue) const
+{
+	return _tickSet->AxisToUnit(axisValue);
+}
+
 void VerticalPlotScale::Draw(Cairo::RefPtr<Cairo::Context> cairo, double offsetX, double offsetY)
 {
 	initializeMetrics(cairo);
 	cairo->set_source_rgb(0.0, 0.0, 0.0);
 	cairo->set_font_size(_tickValuesFontSize);
+	double x = _isSecondAxis ? offsetX : _width + offsetX;
+	double tickX = _isSecondAxis ? 3 : -3;
 	for(unsigned i=0;i!=_tickSet->Size();++i)
 	{
 		const Tick tick = _tickSet->GetTick(i);
 		double y = getTickYPosition(tick);
-		cairo->move_to(_width - 3 + offsetX, y);
-		cairo->line_to(_width + offsetX, y);
+		cairo->move_to(x + tickX, y + offsetY);
+		cairo->line_to(x, y + offsetY);
 		Cairo::TextExtents extents;
 		cairo->get_text_extents(tick.second, extents);
-		cairo->move_to(_width - extents.width - 8 + offsetX,
-										y - extents.height/2  - extents.y_bearing + offsetY);
+		double textX;
+		if(_isSecondAxis)
+			textX = _width - extents.width - 4.0 - _captionSize;
+		else
+			textX = -extents.width - 8.0;
+		cairo->move_to(x + textX, y - extents.height/2 - extents.y_bearing + offsetY);
 		cairo->show_text(tick.second);
 	}
 	cairo->stroke();
@@ -52,8 +67,8 @@ void VerticalPlotScale::drawUnits(Cairo::RefPtr<Cairo::Context> cairo, double of
 	cairo->set_font_size(_descriptionFontSize);
 	Cairo::TextExtents extents;
 	cairo->get_text_extents(_unitsCaption, extents);
-	cairo->translate(offsetX - extents.y_bearing + 2,
-								 offsetY + 0.7 * _plotHeight + _topMargin);
+	double x = _isSecondAxis ? offsetX+2+_width-_captionSize : offsetX+2;
+	cairo->translate(x - extents.y_bearing, offsetY + 0.7 * _plotHeight);
 	cairo->rotate(M_PI * 1.5);
 	cairo->move_to(0.0, 0.0);
 	cairo->show_text(_unitsCaption);
@@ -61,15 +76,15 @@ void VerticalPlotScale::drawUnits(Cairo::RefPtr<Cairo::Context> cairo, double of
 	cairo->restore();
 
 	// Base of arrow
-	cairo->move_to(offsetX + extents.height/2.0 + 2, offsetY + _topMargin + _plotHeight * 0.9);
-	cairo->line_to(offsetX + extents.height/2.0 + 2, offsetY + _topMargin + _plotHeight * 0.725);
+	cairo->move_to(x + extents.height/2.0, offsetY + _plotHeight * 0.9);
+	cairo->line_to(x + extents.height/2.0, offsetY + _plotHeight * 0.725);
 	cairo->stroke();
 
 	// The arrow
-	cairo->move_to(offsetX + extents.height/2.0 + 2, offsetY + _topMargin + _plotHeight * 0.725);
-	cairo->line_to(offsetX + 0.1*extents.height + 2, offsetY + _topMargin + _plotHeight * 0.75);
-	cairo->line_to(offsetX + 0.5*extents.height + 2, offsetY + _topMargin + _plotHeight * 0.74);
-	cairo->line_to(offsetX + 0.9*extents.height + 2, offsetY + _topMargin + _plotHeight * 0.75);
+	cairo->move_to(x + extents.height/2.0, offsetY + _plotHeight * 0.725);
+	cairo->line_to(x + 0.1*extents.height, offsetY + _plotHeight * 0.75);
+	cairo->line_to(x + 0.5*extents.height, offsetY + _plotHeight * 0.74);
+	cairo->line_to(x + 0.9*extents.height, offsetY + _plotHeight * 0.75);
 	cairo->close_path();
 	cairo->fill();
 }
@@ -78,7 +93,7 @@ void VerticalPlotScale::initializeMetrics(Cairo::RefPtr<Cairo::Context> cairo)
 {
 	if(!_metricsAreInitialized)
 	{
-		if(_tickSet != 0)
+		if(_tickSet != nullptr)
 		{
 			_tickSet->Reset();
 			while(!ticksFit(cairo) && _tickSet->Size() > 2)
@@ -101,7 +116,11 @@ void VerticalPlotScale::initializeMetrics(Cairo::RefPtr<Cairo::Context> cairo)
 				cairo->set_font_size(_descriptionFontSize);
 				Cairo::TextExtents extents;
 				cairo->get_text_extents(_unitsCaption, extents);
-				_width += extents.height;
+				_captionSize = extents.height;
+				_width += _captionSize;
+			}
+			else {
+				_captionSize = 0.0;
 			}
 			_metricsAreInitialized = true;
 		}
@@ -110,25 +129,21 @@ void VerticalPlotScale::initializeMetrics(Cairo::RefPtr<Cairo::Context> cairo)
 
 void VerticalPlotScale::InitializeNumericTicks(double min, double max)
 {
-	if(_tickSet == 0)
-		delete _tickSet;
-	_tickSet = new NumericTickSet(min, max, 25);
+	_tickSet.reset(new NumericTickSet(min, max, 25));
 	_isLogarithmic = false;
 	_metricsAreInitialized = false;
 }
 
 void VerticalPlotScale::InitializeLogarithmicTicks(double min, double max)
 {
-	if(_tickSet == 0)
-		delete _tickSet;
-	_tickSet = new LogarithmicTickSet(min, max, 25);
+	_tickSet.reset(new LogarithmicTickSet(min, max, 25));
 	_isLogarithmic = true;
 	_metricsAreInitialized = false;
 }
 
 double VerticalPlotScale::getTickYPosition(const Tick &tick)
 {
-	return (1.0-tick.first) * _plotHeight + _topMargin;
+	return (1.0-tick.first) * _plotHeight;
 }
 
 bool VerticalPlotScale::ticksFit(Cairo::RefPtr<Cairo::Context> cairo)

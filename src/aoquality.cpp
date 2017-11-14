@@ -765,8 +765,7 @@ int main(int argc, char *argv[])
 						"\tRFIRatio, Count, Mean, SumP2, DCount, DMean, DSumP2.\n"
 						"The subtables that will be updated are:\n"
 						"\tQUALITY_KIND_NAME, QUALITY_TIME_STATISTIC,\n"
-						"\tQUALITY_FREQUENCY_STATISTIC and QUALITY_BASELINE_STATISTIC.\n\n"
-						"-c will use the CORRECTED_DATA column.\n";
+						"\tQUALITY_FREQUENCY_STATISTIC and QUALITY_BASELINE_STATISTIC.\n\n";
 				}
 				else if(helpAction == "summarize")
 				{

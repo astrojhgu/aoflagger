@@ -19,7 +19,6 @@
 #include "strategyframes/baselineselectionframe.h"
 #include "strategyframes/changeresolutionframe.h"
 #include "strategyframes/cutareaframe.h"
-#include "strategyframes/directionprofileframe.h"
 #include "strategyframes/foreachbaselineframe.h"
 #include "strategyframes/foreachmsframe.h"
 #include "strategyframes/foreachpolarisationframe.h"
@@ -34,13 +33,11 @@
 #include "strategyframes/setflaggingframe.h"
 #include "strategyframes/setimageframe.h"
 #include "strategyframes/slidingwindowfitframe.h"
-#include "strategyframes/spatialcompositionframe.h"
 #include "strategyframes/statisticalflaggingframe.h"
 #include "strategyframes/svdframe.h"
 #include "strategyframes/sumthresholdframe.h"
 #include "strategyframes/timeconvolutionframe.h"
 #include "strategyframes/timeselectionframe.h"
-#include "strategyframes/uvprojectframe.h"
 
 using namespace rfiStrategy;
 
@@ -201,7 +198,7 @@ void EditStrategyWindow::onRemoveActionClicked()
 	_disableUpdates = true;
 	clearRightFrame();
 	Action *action = GetSelectedAction();
-	if(action != 0 && action->Parent() != 0)
+	if(action != nullptr && action->Parent() != nullptr)
 	{
 		action->Parent()->RemoveAndDelete(action);
 		_store->clear();
@@ -274,9 +271,6 @@ void EditStrategyWindow::onSelectionChanged()
 				case CutAreaActionType:
 					showRight(new CutAreaFrame(*static_cast<rfiStrategy::CutAreaAction*>(selectedAction), *this));
 					break;
-				case DirectionProfileActionType:
-					showRight(new DirectionProfileFrame(*static_cast<rfiStrategy::DirectionProfileAction*>(selectedAction), *this));
-					break;
 				case FringeStopActionType:
 					showRight(new FringeStoppingFrame(*static_cast<rfiStrategy::FringeStopAction*>(selectedAction), *this));
 					break;
@@ -322,9 +316,6 @@ void EditStrategyWindow::onSelectionChanged()
 				case SetFlaggingActionType:
 					showRight(new SetFlaggingFrame(*static_cast<rfiStrategy::SetFlaggingAction*>(selectedAction), *this));
 					break;
-				case SpatialCompositionActionType:
-					showRight(new SpatialCompositionFrame(*static_cast<rfiStrategy::SpatialCompositionAction*>(selectedAction), *this));
-					break;
 				case StatisticalFlagActionType:
 					showRight(new StatisticalFlaggingFrame(*static_cast<rfiStrategy::StatisticalFlagAction*>(selectedAction), *this));
 					break;
@@ -336,9 +327,6 @@ void EditStrategyWindow::onSelectionChanged()
 					break;
 				case TimeSelectionActionType:
 					showRight(new TimeSelectionFrame(*static_cast<rfiStrategy::TimeSelectionAction*>(selectedAction), *this));
-					break;
-				case UVProjectActionType:
-					showRight(new UVProjectFrame(*static_cast<rfiStrategy::UVProjectAction*>(selectedAction), *this));
 					break;
 				default:
 					break;
@@ -389,7 +377,7 @@ size_t EditStrategyWindow::GetSelectedActionChildIndex()
 	else return 0;
 }
 
-void EditStrategyWindow::AddAction(rfiStrategy::Action *newAction)
+void EditStrategyWindow::AddAction(std::unique_ptr<rfiStrategy::Action> newAction)
 {
 	Action *action = GetSelectedAction();
 	if(action != 0)
@@ -397,11 +385,12 @@ void EditStrategyWindow::AddAction(rfiStrategy::Action *newAction)
 		rfiStrategy::ActionContainer *container = dynamic_cast<rfiStrategy::ActionContainer*>(action);
 		if(container != 0)
 		{
-			container->Add(newAction);
+			rfiStrategy::Action* actionPtr = newAction.get();
+			container->Add(std::move(newAction));
 			_store->clear();
 			fillStore();
 			_view.get_selection()->unselect_all();
-			selectAction(newAction);
+			selectAction(actionPtr);
 		}
 	}
 }
@@ -515,8 +504,9 @@ void EditStrategyWindow::onOpenClicked()
 		std::string filename(dialog.get_filename());
 		try {
 			_store->clear();
-			_strategy = reader.CreateStrategyFromFile(filename);
-			_strategyController.SetStrategy(_strategy);
+			std::unique_ptr<Strategy> s = reader.CreateStrategyFromFile(filename);
+			_strategy = s.get();
+			_strategyController.SetStrategy(std::move(s));
 			fillStore();
 		} catch(std::exception &e)
 		{
@@ -528,27 +518,25 @@ void EditStrategyWindow::onOpenClicked()
 
 void EditStrategyWindow::onAddFOBaseline()
 {
-	addContainerBetween(*_strategy, new rfiStrategy::ForEachBaselineAction());
+	addContainerBetween(*_strategy, std::unique_ptr<rfiStrategy::ForEachBaselineAction>(new rfiStrategy::ForEachBaselineAction()));
 	_store->clear();
 	fillStore();
 }
 
 void EditStrategyWindow::onAddFOMS()
 {
-	addContainerBetween(*_strategy, new rfiStrategy::ForEachMSAction());
+	addContainerBetween(*_strategy, std::unique_ptr<rfiStrategy::ForEachMSAction>(new rfiStrategy::ForEachMSAction()));
 	_store->clear();
 	fillStore();
 }
 
-void EditStrategyWindow::addContainerBetween(rfiStrategy::ActionContainer &root, rfiStrategy::ActionContainer *newContainer)
+void EditStrategyWindow::addContainerBetween(rfiStrategy::ActionContainer &root, std::unique_ptr<rfiStrategy::ActionContainer> newContainer)
 {
 	while(root.GetChildCount() > 0)
 	{
-		Action *moveAction = &root.GetFirstChild();
-		root.RemoveWithoutDelete(moveAction);
-		newContainer->Add(moveAction);
+		newContainer->Add(root.RemoveAndAcquire(&root.GetFirstChild()));
 	}
-	root.Add(dynamic_cast<Action *>(newContainer));
+	root.Add(std::move(newContainer));
 }
 
 void EditStrategyWindow::onWizardClicked()
