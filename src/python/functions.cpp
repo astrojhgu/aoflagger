@@ -9,6 +9,8 @@
 #include "../structures/samplerow.h"
 #include "../structures/timefrequencydata.h"
 
+#include "../strategy/algorithms/polarizationstatistics.h"
+
 #include <boost/python.hpp>
 
 using namespace boost::python;
@@ -89,6 +91,13 @@ void high_pass_filter(Data& data, size_t kernelWidth, size_t kernelHeight, doubl
 	
 	for(size_t i=0;i<imageCount;++i)
 		data.TFData().SetImage(i, filter.ApplyHighPass(data.TFData().GetImage(i), mask));
+}
+
+void print_polarization_statistics(const Data& data)
+{
+	PolarizationStatistics statistics;
+	statistics.Add(data.TFData());
+	statistics.Report();
 }
 
 void scale_invariant_rank_operator(Data& data, double level_horizontal, double level_vertical)

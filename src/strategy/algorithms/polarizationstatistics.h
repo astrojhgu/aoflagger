@@ -17,7 +17,7 @@ class PolarizationStatistics {
 		PolarizationStatistics() { }
 		~PolarizationStatistics() { }
 
-		void Add(class TimeFrequencyData &data)
+		void Add(const class TimeFrequencyData &data)
 		{
 			unsigned polarizationCount = data.PolarizationCount();
 			if(_flaggedCounts.size() == 0)

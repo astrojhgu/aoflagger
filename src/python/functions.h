@@ -16,7 +16,7 @@ namespace aoflagger_python
 	
 	// TODO this function should collect the statistics and print
 	// them later on (and be renamed).
-	void print_polarization_statistics();
+	void print_polarization_statistics(const Data& data);
 	
 	Data shrink(const Data& data, size_t horizontalFactor, size_t verticalFactor);
 	
