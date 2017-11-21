@@ -19,14 +19,6 @@ class TwoDimensionalPlotPage : public PlotSheet {
 		TwoDimensionalPlotPage();
     virtual ~TwoDimensionalPlotPage();
 
-		virtual void SetStatistics(const StatisticsCollection* statCollection, const std::vector<class AntennaInfo>& antennas) override final
-		{
-			processStatistics(statCollection, antennas);
-			
-			_statCollection = statCollection;
-			updatePlot();
-		}
-		
 		virtual void CloseStatistics() override final
 		{
 			_statCollection = 0;
@@ -41,21 +33,8 @@ class TwoDimensionalPlotPage : public PlotSheet {
 		
 		void SavePdf(const std::string& filename, QualityTablesFormatter::StatisticKind kind);
 	protected:
-		virtual void processStatistics(const StatisticsCollection *, const std::vector<AntennaInfo> &)
-		{
-		}
-		
-		virtual const std::map<double, class DefaultStatistics> &getStatistics() const = 0;
-		
-		virtual void startLine(Plot2D &plot, const std::string &name, const std::string &yAxisDesc) = 0;
-		
-		virtual void processPlot(Plot2D &plot)
-		{
-		}
-		
 		virtual void addCustomPlotButtons(Gtk::Toolbar &container)
-		{
-		}
+		{ }
 		
 		const StatisticsCollection *getStatCollection() const
 		{

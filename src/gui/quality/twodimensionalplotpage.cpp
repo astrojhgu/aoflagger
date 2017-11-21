@@ -56,57 +56,11 @@ void TwoDimensionalPlotPage::updatePlot()
 	updatePlotForSettings(getSelectedKinds(), getSelectedPolarizations(), getSelectedPhases());
 }
 
-void TwoDimensionalPlotPage::updatePlotForSettings(
-	const std::set<QualityTablesFormatter::StatisticKind>& kinds,
-	const std::set<std::pair<unsigned int, unsigned int> >& pols,
-	const std::set<PhaseType>& phases)
-{
-	if(HasStatistics())
-	{
-		_plot.Clear();
-		
-		for(std::set<QualityTablesFormatter::StatisticKind>::const_iterator k=kinds.begin();
-				k!=kinds.end(); ++k)
-		{
-			for(std::set<std::pair<unsigned,unsigned> >::const_iterator p=pols.begin();
-					p!=pols.end(); ++p)
-			{
-				for(std::set<PhaseType>::const_iterator ph=phases.begin();
-						ph!=phases.end(); ++ph)
-				{
-					plotStatistic(*k, p->first, p->second, *ph, getYDesc(kinds));
-				}
-			}
-		}
-		
-		processPlot(_plot);
-		
-		_plotWidget.Update();
-		
-		if(_dataWindow->get_visible())
-		{
-			updateDataWindow();
-		}
-	}
-}
-
 void TwoDimensionalPlotPage::updatePlotConfig()
 {
 	_plot.SetIncludeZeroYAxis(_zeroAxisButton.get_active());
 	_plot.SetLogarithmicYAxis(_logarithmicButton.get_active());
 	_plotWidget.Update();
-}
-
-double TwoDimensionalPlotPage::getValue(enum PhaseType phase, const std::complex<long double>& val)
-{
-	switch(phase)
-	{
-		default:
-		case AmplitudePhaseType: return sqrt(val.real()*val.real() + val.imag()*val.imag());
-		case PhasePhaseType: return atan2(val.imag(), val.real());
-		case RealPhaseType: return val.real();
-		case ImaginaryPhaseType: return val.imag();
-	}
 }
 
 std::set<QualityTablesFormatter::StatisticKind> TwoDimensionalPlotPage::getSelectedKinds() const
@@ -159,37 +113,6 @@ std::set<TwoDimensionalPlotPage::PhaseType> TwoDimensionalPlotPage::getSelectedP
 	if(_imaginaryButton.get_active())
 		phases.insert(ImaginaryPhaseType);
 	return phases;
-}
-
-void TwoDimensionalPlotPage::plotStatistic(QualityTablesFormatter::StatisticKind kind, unsigned polA, unsigned polB, PhaseType phase, const std::string& yDesc)
-{
-	std::ostringstream s;
-	StatisticsDerivator derivator(*_statCollection);
-	const std::map<double, DefaultStatistics> &statistics = getStatistics();
-	if(polA == polB)
-	{
-		s << "Polarization " << polA;
-		startLine(_plot, s.str(), yDesc);
-		for(std::map<double, DefaultStatistics>::const_iterator i=statistics.begin();i!=statistics.end();++i)
-		{
-			const double x = i->first;
-			const std::complex<long double> val = derivator.GetComplexStatistic(kind, i->second, polA);
-			_plot.PushDataPoint(x, getValue(phase, val));
-		}
-	}
-	else {
-		s << "Polarization " << polA << " and " << polB;
-		startLine(_plot, s.str(), yDesc);
-		for(std::map<double, DefaultStatistics>::const_iterator i=statistics.begin();i!=statistics.end();++i)
-		{
-			const double x = i->first;
-			const std::complex<long double>
-				valA = derivator.GetComplexStatistic(kind, i->second, polA),
-				valB = derivator.GetComplexStatistic(kind, i->second, polB),
-				val = valA*0.5l + valB*0.5l;
-			_plot.PushDataPoint(x, getValue(phase, val));
-		}
-	}
 }
 
 void TwoDimensionalPlotPage::InitializeToolbar(Gtk::Toolbar& toolbar)
