@@ -55,6 +55,8 @@ protected:
 private:
 	class TwoDimensionalPlotPage* _page;
 	
+	enum PhaseType { AmplitudePhaseType, PhasePhaseType, RealPhaseType, ImaginaryPhaseType} ;
+		
 	void updatePlotForSettings(
 		const std::set<QualityTablesFormatter::StatisticKind>& kinds,
 		const std::set<std::pair<unsigned int, unsigned int> >& pols,

@@ -1,5 +1,7 @@
 #include "aoqplotwindow.h"
 
+#include "../controllers/blengthpagecontroller.h"
+
 #include <limits>
 
 #include <gtkmm/main.h>
@@ -235,7 +237,8 @@ void AOQPlotWindow::Save(const AOQPlotWindow::PlotSavingData& data)
 	baselPage.SavePdf(prefix+"-baselines.pdf", kind);
 	
 	std::cout << "Saving " << prefix << "-baselinelengths.pdf...\n";
-	BLengthPlotPage blenPage;
+	BLengthPageController blenController;
+	BLengthPlotPage blenPage(&blenController);
 	blenPage.SetStatistics(_statCollection, _antennas);
 	blenPage.SavePdf(prefix+"-baselinelengths.pdf", kind);
 	

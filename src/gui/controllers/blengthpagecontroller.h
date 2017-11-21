@@ -3,16 +3,22 @@
 
 #include "aoqplotpagecontroller.h"
 
+#include "../../quality/baselinestatisticsmap.h"
+#include "../../quality/statisticscollection.h"
+
 class BLengthPageController : public AOQPlotPageController
 {
 public:
+	void SetIncludeAutoCorrelations(bool inclAutos) {
+		_includeAutoCorrelations = inclAutos;
+	}
 protected:
 	virtual void processStatistics(const StatisticsCollection *statCollection, const std::vector<AntennaInfo> &antennas) override final
 	{
 		_statisticsWithAutocorrelations.clear();
 		_statisticsWithoutAutocorrelations.clear();
 		
-		const BaselineStatisticsMap &map = statCollection->BaselineStatistics();
+		const BaselineStatisticsMap& map = statCollection->BaselineStatistics();
 		
 		vector<std::pair<unsigned, unsigned> > baselines = map.BaselineList();
 		for(vector<std::pair<unsigned, unsigned> >::const_iterator i=baselines.begin();i!=baselines.end();++i)
@@ -27,7 +33,7 @@ protected:
 	
 	virtual const std::map<double, class DefaultStatistics> &getStatistics() const override final
 	{
-		return _includeAutoCorrelationsButton.get_active() ? _statisticsWithAutocorrelations : _statisticsWithoutAutocorrelations;
+		return _includeAutoCorrelations ? _statisticsWithAutocorrelations : _statisticsWithoutAutocorrelations;
 	}
 	
 	virtual void startLine(Plot2D &plot, const std::string &name, const std::string &yAxisDesc) override final
@@ -36,6 +42,7 @@ protected:
 	}
 	
 private:
+	bool _includeAutoCorrelations = false;
 	std::map<double, DefaultStatistics> _statisticsWithAutocorrelations;
 	std::map<double, DefaultStatistics> _statisticsWithoutAutocorrelations;
 };
