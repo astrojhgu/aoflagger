@@ -36,10 +36,6 @@ class TwoDimensionalPlotPage : public PlotSheet {
 		virtual void addCustomPlotButtons(Gtk::Toolbar &container)
 		{ }
 		
-		const StatisticsCollection *getStatCollection() const
-		{
-			return _statCollection;
-		}
 		void updatePlot();
 	private:
 		enum PhaseType { AmplitudePhaseType, PhasePhaseType, RealPhaseType, ImaginaryPhaseType} ;

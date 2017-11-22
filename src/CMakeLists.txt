@@ -60,7 +60,9 @@ set(GUI_QUALITY_FILES
   gui/quality/grayscaleplotpage.cpp
   gui/quality/histogrampage.cpp
   gui/quality/timefrequencyplotpage.cpp
-  gui/quality/twodimensionalplotpage.cpp)
+  gui/quality/twodimensionalplotpage.cpp
+  gui/controllers/aoqplotpagecontroller.cpp
+  gui/controllers/aoqplotcontroller.cpp )
 
 set(GUI_PLOT_FILES
   gui/plot/colorscale.cpp

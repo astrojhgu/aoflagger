@@ -21,6 +21,8 @@
 
 #include "../../structures/antennainfo.h"
 
+#include "../controllers/aoqpagecontroller.h"
+
 class AOQPlotWindow : public Gtk::Window {
 	public:
 		AOQPlotWindow();
@@ -81,6 +83,7 @@ class AOQPlotWindow : public Gtk::Window {
 		Gtk::VBox _vBox;
 		Gtk::Statusbar _statusBar;
 		
+		std::unique_ptr<AOQPageController> _pageController;
 		std::unique_ptr<PlotSheet> _activeSheet;
 		
 		OpenOptionsWindow _openOptionsWindow;

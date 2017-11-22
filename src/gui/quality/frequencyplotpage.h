@@ -28,8 +28,8 @@ class FrequencyPlotPage : public TwoDimensionalPlotPage {
 			_controller->UpdatePlot();
 		}
 		
-		Gtk::ToggleToolButton _ftButton;
 		FrequencyPageController* _controller;
+		Gtk::ToggleToolButton _ftButton;
 };
 
 #endif

@@ -253,7 +253,8 @@ void AOQPlotWindow::Save(const AOQPlotWindow::PlotSavingData& data)
 	timePage.SavePdf(prefix+"-time.pdf", kind);
 	
 	std::cout << "Saving " << prefix << "-frequency.pdf...\n";
-	FrequencyPlotPage freqPage;
+	FrequencyPageController freqController;
+	FrequencyPlotPage freqPage(&freqController);
 	freqPage.SetStatistics(_statCollection, _antennas);
 	freqPage.SavePdf(prefix+"-frequency.pdf", kind);
 }
@@ -282,25 +283,40 @@ void AOQPlotWindow::onChangeSheet()
 	{
 		switch(selectedSheet)
 		{
-			case 0: _activeSheet.reset(new BaselinePlotPage()); break;
-			case 1: _activeSheet.reset(new AntennaePlotPage()); break;
-			case 2: _activeSheet.reset(new BLengthPlotPage()); break;
-			case 3: _activeSheet.reset(new TimePlotPage()); break;
-			case 4: _activeSheet.reset(new FrequencyPlotPage()); break;
-			case 5: _activeSheet.reset(new TimeFrequencyPlotPage()); break;
-			case 6: _activeSheet.reset(new SummaryPage()); break;
-			case 7: _activeSheet.reset(new HistogramPage()); break;
-		}
-		switch(selectedSheet)
-		{
-			case 0: SetStatus("Baseline statistics"); break;
-			case 1: SetStatus("Antennae statistics"); break;
-			case 2: SetStatus("Baseline length statistics");  break;
-			case 3: SetStatus("Time statistics"); break;
-			case 4: SetStatus("Frequency statistics"); break;
-			case 5: SetStatus("Time-frequency statistics");  break;
-			case 6: SetStatus("Summary"); break;
-			case 7: SetStatus("Histograms"); break;
+		case 0:
+			_activeSheet.reset(new BaselinePlotPage());
+			SetStatus("Baseline statistics");
+			break;
+		case 1:
+			_activeSheet.reset(new AntennaePlotPage());
+			SetStatus("Antennae statistics");
+			break;
+		case 2:
+			_pageController.reset(new BLengthPageController());
+			_activeSheet.reset(new BLengthPlotPage(static_cast<BLengthPageController*>(_pageController.get())));
+			SetStatus("Baseline length statistics");
+			break;
+		case 3:
+			_activeSheet.reset(new TimePlotPage());
+			SetStatus("Time statistics");
+			break;
+		case 4:
+			_pageController.reset(new FrequencyPageController());
+			_activeSheet.reset(new FrequencyPlotPage(static_cast<FrequencyPageController*>(_pageController.get())));
+			SetStatus("Frequency statistics");
+			break;
+		case 5:
+			_activeSheet.reset(new TimeFrequencyPlotPage());
+			SetStatus("Time-frequency statistics");
+			break;
+		case 6:
+			_activeSheet.reset(new SummaryPage());
+			SetStatus("Summary");
+			break;
+		case 7:
+			_activeSheet.reset(new HistogramPage());
+			SetStatus("Histograms");
+			break;
 		}
 		
 		_activeSheetIndex = selectedSheet;
