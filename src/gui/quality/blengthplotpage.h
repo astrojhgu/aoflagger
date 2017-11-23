@@ -12,11 +12,10 @@
 class BLengthPlotPage : public TwoDimensionalPlotPage {
 	public:
     BLengthPlotPage(BLengthPageController* controller) :
-			TwoDimensionalPlotPage(_controller),
+			TwoDimensionalPlotPage(controller),
 			_controller(controller),
 			_includeAutoCorrelationsButton("Auto-correlations")
-		{
-		}
+		{ }
 	protected:		
 		virtual void addCustomPlotButtons(Gtk::Toolbar &container) override final
 		{

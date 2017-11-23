@@ -134,7 +134,7 @@ void AOQPlotWindow::onChangeSheet()
 			break;
 		case 2:
 			_pageController.reset(new BLengthPageController());
-			_activeSheet.reset(new BLengthPlotPage(static_cast<BLengthPageController*>(_pageController.get())));
+			_activeSheet.reset(new BLengthPlotPage( static_cast<BLengthPageController*>(_pageController.get())));
 			SetStatus("Baseline length statistics");
 			break;
 		case 3:
@@ -153,7 +153,8 @@ void AOQPlotWindow::onChangeSheet()
 			SetStatus("Time-frequency statistics");
 			break;
 		case 6:
-			_activeSheet.reset(new SummaryPage());
+			_pageController.reset(new SummaryPageController());
+			_activeSheet.reset(new SummaryPage( static_cast<SummaryPageController*>(_pageController.get())));
 			SetStatus("Summary");
 			break;
 		case 7:
