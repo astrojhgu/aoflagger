@@ -3,7 +3,7 @@
 #include <fstream>
 #include <iomanip>
 
-#include "../../util/aologger.h"
+#include "../../util/logger.h"
 #include "../../util/plot.h"
 
 #include "../../structures/timefrequencydata.h"

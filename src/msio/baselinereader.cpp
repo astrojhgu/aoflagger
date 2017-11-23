@@ -13,7 +13,7 @@
 
 #include "../structures/timefrequencydata.h"
 
-#include "../util/aologger.h"
+#include "../util/logger.h"
 
 BaselineReader::BaselineReader(const std::string &msFile)
 	: _measurementSet(msFile), _table(0), _dataColumnName("DATA"), _subtractModel(false), _readData(true), _readFlags(true),

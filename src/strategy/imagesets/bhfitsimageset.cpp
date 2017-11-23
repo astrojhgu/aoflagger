@@ -4,7 +4,7 @@
 #include "../../structures/image2d.h"
 #include "../../structures/timefrequencydata.h"
 
-#include "../../util/aologger.h"
+#include "../../util/logger.h"
 
 namespace rfiStrategy {
 	

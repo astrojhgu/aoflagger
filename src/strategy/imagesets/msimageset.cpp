@@ -10,7 +10,7 @@
 #include "../../msio/indirectbaselinereader.h"
 #include "../../msio/memorybaselinereader.h"
 
-#include "../../util/aologger.h"
+#include "../../util/logger.h"
 
 namespace rfiStrategy {
 

@@ -3,7 +3,7 @@
 #include <iostream>
 #include <thread>
 
-#include "../../util/aologger.h"
+#include "../../util/logger.h"
 
 #include "../control/artifactset.h"
 

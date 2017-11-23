@@ -8,7 +8,7 @@
 #include "../structures/arraycolumniterator.h"
 #include "../structures/scalarcolumniterator.h"
 
-#include "../util/aologger.h"
+#include "../util/logger.h"
 
 SpatialTimeLoader::SpatialTimeLoader(MeasurementSet &measurementSet)
 	:  _measurementSet(measurementSet), _sortedTable(0), _tableIter(0)

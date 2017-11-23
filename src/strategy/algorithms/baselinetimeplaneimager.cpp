@@ -1,6 +1,6 @@
 #include "baselinetimeplaneimager.h"
 
-#include "../../util/aologger.h"
+#include "../../util/logger.h"
 
 #include <cmath>
 

@@ -1,7 +1,7 @@
 #include "memorybaselinereader.h"
 #include "../structures/system.h"
 
-#include "../util/aologger.h"
+#include "../util/logger.h"
 #include "../util/stopwatch.h"
 
 #include <casacore/ms/MeasurementSets/MeasurementSet.h>

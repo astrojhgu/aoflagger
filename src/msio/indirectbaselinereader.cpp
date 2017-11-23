@@ -16,7 +16,7 @@
 #include "../structures/timefrequencydata.h"
 #include "../structures/system.h"
 
-#include "../util/aologger.h"
+#include "../util/logger.h"
 #include "../util/stopwatch.h"
 
 #include "reorderedfilebuffer.h"

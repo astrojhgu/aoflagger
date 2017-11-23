@@ -1,6 +1,6 @@
 #include "baselineselector.h"
 
-#include "../../util/aologger.h"
+#include "../../util/logger.h"
 #include "../../util/plot.h"
 
 #include "../../quality/defaultstatistics.h"

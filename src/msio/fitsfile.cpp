@@ -8,7 +8,7 @@
 
 #include <boost/algorithm/string/trim.hpp>
 
-#include "../util/aologger.h"
+#include "../util/logger.h"
 
 FitsFile::FitsFile(const std::string &filename) : _filename(filename), _fptr(0), _isOpen(false)
 {

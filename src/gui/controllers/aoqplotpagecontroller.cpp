@@ -4,7 +4,7 @@
 
 #include "../../quality/statisticsderivator.h"
 
-#include "../../util/aologger.h"
+#include "../../util/logger.h"
 
 AOQPlotPageController::AOQPlotPageController() :
 	_page(nullptr),

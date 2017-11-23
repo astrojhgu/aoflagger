@@ -7,7 +7,7 @@
 #include "../structures/mask2d.h"
 #include "../structures/samplerow.h"
 
-#include "../util/aologger.h"
+#include "../util/logger.h"
 #include "../util/ffttools.h"
 
 const unsigned char RSPReader::BitReverseTable256[256] = 

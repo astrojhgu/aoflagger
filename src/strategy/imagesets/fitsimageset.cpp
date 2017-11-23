@@ -9,7 +9,7 @@
 #include "../../structures/timefrequencydata.h"
 #include "../../structures/timefrequencymetadata.h"
 
-#include "../../util/aologger.h"
+#include "../../util/logger.h"
 
 namespace rfiStrategy {
 	

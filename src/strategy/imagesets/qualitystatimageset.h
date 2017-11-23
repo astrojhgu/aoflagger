@@ -5,7 +5,7 @@
 
 #include "../../quality/qualitytablesformatter.h"
 #include "../../quality/statisticsderivator.h"
-#include "../../util/aologger.h"
+#include "../../util/logger.h"
 
 #include <casacore/ms/MeasurementSets/MeasurementSet.h>
 #include <casacore/tables/Tables/ArrayColumn.h>

@@ -10,7 +10,7 @@
 #include <casacore/tables/Tables/ArrayColumn.h>
 #include <casacore/tables/Tables/ScalarColumn.h>
 
-#include "../util/aologger.h"
+#include "../util/logger.h"
 
 #include "../structures/image2d.h"
 #include "../structures/timefrequencydata.h"

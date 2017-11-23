@@ -3,7 +3,7 @@
 
 #include <fstream>
 
-#include "../util/aologger.h"
+#include "../util/logger.h"
 
 #include "../structures/timefrequencydata.h"
 #include "../structures/timefrequencymetadata.h"

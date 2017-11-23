@@ -13,7 +13,7 @@
 #include "../../strategy/algorithms/thresholdconfig.h"
 #include "../../strategy/algorithms/thresholdtools.h"
 
-#include "../../util/aologger.h"
+#include "../../util/logger.h"
 
 #include <boost/algorithm/string.hpp>
 

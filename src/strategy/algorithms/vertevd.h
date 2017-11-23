@@ -6,7 +6,7 @@
 
 #include "../../structures/timefrequencydata.h"
 
-#include "../../util/aologger.h"
+#include "../../util/logger.h"
 
 #include "eigenvalue.h"
 

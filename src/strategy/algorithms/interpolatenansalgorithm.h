@@ -1,7 +1,7 @@
 #ifndef INTERPOLATENANSALGORITHM_H
 #define INTERPOLATENANSALGORITHM_H
 
-#include "../../util/aologger.h"
+#include "../../util/logger.h"
 
 #include "../../structures/image2d.h"
 #include "../../structures/mask2d.h"

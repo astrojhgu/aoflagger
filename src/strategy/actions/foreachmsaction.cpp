@@ -13,7 +13,7 @@
 #include "../imagesets/joinedspwset.h"
 #include "../imagesets/msimageset.h"
 
-#include "../../util/aologger.h"
+#include "../../util/logger.h"
 #include "../../util/progresslistener.h"
 
 #include <memory>

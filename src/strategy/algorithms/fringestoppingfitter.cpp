@@ -2,7 +2,7 @@
 
 #include "../../imaging/uvimager.h"
 
-#include "../../util/aologger.h"
+#include "../../util/logger.h"
 #include "../../util/rng.h"
 
 #include "../algorithms/fringestoppingfitter.h"

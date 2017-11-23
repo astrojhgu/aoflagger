@@ -9,7 +9,7 @@
 #include "scalarcolumniterator.h"
 #include "date.h"
 
-#include "../util/aologger.h"
+#include "../util/logger.h"
 
 #include "../strategy/control/strategywriter.h"
 

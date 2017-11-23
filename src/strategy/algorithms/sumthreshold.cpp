@@ -12,7 +12,7 @@
 
 #include "thresholdmitigater.h"
 
-#include "../../util/aologger.h"
+#include "../../util/logger.h"
 
 /**
  * The SSE version of the Vertical SumThreshold algorithm using intrinsics.

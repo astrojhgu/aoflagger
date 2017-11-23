@@ -30,7 +30,7 @@
 
 #include "../../structures/timefrequencydata.h"
 
-#include "../../util/aologger.h"
+#include "../../util/logger.h"
 
 class DefaultStrategySpeedTest : public UnitTest {
 	public:

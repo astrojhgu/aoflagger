@@ -5,7 +5,7 @@
 #include "gui/controllers/imagecomparisoncontroller.h"
 #include "gui/controllers/rfiguicontroller.h"
 
-#include "util/aologger.h"
+#include "util/logger.h"
 
 #include "strategy/imagesets/msimageset.h"
 

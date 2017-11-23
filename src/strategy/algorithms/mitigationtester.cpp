@@ -8,7 +8,7 @@
 #include "../../structures/image2d.h"
 #include "../../msio/pngfile.h"
 
-#include "../../util/aologger.h"
+#include "../../util/logger.h"
 #include "../../util/ffttools.h"
 #include "../../util/stopwatch.h"
 

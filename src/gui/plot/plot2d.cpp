@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-#include "../../util/aologger.h"
+#include "../../util/logger.h"
 
 Plot2D::Plot2D() :
 	_width(640),

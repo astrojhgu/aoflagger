@@ -7,7 +7,7 @@
 
 #include "version.h"
 
-#include "util/aologger.h"
+#include "util/logger.h"
 
 bool SelectFile(AOQPlotWindow& window, std::string& filename)
 {

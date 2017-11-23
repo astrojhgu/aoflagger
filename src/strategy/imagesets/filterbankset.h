@@ -6,7 +6,7 @@
 
 #include "imageset.h"
 
-#include "../../util/aologger.h"
+#include "../../util/logger.h"
 
 namespace rfiStrategy {
 

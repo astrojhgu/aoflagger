@@ -20,7 +20,7 @@
 
 #include "structures/system.h"
 
-#include "util/aologger.h"
+#include "util/logger.h"
 #include "util/parameter.h"
 #include "util/progresslistener.h"
 #include "util/stopwatch.h"

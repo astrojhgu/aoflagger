@@ -206,7 +206,7 @@ set(STRATEGY_FILES
   ${STRATEGY_PLOTS_FILES})
 
 set(UTIL_FILES
-  util/aologger.cpp
+  util/logger.cpp
   util/ffttools.cpp
   util/integerdomain.cpp
   util/plot.cpp

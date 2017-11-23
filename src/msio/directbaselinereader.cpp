@@ -11,7 +11,7 @@
 #include "../structures/scalarcolumniterator.h"
 #include "../structures/timefrequencydata.h"
 
-#include "../util/aologger.h"
+#include "../util/logger.h"
 #include "../util/stopwatch.h"
 
 DirectBaselineReader::DirectBaselineReader(const std::string &msFile) : BaselineReader(msFile)

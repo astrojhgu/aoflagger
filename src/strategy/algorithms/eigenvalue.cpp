@@ -5,7 +5,7 @@
 
 // Needs to be included LAST
 #include "../../f2c.h"
-#include "../../util/aologger.h"
+#include "../../util/logger.h"
 
 extern "C" {
 	void zheevx_(char *jobz, char *range, char *uplo, integer *n,

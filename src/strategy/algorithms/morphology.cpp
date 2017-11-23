@@ -1,7 +1,7 @@
 #include "morphology.h"
 #include "statisticalflagger.h"
 
-#include "../../util/aologger.h"
+#include "../../util/logger.h"
 
 #include <stack>
 #include <iostream>
