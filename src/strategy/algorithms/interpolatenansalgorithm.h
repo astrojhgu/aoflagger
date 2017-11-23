@@ -22,7 +22,7 @@ class InterpolateNansAlgorithms
 					}
 				}
 			}
-				AOLogger::Debug << "Number of flags: " << count << '\n';
+				Logger::Debug << "Number of flags: " << count << '\n';
 		}
 		
 		static double distFunc(int dist)

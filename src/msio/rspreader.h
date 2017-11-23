@@ -67,7 +67,7 @@ class RSPReader {
 			
 			void Print() const
 			{
-				AOLogger::Debug
+				Logger::Debug
 					<< "versionAndHeaderLength=" << versionAndHeaderLength << "\n"
 					<< "typeOfService=" << typeOfService << "\n"
 					<< "totalLength=" << totalLength << "\n"
@@ -113,7 +113,7 @@ class RSPReader {
 			
 			void Print() const
 			{
-				AOLogger::Debug
+				Logger::Debug
 					<< "versionId=" << (unsigned int) versionId << "\n"
 					<< "sourceInfo=" << (unsigned int) sourceInfo << "\n"
 					<< "configurationId=" << (unsigned int) configurationId << "\n"
@@ -142,12 +142,12 @@ class RSPReader {
 			
 			void Print()
 			{
-				AOLogger::Debug << "x=" << xr;
-				if(xi > 0) AOLogger::Debug << "+" << xi << "i";
-				else AOLogger::Debug << "-" << (-xi) << "i";
-				AOLogger::Debug << ",y=" << yr;
-				if(yi > 0) AOLogger::Debug << "+" << yi << "i\n";
-				else AOLogger::Debug << "-" << (-yi) << "i\n";
+				Logger::Debug << "x=" << xr;
+				if(xi > 0) Logger::Debug << "+" << xi << "i";
+				else Logger::Debug << "-" << (-xi) << "i";
+				Logger::Debug << ",y=" << yr;
+				if(yi > 0) Logger::Debug << "+" << yi << "i\n";
+				else Logger::Debug << "-" << (-yi) << "i\n";
 			}
 		};
 		struct BeamletStatistics {
@@ -159,7 +159,7 @@ class RSPReader {
 			{
 				for(unsigned bit=0;bit<16;++bit)
 				{
-					AOLogger::Info
+					Logger::Info
 						<< "Bit " << bit << " times required: "
 						<< bitUseCount[bit] << " ("
 						<< (100.0 * (double) bitUseCount[bit] / (double) totalCount) << "%)"

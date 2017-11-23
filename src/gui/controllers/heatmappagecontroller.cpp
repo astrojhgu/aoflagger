@@ -8,6 +8,7 @@
 #include "../../structures/samplerow.h"
 
 HeatMapPageController::HeatMapPageController() :
+	_page(nullptr),
 	_statisticKind(QualityTablesFormatter::StandardDeviationStatistic),
 	_polarization(Polarization::StokesI),
 	_phase(TimeFrequencyData::AmplitudePart)
@@ -26,10 +27,13 @@ void HeatMapPageController::updateImageImpl(QualityTablesFormatter::StatisticKin
 		setToPhase(data, phase);
 		
 		Image2DCPtr image = data.GetSingleImage();
-		if(_page->NormalizeXAxis())
-			image = normalizeXAxis(image);
-		if(_page->NormalizeYAxis())
-			image = normalizeYAxis(image);
+		if(_page != nullptr)
+		{
+			if(_page->NormalizeXAxis())
+				image = normalizeXAxis(image);
+			if(_page->NormalizeYAxis())
+				image = normalizeYAxis(image);
+		}
 		
 		_heatMap.SetZAxisDescription(StatisticsDerivator::GetDescWithUnits(statisticKind));
 		_heatMap.SetImage(image);

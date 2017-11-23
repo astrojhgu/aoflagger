@@ -39,13 +39,13 @@ namespace rfiStrategy {
 		BaselineSelector& info = artifacts.BaselineSelectionInfo();
 		if(info.BaselineCount() == 0)
 		{
-			AOLogger::Warn <<
+			Logger::Warn <<
 			"BaselineSelectionAction wrongly used: trying to mark baselines, but baselines have\n"
 			"not been prepared previously (you need to add a BaselineSelectionAction within a for\n"
 			"each baseline block, that calculates the statistics and prepares selection)\n";
 		} else {
 
-			AOLogger::Debug << "Searching for bad baselines...\n";
+			Logger::Debug << "Searching for bad baselines...\n";
 
 			Strategy::SyncAll(*GetRoot());
 
@@ -61,19 +61,19 @@ namespace rfiStrategy {
 			
 			if(markedBaselines.size() > 0)
 			{
-				AOLogger::Info << "Found " << markedBaselines.size() << "/" << (markedBaselines.size()+selector.BaselineCount()) << " bad baselines: ";
+				Logger::Info << "Found " << markedBaselines.size() << "/" << (markedBaselines.size()+selector.BaselineCount()) << " bad baselines: ";
 				
 				std::vector<BaselineSelector::SingleBaselineInfo>::const_iterator badBaselineIter = markedBaselines.begin();
-				AOLogger::Info << badBaselineIter->antenna1Name << "x" << badBaselineIter->antenna2Name;
+				Logger::Info << badBaselineIter->antenna1Name << "x" << badBaselineIter->antenna2Name;
 				++badBaselineIter;
 				while(badBaselineIter!=markedBaselines.end())
 				{
-					AOLogger::Info << ", " << badBaselineIter->antenna1Name << "x" << badBaselineIter->antenna2Name;
+					Logger::Info << ", " << badBaselineIter->antenna1Name << "x" << badBaselineIter->antenna2Name;
 					++badBaselineIter;
 				}
-				AOLogger::Info << '\n';
+				Logger::Info << '\n';
 			} else {
-				AOLogger::Info << "No bad baselines found.\n";
+				Logger::Info << "No bad baselines found.\n";
 			}
 			
 			if(_flagBadBaselines)
@@ -81,7 +81,7 @@ namespace rfiStrategy {
 				flagBaselines(artifacts, markedBaselines);
 			} else {
 				if(markedBaselines.size() > 0)
-					AOLogger::Info <<
+					Logger::Info <<
 						"Bad baseline finding is still experimental, please check the results.\n"
 						"These baselines have therefore NOT been flagged yet. Writing flags to\n"
 						"these baselines can be enabled by setting the flag-bad-baselines\n"

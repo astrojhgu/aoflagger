@@ -146,7 +146,7 @@ class Plot2D : public Plotable {
 			else if(_pointSets.empty())
 				return 1.0;
 			else
-				return _system.YRangeMax(**_pointSets.begin());
+				return _system.YRangeMax(*_pointSets.front());
 		}
 		double MaxPositiveY() const
 		{

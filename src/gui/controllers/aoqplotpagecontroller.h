@@ -46,8 +46,7 @@ protected:
 	virtual void startLine(Plot2D &plot, const std::string &name, const std::string &yAxisDesc) = 0;
 	
 	virtual void processPlot(Plot2D &plot)
-	{
-	}
+	{ }
 	
 	const StatisticsCollection *getStatCollection() const
 	{

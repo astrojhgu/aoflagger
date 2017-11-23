@@ -16,6 +16,11 @@ public:
 	
 	void Attach(class AOQPlotWindow* window) { _window = window; }
 	
+	void ReadStatistics(const std::vector<std::string>& files)
+	{
+		ReadStatistics(files, true, true, 1000, 1000, false);
+	}
+	
 	void ReadStatistics(const std::vector<std::string>& files, bool downsampleTime, bool downsampleFreq, size_t timeSize, size_t freqSize, bool correctHistograms);
 	
 	struct PlotSavingData

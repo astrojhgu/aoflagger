@@ -29,7 +29,7 @@ rfiStrategy::BaselineData* rfiStrategy::PngReader::Read()
 	unsigned height = png_get_image_height(png_ptr, info_ptr);
 	unsigned color_type = png_get_color_type(png_ptr, info_ptr);
 	unsigned bit_depth = png_get_bit_depth(png_ptr, info_ptr);
-	AOLogger::Debug << "Png file: " << width << 'x' << height << " colortype=" << color_type << ", bit_depth=" << bit_depth << '\n';
+	Logger::Debug << "Png file: " << width << 'x' << height << " colortype=" << color_type << ", bit_depth=" << bit_depth << '\n';
 
 	png_read_update_info(png_ptr, info_ptr);
 

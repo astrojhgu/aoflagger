@@ -16,17 +16,17 @@ namespace rfiStrategy {
 
 	void MSImageSet::Initialize()
 	{
-		AOLogger::Debug << "Initializing image set...\n";
-		AOLogger::Debug << "Antenna's: " << _set.AntennaCount() << '\n';
+		Logger::Debug << "Initializing image set...\n";
+		Logger::Debug << "Antenna's: " << _set.AntennaCount() << '\n';
 		_sequences = _set.GetSequences();
-		AOLogger::Debug << "Unique sequences: " << _sequences.size() << '\n';
+		Logger::Debug << "Unique sequences: " << _sequences.size() << '\n';
 		if(_sequences.empty())
 			throw std::runtime_error("Trying to open a measurement set with no sequences");
 		initReader();
 		_bandCount = _set.BandCount();
 		_fieldCount = _set.FieldCount();
 		_sequencesPerBaselineCount = _set.SequenceCount();
-		AOLogger::Debug << "Bands: " << _bandCount << '\n';
+		Logger::Debug << "Bands: " << _bandCount << '\n';
 	}
 	
 	void MSImageSetIndex::Previous()

@@ -183,7 +183,7 @@ void MeasurementSet::initializeMainTableData()
 {
 	if(!_isMainTableDataInitialized)
 	{
-		AOLogger::Debug << "Initializing ms cache data...\n"; 
+		Logger::Debug << "Initializing ms cache data...\n"; 
 		// we use a ptr to last, for faster insertion
 		std::set<double>::iterator obsTimePos = _observationTimes.end();
 		MSIterator iterator(*this, false);

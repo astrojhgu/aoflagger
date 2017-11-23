@@ -238,7 +238,7 @@ void HeatMapPlot::SavePdf(const std::string &filename, unsigned width, unsigned 
 	Cairo::RefPtr<Cairo::Context> cairo = Cairo::Context::create(surface);
 	if(HasImage())
 	{
-		AOLogger::Debug << "Saving PDF of " << width << " x " << height << "\n";
+		Logger::Debug << "Saving PDF of " << width << " x " << height << "\n";
 		update(cairo, width, height);
 	}
 	cairo->show_page();
@@ -253,7 +253,7 @@ void HeatMapPlot::SaveSvg(const std::string &filename, unsigned width, unsigned 
 	Cairo::RefPtr<Cairo::Context> cairo = Cairo::Context::create(surface);
 	if(HasImage())
 	{
-		AOLogger::Debug << "Saving SVG of " << width << " x " << height << "\n";
+		Logger::Debug << "Saving SVG of " << width << " x " << height << "\n";
 		update(cairo, width, height);
 	}
 	cairo->show_page();
@@ -266,7 +266,7 @@ void HeatMapPlot::SavePng(const std::string &filename, unsigned width, unsigned 
 	Cairo::RefPtr<Cairo::Context> cairo = Cairo::Context::create(surface);
 	if(HasImage())
 	{
-		AOLogger::Debug << "Saving PNG of " << width << " x " << height << "\n";
+		Logger::Debug << "Saving PNG of " << width << " x " << height << "\n";
 		update(cairo, width, height);
 	}
 	surface->write_to_png(filename);
@@ -284,7 +284,7 @@ void HeatMapPlot::SaveText(const std::string &filename)
 		size_t
 			imageWidth = endX - startX,
 			imageHeight = endY - startY;
-		AOLogger::Debug << "Saving text file for " << imageWidth << " x " << imageHeight << " values.\n";
+		Logger::Debug << "Saving text file for " << imageWidth << " x " << imageHeight << " values.\n";
 		std::ofstream file(filename.c_str());
 		file << imageWidth << '\n' << imageHeight << '\n';
 		for(size_t y=startY; y!=endY; ++y)

@@ -4,7 +4,11 @@
 
 #include "../../quality/statisticsderivator.h"
 
-AOQPlotPageController::AOQPlotPageController() : 	_statCollection(nullptr)
+#include "../../util/aologger.h"
+
+AOQPlotPageController::AOQPlotPageController() :
+	_page(nullptr),
+	_statCollection(nullptr)
 { }
 
 void AOQPlotPageController::UpdatePlot()
@@ -106,14 +110,9 @@ std::string AOQPlotPageController::getYDesc(const std::set<QualityTablesFormatte
 
 void AOQPlotPageController::SavePdf(const string& filename, QualityTablesFormatter::StatisticKind kind)
 {
-	std::set<QualityTablesFormatter::StatisticKind> kinds;
-	kinds.insert(kind);
-	
-	std::set<std::pair<unsigned int, unsigned int> > pols;
-	pols.insert(std::make_pair(0, 3));
-	
-	std::set<PhaseType> phases;
-	phases.insert(AmplitudePhaseType);
+	std::set<QualityTablesFormatter::StatisticKind> kinds{kind};
+	std::set<std::pair<unsigned int, unsigned int> > pols{std::make_pair(0, 3)};
+	std::set<PhaseType> phases{AmplitudePhaseType};
 
 	updatePlotForSettings(kinds, pols, phases);
 	

@@ -83,7 +83,7 @@ public:
 			const size_t
 				polCount = flagArray.shape()[0],
 				channelCount = flagArray.shape()[1];
-			AOLogger::Debug << "Saving flags to measurement set (" << channelCount << " ch x " << polCount << " pol)...\n";
+			Logger::Debug << "Saving flags to measurement set (" << channelCount << " ch x " << polCount << " pol)...\n";
 			if(flagsCopy.size() == 1 && polCount>1)
 			{
 				do { flagsCopy.push_back(flagsCopy[0]);

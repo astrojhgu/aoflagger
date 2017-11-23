@@ -53,7 +53,7 @@ static void run(int argc, char *argv[])
 				p = &argv[argi][1];
 			if(p == "h" || p == "help" || p == "?")
 			{
-				AOLogger::Info
+				Logger::Info
 					<< "The RFIGui is a program to analyze the time-frequency information in radio astronomical observations.\n"
 					<< "It is written by André Offringa (offringa@gmail.com) and published under the GPL 3.\n"
 					<< "This program is part of AOFlagger " << AOFLAGGER_VERSION_STR << " (" << AOFLAGGER_VERSION_DATE_STR << ")\n\n"
@@ -65,6 +65,8 @@ static void run(int argc, char *argv[])
 					<< "    Display this help message and exit.\n"
 					<< " -version\n"
 					<< "    Display AOFlagger version and exit.\n"
+					<< " -v\n"
+					<< "    Verbose logging.\n"
 					<< " -save-baseline <filename> <antenna1> <antenna2> <band> <sequence index>\n"
 					<< "    Save the selected baseline to the given filename. The parameter can be specified\n"
 					<< "    multiple times to save multiple baselines in one run. When this parameter is specified,\n"
@@ -75,7 +77,7 @@ static void run(int argc, char *argv[])
 			}
 			else if(p == "version")
 			{
-				AOLogger::Info << "AOFlagger " << AOFLAGGER_VERSION_STR << " (" << AOFLAGGER_VERSION_DATE_STR << ")\n";
+				Logger::Info << "AOFlagger " << AOFLAGGER_VERSION_STR << " (" << AOFLAGGER_VERSION_DATE_STR << ")\n";
 				return;
 			}
 			else if(p == "save-baseline")
@@ -95,8 +97,12 @@ static void run(int argc, char *argv[])
 				++argi;
 				dataColumnName = argv[argi];
 			}
+			else if(p == "v")
+			{
+				Logger::SetVerbosity(Logger::VerboseVerbosity);
+			}
 			else {
-				AOLogger::Error << "Unknown parameter " << argv[argi] << " specified on command line.\n";
+				Logger::Error << "Unknown parameter " << argv[argi] << " specified on command line.\n";
 				return;
 			}
 		}
@@ -108,14 +114,14 @@ static void run(int argc, char *argv[])
 	
 	// We have to 'lie' about argc to create(..), because of a bug in older gtkmms.
 	int altArgc = 1;
-	AOLogger::Info << "Opening controller.\n";
+	Logger::Info << "Opening controller.\n";
 	RFIGuiController controller;
 	Glib::RefPtr<Gtk::Application> app;
 	std::unique_ptr<RFIGuiWindow> window;
 	if(interactive)
 	{
 		app = Gtk::Application::create(altArgc, argv, "", Gio::APPLICATION_HANDLES_OPEN);
-		AOLogger::Info << "Opening main window.\n";
+		Logger::Info << "Opening main window.\n";
 		window.reset(new RFIGuiWindow(&controller));
 		window->present();
 	}
@@ -154,7 +160,7 @@ static void run(int argc, char *argv[])
 			app->run(*window);
 	} catch(const std::exception& e)
 	{
-		AOLogger::Error <<
+		Logger::Error <<
 			"\n"
 			"==========\n"
 			"An unhandled exception occured while executing RFIGui. The error is:\n" <<
@@ -164,8 +170,6 @@ static void run(int argc, char *argv[])
 
 int main(int argc, char *argv[])
 {
-	AOLogger::Init(basename(argv[0]), false, true);
-	
 	run(argc, argv);
 	
 	Glib::Error::register_cleanup();

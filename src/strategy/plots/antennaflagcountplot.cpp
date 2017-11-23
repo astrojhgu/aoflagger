@@ -82,7 +82,7 @@ void AntennaFlagCountPlot::Report()
 	{
 		if(i->second.autoTotal != 0)
 		{
-			AOLogger::Info
+			Logger::Info
 				<< "Flagged in autocorrelations of antenna "
 				<< i->second.name << ": "
 				<< formatPercentage(100.0L * (long double) i->second.autoCount / (long double) i->second.autoTotal)
@@ -90,7 +90,7 @@ void AntennaFlagCountPlot::Report()
 		}
 		if(i->second.crossTotal != 0)
 		{
-			AOLogger::Info
+			Logger::Info
 				<< "Flagged in cross correlations with antenna "
 				<< i->second.name << ": "
 				<< formatPercentage(100.0L * (long double) i->second.crossCount / (long double) i->second.crossTotal)

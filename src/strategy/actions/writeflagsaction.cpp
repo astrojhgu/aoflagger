@@ -68,9 +68,9 @@ namespace rfiStrategy {
 			}
 			_parent->_bufferChange.notify_all();
 			if(bufferCopy.size() >= _parent->_minBufferItemsForWriting)
-				AOLogger::Debug << "Flag buffer has reached minimal writing size, flushing flags...\n";
+				Logger::Debug << "Flag buffer has reached minimal writing size, flushing flags...\n";
 			else
-				AOLogger::Debug << "Flushing flags...\n";
+				Logger::Debug << "Flushing flags...\n";
 			lock.unlock();
 
 			std::unique_lock<std::mutex> ioLock(*_parent->_ioMutex);
@@ -96,7 +96,7 @@ namespace rfiStrategy {
 		{
 			std::unique_ptr<std::thread> flusher = std::move(_flusher);
 			lock.unlock();
-			AOLogger::Debug << "Finishing the flusher thread...\n";
+			Logger::Debug << "Finishing the flusher thread...\n";
 			flusher->join();
 			flusher.reset();
 			_imageSet.reset();

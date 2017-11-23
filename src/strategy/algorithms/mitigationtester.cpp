@@ -478,8 +478,8 @@ void MitigationTester::AddBroadbandToTestSet(Image2DPtr image, Mask2DPtr rfi, lo
 		unsigned n = (unsigned) floor(0.5 + sqrt(0.25 + 2.0 * frequencyCount));
 		unsigned affectedAntennas = (unsigned) n*(double)length;
 		unsigned index = 0;
-		AOLogger::Debug << affectedAntennas << " of " << n << " antennas effected." << '\n';
-		AOLogger::Debug << "Affected  baselines: ";
+		Logger::Debug << affectedAntennas << " of " << n << " antennas effected." << '\n';
+		Logger::Debug << "Affected  baselines: ";
 		for(unsigned y=0;y<n;++y)
 		{
 			for(unsigned x=y+1;x<n;++x)
@@ -490,7 +490,7 @@ void MitigationTester::AddBroadbandToTestSet(Image2DPtr image, Mask2DPtr rfi, lo
 				
 				if(y<affectedAntennas || x<affectedAntennas)
 				{
-					AOLogger::Debug << x << " x " << y << ", ";
+					Logger::Debug << x << " x " << y << ", ";
 					AddRfiPos(image, rfi, 3.0*strength*a1*a2, step*1, 3, index);
 					AddRfiPos(image, rfi, 2.5*strength*a1*a2, step*2, 3, index);
 					AddRfiPos(image, rfi, 2.0*strength*a1*a2, step*3, 3, index);
@@ -506,7 +506,7 @@ void MitigationTester::AddBroadbandToTestSet(Image2DPtr image, Mask2DPtr rfi, lo
 				++index;
 			}
 		}
-		AOLogger::Debug << ".\n";
+		Logger::Debug << ".\n";
 	} else {
 		unsigned fStart = (unsigned) ((0.5 - length/2.0) * frequencyCount);
 		unsigned fEnd = (unsigned) ((0.5 + length/2.0) * frequencyCount);

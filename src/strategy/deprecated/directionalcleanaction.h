@@ -100,7 +100,7 @@ namespace rfiStrategy {
 				revised.SetImage(1, imagDest);
 				original.SetImage(0, realOriginal);
 				original.SetImage(1, imagOriginal);
-				AOLogger::Debug << "Done: direction clean iteration\n";
+				Logger::Debug << "Done: direction clean iteration\n";
 			}
 			numl_t LimitingDistance() const { return _limitingDistance; }
 			void SetLimitingDistance(double limitingDistance) { _limitingDistance = limitingDistance; }
@@ -161,7 +161,7 @@ namespace rfiStrategy {
 				unsigned fIndex = row->IndexOfMax();
 				
 				if(verbose)
-					AOLogger::Debug << "Removing component index " << fIndex << '\n';
+					Logger::Debug << "Removing component index " << fIndex << '\n';
 				
 				const numl_t
 					mean = row->Mean(),
@@ -172,7 +172,7 @@ namespace rfiStrategy {
 					phase = atan2nl(diffI, diffR);
 				
 				if(verbose)
-					AOLogger::Debug << "Mean=" << mean << ", sigma=" << sigma << ", component = " << ((amplitude-mean)/sigma) << " x sigma\n";
+					Logger::Debug << "Mean=" << mean << ", sigma=" << sigma << ", component = " << ((amplitude-mean)/sigma) << " x sigma\n";
 				
 				numl_t amplitudeRemoved = amplitude * _removeRatio;
 
@@ -181,7 +181,7 @@ namespace rfiStrategy {
 				if(amplitude < limit || amplitude < 0.0)
 				{
 					if(verbose)
-						AOLogger::Debug << "Strongest component is < limit not continuing with clean\n";
+						Logger::Debug << "Strongest component is < limit not continuing with clean\n";
 				} else
 				{
 					subtractComponent(realDest, imagDest, inputWidth, uPositions, fIndex, amplitudeRemoved, phase, y);
@@ -191,12 +191,12 @@ namespace rfiStrategy {
 					if(fIndex >= lowestIndex && fIndex < upperLimit)
 					{
 						if(verbose)
-							AOLogger::Debug << "Within limits " << lowestIndex << "-" << upperLimit << '\n';
+							Logger::Debug << "Within limits " << lowestIndex << "-" << upperLimit << '\n';
 						_values[fIndex] += amplitudeRemoved;
 						subtractComponent(realOriginal, imagOriginal, inputWidth, uPositions, fIndex, amplitudeRemoved, phase, y);
 					} else {
 						if(verbose)
-							AOLogger::Debug << "Outside limits " << lowestIndex << "-" << upperLimit << '\n';
+							Logger::Debug << "Outside limits " << lowestIndex << "-" << upperLimit << '\n';
 					}
 				}
 				

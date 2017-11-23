@@ -323,7 +323,7 @@ void FringeStoppingFitter::PerformDynamicFrequencyFitOnOneRow(SampleRowCPtr real
 {
 	num_t phase, strength;
 	MinimizeRFIFitError(phase, strength, real, imaginary, 0, _originalData->ImageWidth(), y);
-	AOLogger::Debug << "Amplitude found: " << strength << " phase found: " << phase << '\n';
+	Logger::Debug << "Amplitude found: " << strength << " phase found: " << phase << '\n';
 	for(size_t x=0;x<_originalData->ImageWidth();++x)
 	{
 		num_t rfiR, rfiI;

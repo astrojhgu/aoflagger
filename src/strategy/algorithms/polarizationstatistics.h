@@ -45,19 +45,19 @@ class PolarizationStatistics {
 		{
 			if(HasData())
 			{
-				AOLogger::Info
+				Logger::Info
 					<< "Polarization statistics: ";
 				for(unsigned i=0;i<_flaggedCounts.size();++i)
 				{
 					numl_t percentage = (numl_t) _flaggedCounts[i] * 100.0 / (numl_t) _totalCounts[i];
 					if(i!=0)
-						AOLogger::Info << ", ";
-					AOLogger::Info
+						Logger::Info << ", ";
+					Logger::Info
 						<< _names[i] << ": " << formatPercentage(percentage) << '%';
 				}
-				AOLogger::Info << '\n';
+				Logger::Info << '\n';
 			} else {
-				AOLogger::Info
+				Logger::Info
 					<< "No polarization statistics were collected.\n";
 			}
 		}

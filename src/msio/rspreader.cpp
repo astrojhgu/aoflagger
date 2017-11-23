@@ -141,7 +141,7 @@ unsigned long RSPReader::TimeStepCount(size_t beamletCount) const
 	const unsigned long bytesPerFrame = beamletCount * firstHeader.nofBlocks * RCPBeamletData::SIZE + RCPApplicationHeader::SIZE;
 	const unsigned long frames = fileSize / bytesPerFrame;
 	
-	AOLogger::Debug << "File has " << frames << " number of frames (" << ((double) (frames*firstHeader.nofBlocks*STATION_INTEGRATION_STEPS)/_clockSpeed) << "s of data)\n";
+	Logger::Debug << "File has " << frames << " number of frames (" << ((double) (frames*firstHeader.nofBlocks*STATION_INTEGRATION_STEPS)/_clockSpeed) << "s of data)\n";
 	
 	return frames * firstHeader.nofBlocks;
 }
@@ -180,7 +180,7 @@ std::pair<TimeFrequencyData,TimeFrequencyMetaDataPtr> RSPReader::ReadAllBeamlets
 	const unsigned long startFrame = timestepStart / (unsigned long) firstHeader.nofBlocks;
 	const unsigned long startByte = startFrame * bytesPerFrame;
 	const unsigned long offsetFromStart = timestepStart - (startFrame * firstHeader.nofBlocks);
-	//AOLogger::Debug << "Seeking to " << startByte << " (timestepStart=" << timestepStart << ", offsetFromStart=" << offsetFromStart << ", startFrame=" << startFrame << ",bytesPerFrame=" << bytesPerFrame << ")\n";
+	//Logger::Debug << "Seeking to " << startByte << " (timestepStart=" << timestepStart << ", offsetFromStart=" << offsetFromStart << ", startFrame=" << startFrame << ",bytesPerFrame=" << bytesPerFrame << ")\n";
 	file.seekg(startByte, std::ios_base::beg);
 	
 	// Read the frames
@@ -224,7 +224,7 @@ std::pair<TimeFrequencyData,TimeFrequencyMetaDataPtr> RSPReader::ReadAllBeamlets
 		x += header.nofBlocks;
 		++frame;
 	}
-	//AOLogger::Debug << "Read " << frame << " frames.\n";
+	//Logger::Debug << "Read " << frame << " frames.\n";
 	
 	for(unsigned long i=0;i<width;++i)
 	{
@@ -300,13 +300,13 @@ void RSPReader::ReadForStatistics(unsigned beamletCount)
 		{
 			for(unsigned i=0;i<beamletCount;++i)
 			{
-				AOLogger::Info << "Beamlet index " << i << ":\n";
+				Logger::Info << "Beamlet index " << i << ":\n";
 				statistics[i].Print();
 			}
 		}
 		if((dataPair.second->ObservationTimes()[0] - periodStartTime) > 60.0)
 		{
-			AOLogger::Debug << "Processed 1 minute of data (" << (dataPair.second->ObservationTimes()[0] - startTime) << "s)\n";
+			Logger::Debug << "Processed 1 minute of data (" << (dataPair.second->ObservationTimes()[0] - startTime) << "s)\n";
 			for(unsigned i=0;i<beamletCount;++i)
 			{
 				(*statFile[i])
@@ -327,7 +327,7 @@ void RSPReader::ReadForStatistics(unsigned beamletCount)
 	
 	for(unsigned i=0;i<beamletCount;++i)
 	{
-		AOLogger::Info << "Beamlet index " << i << ":\n";
+		Logger::Info << "Beamlet index " << i << ":\n";
 		statistics[i].Print();
 		delete statFile[i];
 	}

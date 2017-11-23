@@ -353,7 +353,7 @@ void Morphology::floodFill(const Mask2D* mask, SegmentedImagePtr output, Mask2DP
 void Morphology::Cluster(SegmentedImagePtr segmentedImage)
 {
 	std::map<size_t,SegmentInfo> segments = createSegmentMap(segmentedImage);
-	AOLogger::Debug << "Segments before clustering: " << segments.size();
+	Logger::Debug << "Segments before clustering: " << segments.size();
 
 	for(std::map<size_t,SegmentInfo>::iterator i=segments.begin();i!=segments.end();++i)
 	{
@@ -479,7 +479,7 @@ void Morphology::RemoveSmallSegments(SegmentedImagePtr segmentedImage, size_t th
 			segmentedImage->RemoveSegment(segment.segment, segment.left, segment.right, segment.top, segment.bottom);
 		}
 	}
-	AOLogger::Debug << "Removed " << removedSegments << " segments of size " << thresholdLevel << " or smaller.\n";
+	Logger::Debug << "Removed " << removedSegments << " segments of size " << thresholdLevel << " or smaller.\n";
 }
 
 void Morphology::Classify(SegmentedImagePtr segmentedImage)

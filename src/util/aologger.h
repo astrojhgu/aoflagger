@@ -3,39 +3,32 @@
 
 #include <sstream>
 #include <iostream>
-#include <mutex>
 
-class AOLogger
+#include <boost/thread/mutex.hpp>
+
+class Logger
 {
 	public:
-		enum AOLoggerLevel { NoLevel=5, FatalLevel=4, ErrorLevel=3, WarningLevel=2, InfoLevel=1, DebugLevel=0 };
-
-		template<enum AOLoggerLevel Level, bool ToStdErr=false>
+		enum LoggerLevel { NoLevel=5, FatalLevel=4, ErrorLevel=3, WarningLevel=2, InfoLevel=1, DebugLevel=0 };
+		
+		enum VerbosityLevel { QuietVerbosity, NormalVerbosity, VerboseVerbosity };
+		
+		template<enum LoggerLevel Level, bool ToStdErr=false>
 		class LogWriter
 		{
 			public:
-				LogWriter() : _useLogger(false) { }
-				~LogWriter()
-				{
-					if(_useLogger && _buffer.str().size() != 0)
-						Log(_buffer.str());
-				}
+				LogWriter() : _atNewLine(true) { }
+				
 				LogWriter &operator<<(const std::string &str)
 				{
-					std::lock_guard<std::mutex> lock(_mutex);
-					if(_useLogger)
+					boost::mutex::scoped_lock lock(_mutex);
+					size_t start = 0, end;
+					while(std::string::npos != (end = str.find('\n', start)))
 					{
-						size_t start = 0, end;
-						while(std::string::npos != (end = str.find('\n', start)))
-						{
-							_buffer << str.substr(start, end - start);
-							start = end+1;
-							Log(_buffer.str());
-							_buffer.str(std::string());
-						}
-						_buffer << str.substr(start, str.size() - start);
+						outputLinePart(str.substr(start, end - start + 1), true);
+						start = end+1;
 					}
-					ToStdOut(str);
+					outputLinePart(str.substr(start, str.size() - start), false);
 					return *this;
 				}
 				LogWriter &operator<<(const char *str)
@@ -45,78 +38,52 @@ class AOLogger
 				}
 				LogWriter &operator<<(const char c)
 				{
-					std::lock_guard<std::mutex> lock(_mutex);
-					if(_useLogger)
-					{
-						if(c == '\n')
-						{
-							Log(_buffer.str());
-							_buffer.str(std::string());
-						} else {
-							_buffer << c;
-						}
-					}
-					ToStdOut(c);
+					boost::mutex::scoped_lock lock(_mutex);
+					outputLinePart(std::string(1, c), c == '\n');
 					return *this;
 				}
 				template<typename S>
 				LogWriter &operator<<(const S &str)
 				{
-					std::lock_guard<std::mutex> lock(_mutex);
-					if(_useLogger)
-					{
-						_buffer << str;
-					}
-					ToStdOut(str);
+					std::ostringstream stream;
+					stream << str;
+					(*this) << stream.str();
 					return *this;
 				}
 				void Flush()
 				{
-					if((int) _coutLevel <= (int) Level)
-					{
-						std::lock_guard<std::mutex> lock(_mutex);
-						if(ToStdErr)
-							std::cerr.flush();
-						else
-							std::cout.flush();
-					}
-				}
-				void SetUseLogger(bool useLogger)
-				{
-					std::lock_guard<std::mutex> lock(_mutex);
-					_useLogger = useLogger;
+					boost::mutex::scoped_lock lock(_mutex);
+					if(ToStdErr)
+						std::cerr.flush();
+					else
+						std::cout.flush();
 				}
 			private:
-				bool _useLogger;
-				std::stringstream _buffer;
-				std::mutex _mutex;
-
-				void Log(const std::string &str)
+				boost::mutex _mutex;
+				bool _atNewLine;
+		
+				void outputLinePart(const std::string &str, bool endsWithCR)
 				{
-					/*switch(Level)
+					if((int) _coutLevel <= (int) Level && !str.empty())
 					{
-						case NoLevel: break;
-						case DebugLevel:   LOG_DEBUG(str); break;
-						case InfoLevel:    LOG_INFO(str); break;
-						case WarningLevel: LOG_WARN(str); break;
-						case ErrorLevel:   LOG_ERROR(str); break;
-						case FatalLevel:   LOG_FATAL(str); break;
-					}*/
-				}
-				template<typename S>
-				void ToStdOut(const S &str)
-				{
-					if((int) _coutLevel <= (int) Level)
-					{
+						if(_atNewLine && _logTime)
+							outputTime(ToStdErr);
 						if(ToStdErr)
 							std::cerr << str;
 						else
 							std::cout << str;
+						_atNewLine = endsWithCR;
 					}
 				}
 		};
 
-		static void Init(const std::string &name, bool useLogger=false, bool verbose=false);
+		static void SetVerbosity(VerbosityLevel verbosityLevel);
+		
+		static bool IsVerbose() { return _coutLevel==DebugLevel; }
+		
+		static void SetLogTime(bool logTime) { _logTime = logTime; }
+		
+		static bool LogTime() { return _logTime; }
 
 		static class LogWriter<DebugLevel> Debug;
 		static class LogWriter<InfoLevel> Info;
@@ -125,11 +92,15 @@ class AOLogger
 		static class LogWriter<FatalLevel> Fatal;
 		static class LogWriter<NoLevel, true> Progress;
 	private:
-		AOLogger()
+		Logger()
 		{
 		}
 
-		static enum AOLoggerLevel _coutLevel;
+		static void outputTime(bool toStdErr);
+
+		static enum LoggerLevel _coutLevel;
+		
+		static bool _logTime;
 };
 
 #endif

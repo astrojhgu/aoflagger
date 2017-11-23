@@ -97,7 +97,7 @@ TimeFrequencyData SpatialTimeLoader::Load(unsigned channelIndex, bool fringeStop
 			for(unsigned c=0;c<_channelCount;++c) {
 				if(c == channelIndex)
 				{
-					AOLogger::Debug << "Reading timeIndex=" << timeIndex << ", baselineIndex=" << baselineIndex << ", a1=" << a1 << ", a2=" << a2 << ",w=" << wRotation << "\n";
+					Logger::Debug << "Reading timeIndex=" << timeIndex << ", baselineIndex=" << baselineIndex << ", a1=" << a1 << ", a2=" << a2 << ",w=" << wRotation << "\n";
 					for(unsigned p=0;p<_polarizationCount;++p) {
 						double realValue = i->real();
 						double imagValue = i->imag();

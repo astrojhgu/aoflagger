@@ -350,7 +350,7 @@ void RFIGuiController::PlotSingularValues()
 
 void RFIGuiController::Open(const std::string& filename, BaselineIOMode ioMode, bool readUVW, const std::string& dataColumn, bool subtractModel, size_t polCountToRead, bool loadStrategy, bool combineSPW)
 {
-	AOLogger::Info << "Opening " << filename << '\n';
+	Logger::Info << "Opening " << filename << '\n';
 	try
 	{
 		std::unique_ptr<rfiStrategy::ImageSet> imageSet(rfiStrategy::ImageSet::Create(filename, ioMode));
@@ -408,7 +408,7 @@ void RFIGuiController::Open(const std::string& filename, BaselineIOMode ioMode, 
 			dialog.run();
 		}
 		else {
-			AOLogger::Error << e.what() << '\n';
+			Logger::Error << e.what() << '\n';
 		}
 	}
 }

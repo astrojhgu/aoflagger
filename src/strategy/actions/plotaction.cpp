@@ -61,7 +61,7 @@ namespace rfiStrategy {
 			TimeFrequencyMetaDataCPtr meta = artifacts.MetaData();
 			artifacts.AntennaFlagCountPlot().Add(data, meta);
 		} else {
-			AOLogger::Warn << "The strategy contains an action that makes an antenna plot, but the image set did not provide meta data.\n"
+			Logger::Warn << "The strategy contains an action that makes an antenna plot, but the image set did not provide meta data.\n"
 				"Plot will not be made.\n";
 		}
 	}
@@ -122,7 +122,7 @@ namespace rfiStrategy {
 		}
 		rms /= data.PolarizationCount();
 		;
-		AOLogger::Info << "RMS of " << metaData->Antenna1().name << " x " << metaData->Antenna2().name << ": "
+		Logger::Info << "RMS of " << metaData->Antenna1().name << " x " << metaData->Antenna2().name << ": "
 			<< rms << '\n';
 	}
 	

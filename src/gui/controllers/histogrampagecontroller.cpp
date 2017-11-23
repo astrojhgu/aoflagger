@@ -9,8 +9,9 @@
 #include "../../structures/measurementset.h"
 
 HistogramPageController::HistogramPageController() :
-	_histograms(0),
-	_summedPolarizationHistograms(0)
+	_page(nullptr),
+	_histograms(nullptr),
+	_summedPolarizationHistograms(nullptr)
 {
 }
 

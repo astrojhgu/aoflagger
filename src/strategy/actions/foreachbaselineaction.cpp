@@ -26,7 +26,7 @@ namespace rfiStrategy {
 		{
 			progress.OnStartTask(*this, 0, 1, "For each baseline (no image set)");
 			progress.OnEndTask(*this);
-			AOLogger::Warn <<
+			Logger::Warn <<
 				"I executed a ForEachBaselineAction without an active imageset: something is\n"
 				"likely wrong. Check your strategy and the input files.\n";
 		} else if(_selection == Current)
@@ -47,18 +47,18 @@ namespace rfiStrategy {
 					8.0/*bp complex*/ * 4.0 /*polarizations*/ *
 					double(timeStepCount) * double(channelCount) *
 					3.0 /* approx copies of the data that will be made in memory*/;
-				AOLogger::Debug << "Estimate of memory each thread will use: " << memToStr(estMemorySizePerThread) << ".\n";
+				Logger::Debug << "Estimate of memory each thread will use: " << memToStr(estMemorySizePerThread) << ".\n";
 				size_t compThreadCount = _threadCount;
 				if(compThreadCount > 0) --compThreadCount;
 				
 				int64_t memSize = System::TotalMemory();
-				AOLogger::Debug << "Detected " << memToStr(memSize) << " of system memory.\n";
+				Logger::Debug << "Detected " << memToStr(memSize) << " of system memory.\n";
 				
 				if(estMemorySizePerThread * double(compThreadCount) > memSize)
 				{
 					size_t maxThreads = size_t(memSize / estMemorySizePerThread);
 					if(maxThreads < 1) maxThreads = 1;
-					AOLogger::Warn <<
+					Logger::Warn <<
 						"This measurement set is TOO LARGE to be processed with " << _threadCount << " threads!\n" <<
 						_threadCount << " threads would require " << memToStr(estMemorySizePerThread*compThreadCount) << " of memory approximately.\n"
 						"Number of threads that will actually be used: " << maxThreads << "\n"
@@ -68,22 +68,22 @@ namespace rfiStrategy {
 			}
 			if(dynamic_cast<FilterBankSet*>(&imageSet) != nullptr && _threadCount != 1)
 			{
-				AOLogger::Info << "This is a Filterbank set -- disabling multi-threading\n";
+				Logger::Info << "This is a Filterbank set -- disabling multi-threading\n";
 				_threadCount = 1;
 			}
 			if(!_antennaeToSkip.empty())
 			{
-				AOLogger::Debug << "The following antennas will be skipped: ";
+				Logger::Debug << "The following antennas will be skipped: ";
 				for(std::set<size_t>::const_iterator i=_antennaeToSkip.begin();i!=_antennaeToSkip.end(); ++i)
-					AOLogger::Debug << (*i) << ' ';
-				AOLogger::Debug <<'\n';
+					Logger::Debug << (*i) << ' ';
+				Logger::Debug <<'\n';
 			}
 			if(!_antennaeToInclude.empty())
 			{
-				AOLogger::Debug << "Only the following antennas will be included: ";
+				Logger::Debug << "Only the following antennas will be included: ";
 				for(std::set<size_t>::const_iterator i=_antennaeToInclude.begin();i!=_antennaeToInclude.end(); ++i)
-					AOLogger::Debug << (*i) << ' ';
-				AOLogger::Debug <<'\n';
+					Logger::Debug << (*i) << ' ';
+				Logger::Debug <<'\n';
 			}
 
 			if(artifacts.MetaData() != 0)
@@ -115,7 +115,7 @@ namespace rfiStrategy {
 				iteratorIndex->Next();
 			}
 			iteratorIndex.reset();
-			AOLogger::Debug << "Will process " << _baselineCount << " baselines.\n";
+			Logger::Debug << "Will process " << _baselineCount << " baselines.\n";
 			
 			// Initialize thread data and threads
 			_loopIndex = imageSet.StartIndex();
@@ -362,7 +362,7 @@ namespace rfiStrategy {
 		_action.SetFinishedBaselines();
 		_action._dataAvailable.notify_all();
 		watch.Pause();
-		AOLogger::Debug << "Time spent on reading: " << watch.ToString() << '\n';
+		Logger::Debug << "Time spent on reading: " << watch.ToString() << '\n';
 	}
 
 	void ForEachBaselineAction::SetProgress(ProgressListener &progress, int no, int count, const std::string& taskName, int threadId)

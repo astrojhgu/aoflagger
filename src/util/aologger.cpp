@@ -1,36 +1,45 @@
 #include "aologger.h"
 
-enum AOLogger::AOLoggerLevel AOLogger::_coutLevel = AOLogger::InfoLevel;
+#include <boost/date_time/posix_time/posix_time.hpp>
 
-AOLogger::LogWriter<AOLogger::DebugLevel> AOLogger::Debug;
+enum Logger::LoggerLevel Logger::_coutLevel = Logger::InfoLevel;
 
-AOLogger::LogWriter<AOLogger::InfoLevel> AOLogger::Info;
+bool Logger::_logTime = false;
 
-AOLogger::LogWriter<AOLogger::WarningLevel> AOLogger::Warn;
+Logger::LogWriter<Logger::DebugLevel> Logger::Debug;
 
-AOLogger::LogWriter<AOLogger::ErrorLevel> AOLogger::Error;
+Logger::LogWriter<Logger::InfoLevel> Logger::Info;
 
-AOLogger::LogWriter<AOLogger::FatalLevel> AOLogger::Fatal;
+Logger::LogWriter<Logger::WarningLevel> Logger::Warn;
 
-AOLogger::LogWriter<AOLogger::NoLevel, true> AOLogger::Progress;
+Logger::LogWriter<Logger::ErrorLevel> Logger::Error;
 
-void AOLogger::Init(const std::string &name, bool useLogger, bool verbose)
+Logger::LogWriter<Logger::FatalLevel> Logger::Fatal;
+
+Logger::LogWriter<Logger::NoLevel, true> Logger::Progress;
+
+void Logger::SetVerbosity(VerbosityLevel verbosityLevel)
 {
-	Debug.SetUseLogger(useLogger && verbose);
-	Info.SetUseLogger(useLogger);
-	Warn.SetUseLogger(useLogger);
-	Error.SetUseLogger(useLogger);
-	Fatal.SetUseLogger(useLogger);
-	Debug.SetUseLogger(useLogger && verbose);
-
-	if(useLogger) {
-		_coutLevel = ErrorLevel;
-		//INIT_LOGGER(name);
-	}
-	else {
-		if(verbose)
-			_coutLevel = DebugLevel;
-		else
+	switch(verbosityLevel)
+	{
+		case QuietVerbosity:
+			_coutLevel = NoLevel;
+			break;
+		case NormalVerbosity:
 			_coutLevel = InfoLevel;
+		break;
+		case VerboseVerbosity:
+			_coutLevel = DebugLevel;
+			break;
 	}
+}
+
+void Logger::outputTime(bool toStdErr)
+{
+	boost::posix_time::ptime t(boost::posix_time::microsec_clock::local_time());
+	std::string str = boost::posix_time::to_simple_string(t);
+	if(toStdErr)
+		std::cerr << str << ' ';
+	else
+		std::cout << str << ' ';
 }

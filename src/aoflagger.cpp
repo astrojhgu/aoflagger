@@ -43,12 +43,12 @@ class ConsoleProgressHandler : public ProgressListener {
 			
 			double totalProgress = TotalProgress();
 			
-			AOLogger::Progress << round(totalProgress*1000.0)/10.0 << "% : ";
+			Logger::Progress << round(totalProgress*1000.0)/10.0 << "% : ";
 			
 			for(size_t i=1;i<Depth();++i)
-				AOLogger::Progress << "+-";
+				Logger::Progress << "+-";
 			
-			AOLogger::Progress << description << "...\n";
+			Logger::Progress << description << "...\n";
 		}
 		
 		virtual void OnEndTask(const rfiStrategy::Action &action) final override
@@ -65,7 +65,7 @@ class ConsoleProgressHandler : public ProgressListener {
 
 		virtual void OnException(const rfiStrategy::Action &, std::exception &thrownException) final override
 		{
-			AOLogger::Error <<
+			Logger::Error <<
 				"An exception occured during execution of the strategy!\n"
 				"Your set might not be fully flagged. Exception was:\n"
 				<< thrownException.what() << '\n';
@@ -80,14 +80,14 @@ class ConsoleProgressHandler : public ProgressListener {
 void checkRelease()
 {
 #ifndef NDEBUG
-		AOLogger::Warn
+		Logger::Warn
 			<< "This version of the AOFlagger has been compiled as DEBUG version! (NDEBUG was not defined)\n"
 			<< "For better performance, recompile it as a RELEASE.\n\n";
 #endif
 }
 void generalInfo()
 {
-	AOLogger::Info << 
+	Logger::Info << 
 		"AOFlagger " << AOFLAGGER_VERSION_STR << " (" << AOFLAGGER_VERSION_DATE_STR <<
 		") command line application\n"
 		"This program will execute an RFI strategy as can be created with the RFI gui\n"
@@ -99,9 +99,8 @@ int main(int argc, char **argv)
 {
 	if(argc == 1)
 	{
-		AOLogger::Init(basename(argv[0]));
 		generalInfo();
-		AOLogger::Error << "Usage: " << argv[0] << " [options] <obs1> [<obs2> [..]]\n"
+		Logger::Error << "Usage: " << argv[0] << " [options] <obs1> [<obs2> [..]]\n"
 		"  -v will produce verbose output\n"
 		"  -j overrides the number of threads specified in the strategy\n"
 		"     (default: one thread for each CPU core)\n"
@@ -136,7 +135,7 @@ int main(int argc, char **argv)
 	Parameter<BaselineIOMode> readMode;
 	Parameter<bool> readUVW;
 	Parameter<std::string> strategyFile;
-	Parameter<bool> logVerbose;
+	Parameter<Logger::VerbosityLevel> logVerbosity;
 	Parameter<bool> skipFlagged;
 	Parameter<std::string> dataColumn;
 	Parameter<bool> combineSPWs;
@@ -158,12 +157,11 @@ int main(int argc, char **argv)
 		}
 		else if(flag=="v")
 		{
-			logVerbose = true;
+			logVerbosity = Logger::VerboseVerbosity;
 		}
 		else if(flag == "version")
 		{
-			AOLogger::Init(basename(argv[0]));
-			AOLogger::Info << "AOFlagger " << AOFLAGGER_VERSION_STR << " (" << AOFLAGGER_VERSION_DATE_STR << ")\n";
+			Logger::Info << "AOFlagger " << AOFLAGGER_VERSION_STR << " (" << AOFLAGGER_VERSION_DATE_STR << ")\n";
 			return 0;
 		}
 		else if(flag=="direct-read")
@@ -217,22 +215,21 @@ int main(int argc, char **argv)
 		}
 		else
 		{
-			AOLogger::Init(basename(argv[0]));
-			AOLogger::Error << "Incorrect usage; parameter \"" << argv[parameterIndex] << "\" not understood.\n";
+			Logger::Error << "Incorrect usage; parameter \"" << argv[parameterIndex] << "\" not understood.\n";
 			return 1;
 		}
 		++parameterIndex;
 	}
 
 	try {
-		AOLogger::Init(basename(argv[0]), false, logVerbose.Value(false));
+		Logger::SetVerbosity(logVerbosity.Value(Logger::NormalVerbosity));
 		generalInfo();
 			
 		checkRelease();
 
 		if(!threadCount.IsSet())
 			threadCount = System::ProcessorCount();
-		AOLogger::Debug << "Number of threads: " << threadCount.Value() << "\n";
+		Logger::Debug << "Number of threads: " << threadCount.Value() << "\n";
 
 		Stopwatch watch(true);
 
@@ -262,7 +259,7 @@ int main(int argc, char **argv)
 			fomAction->SetSkipIfAlreadyProcessed(skipFlagged);
 		for(int i=parameterIndex;i<argc;++i)
 		{
-			AOLogger::Debug << "Adding '" << argv[i] << "'\n";
+			Logger::Debug << "Adding '" << argv[i] << "'\n";
 			fomAction->Filenames().push_back(argv[i]);
 		}
 		
@@ -272,12 +269,12 @@ int main(int argc, char **argv)
 			rfiStrategy::StrategyReader reader;
 			std::unique_ptr<rfiStrategy::Strategy> subStrategy;
 			try {
-				AOLogger::Debug << "Opening strategy file '" << strategyFile.Value() << "'\n";
+				Logger::Debug << "Opening strategy file '" << strategyFile.Value() << "'\n";
 				subStrategy = reader.CreateStrategyFromFile(strategyFile);
-				AOLogger::Debug << "Strategy parsed succesfully.\n";
+				Logger::Debug << "Strategy parsed succesfully.\n";
 			} catch(std::exception &e)
 			{
-				AOLogger::Error <<
+				Logger::Error <<
 					"ERROR: Reading strategy file \"" << strategyFile.Value() << "\" failed! This\n"
 					"might be caused by a change in the file format of the strategy file after you\n"
 					"created the strategy file.\n"
@@ -289,7 +286,7 @@ int main(int argc, char **argv)
 				!rfiStrategy::DefaultStrategy::StrategyContainsAction(*subStrategy, rfiStrategy::WriteFlagsActionType))
 			{
 				rfiStrategy::DefaultStrategy::EncapsulateSingleStrategy(*fomAction, std::move(subStrategy), rfiStrategy::DefaultStrategy::GENERIC_TELESCOPE);
-				AOLogger::Info << "Modified single-baseline strategy so it will execute strategy on all baselines and write flags.\n";
+				Logger::Info << "Modified single-baseline strategy so it will execute strategy on all baselines and write flags.\n";
 			}
 			else {
 				fomAction->Add(std::move(subStrategy));
@@ -316,7 +313,7 @@ int main(int argc, char **argv)
 		
 		ConsoleProgressHandler progress;
 
-		AOLogger::Info << "Starting strategy on " << to_simple_string(boost::posix_time::microsec_clock::local_time()) << '\n';
+		Logger::Info << "Starting strategy on " << to_simple_string(boost::posix_time::microsec_clock::local_time()) << '\n';
 		
 		overallStrategy.InitializeAll();
 		overallStrategy.StartPerformThread(artifacts, progress);
@@ -329,7 +326,7 @@ int main(int argc, char **argv)
 
 		delete set;
 
-		AOLogger::Debug << "Time: " << watch.ToString() << "\n";
+		Logger::Debug << "Time: " << watch.ToString() << "\n";
 		
 		return RETURN_SUCCESS;
 	} catch(std::exception& exception)

@@ -194,7 +194,7 @@ private:
 					const num_t sincScale = ActualSincScaleInSamples(artifacts, band.channels[y].frequencyHz);
 					if(y == image->Height()/2)
 					{
-						AOLogger::Debug << "Horizontal sinc scale: " << sincScale << " (filter scale: " << Angle::ToString(ActualSincScaleAsRaDecDist(artifacts, band.channels[y].frequencyHz)) << ")\n";
+						Logger::Debug << "Horizontal sinc scale: " << sincScale << " (filter scale: " << Angle::ToString(ActualSincScaleAsRaDecDist(artifacts, band.channels[y].frequencyHz)) << ")\n";
 					}
 					if(sincScale > 1.0)
 					{
@@ -236,7 +236,7 @@ private:
 					const num_t sincScale = ActualSincScaleInSamples(artifacts, band.channels[y].frequencyHz);
 					if(y == image->Height()/2)
 					{
-						AOLogger::Debug << "Horizontal sinc scale: " << sincScale << " (filter scale: " << Angle::ToString(ActualSincScaleAsRaDecDist(artifacts, band.channels[y].frequencyHz)) << ")\n";
+						Logger::Debug << "Horizontal sinc scale: " << sincScale << " (filter scale: " << Angle::ToString(ActualSincScaleAsRaDecDist(artifacts, band.channels[y].frequencyHz)) << ")\n";
 					}
 					if(sincScale > 1.0)
 					{
@@ -383,7 +383,7 @@ private:
 					iterData.channelMaxDist[y] = fabsnl(rowUPositions[vZeroPos]);
 					iterData.maxDist += iterData.channelMaxDist[y] / yL;
 
-					//AOLogger::Debug << "v is min at t=" << vZeroPos << " (v=+-" << vDist << ", maxDist=" << iterData.channelMaxDist[y] << ")\n";
+					//Logger::Debug << "v is min at t=" << vZeroPos << " (v=+-" << vDist << ", maxDist=" << iterData.channelMaxDist[y] << ")\n";
 				}
 			}
 
@@ -491,7 +491,7 @@ private:
 					width = iterData.width,
 					fourierWidth = iterData.fourierWidth;
 
-				AOLogger::Debug << "Inv FT, using 0-" << startXf << " and " << endXf << "-" << fourierWidth << '\n';
+				Logger::Debug << "Inv FT, using 0-" << startXf << " and " << endXf << "-" << fourierWidth << '\n';
 				
 				for(size_t t=0;t<width;++t)
 				{
@@ -565,7 +565,7 @@ private:
 					iterData.fourierValuesReal[0]*iterData.fourierValuesReal[0] + iterData.fourierValuesImag[0]*iterData.fourierValuesImag[0];
 				if(withinBounds)
 				{
-					AOLogger::Debug << "Limiting search to xF<" << startXf << " and xF>" << endXf << '\n'; 
+					Logger::Debug << "Limiting search to xF<" << startXf << " and xF>" << endXf << '\n'; 
 					for(size_t xF=0;xF<startXf;++xF)
 					{
 						numl_t
@@ -693,13 +693,13 @@ private:
 									fReal = iterData.fourierValuesReal[xFRemoval],
 									fImag = iterData.fourierValuesImag[xFRemoval],
 									xFValue = sqrtnl(fReal*fReal + fImag*fImag);
-							AOLogger::Debug << "Removing frequency at xF=" << xFRemoval << ", amp=" << xFValue << '\n';
-							AOLogger::Debug << "Amplitude = sigma x " << (xFValue / GetAverageAmplitude(iterData)) << '\n';
+							Logger::Debug << "Removing frequency at xF=" << xFRemoval << ", amp=" << xFValue << '\n';
+							Logger::Debug << "Amplitude = sigma x " << (xFValue / GetAverageAmplitude(iterData)) << '\n';
 
 							if(xFRemoval < iterData.startXf || xFRemoval > iterData.endXf || _alwaysRemove)
 							{
 								if(!_alwaysRemove)
-									AOLogger::Debug << "Within bounds 0-" << iterData.startXf << '/' << iterData.endXf << "-.. removing from image.\n";
+									Logger::Debug << "Within bounds 0-" << iterData.startXf << '/' << iterData.endXf << "-.. removing from image.\n";
 								// Now, remove the fringe from each channel 
 								for(size_t yI = y; yI != y+_channelAveragingSize; ++yI)
 								{
@@ -784,13 +784,13 @@ private:
 				imager.PerformFFT();
 				Image2DPtr image(FFTTools::CreateAbsoluteImage(imager.FTReal(), imager.FTImaginary()));
 				const numl_t centralFreq = artifacts.MetaData()->Band().channels[data.ImageHeight()/2].frequencyHz;
-				AOLogger::Debug << "Central frequency: " << centralFreq << "\n";
-				AOLogger::Debug << "Baseline length: " << artifacts.MetaData()->Baseline().Distance() << '\n';
-				AOLogger::Debug << "Sinc scale in lambda: " << ActualSincScaleInLambda(artifacts, centralFreq) << '\n';
-				AOLogger::Debug << "Average distance: " << avgUVDistance(artifacts, centralFreq) << '\n';
+				Logger::Debug << "Central frequency: " << centralFreq << "\n";
+				Logger::Debug << "Baseline length: " << artifacts.MetaData()->Baseline().Distance() << '\n';
+				Logger::Debug << "Sinc scale in lambda: " << ActualSincScaleInLambda(artifacts, centralFreq) << '\n';
+				Logger::Debug << "Average distance: " << avgUVDistance(artifacts, centralFreq) << '\n';
 				const numl_t sincDist = ActualSincScaleAsRaDecDist(artifacts, centralFreq);
 				numl_t ignoreRadius = sincDist / imager.UVScaling();
-				AOLogger::Debug << "Ignoring radius=" << ignoreRadius << "\n";
+				Logger::Debug << "Ignoring radius=" << ignoreRadius << "\n";
 
 				long maxX = 0, maxY = 0;
 				num_t maxValue = image->Value(maxX, maxY);
@@ -815,7 +815,7 @@ private:
 				maxX = maxX*2-image->Width();
 				maxY = image->Height() - maxY*2;
 				numl_t angle = SinusFitter::Phase((numl_t) maxX, (numl_t) maxY);
- 				AOLogger::Debug << "Angle: " << angle/M_PInl*180.0 << ",maxX=" << maxX << ",maxY=" << maxY << '\n';
+ 				Logger::Debug << "Angle: " << angle/M_PInl*180.0 << ",maxX=" << maxX << ",maxY=" << maxY << '\n';
 				return angle;
 			}
 

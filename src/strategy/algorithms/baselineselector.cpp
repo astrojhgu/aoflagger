@@ -66,7 +66,7 @@ void BaselineSelector::Search(std::vector<BaselineSelector::SingleBaselineInfo> 
 		if(currentValue>_absThreshold || (_baselines[i].rfiCount==0 && _baselines[i].totalCount>=2500))
 		{
 			if(_useLog)
-				AOLogger::Info << "Baseline " << _baselines[i].antenna1Name << " x " << _baselines[i].antenna2Name << " looks bad: "
+				Logger::Info << "Baseline " << _baselines[i].antenna1Name << " x " << _baselines[i].antenna2Name << " looks bad: "
 			<< round(currentValue * 10000.0)/100.0 << "% rfi (zero or above " << (_absThreshold*100.0) << "% abs threshold)\n";
 				
 			_baselines[i].marked = true;
@@ -112,7 +112,7 @@ void BaselineSelector::Search(std::vector<BaselineSelector::SingleBaselineInfo> 
 		ThresholdTools::TrimmedMeanAndStdDev(valuesCopy, mean, stddev);
 
 		if(_makePlot && _useLog)
-			AOLogger::Debug << "Estimated std dev for thresholding, in percentage of RFI: " << round(10000.0*stddev)/100.0 << "%\n";
+			Logger::Debug << "Estimated std dev for thresholding, in percentage of RFI: " << round(10000.0*stddev)/100.0 << "%\n";
 
 		// unselect already marked baselines
 		for(int i=markedBaselines.size()-1;i>=0;--i)
@@ -127,7 +127,7 @@ void BaselineSelector::Search(std::vector<BaselineSelector::SingleBaselineInfo> 
 				markedBaselines.erase(markedBaselines.begin()+i);
 				_baselines.push_back(baseline);
 				if(_useLog)
-					AOLogger::Info << "Baseline " << baseline.antenna1Name << " x " << baseline.antenna2Name << " is now within baseline curve\n";
+					Logger::Info << "Baseline " << baseline.antenna1Name << " x " << baseline.antenna2Name << " is now within baseline curve\n";
 			}
 		}
 		
@@ -149,7 +149,7 @@ void BaselineSelector::Search(std::vector<BaselineSelector::SingleBaselineInfo> 
 			if(values[i] < mean - _threshold*stddev || values[i] > mean + _threshold*stddev || currentValue>_absThreshold || (_baselines[i].rfiCount==0 && _baselines[i].totalCount>=2500))
 			{
 				if(_useLog)
-					AOLogger::Info << "Baseline " << _baselines[i].antenna1Name << " x " << _baselines[i].antenna2Name << " looks bad: "
+					Logger::Info << "Baseline " << _baselines[i].antenna1Name << " x " << _baselines[i].antenna2Name << " looks bad: "
 				<< round(currentValue * 10000.0)/100.0 << "% rfi, "
 				<< round(10.0*fabs((values[i] - mean) / stddev))/10.0 << "*sigma away from est baseline curve\n";
 					

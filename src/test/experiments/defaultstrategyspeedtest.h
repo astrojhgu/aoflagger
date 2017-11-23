@@ -134,7 +134,7 @@ inline void DefaultStrategySpeedTest::TimeStrategy::operator()()
 	DummyProgressListener progressListener;
 	Stopwatch watch(true);
 	strategy->Perform(artifacts, progressListener);
-	AOLogger::Info << "Default strategy took: " << watch.ToString() << '\n';
+	Logger::Info << "Default strategy took: " << watch.ToString() << '\n';
 }
 
 inline void DefaultStrategySpeedTest::TimeSlidingWindowFit::operator()()
@@ -182,7 +182,7 @@ inline void DefaultStrategySpeedTest::TimeSlidingWindowFit::operator()()
 	DummyProgressListener progressListener;
 	Stopwatch watch(true);
 	strategy.Perform(artifacts, progressListener);
-	AOLogger::Info << "Sliding window fit took (loop + fit): " << watch.ToString() << '\n';
+	Logger::Info << "Sliding window fit took (loop + fit): " << watch.ToString() << '\n';
 }
 
 inline void DefaultStrategySpeedTest::TimeHighPassFilter::operator()()
@@ -232,7 +232,7 @@ inline void DefaultStrategySpeedTest::TimeHighPassFilter::operator()()
 	DummyProgressListener progressListener;
 	Stopwatch watch(true);
 	strategy.Perform(artifacts, progressListener);
-	AOLogger::Info << "High-pass filter took (loop + fit): " << watch.ToString() << '\n';
+	Logger::Info << "High-pass filter took (loop + fit): " << watch.ToString() << '\n';
 }
 
 inline void DefaultStrategySpeedTest::TimeLoop::operator()()
@@ -273,7 +273,7 @@ inline void DefaultStrategySpeedTest::TimeLoop::operator()()
 	DummyProgressListener progressListener;
 	Stopwatch watch(true);
 	strategy.Perform(artifacts, progressListener);
-	AOLogger::Info << "Loop took: " << watch.ToString() << '\n';
+	Logger::Info << "Loop took: " << watch.ToString() << '\n';
 }
 
 inline void DefaultStrategySpeedTest::TimeLoopUntilAmplitude::operator()()
@@ -298,7 +298,7 @@ inline void DefaultStrategySpeedTest::TimeLoopUntilAmplitude::operator()()
 	DummyProgressListener progressListener;
 	Stopwatch watch(true);
 	strategy.Perform(artifacts, progressListener);
-	AOLogger::Info << "Loop took: " << watch.ToString() << '\n';
+	Logger::Info << "Loop took: " << watch.ToString() << '\n';
 }
 
 inline void DefaultStrategySpeedTest::TimeSumThreshold::operator()()
@@ -340,7 +340,7 @@ inline void DefaultStrategySpeedTest::TimeSumThreshold::operator()()
 	DummyProgressListener progressListener;
 	Stopwatch watch(true);
 	strategy.Perform(artifacts, progressListener);
-	AOLogger::Info << "Sum threshold took (loop + threshold): " << watch.ToString() << '\n';
+	Logger::Info << "Sum threshold took (loop + threshold): " << watch.ToString() << '\n';
 }
 
 inline void DefaultStrategySpeedTest::TimeSumThresholdN::operator()()
@@ -352,8 +352,8 @@ inline void DefaultStrategySpeedTest::TimeSumThresholdN::operator()()
 	config.InitializeLengthsDefault(9);
 	num_t stddev = artifacts.OriginalData().GetSingleImage()->GetStdDev();
 	num_t mode = artifacts.OriginalData().GetSingleImage()->GetMode();
-	AOLogger::Info << "Stddev: " << stddev << '\n';
-	AOLogger::Info << "Mode: " << mode << '\n';
+	Logger::Info << "Stddev: " << stddev << '\n';
+	Logger::Info << "Mode: " << mode << '\n';
 	config.InitializeThresholdsFromFirstThreshold(6.0 * stddev, ThresholdConfig::Rayleigh);
 	for(unsigned i=0;i<9;++i)
 	{
@@ -364,25 +364,25 @@ inline void DefaultStrategySpeedTest::TimeSumThresholdN::operator()()
 		Mask2DPtr maskA(new Mask2D(*artifacts.OriginalData().GetSingleMask()));
 		Stopwatch watchA(true);
 		ThresholdMitigater::HorizontalSumThresholdLargeReference(input.get(), maskA.get(), length, threshold);
-		AOLogger::Info << "Horizontal, length " << length << ": " << watchA.ToString() << '\n';
+		Logger::Info << "Horizontal, length " << length << ": " << watchA.ToString() << '\n';
 		
 #ifdef __SSE__
 		Mask2DPtr maskC(new Mask2D(*artifacts.OriginalData().GetSingleMask()));
 		Stopwatch watchC(true);
 		ThresholdMitigater::HorizontalSumThresholdLargeSSE(input.get(), maskC.get(), length, threshold);
-		AOLogger::Info << "Horizontal SSE, length " << length << ": " << watchC.ToString() << '\n';
+		Logger::Info << "Horizontal SSE, length " << length << ": " << watchC.ToString() << '\n';
 #endif
 		
 		Mask2DPtr maskB(new Mask2D(*artifacts.OriginalData().GetSingleMask()));
 		Stopwatch watchB(true);
 		ThresholdMitigater::VerticalSumThresholdLargeReference(input.get(), maskB.get(), length, threshold);
-		AOLogger::Info << "Vertical, length " << length << ": " << watchB.ToString() << '\n';
+		Logger::Info << "Vertical, length " << length << ": " << watchB.ToString() << '\n';
 		
 #ifdef __SSE__
 		Mask2DPtr maskD(new Mask2D(*artifacts.OriginalData().GetSingleMask()));
 		Stopwatch watchD(true);
 		ThresholdMitigater::VerticalSumThresholdLargeSSE(input.get(), maskD.get(), length, threshold);
-		AOLogger::Info << "SSE Vertical, length " << length << ": " << watchD.ToString() << '\n';
+		Logger::Info << "SSE Vertical, length " << length << ": " << watchD.ToString() << '\n';
 #endif
 	}
 }
@@ -411,7 +411,7 @@ inline void DefaultStrategySpeedTest::TimeRankOperator::operator()()
 	long double operatorTime = operatorTimer.Seconds();
 	long double totalTime = watch.Seconds();
 	
-	AOLogger::Info
+	Logger::Info
 		<< "Rank operator took " << operatorTimer.ToShortString() << " (" << operatorTime << ")"
 		<< " of " << watch.ToShortString() << " (" << totalTime << ")"
 		<< ", " << ( operatorTime * 100.0 / totalTime) << "%\n";
@@ -504,7 +504,7 @@ inline void DefaultStrategySpeedTest::TimeSSEHighPassFilterStrategy::operator()(
 	DummyProgressListener progressListener;
 	Stopwatch watch(true);
 	strategy->Perform(artifacts, progressListener);
-	AOLogger::Info << "Default strategy took: " << watch.ToString() << '\n';
+	Logger::Info << "Default strategy took: " << watch.ToString() << '\n';
 }
 #endif // __SSE__
 

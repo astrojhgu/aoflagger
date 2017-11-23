@@ -362,7 +362,7 @@ namespace rfiStrategy {
 	{
 		if(telescopeId == GENERIC_TELESCOPE)
 		{
-			AOLogger::Warn << 
+			Logger::Warn << 
 				"**\n"
 				"** Measurement set specified the following telescope name: '" << telescopeName << "'\n"
 				"** No good strategy is known for this telescope!\n"
@@ -373,7 +373,7 @@ namespace rfiStrategy {
 	
 	void DefaultStrategy::DetermineSettings(MeasurementSet& measurementSet, DefaultStrategy::TelescopeId& telescopeId, unsigned int& flags, double& frequency, double& timeRes, double& frequencyRes)
 	{
-		AOLogger::Debug << "Determining best known strategy for measurement set...\n";
+		Logger::Debug << "Determining best known strategy for measurement set...\n";
 		
 		std::string telescopeName = measurementSet.TelescopeName();
 		telescopeId = TelescopeIdFromName(telescopeName);
@@ -417,7 +417,7 @@ namespace rfiStrategy {
 		else
 			timeRes = 0.0;
 		
-		AOLogger::Info <<
+		Logger::Info <<
 			"The strategy will be optimized for the following settings:\n"
 			"Telescope=" << TelescopeName(telescopeId) << ", flags=NONE, frequency="
 			<< Frequency::ToString(frequency) << ",\n"
@@ -447,7 +447,7 @@ namespace rfiStrategy {
 		  telescopeId = TelescopeIdFromName(telescopeName);
 		  warnIfUnknownTelescope(telescopeId, telescopeName);
 		  if(telescopeId != GENERIC_TELESCOPE)
-		    AOLogger::Info <<
+		    Logger::Info <<
 		      "The strategy will be optimized for telescope " << TelescopeName(telescopeId) << ". Telescope-specific\n"
 		      "settings will be left to their defaults, which might not be optimal for all cases.\n";
 		  flags = 0;
@@ -460,7 +460,7 @@ namespace rfiStrategy {
 		  telescopeId = TelescopeIdFromName(telescopeName);
 		  warnIfUnknownTelescope(telescopeId, telescopeName);
 		  if(telescopeId != GENERIC_TELESCOPE)
-		    AOLogger::Info <<
+		    Logger::Info <<
 		      "The strategy will be optimized for telescope " << TelescopeName(telescopeId) << ". Telescope-specific\n"
 		      "settings will be left to their defaults, which might not be optimal for all cases.\n";
 		  flags = 0;
@@ -473,12 +473,12 @@ namespace rfiStrategy {
 			frequency = fbImageSet->CentreFrequency();
 			timeRes = fbImageSet->TimeResolution();
 			frequencyRes = fbImageSet->ChannelWidth();
-			AOLogger::Info <<
+			Logger::Info <<
 				"The strategy will be optimized for the following settings specified by the FilterBankSet:\n"
 				"Telescope=" << TelescopeName(telescopeId) << ", flags=NONE, frequency="
 				<< Frequency::ToString(frequency) << ",\n"
 				"time resolution=" << timeRes*1e6 << " µs, frequency resolution=" << Frequency::ToString(frequencyRes) << '\n';
-			AOLogger::Warn <<
+			Logger::Warn <<
 				"** Determined some settings from FilterBankSet, but telescope name cannot be determined.\n";
 		} else {
 		  telescopeId = GENERIC_TELESCOPE;
@@ -486,7 +486,7 @@ namespace rfiStrategy {
 		  frequency = 0.0;
 		  timeRes = 0.0;
 		  frequencyRes = 0.0;
-		  AOLogger::Warn <<
+		  Logger::Warn <<
 		    "** Could not determine telescope name from set, because it has not\n"
 		    "** been implemented for this file format. A generic strategy will be used!\n";
 		}

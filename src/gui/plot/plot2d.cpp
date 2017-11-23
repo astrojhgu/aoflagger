@@ -31,10 +31,6 @@ void Plot2D::Clear()
 
 void Plot2D::Render(Gtk::DrawingArea &drawingArea)
 {
-	_system.Clear();
-	for(std::unique_ptr<Plot2DPointSet>& set : _pointSets)
-		_system.AddToSystem(*set);
-
 	Glib::RefPtr<Gdk::Window> window = drawingArea.get_window();
 	if(window)
 	{
@@ -51,7 +47,7 @@ void Plot2D::SavePdf(const std::string &filename)
 {
 	Cairo::RefPtr<Cairo::PdfSurface> surface = Cairo::PdfSurface::create(filename, _width, _height);
 	Cairo::RefPtr<Cairo::Context> cairo = Cairo::Context::create(surface);
-	AOLogger::Debug << "Saving PDF of " << _width << " x " << _height << "\n";
+	Logger::Debug << "Saving PDF of " << _width << " x " << _height << "\n";
 	render(cairo);
 	cairo->show_page();
 	surface->finish();
@@ -61,7 +57,7 @@ void Plot2D::SaveSvg(const std::string &filename)
 {
 	Cairo::RefPtr<Cairo::SvgSurface> surface = Cairo::SvgSurface::create(filename, _width, _height);
 	Cairo::RefPtr<Cairo::Context> cairo = Cairo::Context::create(surface);
-	AOLogger::Debug << "Saving SVG of " << _width << " x " << _height << "\n";
+	Logger::Debug << "Saving SVG of " << _width << " x " << _height << "\n";
 	render(cairo);
 	cairo->show_page();
 	surface->finish();
@@ -71,14 +67,17 @@ void Plot2D::SavePng(const std::string &filename)
 {
 	Cairo::RefPtr<Cairo::ImageSurface> surface = Cairo::ImageSurface::create(Cairo::FORMAT_ARGB32, _width, _height);
 	Cairo::RefPtr<Cairo::Context> cairo = Cairo::Context::create(surface);
-	AOLogger::Debug << "Saving PNG of " << _width << " x " << _height << "\n";
+	Logger::Debug << "Saving PNG of " << _width << " x " << _height << "\n";
 	render(cairo);
 	surface->write_to_png(filename);
 }
 
-
 void Plot2D::render(Cairo::RefPtr<Cairo::Context> cr)
 {
+	_system.Clear();
+	for(std::unique_ptr<Plot2DPointSet>& set : _pointSets)
+		_system.AddToSystem(*set);
+	
 	cr->set_line_width(2);
 
 	cr->set_source_rgba(1, 1, 1, 1);

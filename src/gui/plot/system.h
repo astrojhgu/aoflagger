@@ -16,6 +16,11 @@ class System {
 		{
 			Clear();
 		}
+		
+		bool Empty() const
+		{
+			return _dimensions.empty();
+		}
 
 		void AddToSystem(class Plot2DPointSet &pointSet)
 		{

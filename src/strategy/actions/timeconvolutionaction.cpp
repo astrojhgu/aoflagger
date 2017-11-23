@@ -28,7 +28,7 @@ void TimeConvolutionAction::PerformFFTSincOperation(ArtifactSet &artifacts, Imag
 		const numl_t limitFrequency = (numl_t) width / sincScale;
 		if(y == real->Height()/2)
 		{
-			AOLogger::Debug << "Horizontal sinc scale: " << sincScale << " (filter scale: " << Angle::ToString(ActualSincScaleAsRaDecDist(artifacts, band.channels[y].frequencyHz)) << ")\n";
+			Logger::Debug << "Horizontal sinc scale: " << sincScale << " (filter scale: " << Angle::ToString(ActualSincScaleAsRaDecDist(artifacts, band.channels[y].frequencyHz)) << ")\n";
 		}
 		if(sincScale > 1.0)
 		{

@@ -208,3 +208,4 @@ void AOQPlotController::Initialize(AOQPageController* controller, bool averagedS
 		controller->SetStatistics(_fullStats.get(), _antennas);
 	controller->SetHistograms(_histCollection.get());
 }
+
