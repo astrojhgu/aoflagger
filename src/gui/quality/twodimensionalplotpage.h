@@ -1,9 +1,7 @@
 #ifndef GUI_QUALITY__2DPLOTPAGE_H
 #define GUI_QUALITY__2DPLOTPAGE_H
 
-#include <gtkmm/toggletoolbutton.h>
-#include <gtkmm/toolbutton.h>
-#include <gtkmm/separatortoolitem.h>
+#include "../controllers/aoqplotpagecontroller.h"
 
 #include "../../quality/qualitytablesformatter.h"
 
@@ -12,50 +10,32 @@
 
 #include "plotsheet.h"
 
+#include <gtkmm/toggletoolbutton.h>
+#include <gtkmm/toolbutton.h>
+#include <gtkmm/separatortoolitem.h>
+
 #include <set>
 
 class TwoDimensionalPlotPage : public PlotSheet {
 	public:
-		TwoDimensionalPlotPage();
+		TwoDimensionalPlotPage(AOQPlotPageController* _controller);
     virtual ~TwoDimensionalPlotPage();
 
-		virtual void CloseStatistics() override final
-		{
-			_statCollection = 0;
-		}
-		
 		virtual void InitializeToolbar(Gtk::Toolbar& toolbar) override final;
 		
-		bool HasStatistics() const
-		{
-			return _statCollection != 0;
-		}
+		std::set<QualityTablesFormatter::StatisticKind> GetSelectedKinds() const;
+		std::set<std::pair<unsigned, unsigned> > GetSelectedPolarizations() const;
+		std::set<enum AOQPlotPageController::PhaseType> GetSelectedPhases() const;
 		
-		void SavePdf(const std::string& filename, QualityTablesFormatter::StatisticKind kind);
+		void Redraw();
+		
 	protected:
-		virtual void addCustomPlotButtons(Gtk::Toolbar &container)
+		virtual void addCustomPlotButtons(Gtk::Toolbar& container)
 		{ }
 		
-		void updatePlot();
-	private:
-		enum PhaseType { AmplitudePhaseType, PhasePhaseType, RealPhaseType, ImaginaryPhaseType} ;
-		
-		void updatePlotForSettings(
-			const std::set<QualityTablesFormatter::StatisticKind>& kinds,
-			const std::set<std::pair<unsigned int, unsigned int> >& pols,
-			const std::set<PhaseType>& phases
-		);
-		
+	private:		
 		void updatePlotConfig();
 		void updateDataWindow();
-		
-		inline double getValue(enum PhaseType Phase, const std::complex<long double>& val);
-		
-		std::set<QualityTablesFormatter::StatisticKind> getSelectedKinds() const;
-		std::set<std::pair<unsigned, unsigned> > getSelectedPolarizations() const;
-		std::set<enum PhaseType> getSelectedPhases() const;
-		
-		void plotStatistic(QualityTablesFormatter::StatisticKind kind, unsigned polA, unsigned polB, PhaseType phase, const std::string& yDesc);
 		
 		void initStatisticKindButtons(Gtk::Toolbar& toolbar);
 		void initPolarizationButtons(Gtk::Toolbar& toolbar);
@@ -70,6 +50,8 @@ class TwoDimensionalPlotPage : public PlotSheet {
 		void onPlotPropertiesClicked();
 		void onDataExportClicked();
 		
+		AOQPlotPageController* _controller;
+		
 		Gtk::SeparatorToolItem _separator1, _separator2, _separator3, _separator4;
 		
 		Gtk::ToggleToolButton _countButton, _meanButton, _stdDevButton, _varianceButton, _dCountButton, _dMeanButton, _dStdDevButton,  _rfiPercentageButton;
@@ -81,16 +63,12 @@ class TwoDimensionalPlotPage : public PlotSheet {
 		Gtk::ToggleToolButton _logarithmicButton, _zeroAxisButton;
 		Gtk::ToolButton _plotPropertiesButton, _dataExportButton;
 		
-		const StatisticsCollection *_statCollection;
-		Plot2D _plot;
 		PlotWidget _plotWidget;
 		
-		class PlotPropertiesWindow *_plotPropertiesWindow;
-		class DataWindow *_dataWindow;
+		class PlotPropertiesWindow* _plotPropertiesWindow;
+		class DataWindow* _dataWindow;
 		
 		bool _customButtonsCreated;
-		
-		std::string getYDesc(const std::set<QualityTablesFormatter::StatisticKind>& kinds) const;
 };
 
 #endif

@@ -12,45 +12,29 @@
 #include <gtkmm/textview.h>
 #include <gtkmm/radiobutton.h>
 
-#include "../../quality/qualitytablesformatter.h"
-
-#include "../plot/plot2d.h"
 #include "../plot/plotwidget.h"
 
 #include "plotsheet.h"
 
 class HistogramPage : public PlotSheet {
 	public:
-		HistogramPage();
+		HistogramPage(class HistogramPageController* controller);
     ~HistogramPage();
 
-		virtual void SetHistograms(const HistogramCollection *histograms) override final;
+		void updatePlot();
 		
-		void SetHistograms(const std::string &filename)
+		void Redraw() { _plotWidget.Update(); }
+		
+		void SetSlopeFrame(const std::string& str);
+		void SetFitText(const std::string& str)
 		{
-			_statFilename = filename;
-			readFromFile();
-			updatePlot();
-		}
-		virtual void CloseStatistics() override final;
-		bool HasStatistics() const
-		{
-			return _histograms != 0;
+			_fitTextView.get_buffer()->set_text(str);
 		}
 	private:
-		void addHistogramToPlot(const class LogHistogram &histogram);
-		void addRayleighToPlot(const class LogHistogram &histogram, double sigma, double n);
-		void addRayleighDifferenceToPlot(const LogHistogram &histogram, double sigma, double n);
-		void updatePlot();
-		void plotPolarization(const HistogramCollection &histogramCollection, unsigned polarization);
-		void plotPolarization(const class LogHistogram &totalHistogram, const class LogHistogram &rfiHistogram);
-		void plotFit(const class LogHistogram &histogram, const std::string &title);
-		void plotSlope(const class LogHistogram &histogram, const std::string &title, bool useLowerLimit2);
 		void onPlotPropertiesClicked();
 		void onDataExportClicked();
-		void readFromFile();
-		void updateSlopeFrame(const LogHistogram &histogram);
-		void addSlopeText(std::stringstream &str, const LogHistogram &histogram, bool updateRange);
+		void updateSlopeFrame(const class LogHistogram &histogram);
+		std::string SlopeText(std::stringstream &str, const LogHistogram &histogram, bool updateRange);
 		void updateDataWindow();
 		
 		void onAutoRangeClicked()
@@ -70,6 +54,8 @@ class HistogramPage : public PlotSheet {
 			if(autoRange)
 				updatePlot();
 		}
+		
+		class HistogramPageController* _controller;
 		
 		Gtk::Expander _expander;
 		Gtk::VBox _sideBox;
@@ -103,13 +89,9 @@ class HistogramPage : public PlotSheet {
 		Gtk::CheckButton _slopeAutoRangeButton;
 		Gtk::Entry _slopeStartEntry, _slopeEndEntry, _slopeRFIRatio;
 		
-		std::string _statFilename;
-		Plot2D _plot;
 		PlotWidget _plotWidget;
 		class PlotPropertiesWindow *_plotPropertiesWindow;
 		class DataWindow *_dataWindow;
-		class HistogramCollection *_histograms;
-		class HistogramCollection *_summedPolarizationHistograms;
 };
 
 #endif

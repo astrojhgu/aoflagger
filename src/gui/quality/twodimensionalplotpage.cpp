@@ -10,7 +10,8 @@
 
 #include "../plot/plotpropertieswindow.h"
 
-TwoDimensionalPlotPage::TwoDimensionalPlotPage() :
+TwoDimensionalPlotPage::TwoDimensionalPlotPage(AOQPlotPageController* controller) :
+	_controller(controller),
 	_countButton("#"),
 	_meanButton("μ"),
 	_stdDevButton("σ"),
@@ -32,16 +33,17 @@ TwoDimensionalPlotPage::TwoDimensionalPlotPage() :
 	_zeroAxisButton("0"),
 	_plotPropertiesButton("P"),
 	_dataExportButton("D"),
-	_statCollection(0),
-	_plotPropertiesWindow(0),
+	_plotPropertiesWindow(nullptr),
 	_customButtonsCreated(false)
 {
-	_plotWidget.SetPlot(_plot);
+	_plotWidget.SetPlot(_controller->Plot());
 	pack_start(_plotWidget, Gtk::PACK_EXPAND_WIDGET);
 	
 	show_all_children();
 	
 	_dataWindow = new DataWindow();
+	
+	_controller->Attach(this);
 }
 
 TwoDimensionalPlotPage::~TwoDimensionalPlotPage()
@@ -51,19 +53,14 @@ TwoDimensionalPlotPage::~TwoDimensionalPlotPage()
 		delete _plotPropertiesWindow;
 }
 
-void TwoDimensionalPlotPage::updatePlot()
-{
-	updatePlotForSettings(getSelectedKinds(), getSelectedPolarizations(), getSelectedPhases());
-}
-
 void TwoDimensionalPlotPage::updatePlotConfig()
 {
-	_plot.SetIncludeZeroYAxis(_zeroAxisButton.get_active());
-	_plot.SetLogarithmicYAxis(_logarithmicButton.get_active());
+	_controller->Plot().SetIncludeZeroYAxis(_zeroAxisButton.get_active());
+	_controller->Plot().SetLogarithmicYAxis(_logarithmicButton.get_active());
 	_plotWidget.Update();
 }
 
-std::set<QualityTablesFormatter::StatisticKind> TwoDimensionalPlotPage::getSelectedKinds() const
+std::set<QualityTablesFormatter::StatisticKind> TwoDimensionalPlotPage::GetSelectedKinds() const
 {
 	std::set<QualityTablesFormatter::StatisticKind> kinds;
 	if(_countButton.get_active())
@@ -85,7 +82,7 @@ std::set<QualityTablesFormatter::StatisticKind> TwoDimensionalPlotPage::getSelec
 	return kinds;
 }
 
-std::set<std::pair<unsigned int, unsigned int> > TwoDimensionalPlotPage::getSelectedPolarizations() const
+std::set<std::pair<unsigned int, unsigned int> > TwoDimensionalPlotPage::GetSelectedPolarizations() const
 {
 	std::set<std::pair<unsigned, unsigned> > pols;
 	if(_polXXButton.get_active())
@@ -101,17 +98,17 @@ std::set<std::pair<unsigned int, unsigned int> > TwoDimensionalPlotPage::getSele
 	return pols;
 }
 
-std::set<TwoDimensionalPlotPage::PhaseType> TwoDimensionalPlotPage::getSelectedPhases() const
+std::set<AOQPlotPageController::PhaseType> TwoDimensionalPlotPage::GetSelectedPhases() const
 {
-	std::set<TwoDimensionalPlotPage::PhaseType> phases;
+	std::set<AOQPlotPageController::PhaseType> phases;
 	if(_amplitudeButton.get_active())
-		phases.insert(AmplitudePhaseType);
+		phases.insert(AOQPlotPageController::AmplitudePhaseType);
 	if(_phaseButton.get_active())
-		phases.insert(PhasePhaseType);
+		phases.insert(AOQPlotPageController::PhasePhaseType);
 	if(_realButton.get_active())
-		phases.insert(RealPhaseType);
+		phases.insert(AOQPlotPageController::RealPhaseType);
 	if(_imaginaryButton.get_active())
-		phases.insert(ImaginaryPhaseType);
+		phases.insert(AOQPlotPageController::ImaginaryPhaseType);
 	return phases;
 }
 
@@ -134,34 +131,34 @@ void TwoDimensionalPlotPage::initStatisticKindButtons(Gtk::Toolbar& toolbar)
 {
 	toolbar.append(_separator1);
 	
-	_countButton.signal_clicked().connect(sigc::mem_fun(*this, &TwoDimensionalPlotPage::updatePlot));
+	_countButton.signal_clicked().connect(sigc::mem_fun(*_controller, &AOQPlotPageController::UpdatePlot));
 	_countButton.set_tooltip_text("Visibility count");
 	toolbar.append(_countButton);
 	
-	_meanButton.signal_clicked().connect(sigc::mem_fun(*this, &TwoDimensionalPlotPage::updatePlot));
+	_meanButton.signal_clicked().connect(sigc::mem_fun(*_controller, &AOQPlotPageController::UpdatePlot));
 	_meanButton.set_tooltip_text("Mean value");
 	toolbar.append(_meanButton);
 	
-	_stdDevButton.signal_clicked().connect(sigc::mem_fun(*this, &TwoDimensionalPlotPage::updatePlot));
+	_stdDevButton.signal_clicked().connect(sigc::mem_fun(*_controller, &AOQPlotPageController::UpdatePlot));
 	_stdDevButton.set_active(true);
 	_stdDevButton.set_tooltip_text("Standard deviation");
 	toolbar.append(_stdDevButton);
 	
-	_varianceButton.signal_clicked().connect(sigc::mem_fun(*this, &TwoDimensionalPlotPage::updatePlot));
+	_varianceButton.signal_clicked().connect(sigc::mem_fun(*_controller, &AOQPlotPageController::UpdatePlot));
 	toolbar.append(_varianceButton);
 	
-	//_dCountButton.signal_clicked().connect(sigc::mem_fun(*this, &TwoDimensionalPlotPage::updatePlot));
+	//_dCountButton.signal_clicked().connect(sigc::mem_fun(*_controller, &AOQPlotPageController::UpdatePlot));
 	//toolbar.append(_dCountButton);
 	
-	_dMeanButton.signal_clicked().connect(sigc::mem_fun(*this, &TwoDimensionalPlotPage::updatePlot));
+	_dMeanButton.signal_clicked().connect(sigc::mem_fun(*_controller, &AOQPlotPageController::UpdatePlot));
 	_dMeanButton.set_tooltip_text("Frequency-differential (difference between channels) mean value");
 	toolbar.append(_dMeanButton);
 	
-	_dStdDevButton.signal_clicked().connect(sigc::mem_fun(*this, &TwoDimensionalPlotPage::updatePlot));
+	_dStdDevButton.signal_clicked().connect(sigc::mem_fun(*_controller, &AOQPlotPageController::UpdatePlot));
 	_dStdDevButton.set_tooltip_text("Frequency-differential (difference between channels) standard deviation");
 	toolbar.append(_dStdDevButton);
 	
-	_rfiPercentageButton.signal_clicked().connect(sigc::mem_fun(*this, &TwoDimensionalPlotPage::updatePlot));
+	_rfiPercentageButton.signal_clicked().connect(sigc::mem_fun(*_controller, &AOQPlotPageController::UpdatePlot));
 	_rfiPercentageButton.set_tooltip_text("Flagged percentage");
 	toolbar.append(_rfiPercentageButton);
 }
@@ -170,23 +167,23 @@ void TwoDimensionalPlotPage::initPolarizationButtons(Gtk::Toolbar& toolbar)
 {
 	toolbar.append(_separator2);
 	
-	_polXXButton.signal_clicked().connect(sigc::mem_fun(*this, &TwoDimensionalPlotPage::updatePlot));
+	_polXXButton.signal_clicked().connect(sigc::mem_fun(*_controller, &AOQPlotPageController::UpdatePlot));
 	_polXXButton.set_tooltip_text("XX polarization");
 	toolbar.append(_polXXButton);
 	
-	_polXYButton.signal_clicked().connect(sigc::mem_fun(*this, &TwoDimensionalPlotPage::updatePlot));
+	_polXYButton.signal_clicked().connect(sigc::mem_fun(*_controller, &AOQPlotPageController::UpdatePlot));
 	_polXYButton.set_tooltip_text("XY polarization");
 	toolbar.append(_polXYButton);
 	
-	_polYXButton.signal_clicked().connect(sigc::mem_fun(*this, &TwoDimensionalPlotPage::updatePlot));
+	_polYXButton.signal_clicked().connect(sigc::mem_fun(*_controller, &AOQPlotPageController::UpdatePlot));
 	_polYXButton.set_tooltip_text("YX polarization");
 	toolbar.append(_polYXButton);
 	
-	_polYYButton.signal_clicked().connect(sigc::mem_fun(*this, &TwoDimensionalPlotPage::updatePlot));
+	_polYYButton.signal_clicked().connect(sigc::mem_fun(*_controller, &AOQPlotPageController::UpdatePlot));
 	_polYYButton.set_tooltip_text("YY polarization");
 	toolbar.append(_polYYButton);
 	
-	_polIButton.signal_clicked().connect(sigc::mem_fun(*this, &TwoDimensionalPlotPage::updatePlot));
+	_polIButton.signal_clicked().connect(sigc::mem_fun(*_controller, &AOQPlotPageController::UpdatePlot));
 	_polIButton.set_active(true);
 	_polIButton.set_tooltip_text("Stokes I polarization");
 	toolbar.append(_polIButton);
@@ -196,20 +193,20 @@ void TwoDimensionalPlotPage::initPhaseButtons(Gtk::Toolbar& toolbar)
 {
 	toolbar.append(_separator3);
 	
-	_amplitudeButton.signal_clicked().connect(sigc::mem_fun(*this, &TwoDimensionalPlotPage::updatePlot));
+	_amplitudeButton.signal_clicked().connect(sigc::mem_fun(*_controller, &AOQPlotPageController::UpdatePlot));
 	_amplitudeButton.set_active(true);
 	_amplitudeButton.set_tooltip_text("Amplitude");
 	toolbar.append(_amplitudeButton);
 	
-	_phaseButton.signal_clicked().connect(sigc::mem_fun(*this, &TwoDimensionalPlotPage::updatePlot));
+	_phaseButton.signal_clicked().connect(sigc::mem_fun(*_controller, &AOQPlotPageController::UpdatePlot));
 	_phaseButton.set_tooltip_text("Phase");
 	toolbar.append(_phaseButton);
 	
-	_realButton.signal_clicked().connect(sigc::mem_fun(*this, &TwoDimensionalPlotPage::updatePlot));
+	_realButton.signal_clicked().connect(sigc::mem_fun(*_controller, &AOQPlotPageController::UpdatePlot));
 	_realButton.set_tooltip_text("Real value");
 	toolbar.append(_realButton);
 	
-	_imaginaryButton.signal_clicked().connect(sigc::mem_fun(*this, &TwoDimensionalPlotPage::updatePlot));
+	_imaginaryButton.signal_clicked().connect(sigc::mem_fun(*_controller, &AOQPlotPageController::UpdatePlot));
 	_imaginaryButton.set_tooltip_text("Imaginary value");
 	toolbar.append(_imaginaryButton);
 }
@@ -224,7 +221,7 @@ void TwoDimensionalPlotPage::initPlotButtons(Gtk::Toolbar& toolbar)
 	_zeroAxisButton.signal_clicked().connect(sigc::mem_fun(*this, &TwoDimensionalPlotPage::updatePlotConfig));
 	_zeroAxisButton.set_active(true);
 	toolbar.append(_zeroAxisButton);
-	_plot.SetIncludeZeroYAxis(true);
+	_controller->Plot().SetIncludeZeroYAxis(true);
 	
 	_plotPropertiesButton.signal_clicked().connect(sigc::mem_fun(*this, &TwoDimensionalPlotPage::onPlotPropertiesClicked));
 	toolbar.append(_plotPropertiesButton);
@@ -237,8 +234,8 @@ void TwoDimensionalPlotPage::onPlotPropertiesClicked()
 {
 	if(_plotPropertiesWindow == 0)
 	{
-		_plotPropertiesWindow = new PlotPropertiesWindow(_plot, "Plot properties");
-		_plotPropertiesWindow->OnChangesApplied = boost::bind(&TwoDimensionalPlotPage::updatePlot, this);
+		_plotPropertiesWindow = new PlotPropertiesWindow(_controller->Plot(), "Plot properties");
+		_plotPropertiesWindow->OnChangesApplied = boost::bind(&AOQPlotPageController::UpdatePlot, _controller);
 	}
 	
 	_plotPropertiesWindow->show();
@@ -248,7 +245,7 @@ void TwoDimensionalPlotPage::onPlotPropertiesClicked()
 void TwoDimensionalPlotPage::updateDataWindow()
 {
 	if(_dataWindow->get_visible())
-		_dataWindow->SetData(_plot);
+		_dataWindow->SetData(_controller->Plot());
 }
 
 void TwoDimensionalPlotPage::onDataExportClicked()
@@ -257,30 +254,12 @@ void TwoDimensionalPlotPage::onDataExportClicked()
 	_dataWindow->raise();
 	updateDataWindow();
 }
-
-std::string TwoDimensionalPlotPage::getYDesc(const std::set<QualityTablesFormatter::StatisticKind>& kinds) const
+void TwoDimensionalPlotPage::Redraw()
 {
-	if(kinds.size() != 1)
-		return "Value";
-	else
+	_plotWidget.Update();
+	
+	if(_dataWindow->get_visible())
 	{
-		QualityTablesFormatter::StatisticKind kind = *kinds.begin();
-		return StatisticsDerivator::GetDescWithUnits(kind);
+		updateDataWindow();
 	}
-}
-
-void TwoDimensionalPlotPage::SavePdf(const string& filename, QualityTablesFormatter::StatisticKind kind)
-{
-	std::set<QualityTablesFormatter::StatisticKind> kinds;
-	kinds.insert(kind);
-	
-	std::set<std::pair<unsigned int, unsigned int> > pols;
-	pols.insert(std::make_pair(0, 3));
-	
-	std::set<PhaseType> phases;
-	phases.insert(AmplitudePhaseType);
-
-	updatePlotForSettings(kinds, pols, phases);
-	
-	_plot.SavePdf(filename);
 }

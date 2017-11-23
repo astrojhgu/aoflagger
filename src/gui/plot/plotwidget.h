@@ -7,7 +7,7 @@
 
 class PlotWidget : public Gtk::DrawingArea {
 	public:
-		PlotWidget() : _plot(0)
+		PlotWidget() : _plot(nullptr)
 		{
 			signal_draw().connect(sigc::mem_fun(*this, &PlotWidget::onDraw) );
 			set_size_request(400, 300);
@@ -28,7 +28,7 @@ class PlotWidget : public Gtk::DrawingArea {
 		}
 		void Clear()
 		{
-			_plot = 0;
+			_plot = nullptr;
 			redraw();
 		}
 		void Update()
@@ -49,7 +49,7 @@ class PlotWidget : public Gtk::DrawingArea {
 
 		void redraw()
 		{
-			if(_plot != 0)
+			if(_plot != nullptr)
 				_plot->Render(*this);
 			else {
 				Glib::RefPtr<Gdk::Window> window = get_window();

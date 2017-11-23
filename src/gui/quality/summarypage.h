@@ -20,12 +20,12 @@ class SummaryPage : public PlotSheet {
 			CloseStatistics();
 		}
 		
-		virtual void SetStatistics(const StatisticsCollection* statCollection, const std::vector<class AntennaInfo>&) override final
+		void SetStatistics(const StatisticsCollection* statCollection, const std::vector<class AntennaInfo>&)
 		{
 			_statCollection = statCollection;
 			updateText();
 		}
-		virtual void CloseStatistics() override final
+		void CloseStatistics()
 		{
 			_statCollection = 0;
 			_textView.get_buffer()->set_text("No open measurement set");

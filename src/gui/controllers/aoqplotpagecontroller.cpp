@@ -112,8 +112,8 @@ void AOQPlotPageController::SavePdf(const string& filename, QualityTablesFormatt
 	std::set<std::pair<unsigned int, unsigned int> > pols;
 	pols.insert(std::make_pair(0, 3));
 	
-	std::set<TwoDimensionalPlotPage::PhaseType> phases;
-	phases.insert(TwoDimensionalPlotPage::AmplitudePhaseType);
+	std::set<PhaseType> phases;
+	phases.insert(AmplitudePhaseType);
 
 	updatePlotForSettings(kinds, pols, phases);
 	
@@ -125,10 +125,5 @@ void AOQPlotPageController::SetStatistics(const StatisticsCollection* statCollec
 	processStatistics(statCollection, antennas);
 	
 	_statCollection = statCollection;
-	_page->Update();
-}
-
-void AOQPlotPageController::updatePlot()
-{
-	_controller->UpdatePlot();
+	UpdatePlot();
 }

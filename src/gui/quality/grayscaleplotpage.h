@@ -17,19 +17,16 @@
 
 class GrayScalePlotPage : public PlotSheet {
 	public:
-		GrayScalePlotPage();
+		GrayScalePlotPage(class HeatMapPageController* controller);
     virtual ~GrayScalePlotPage();
 		
-		void SavePdf(const std::string& filename, QualityTablesFormatter::StatisticKind kind)
-		{
-			updateImageImpl(kind, Polarization::StokesI, TimeFrequencyData::AmplitudePart);
-			_imageWidget.SavePdf(filename);
-		}
-		
 		virtual void InitializeToolbar(Gtk::Toolbar& toolbar) override final;
-	protected:
-		virtual std::pair<TimeFrequencyData, TimeFrequencyMetaDataCPtr> constructImage(QualityTablesFormatter::StatisticKind kind) = 0;
 		
+		bool NormalizeXAxis() const { return _normalizeXAxisButton.get_active(); }
+		bool NormalizeYAxis() const { return _normalizeYAxisButton.get_active(); }
+		
+		void Redraw();
+	protected:
 		QualityTablesFormatter::StatisticKind getSelectedStatisticKind() const
 		{
 			return _selectStatisticKind;
@@ -38,9 +35,8 @@ class GrayScalePlotPage : public PlotSheet {
 		void updateImage();
 		
 		HeatMapWidget &grayScaleWidget() { return _imageWidget; }
-	private:
-		void updateImageImpl(QualityTablesFormatter::StatisticKind statisticKind, PolarizationEnum polarisation, enum TimeFrequencyData::ComplexRepresentation phase);
 		
+	private:
 		void initStatisticKinds(Gtk::Toolbar& toolbar);
 		void initPolarizations(Gtk::Toolbar& toolbar);
 		void initPhaseButtons(Gtk::Toolbar& toolbar);
@@ -79,11 +75,8 @@ class GrayScalePlotPage : public PlotSheet {
 			if(_normalizeYAxisButton.get_active())
 				updateImage();
 		}
-		Image2DCPtr normalizeXAxis(Image2DCPtr input);
-		Image2DCPtr normalizeYAxis(Image2DCPtr input);
 		
-		void setToPolarization(TimeFrequencyData &data, PolarizationEnum polarisation);
-		void setToPhase(TimeFrequencyData &data, enum TimeFrequencyData::ComplexRepresentation phase);
+		class HeatMapPageController* _controller;
 		
 		Gtk::SeparatorToolItem _separator1, _separator2, _separator3, _separator4, _separator5, _separator6;
 		
@@ -104,10 +97,7 @@ class GrayScalePlotPage : public PlotSheet {
 		Gtk::ToolButton _plotPropertiesButton;
 		
 		QualityTablesFormatter::StatisticKind _selectStatisticKind;
-		HeatMapPlot _heatMapPlot;
 		HeatMapWidget _imageWidget;
-		
-		bool _ready;
 		
 		class ImagePropertiesWindow *_imagePropertiesWindow;
 };

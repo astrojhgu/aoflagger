@@ -1,7 +1,13 @@
 #include "aoqplotcontroller.h"
 
+#include "antennapagecontroller.h"
+#include "baselinepagecontroller.h"
+#include "blengthpagecontroller.h"
+#include "frequencypagecontroller.h"
+#include "tfpagecontroller.h"
+#include "timepagecontroller.h"
+
 #include "../quality/aoqplotwindow.h"
-#include "../quality/antennaeplotpage.h"
 #include "../quality/baselineplotpage.h"
 #include "../quality/blengthplotpage.h"
 #include "../quality/frequencyplotpage.h"
@@ -9,7 +15,6 @@
 #include "../quality/plotsheet.h"
 #include "../quality/summarypage.h"
 #include "../quality/timefrequencyplotpage.h"
-#include "../quality/timeplotpage.h"
 
 #include "../../structures/measurementset.h"
 
@@ -158,47 +163,48 @@ void AOQPlotController::ReadStatistics(const std::vector<std::string>& files, bo
 	}
 }
 
-void AOQPlotController::Save(const AOQPlotController::PlotSavingData& data)
+void AOQPlotController::Save(const AOQPlotController::PlotSavingData& data, size_t width, size_t height)
 {
 	const std::string& prefix = data.filenamePrefix;
 	QualityTablesFormatter::StatisticKind kind = data.statisticKind;
 	
 	std::cout << "Saving " << prefix << "-antennas.pdf...\n";
-	AntennaePlotPage antPage;
-	antPage.SetStatistics(_statCollection.get(), _antennas);
-	antPage.SavePdf(prefix+"-antennas.pdf", kind);
+	AntennaePageController antController;
+	antController.SetStatistics(_statCollection.get(), _antennas);
+	antController.SavePdf(prefix+"-antennas.pdf", kind);
 	
 	std::cout << "Saving " << prefix << "-baselines.pdf...\n";
-	BaselinePlotPage baselPage;
-	baselPage.SetStatistics(_statCollection.get(), _antennas);
-	baselPage.SavePdf(prefix+"-baselines.pdf", kind);
+	BaselinePageController baselController;
+	BaselinePlotPage baselPage(&baselController);
+	baselController.SetStatistics(_statCollection.get(), _antennas);
+	baselController.SavePdf(prefix+"-baselines.pdf", kind, width, height);
 	
 	std::cout << "Saving " << prefix << "-baselinelengths.pdf...\n";
-	BLengthPlotPage blenPage;
-	blenPage.SetStatistics(_statCollection.get(), _antennas);
-	blenPage.SavePdf(prefix+"-baselinelengths.pdf", kind);
+	BLengthPageController blenController;
+	blenController.SetStatistics(_statCollection.get(), _antennas);
+	blenController.SavePdf(prefix+"-baselinelengths.pdf", kind);
 	
 	std::cout << "Saving " << prefix << "-timefrequency.pdf...\n";
-	TimeFrequencyPlotPage tfPage;
-	tfPage.SetStatistics(_fullStats.get(), _antennas);
-	tfPage.SavePdf(prefix+"-timefrequency.pdf", kind);
+	TFPageController tfController;
+	tfController.SetStatistics(_fullStats.get(), _antennas);
+	tfController.SavePdf(prefix+"-timefrequency.pdf", kind, width, height);
 	
 	std::cout << "Saving " << prefix << "-time.pdf...\n";
-	TimePlotPage timePage;
-	timePage.SetStatistics(_statCollection.get(), _antennas);
-	timePage.SavePdf(prefix+"-time.pdf", kind);
+	TimePageController timeController;
+	timeController.SetStatistics(_statCollection.get(), _antennas);
+	timeController.SavePdf(prefix+"-time.pdf", kind);
 	
 	std::cout << "Saving " << prefix << "-frequency.pdf...\n";
-	FrequencyPlotPage freqPage;
-	freqPage.SetStatistics(_statCollection.get(), _antennas);
-	freqPage.SavePdf(prefix+"-frequency.pdf", kind);
+	FrequencyPageController freqController;
+	freqController.SetStatistics(_statCollection.get(), _antennas);
+	freqController.SavePdf(prefix+"-frequency.pdf", kind);
 }
 
-void AOQPlotController::InitializeSheet(PlotSheet& sheet, bool averagedStats)
+void AOQPlotController::Initialize(AOQPageController* controller, bool averagedStats)
 {
 	if(averagedStats)
-		sheet.SetStatistics(_statCollection.get(), _antennas);
+		controller->SetStatistics(_statCollection.get(), _antennas);
 	else
-		sheet.SetStatistics(_fullStats.get(), _antennas);
-	sheet.SetHistograms(_histCollection.get());
+		controller->SetStatistics(_fullStats.get(), _antennas);
+	controller->SetHistograms(_histCollection.get());
 }

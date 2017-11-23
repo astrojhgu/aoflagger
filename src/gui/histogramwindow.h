@@ -3,6 +3,8 @@
 
 #include "quality/histogrampage.h"
 
+#include "controllers/histogrampagecontroller.h"
+
 #include <gtkmm/window.h>
 
 #include "../quality/histogramcollection.h"
@@ -10,17 +12,19 @@
 class HistogramWindow : public Gtk::Window
 {
 	public:
-		explicit HistogramWindow(const HistogramCollection &histograms)
+		explicit HistogramWindow(const HistogramCollection &histograms) :
+			_histogramPage(&_controller)
 		{
-			_histogramPage.SetHistograms(&histograms);
+			_controller.SetHistograms(&histograms);
 			add(_histogramPage);
 			_histogramPage.show();
 		}
 		void SetStatistics(const HistogramCollection &histograms)
 		{
-			_histogramPage.SetHistograms(&histograms);
+			_controller.SetHistograms(&histograms);
 		}
 	private:
+		HistogramPageController _controller;
 		HistogramPage _histogramPage;
 };
 

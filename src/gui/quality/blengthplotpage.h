@@ -12,6 +12,7 @@
 class BLengthPlotPage : public TwoDimensionalPlotPage {
 	public:
     BLengthPlotPage(BLengthPageController* controller) :
+			TwoDimensionalPlotPage(_controller),
 			_controller(controller),
 			_includeAutoCorrelationsButton("Auto-correlations")
 		{

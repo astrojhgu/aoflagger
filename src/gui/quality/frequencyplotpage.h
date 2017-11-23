@@ -11,6 +11,7 @@
 class FrequencyPlotPage : public TwoDimensionalPlotPage {
 	public:
     FrequencyPlotPage(FrequencyPageController* controller) :
+			TwoDimensionalPlotPage(controller),
 			_controller(controller),
 			_ftButton("FT")
 		{ }

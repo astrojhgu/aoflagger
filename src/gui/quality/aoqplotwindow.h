@@ -25,11 +25,7 @@
 
 class AOQPlotWindow : public Gtk::Window {
 	public:
-		AOQPlotWindow();
-    virtual ~AOQPlotWindow()
-    { 
-			close();
-		}
+		AOQPlotWindow(class AOQPlotController* controller);
     
 		void Open(const std::vector<std::string>& files);
 		void Open(const std::string& file)
@@ -46,16 +42,16 @@ class AOQPlotWindow : public Gtk::Window {
 		{
 			onStatusChange(newStatus);
 		}
-		struct PlotSavingData
+		
+		void ShowError(const std::string& message);
+		
+		void SetShowHistograms(bool show)
 		{
-			QualityTablesFormatter::StatisticKind statisticKind;
-			std::string filenamePrefix;
-		};
-		void Save(const PlotSavingData& data);
+			_histogramMI.set_sensitive(show);
+		}
 	private:
 		void onOpenOptionsSelected(const std::vector<std::string>& files, bool downsampleTime, bool downsampleFreq, size_t timeSize, size_t freqSize, bool correctHistograms);
 		void close();
-		void readStatistics(const std::vector<std::string>& files, bool downsampleTime, bool downsampleFreq, size_t timeSize, size_t freqSize, bool correctHistograms);
 		void readDistributedObservation(const std::string& filename, bool correctHistograms);
 		void readMetaInfoFromMS(const std::string& filename);
 		void readAndCombine(const std::string& filename);
@@ -68,11 +64,7 @@ class AOQPlotWindow : public Gtk::Window {
 		
 		void onChangeSheet();
 		
-		void setShowHistograms(bool show)
-		{
-			_histogramMI.set_sensitive(show);
-		}
-		
+		class AOQPlotController* _controller;
 		int _activeSheetIndex;
 		Gtk::Toolbar _toolbar;
 		Gtk::MenuToolButton _pageMenuButton;
@@ -87,13 +79,6 @@ class AOQPlotWindow : public Gtk::Window {
 		std::unique_ptr<PlotSheet> _activeSheet;
 		
 		OpenOptionsWindow _openOptionsWindow;
-
-		bool _isOpen;
-		class StatisticsCollection *_statCollection;
-		class HistogramCollection *_histCollection;
-		class StatisticsCollection *_fullStats;
-		std::vector<class AntennaInfo> _antennas;
-		size_t _polarizationCount;
 };
 
 #endif

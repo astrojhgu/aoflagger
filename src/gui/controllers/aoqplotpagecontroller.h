@@ -34,6 +34,8 @@ public:
 	Plot2D& Plot() { return _plot; }
 	
 	void UpdatePlot();
+	
+	enum PhaseType { AmplitudePhaseType, PhasePhaseType, RealPhaseType, ImaginaryPhaseType} ;
 protected:
 	virtual void processStatistics(const StatisticsCollection *, const std::vector<AntennaInfo> &)
 	{
@@ -52,18 +54,17 @@ protected:
 		return _statCollection;
 	}
 	
+	class TwoDimensionalPlotPage* page() { return _page; }
 private:
 	class TwoDimensionalPlotPage* _page;
 	
-	enum PhaseType { AmplitudePhaseType, PhasePhaseType, RealPhaseType, ImaginaryPhaseType} ;
-		
 	void updatePlotForSettings(
 		const std::set<QualityTablesFormatter::StatisticKind>& kinds,
 		const std::set<std::pair<unsigned int, unsigned int> >& pols,
 		const std::set<PhaseType>& phases
 	);
 	
-	inline double getValue(enum PhaseType Phase, const std::complex<long double>& val);
+	double getValue(enum PhaseType Phase, const std::complex<long double>& val);
 	
 	void plotStatistic(QualityTablesFormatter::StatisticKind kind, unsigned polA, unsigned polB, PhaseType phase, const std::string& yDesc);
 	const StatisticsCollection *_statCollection;

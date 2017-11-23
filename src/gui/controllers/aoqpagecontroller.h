@@ -6,7 +6,6 @@
 class AOQPageController
 {
 public:
-private:
 	virtual void SetStatistics(const class StatisticsCollection* statCollection, const std::vector<AntennaInfo>& antennas) { }
 	
 	virtual void SetHistograms(const class HistogramCollection* histograms) { }

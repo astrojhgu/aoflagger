@@ -11,12 +11,6 @@
 class PlotSheet : public Gtk::HBox
 {
 public:
-	virtual void SetStatistics(const class StatisticsCollection* statCollection, const std::vector<class AntennaInfo>& antennas) { }
-	
-	virtual void SetHistograms(const class HistogramCollection* histograms) { }
-	
-	virtual void CloseStatistics() = 0;
-
 	sigc::signal<void, const std::string &> SignalStatusChange() { return _signalStatusChange; }
 
 	virtual void InitializeToolbar(Gtk::Toolbar& toolbar) { };

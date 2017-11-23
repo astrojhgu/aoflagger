@@ -1,41 +1,11 @@
-#include <limits>
-
 #include "timefrequencyplotpage.h"
 
-#include "../../quality/statisticscollection.h"
-#include "../../quality/statisticsderivator.h"
+#include "../controllers/tfpagecontroller.h"
 
-TimeFrequencyPlotPage::TimeFrequencyPlotPage() :
-	_statCollection(0)
+TimeFrequencyPlotPage::TimeFrequencyPlotPage(TFPageController* controller) :
+	GrayScalePlotPage(controller)
 {
 	grayScaleWidget().OnMouseMovedEvent().connect(sigc::mem_fun(*this, &TimeFrequencyPlotPage::onMouseMoved));
-	grayScaleWidget().Plot().SetXAxisDescription("Time index");
-	grayScaleWidget().Plot().SetYAxisDescription("Frequency index");
-}
-
-TimeFrequencyPlotPage::~TimeFrequencyPlotPage()
-{
-}
-
-std::pair<TimeFrequencyData, TimeFrequencyMetaDataCPtr> TimeFrequencyPlotPage::constructImage(QualityTablesFormatter::StatisticKind kind)
-{
-	if(HasStatistics())
-	{
-		StatisticsDerivator derivator(*_statCollection);
-		
-		std::pair<TimeFrequencyData, TimeFrequencyMetaDataCPtr> data = derivator.CreateTFData(kind);
-		if(data.second == 0)
-		{
-			grayScaleWidget().Plot().SetXAxisDescription("Time index");
-			grayScaleWidget().Plot().SetYAxisDescription("Frequency index");
-		} else {
-			grayScaleWidget().Plot().SetXAxisDescription("Time");
-			grayScaleWidget().Plot().SetYAxisDescription("Frequency (MHz)");
-		}
-		return data;
-	} else {
-		return std::pair<TimeFrequencyData, TimeFrequencyMetaDataCPtr>(TimeFrequencyData(), TimeFrequencyMetaDataCPtr());
-	}
 }
 
 void TimeFrequencyPlotPage::onMouseMoved(size_t x, size_t y)

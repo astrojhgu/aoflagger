@@ -1,15 +1,13 @@
 #include <limits>
 
-#include "../../structures/samplerow.h"
+#include "../controllers/heatmappagecontroller.h"
 
 #include "grayscaleplotpage.h"
 
 #include "../imagepropertieswindow.h"
 
-#include "../../quality/statisticscollection.h"
-#include "../../quality/statisticsderivator.h"
-
-GrayScalePlotPage::GrayScalePlotPage() :
+GrayScalePlotPage::GrayScalePlotPage(HeatMapPageController* controller) :
+	_controller(controller),
 	_countButton(_statisticGroup, "#"),
 	_meanButton(_statisticGroup, "μ"),
 	_stdDevButton(_statisticGroup, "σ"),
@@ -36,10 +34,8 @@ GrayScalePlotPage::GrayScalePlotPage() :
 	_winsorNormButton(_rangeTypeGroup, "Winsor"),
 	_medianNormButton(_rangeTypeGroup, "Median"),
 	_plotPropertiesButton("Properties..."),
-	_selectStatisticKind(QualityTablesFormatter::VarianceStatistic),
-	_heatMapPlot(),
-	_imageWidget(&_heatMapPlot),
-	_ready(false),
+	_selectStatisticKind(QualityTablesFormatter::StandardDeviationStatistic),
+	_imageWidget(&controller->Plot()),
 	_imagePropertiesWindow(nullptr)
 {
 	_imageWidget.Plot().SetCairoFilter(Cairo::FILTER_NEAREST);
@@ -52,7 +48,7 @@ GrayScalePlotPage::GrayScalePlotPage() :
 	
 	pack_start(_imageWidget);
 	
-	_ready = true;
+	controller->Attach(this);
 }
 
 GrayScalePlotPage::~GrayScalePlotPage()
@@ -195,39 +191,18 @@ void GrayScalePlotPage::initPlotOptions(Gtk::Toolbar& toolbar)
 	toolbar.append(_plotPropertiesButton);
 }
 
-void GrayScalePlotPage::updateImageImpl(QualityTablesFormatter::StatisticKind statisticKind, PolarizationEnum polarisation, enum TimeFrequencyData::ComplexRepresentation phase)
-{
-	if(_ready)
-	{
-		std::pair<TimeFrequencyData, TimeFrequencyMetaDataCPtr> pair = constructImage(statisticKind);
-		
-		TimeFrequencyData &data = pair.first;
-		
-		if(!data.IsEmpty())
-		{
-			setToPolarization(data, polarisation);
-			
-			setToPhase(data, phase);
-			
-			Image2DCPtr image = data.GetSingleImage();
-			if(_normalizeXAxisButton.get_active())
-				image = normalizeXAxis(image);
-			if(_normalizeYAxisButton.get_active())
-				image = normalizeYAxis(image);
-			
-			_imageWidget.Plot().SetZAxisDescription(StatisticsDerivator::GetDescWithUnits(statisticKind));
-			_imageWidget.Plot().SetImage(image);
-			_imageWidget.Plot().SetOriginalMask(data.GetSingleMask());
-			if(pair.second != 0)
-				_imageWidget.Plot().SetMetaData(pair.second);
-			_imageWidget.Update();
-		}
-	}
-}
-
 void GrayScalePlotPage::updateImage()
 {
-	updateImageImpl(getSelectedStatisticKind(), getSelectedPolarization(), getSelectedPhase());
+	_controller->SetKind(getSelectedStatisticKind());
+	_controller->SetPolarization(getSelectedPolarization());
+	_controller->SetPhase(getSelectedPhase());
+	if(_meanNormButton.get_active())
+		_controller->SetNormalization(HeatMapPageController::Mean);
+	else if(_winsorNormButton.get_active())
+		_controller->SetNormalization(HeatMapPageController::Winsorized);
+	else // _medianNormButton
+		_controller->SetNormalization(HeatMapPageController::Median);
+	_controller->UpdateImage();
 }
 
 PolarizationEnum GrayScalePlotPage::getSelectedPolarization() const
@@ -240,8 +215,6 @@ PolarizationEnum GrayScalePlotPage::getSelectedPolarization() const
 		return Polarization::YX;
 	else if(_polYYButton.get_active())
 		return Polarization::YY;
-	//else if(_polIButton.get_active())
-	//	return StokesIPolarisation;
 	else
 		return Polarization::StokesI;
 }
@@ -260,66 +233,15 @@ enum TimeFrequencyData::ComplexRepresentation GrayScalePlotPage::getSelectedPhas
 		return TimeFrequencyData::AmplitudePart;
 }
 
-void GrayScalePlotPage::setToPolarization(TimeFrequencyData &data, PolarizationEnum polarisation)
-{
-	try {
-		data = data.Make(polarisation);
-		if(polarisation == Polarization::StokesI)
-			data.MultiplyImages(0.5);
-	} catch(std::exception& e)
-	{
-		// probably a conversion error -- polarisation was not available.
-		// Best solution is probably to ignore.
-	}
-}
-
-void GrayScalePlotPage::setToPhase(TimeFrequencyData &data, enum TimeFrequencyData::ComplexRepresentation phase)
-{
-	data = data.Make(phase);
-}
-
-Image2DCPtr GrayScalePlotPage::normalizeXAxis(Image2DCPtr input)
-{
-	Image2DPtr output = Image2D::CreateUnsetImagePtr(input->Width(), input->Height());
-	for(size_t x=0;x<input->Width();++x)
-	{
-		SampleRowPtr row = SampleRow::CreateFromColumn(input.get(), x);
-		num_t norm;
-		if(_meanNormButton.get_active())
-			norm = 1.0 / row->MeanWithMissings();
-		else if(_winsorNormButton.get_active())
-			norm = 1.0 / row->WinsorizedMeanWithMissings();
-		else // _medianNormButton
-			norm = 1.0 / row->MedianWithMissings();
-		for(size_t y=0;y<input->Height();++y)
-			output->SetValue(x, y, input->Value(x, y) * norm);
-	}
-	return output;
-}
-
-Image2DCPtr GrayScalePlotPage::normalizeYAxis(Image2DCPtr input)
-{
-	Image2DPtr output = Image2D::CreateUnsetImagePtr(input->Width(), input->Height());
-	for(size_t y=0;y<input->Height();++y)
-	{
-		SampleRowPtr row = SampleRow::CreateFromRow(input.get(), y);
-		num_t norm;
-		if(_meanNormButton.get_active())
-			norm = 1.0 / row->MeanWithMissings();
-		else if(_winsorNormButton.get_active())
-			norm = 1.0 / row->WinsorizedMeanWithMissings();
-		else // _medianNormButton
-			norm = 1.0 / row->MedianWithMissings();
-		for(size_t x=0;x<input->Width();++x)
-			output->SetValue(x, y, input->Value(x, y) * norm);
-	}
-	return output;
-}
-
 void GrayScalePlotPage::onPropertiesClicked()
 {
 	if(_imagePropertiesWindow == 0)
 		_imagePropertiesWindow = new ImagePropertiesWindow(_imageWidget, "Plotting properties");
 	_imagePropertiesWindow->show();
 	_imagePropertiesWindow->raise();
+}
+
+void GrayScalePlotPage::Redraw()
+{
+	_imageWidget.Update();
 }

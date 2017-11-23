@@ -14,31 +14,14 @@
 
 class BaselinePlotPage : public GrayScalePlotPage {
 	public:
-		BaselinePlotPage();
+		BaselinePlotPage(class BaselinePageController* controller);
     virtual ~BaselinePlotPage();
 		
-		virtual void SetStatistics(const StatisticsCollection* statCollection, const std::vector<class AntennaInfo>& antennas) override final
-		{
-			_statCollection = statCollection;
-			_antennas = &antennas;
-			updateImage();
-		}
-		virtual void CloseStatistics() override final
-		{
-			_statCollection = 0;
-			_antennas = 0;
-		}
-		bool HasStatistics() const
-		{
-			return _statCollection != 0;
-		}
 	protected:
-		virtual std::pair<TimeFrequencyData, TimeFrequencyMetaDataCPtr> constructImage(QualityTablesFormatter::StatisticKind kind) override final;
 	private:
-		void onMouseMoved(size_t x, size_t y);
+		class BaselinePageController* _controller;
 		
-		const StatisticsCollection *_statCollection;
-		const std::vector<class AntennaInfo> *_antennas;
+		void onMouseMoved(size_t x, size_t y);
 };
 
 #endif

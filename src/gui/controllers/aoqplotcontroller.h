@@ -24,9 +24,9 @@ public:
 		std::string filenamePrefix;
 	};
 	
-	void Save(const PlotSavingData& data);
+	void Save(const PlotSavingData& data, size_t width, size_t height);
 	
-	void InitializeSheet(class PlotSheet& sheet, bool averagedStats);
+	void Initialize(class AOQPageController* controller, bool averagedStats);
 private:
 	void close();
 	void readDistributedObservation(const std::string& filename, bool correctHistograms);

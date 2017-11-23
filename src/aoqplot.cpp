@@ -1,5 +1,7 @@
 #include "gui/quality/aoqplotwindow.h"
 
+#include "gui/controllers/aoqplotcontroller.h"
+
 #include <gtkmm/main.h>
 #include <gtkmm/filechooserdialog.h>
 
@@ -10,10 +12,11 @@ int main(int argc, char *argv[])
 	// We have to 'lie' about argc to create(..), because of a bug in older gtkmms.
 	int altArgc = 1;
 	Glib::RefPtr<Gtk::Application> app = Gtk::Application::create(altArgc, argv, "", Gio::APPLICATION_HANDLES_OPEN);
-	AOQPlotWindow window;
+	AOQPlotController controller;
+	AOQPlotWindow window(&controller);
 	bool openGUI = true;
 	int argi = 1;
-	std::vector<AOQPlotWindow::PlotSavingData> savedPlots;
+	std::vector<AOQPlotController::PlotSavingData> savedPlots;
 	while(argi < argc && argv[argi][0]=='-')
 	{
 		std::string p;
@@ -47,7 +50,7 @@ int main(int argc, char *argv[])
 		}
 		else if(p=="save")
 		{
-			AOQPlotWindow::PlotSavingData newPlot;
+			AOQPlotController::PlotSavingData newPlot;
 			newPlot.filenamePrefix = argv[argi+1];
 			newPlot.statisticKind = QualityTablesFormatter::NameToKind(argv[argi+2]);
 			argi += 2;
@@ -104,9 +107,9 @@ int main(int argc, char *argv[])
 		else return 0;
 	}
 	
-	for(std::vector<AOQPlotWindow::PlotSavingData>::const_iterator plot=savedPlots.begin(); plot!=savedPlots.end(); ++plot)
+	for(const AOQPlotController::PlotSavingData& plot : savedPlots)
 	{
-		window.Save(*plot);
+		controller.Save(plot, 640, 480);
 	}
 		
 	if(openGUI)

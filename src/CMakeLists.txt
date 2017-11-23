@@ -61,8 +61,12 @@ set(GUI_QUALITY_FILES
   gui/quality/histogrampage.cpp
   gui/quality/timefrequencyplotpage.cpp
   gui/quality/twodimensionalplotpage.cpp
+  gui/controllers/aoqplotcontroller.cpp
   gui/controllers/aoqplotpagecontroller.cpp
-  gui/controllers/aoqplotcontroller.cpp )
+  gui/controllers/baselinepagecontroller.cpp
+  gui/controllers/heatmappagecontroller.cpp
+  gui/controllers/histogrampagecontroller.cpp
+  gui/controllers/tfpagecontroller.cpp)
 
 set(GUI_PLOT_FILES
   gui/plot/colorscale.cpp
