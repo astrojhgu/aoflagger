@@ -25,35 +25,35 @@ class System {
 		void AddToSystem(class Plot2DPointSet &pointSet)
 		{
 			Dimension *dimension;
-			if(_dimensions.count(pointSet.YUnits()) == 0)
+			auto iter = _dimensions.find(pointSet.YUnits());
+			if(iter == _dimensions.end())
 			{
-				dimension = new Dimension();
-				_dimensions.insert(std::pair<std::string, Dimension*>(pointSet.YUnits(), dimension));
+				dimension = &_dimensions.emplace(pointSet.YUnits(), Dimension()).first->second;
 			} else {
-				dimension = _dimensions.find(pointSet.YUnits())->second;
+				dimension = &iter->second;
 			}
 			dimension->AdjustRanges(pointSet);
 		}
 
 		double XRangeMin(class Plot2DPointSet &pointSet) const
 		{
-			return _dimensions.find(pointSet.YUnits())->second->XRangeMin();
+			return _dimensions.find(pointSet.YUnits())->second.XRangeMin();
 		}
 		double XRangePositiveMin(class Plot2DPointSet &pointSet) const
 		{
-			return _dimensions.find(pointSet.YUnits())->second->XRangePositiveMin();
+			return _dimensions.find(pointSet.YUnits())->second.XRangePositiveMin();
 		}
 		double XRangeMax(class Plot2DPointSet &pointSet) const
 		{
-			return _dimensions.find(pointSet.YUnits())->second->XRangeMax();
+			return _dimensions.find(pointSet.YUnits())->second.XRangeMax();
 		}
 		double XRangePositiveMax(class Plot2DPointSet &pointSet) const
 		{
-			return _dimensions.find(pointSet.YUnits())->second->XRangePositiveMax();
+			return _dimensions.find(pointSet.YUnits())->second.XRangePositiveMax();
 		}
 		double YRangeMin(class Plot2DPointSet &pointSet) const
 		{
-			const double yMin = _dimensions.find(pointSet.YUnits())->second->YRangeMin();
+			const double yMin = _dimensions.find(pointSet.YUnits())->second.YRangeMin();
 			if(yMin > 0.0 && _includeZeroYAxis)
 				return 0.0;
 			else
@@ -61,11 +61,11 @@ class System {
 		}
 		double YRangePositiveMin(class Plot2DPointSet &pointSet) const
 		{
-			return _dimensions.find(pointSet.YUnits())->second->YRangePositiveMin();
+			return _dimensions.find(pointSet.YUnits())->second.YRangePositiveMin();
 		}
 		double YRangeMax(class Plot2DPointSet &pointSet) const
 		{
-			const double yMax = _dimensions.find(pointSet.YUnits())->second->YRangeMax();
+			const double yMax = _dimensions.find(pointSet.YUnits())->second.YRangeMax();
 			if(yMax < 0.0 && _includeZeroYAxis)
 				return 0.0;
 			else
@@ -73,17 +73,15 @@ class System {
 		}
 		double YRangePositiveMax(class Plot2DPointSet &pointSet) const
 		{
-			return _dimensions.find(pointSet.YUnits())->second->YRangePositiveMax();
+			return _dimensions.find(pointSet.YUnits())->second.YRangePositiveMax();
 		}
 		void Clear()
 		{
-			for(std::map<std::string, Dimension*>::iterator i=_dimensions.begin();i!=_dimensions.end();++i)
-				delete i->second;
 			_dimensions.clear();
 		}
 		void SetIncludeZeroYAxis(bool includeZeroYAxis) { _includeZeroYAxis = includeZeroYAxis; }
 	private:
-		std::map<std::string, Dimension*> _dimensions;
+		std::map<std::string, Dimension> _dimensions;
 		bool _includeZeroYAxis;
 };
 
