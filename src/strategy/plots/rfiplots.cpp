@@ -12,7 +12,7 @@
 #include "../algorithms/sinusfitter.h"
 #include "../algorithms/thresholdtools.h"
 
-#include "../../gui/plot/plot2d.h"
+#include "../../plot/plot2d.h"
 
 void RFIPlots::Bin(Image2DCPtr image, Mask2DCPtr mask, std::vector<size_t> &valuesOutput, std::vector<long double> &binsOutput, size_t binCount, long double start, long double end, long double factor, long double stretch) throw()
 {

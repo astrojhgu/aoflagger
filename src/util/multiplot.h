@@ -7,7 +7,7 @@
 
 #include <vector>
 
-#include "../gui/plot/plotmanager.h"
+#include "../plot/plotmanager.h"
 
 class MultiPlot {
 	public:

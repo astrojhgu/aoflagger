@@ -53,48 +53,48 @@ endif(GSL_LIB AND GSL_CBLAS_LIB AND GSL_INCLUDE_DIR)
 
 add_executable(rficonsole rficonsole.cpp)
 
-set(GUI_QUALITY_FILES
-  gui/quality/aoqplotwindow.cpp
-  gui/quality/baselineplotpage.cpp
-  gui/quality/datawindow.cpp
-  gui/quality/grayscaleplotpage.cpp
-  gui/quality/histogrampage.cpp
-  gui/quality/timefrequencyplotpage.cpp
-  gui/quality/twodimensionalplotpage.cpp
-  gui/controllers/aoqplotcontroller.cpp
-  gui/controllers/aoqplotpagecontroller.cpp
-  gui/controllers/baselinepagecontroller.cpp
-  gui/controllers/heatmappagecontroller.cpp
-  gui/controllers/histogrampagecontroller.cpp
-  gui/controllers/tfpagecontroller.cpp)
+set(AOQPLOT_FILES
+  aoqplot/aoqplotwindow.cpp
+  aoqplot/baselineplotpage.cpp
+  aoqplot/datawindow.cpp
+  aoqplot/grayscaleplotpage.cpp
+  aoqplot/histogrampage.cpp
+  aoqplot/timefrequencyplotpage.cpp
+  aoqplot/twodimensionalplotpage.cpp
+  aoqplot/controllers/aoqplotcontroller.cpp
+  aoqplot/controllers/aoqplotpagecontroller.cpp
+  aoqplot/controllers/baselinepagecontroller.cpp
+  aoqplot/controllers/heatmappagecontroller.cpp
+  aoqplot/controllers/histogrampagecontroller.cpp
+  aoqplot/controllers/tfpagecontroller.cpp)
 
-set(GUI_PLOT_FILES
-  gui/plot/colorscale.cpp
-  gui/plot/heatmapplot.cpp
-  gui/plot/horizontalplotscale.cpp
-  gui/plot/plot2d.cpp
-  gui/plot/plotpropertieswindow.cpp
-  gui/plot/title.cpp
-  gui/plot/verticalplotscale.cpp)
+set(PLOT_FILES
+  plot/colorscale.cpp
+  plot/heatmapplot.cpp
+  plot/horizontalplotscale.cpp
+  plot/plot2d.cpp
+  plot/plotpropertieswindow.cpp
+  plot/title.cpp
+  plot/verticalplotscale.cpp)
 
 set(GUI_FILES
-  gui/controllers/imagecomparisoncontroller.cpp
-  gui/controllers/rfiguicontroller.cpp
-  gui/complexplaneplotwindow.cpp
-  gui/editstrategywindow.cpp
-  gui/gotowindow
-  gui/highlightwindow.cpp
-  gui/imagecomparisonwidget.cpp
-  gui/imageplanewindow
-  gui/imagepropertieswindow.cpp
-  gui/heatmapwidget.cpp
-  gui/msoptionwindow.cpp
-  gui/plotframe.cpp
-  gui/plotwindow.cpp
-  gui/progresswindow.cpp
-  gui/rfiguiwindow.cpp
-  gui/strategywizardwindow.cpp
-  ${GUI_PLOT_FILES} ${GUI_QUALITY_FILES})
+  rfigui/controllers/imagecomparisoncontroller.cpp
+  rfigui/controllers/rfiguicontroller.cpp
+  rfigui/complexplaneplotwindow.cpp
+  rfigui/editstrategywindow.cpp
+  rfigui/gotowindow
+  rfigui/highlightwindow.cpp
+  rfigui/imagecomparisonwidget.cpp
+  rfigui/imageplanewindow
+  rfigui/imagepropertieswindow.cpp
+  rfigui/heatmapwidget.cpp
+  rfigui/msoptionwindow.cpp
+  rfigui/plotframe.cpp
+  rfigui/plotwindow.cpp
+  rfigui/progresswindow.cpp
+  rfigui/rfiguiwindow.cpp
+  rfigui/strategywizardwindow.cpp
+  ${PLOT_FILES} ${AOQPLOT_FILES})
 
 set(IMAGING_FILES
   imaging/uvimager.cpp
@@ -255,7 +255,7 @@ if(SIGCXX_FOUND)
   set(ALL_LIBRARIES ${ALL_LIBRARIES} ${SIGCXX_LIBRARIES})
 endif(SIGCXX_FOUND)
 
-add_library(aoflagger SHARED ${GUI_PLOT_FILES} ${IMAGING_FILES} ${INTERFACE_FILES} ${MSIO_FILES} ${QUALITY_FILES} ${STRATEGY_FILES} ${STRUCTURES_FILES} ${UTIL_FILES} ${PYTHON_FILES})
+add_library(aoflagger SHARED ${PLOT_FILES} ${IMAGING_FILES} ${INTERFACE_FILES} ${MSIO_FILES} ${QUALITY_FILES} ${STRATEGY_FILES} ${STRUCTURES_FILES} ${UTIL_FILES} ${PYTHON_FILES})
 set_target_properties(aoflagger PROPERTIES SOVERSION 0)
 target_link_libraries(aoflagger ${ALL_LIBRARIES})
 

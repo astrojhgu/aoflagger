@@ -1,6 +1,6 @@
-#include "gui/quality/aoqplotwindow.h"
+#include "aoqplot/aoqplotwindow.h"
 
-#include "gui/controllers/aoqplotcontroller.h"
+#include "aoqplot/controllers/aoqplotcontroller.h"
 
 #include <gtkmm/main.h>
 #include <gtkmm/filechooserdialog.h>

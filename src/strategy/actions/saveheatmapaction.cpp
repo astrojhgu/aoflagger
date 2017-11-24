@@ -1,6 +1,6 @@
 #include "saveheatmapaction.h"
 
-#include "../../gui/plot/heatmapplot.h"
+#include "../../plot/heatmapplot.h"
 
 namespace rfiStrategy {
 

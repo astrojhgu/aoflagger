@@ -9,7 +9,7 @@
 #include "../structures/samplerow.h"
 #include "../structures/timefrequencydata.h"
 
-#include "../gui/plot/heatmapplot.h"
+#include "../plot/heatmapplot.h"
 
 #include "../strategy/algorithms/polarizationstatistics.h"
 

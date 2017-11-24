@@ -3,7 +3,7 @@
 #include "svdmitigater.h"
 
 #ifdef HAVE_GTKMM
- #include "../../gui/plot/plot2d.h"
+ #include "../../plot/plot2d.h"
 #endif
 
 extern "C" {

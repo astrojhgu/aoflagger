@@ -1,9 +1,9 @@
 #include "version.h"
 
-#include "gui/rfiguiwindow.h"
+#include "rfigui/rfiguiwindow.h"
 
-#include "gui/controllers/imagecomparisoncontroller.h"
-#include "gui/controllers/rfiguicontroller.h"
+#include "rfigui/controllers/imagecomparisoncontroller.h"
+#include "rfigui/controllers/rfiguicontroller.h"
 
 #include "util/logger.h"
 
