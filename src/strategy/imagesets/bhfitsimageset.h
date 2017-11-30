@@ -30,7 +30,7 @@ namespace rfiStrategy {
 			std::unique_ptr<BHFitsImageSetIndex> index( new BHFitsImageSetIndex(imageSet()) );
 			index->_imageIndex = _imageIndex;
 			index->_isValid = _isValid;
-			return index;
+			return std::move(index);
 		}
 		private:
 			size_t _imageIndex;
@@ -71,7 +71,7 @@ namespace rfiStrategy {
 			{
 				std::unique_ptr<BaselineData> data(new BaselineData(_baselineData.top()));
 				_baselineData.pop();
-				return data;
+				return std::move(data);
 			}
 			virtual void AddWriteFlagsTask(const ImageSetIndex &index, std::vector<Mask2DCPtr> &flags) override final;
 			virtual void PerformWriteFlagsTask() override final;

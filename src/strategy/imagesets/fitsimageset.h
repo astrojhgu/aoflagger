@@ -31,7 +31,7 @@ namespace rfiStrategy {
 			index->_band = _band;
 			index->_field = _field;
 			index->_isValid = _isValid;
-			return index;
+			return std::move(index);
 		}
 		private:
 			size_t _baselineIndex, _band, _field;
@@ -67,7 +67,7 @@ namespace rfiStrategy {
 			{
 				std::unique_ptr<BaselineData> data(new BaselineData(_baselineData.top()));
 				_baselineData.pop();
-				return data;
+				return std::move(data);
 			}
 			virtual void AddWriteFlagsTask(const ImageSetIndex &index, std::vector<Mask2DCPtr> &flags) override final;
 			virtual void PerformWriteFlagsTask() override final;
