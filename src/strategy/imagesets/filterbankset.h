@@ -27,7 +27,7 @@ namespace rfiStrategy {
 				std::unique_ptr<FilterBankSetIndex> index( new FilterBankSetIndex(imageSet()) );
 				index->_intervalIndex = _intervalIndex;
 				index->_isValid = _isValid;
-				return index;
+				return std::move(index);
 			}
 		private:
 			size_t _intervalIndex;
@@ -45,7 +45,7 @@ namespace rfiStrategy {
 			{
 				std::unique_ptr<FilterBankSet> set(new FilterBankSet(*this));
 				set->_requests.clear();
-				return set;
+				return std::move(set);
 			}
 	
 			virtual std::string Name() final override { return _location; }

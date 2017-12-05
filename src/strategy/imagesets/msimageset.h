@@ -35,7 +35,7 @@ namespace rfiStrategy {
 				std::unique_ptr<MSImageSetIndex> index(new MSImageSetIndex(imageSet()));
 				index->_sequenceIndex = _sequenceIndex;
 				index->_isValid = _isValid;
-				return index;
+				return std::move(index);
 			}
 			size_t SequenceIndex() const { return _sequenceIndex; }
 		private:
@@ -89,7 +89,7 @@ namespace rfiStrategy {
 				newSet->_readFlags = _readFlags;
 				newSet->_readUVW = _readUVW;
 				newSet->_ioMode = _ioMode;
-				return newSet;
+				return std::move(newSet);
 			}
 	
 			virtual std::string Name() override final { return _set.Path(); }

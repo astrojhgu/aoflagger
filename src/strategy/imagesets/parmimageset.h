@@ -36,7 +36,7 @@ namespace rfiStrategy {
 			{
 				std::unique_ptr<ParmImageSetIndex> index( new ParmImageSetIndex(imageSet()) );
 				index->_antennaIndex = _antennaIndex;
-				return index;
+				return std::move(index);
 			}
 			
 			unsigned AntennaIndex() const { return _antennaIndex; }
@@ -84,7 +84,7 @@ namespace rfiStrategy {
 			{
 				std::unique_ptr<BaselineData> baseline(std::move(_baselineBuffer.front()));
 				_baselineBuffer.pop_front();
-				return baseline;
+				return std::move(baseline);
 			}
 
 			unsigned AntennaCount() const

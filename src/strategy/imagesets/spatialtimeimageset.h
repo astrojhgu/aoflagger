@@ -39,7 +39,7 @@ namespace rfiStrategy {
 					newIndex( new SpatialTimeImageSetIndex(imageSet()) );
 				newIndex->_channelIndex = _channelIndex;
 				newIndex->_isValid = _isValid;
-				return newIndex;
+				return std::move(newIndex);
 			}
 		private:
 			inline class SpatialTimeImageSet &STMSSet() const;
@@ -57,7 +57,7 @@ namespace rfiStrategy {
 		}
 		virtual std::unique_ptr<ImageSet> Clone() final override
 		{
-			return 0;
+			return nullptr;
 		}
 
 		virtual std::unique_ptr<ImageSetIndex> StartIndex() final override
@@ -98,7 +98,7 @@ namespace rfiStrategy {
 		{
 			std::unique_ptr<BaselineData> data(new BaselineData(_baseline.top()));
 			_baseline.pop();
-			return data;
+			return std::move(data);
 		}
 		virtual void AddWriteFlagsTask(const ImageSetIndex &, std::vector<Mask2DCPtr> &) final override
 		{
