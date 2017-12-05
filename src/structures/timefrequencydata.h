@@ -277,7 +277,7 @@ class TimeFrequencyData
 		void SetIndividualPolarizationMasks(const Mask2DCPtr& maskA, const Mask2DCPtr& maskB, const Mask2DCPtr& maskC, const Mask2DCPtr& maskD)
 		{
 			if(_data.size() != 4)
-				throw BadUsageException("Trying to set four individual mask in non-matching time frequency data");
+				throw BadUsageException("Trying to set four individual masks in non-matching time frequency data");
 			_data[0]._flagging = maskA;
 			_data[1]._flagging = maskB;
 			_data[2]._flagging = maskC;
