@@ -1,6 +1,7 @@
 #ifndef HORIZONTALPLOTSCALE_H
 #define HORIZONTALPLOTSCALE_H
 
+#include <memory>
 #include <string>
 #include <vector>
 
