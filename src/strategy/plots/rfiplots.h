@@ -20,11 +20,11 @@ class RFIPlots{
 		static void MakeComplexPlanePlot(class Plot2DPointSet &plot, const class TimeFrequencyData &data, size_t xStart, size_t length, size_t y, size_t yAvgSize, Mask2DCPtr mask, bool realVersusImaginary, bool imaginary);
 		static void MakeFittedComplexPlot(class Plot2DPointSet &plot, const TimeFrequencyData &data, size_t xStart, size_t length, size_t y, size_t yAvgSize, Mask2DCPtr mask, num_t sampleFringeFrequency, bool realVersusImaginary, bool imaginary);
 		
-		static void MakeTimeScatterPlot(class MultiPlot &plot, size_t plotIndex, Image2DCPtr image, Mask2DCPtr mask, TimeFrequencyMetaDataCPtr metaData);
-		static void MakeTimeScatterPlot(class MultiPlot &plot, const TimeFrequencyData &data, TimeFrequencyMetaDataCPtr metaData, unsigned startIndex = 0);
+		static void MakeTimeScatterPlot(class MultiPlot &plot, size_t plotIndex, const Image2DCPtr& image, const Mask2DCPtr& mask, const TimeFrequencyMetaDataCPtr& metaData);
+		static void MakeTimeScatterPlot(class MultiPlot &plot, const TimeFrequencyData &data, const TimeFrequencyMetaDataCPtr& metaData, unsigned startIndex = 0);
 		
-		static void MakeFrequencyScatterPlot(class MultiPlot &plot, size_t plotIndex, Image2DCPtr image, Mask2DCPtr mask, TimeFrequencyMetaDataCPtr metaData);
-		static void MakeFrequencyScatterPlot(class MultiPlot &plot, const TimeFrequencyData &data, TimeFrequencyMetaDataCPtr metaData, unsigned startIndex = 0);
+		static void MakeFrequencyScatterPlot(class MultiPlot &plot, size_t plotIndex, const Image2DCPtr& image, const Mask2DCPtr& mask, const TimeFrequencyMetaDataCPtr& metaData);
+		static void MakeFrequencyScatterPlot(class MultiPlot& plot, const TimeFrequencyData& data, const TimeFrequencyMetaDataCPtr& metaData, unsigned startIndex = 0);
 		
 		static void MakeScatterPlot(class MultiPlot &plot, size_t plotIndex, SampleRowCPtr row);
 	private:

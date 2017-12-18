@@ -280,10 +280,6 @@ void RFIPlots::MakeFittedComplexPlot(Plot2DPointSet &pointSet, const TimeFrequen
 		imagPhase, imagAmplitude, imagMean;
 	const num_t twopi = 2.0*M_PIn;
 
-	//fitter.FindPhaseAndAmplitude(realPhase, realAmplitude, xReal, t, dataIndex, frequency*twopi);
-	//fitter.FindPhaseAndAmplitude(imagPhase, imagAmplitude, xImag, t, dataIndex, frequency*twopi);
-	//realMean = fitter.FindMean(realPhase, realAmplitude, xReal, t, dataIndex, frequency*twopi);
-	//imagMean = fitter.FindMean(imagPhase, imagAmplitude, xImag, t, dataIndex, frequency*twopi);
 	fitter.FindPhaseAndAmplitudeComplex(realPhase, realAmplitude, xReal.data(), xImag.data(), t.data(), dataIndex, frequency*twopi);
 	imagPhase = realPhase + 0.5*M_PIn;
 	imagAmplitude = realAmplitude;
@@ -307,7 +303,7 @@ void RFIPlots::MakeFittedComplexPlot(Plot2DPointSet &pointSet, const TimeFrequen
 	}
 }
 
-void RFIPlots::MakeTimeScatterPlot(class MultiPlot &plot, size_t plotIndex, Image2DCPtr image, Mask2DCPtr mask, TimeFrequencyMetaDataCPtr metaData)
+void RFIPlots::MakeTimeScatterPlot(class MultiPlot &plot, size_t plotIndex, const Image2DCPtr& image, const Mask2DCPtr& mask, const TimeFrequencyMetaDataCPtr& metaData)
 {
 	plot.SetXAxisText("Time (s)");
 	plot.SetYAxisText("Visibility");
@@ -341,7 +337,7 @@ void RFIPlots::MakeTimeScatterPlot(class MultiPlot &plot, size_t plotIndex, Imag
 	}
 }
 
-void RFIPlots::MakeFrequencyScatterPlot(class MultiPlot &plot, size_t plotIndex, Image2DCPtr image, Mask2DCPtr mask, TimeFrequencyMetaDataCPtr metaData)
+void RFIPlots::MakeFrequencyScatterPlot(class MultiPlot &plot, size_t plotIndex, const Image2DCPtr& image, const Mask2DCPtr& mask, const TimeFrequencyMetaDataCPtr& metaData)
 {
 	plot.SetXAxisText("Frequency (MHz)");
 	plot.SetYAxisText("Visibility");
@@ -378,81 +374,31 @@ void RFIPlots::MakeScatterPlot(class MultiPlot &plot, size_t plotIndex, SampleRo
 	}
 }
 
-void RFIPlots::MakeTimeScatterPlot(class MultiPlot &plot, const TimeFrequencyData &data, TimeFrequencyMetaDataCPtr metaData, unsigned startIndex)
+void RFIPlots::MakeTimeScatterPlot(class MultiPlot &plot, const TimeFrequencyData &data, const TimeFrequencyMetaDataCPtr& metaData, unsigned startIndex)
 {
-	switch(data.PolarizationCount())
+	for(size_t polIndex = 0; polIndex!=data.PolarizationCount(); ++polIndex)
 	{
-		case 4:
-		{
-			TimeFrequencyData
-				xx = data.Make(Polarization::XX),
-				xy = data.Make(Polarization::XY),
-				yx = data.Make(Polarization::YX),
-				yy = data.Make(Polarization::YY);
-			MakeTimeScatterPlot(plot, startIndex+0, xx.GetSingleImage(), xx.GetSingleMask(), metaData);
-			MakeTimeScatterPlot(plot, startIndex+1, xy.GetSingleImage(), xy.GetSingleMask(), metaData);
-			MakeTimeScatterPlot(plot, startIndex+2, yx.GetSingleImage(), yx.GetSingleMask(), metaData);
-			MakeTimeScatterPlot(plot, startIndex+3, yy.GetSingleImage(), yy.GetSingleMask(), metaData);
-			plot.SetLegend(startIndex+0, "XX");
-			plot.SetLegend(startIndex+1, "XY");
-			plot.SetLegend(startIndex+2, "YX");
-			plot.SetLegend(startIndex+3, "YY");
-			break;
-		}
-		case 2:
-		{
-			TimeFrequencyData
-				xx = data.Make(Polarization::XX),
-				yy = data.Make(Polarization::YY);
-			MakeTimeScatterPlot(plot, startIndex+0, xx.GetSingleImage(), xx.GetSingleMask(), metaData);
-			MakeTimeScatterPlot(plot, startIndex+1, yy.GetSingleImage(), yy.GetSingleMask(), metaData);
-			plot.SetLegend(startIndex+0, "XX");
-			plot.SetLegend(startIndex+1, "YY");
-			break;
-		}
-		case 1:
-			MakeTimeScatterPlot(plot, startIndex+0, data.GetSingleImage(), data.GetSingleMask(), metaData);
-			plot.SetLegend(startIndex+0, data.Description());
-		break;
+		PolarizationEnum pol = data.GetPolarization(polIndex);
+		TimeFrequencyData polTF = data.Make(pol);
+		MakeTimeScatterPlot(plot, startIndex+polIndex, polTF.GetSingleImage(), polTF.GetSingleMask(), metaData);
+		if(data.PolarizationCount() == 1)
+			plot.SetLegend(startIndex, data.Description());
+		else
+			plot.SetLegend(startIndex+polIndex, Polarization::TypeToFullString(pol));
 	}
 }
 
-void RFIPlots::MakeFrequencyScatterPlot(class MultiPlot &plot, const TimeFrequencyData &data, TimeFrequencyMetaDataCPtr metaData, unsigned startIndex)
+void RFIPlots::MakeFrequencyScatterPlot(class MultiPlot &plot, const TimeFrequencyData &data, const TimeFrequencyMetaDataCPtr& metaData, unsigned startIndex)
 {
-	switch(data.PolarizationCount())
+	for(size_t polIndex = 0; polIndex!=data.PolarizationCount(); ++polIndex)
 	{
-		case 4:
-		{
-			TimeFrequencyData
-				xx = data.Make(Polarization::XX),
-				xy = data.Make(Polarization::XY),
-				yx = data.Make(Polarization::YX),
-				yy = data.Make(Polarization::YY);
-			MakeFrequencyScatterPlot(plot, startIndex+0, xx.GetSingleImage(), xx.GetSingleMask(), metaData);
-			MakeFrequencyScatterPlot(plot, startIndex+1, xy.GetSingleImage(), xy.GetSingleMask(), metaData);
-			MakeFrequencyScatterPlot(plot, startIndex+2, yx.GetSingleImage(), yx.GetSingleMask(), metaData);
-			MakeFrequencyScatterPlot(plot, startIndex+3, yy.GetSingleImage(), yy.GetSingleMask(), metaData);
-			plot.SetLegend(startIndex+0, "XX");
-			plot.SetLegend(startIndex+1, "XY");
-			plot.SetLegend(startIndex+2, "YX");
-			plot.SetLegend(startIndex+3, "YY");
-			break;
-		}
-		case 2:
-		{
-			TimeFrequencyData
-				xx = data.Make(Polarization::XX),
-				yy = data.Make(Polarization::YY);
-			MakeFrequencyScatterPlot(plot, startIndex+0, xx.GetSingleImage(), xx.GetSingleMask(), metaData);
-			MakeFrequencyScatterPlot(plot, startIndex+1, yy.GetSingleImage(), yy.GetSingleMask(), metaData);
-			plot.SetLegend(startIndex+0, "XX");
-			plot.SetLegend(startIndex+1, "YY");
-			break;
-		}
-		case 1:
-			MakeFrequencyScatterPlot(plot, startIndex+0, data.GetSingleImage(), data.GetSingleMask(), metaData);
-			plot.SetLegend(startIndex+0, data.Description());
-		break;
+		PolarizationEnum pol = data.GetPolarization(polIndex);
+		TimeFrequencyData polTF = data.Make(pol);
+		MakeFrequencyScatterPlot(plot, startIndex+polIndex, polTF.GetSingleImage(), polTF.GetSingleMask(), metaData);
+		if(data.PolarizationCount() == 1)
+			plot.SetLegend(startIndex, data.Description());
+		else
+			plot.SetLegend(startIndex+polIndex, Polarization::TypeToFullString(pol));
 	}
 }
 
