@@ -29,18 +29,21 @@ void AOQPlotPageController::updatePlotForSettings(
 {
 	if(HasStatistics())
 	{
+		std::set<std::pair<unsigned int, unsigned int> > actualPols;
+		for(auto p : pols)
+		{
+			if(p.first < _statCollection->PolarizationCount() && p.second < _statCollection->PolarizationCount())
+				actualPols.insert(p);
+		}
 		_plot.Clear();
 		
-		for(std::set<QualityTablesFormatter::StatisticKind>::const_iterator k=kinds.begin();
-				k!=kinds.end(); ++k)
+		for(QualityTablesFormatter::StatisticKind k : kinds)
 		{
-			for(std::set<std::pair<unsigned,unsigned> >::const_iterator p=pols.begin();
-					p!=pols.end(); ++p)
+			for(std::pair<unsigned,unsigned> p : actualPols)
 			{
-				for(std::set<PhaseType>::const_iterator ph=phases.begin();
-						ph!=phases.end(); ++ph)
+				for(PhaseType ph : phases)
 				{
-					plotStatistic(*k, p->first, p->second, *ph, getYDesc(kinds));
+					plotStatistic(k, p.first, p.second, ph, getYDesc(kinds));
 				}
 			}
 		}
