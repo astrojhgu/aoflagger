@@ -114,14 +114,12 @@ static void run(int argc, char *argv[])
 	
 	// We have to 'lie' about argc to create(..), because of a bug in older gtkmms.
 	int altArgc = 1;
-	Logger::Info << "Opening controller.\n";
 	RFIGuiController controller;
 	Glib::RefPtr<Gtk::Application> app;
 	std::unique_ptr<RFIGuiWindow> window;
 	if(interactive)
 	{
 		app = Gtk::Application::create(altArgc, argv, "", Gio::APPLICATION_HANDLES_OPEN);
-		Logger::Info << "Opening main window.\n";
 		window.reset(new RFIGuiWindow(&controller));
 		window->present();
 	}

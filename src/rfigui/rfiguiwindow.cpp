@@ -1891,7 +1891,6 @@ void RFIGuiWindow::onZoomOut() {
 
 void RFIGuiWindow::onTFZoomChanged()
 {
-	Logger::Info << "Zoom changed.\n";
 	bool s = !_timeFrequencyWidget.Plot().IsZoomedOut();
 	bool i = _timeFrequencyWidget.Plot().HasImage();
 	_zoomToFitButton->set_sensitive(s && i);
