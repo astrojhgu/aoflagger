@@ -1,5 +1,6 @@
 #include "saveheatmapaction.h"
 
+#ifdef HAVE_GTKMM
 #include "../../plot/heatmapplot.h"
 
 namespace rfiStrategy {
@@ -36,5 +37,18 @@ void SaveHeatMapAction::Perform(rfiStrategy::ArtifactSet& artifacts, ProgressLis
 	plot.SetAlternativeMask(tfData.GetSingleMask());
 	plot.SaveByExtension(filename.str(), 800, 500);
 }
+
+#else // HAVE_GTKMM
+
+namespace rfiStrategy {
+
+void SaveHeatMapAction::Perform(rfiStrategy::ArtifactSet&, ProgressListener&)
+{
+	throw std::runtime_error("Not compiled with GTKMM -- graphical drawing is not available for SaveHeatMapAction");
+}
+
+}
+
+#endif // HAVE_GTKMM 
 
 }
