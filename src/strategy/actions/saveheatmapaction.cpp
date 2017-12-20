@@ -38,6 +38,8 @@ void SaveHeatMapAction::Perform(rfiStrategy::ArtifactSet& artifacts, ProgressLis
 	plot.SaveByExtension(filename.str(), 800, 500);
 }
 
+}
+
 #else // HAVE_GTKMM
 
 namespace rfiStrategy {
@@ -50,5 +52,3 @@ void SaveHeatMapAction::Perform(rfiStrategy::ArtifactSet&, ProgressListener&)
 }
 
 #endif // HAVE_GTKMM 
-
-}
