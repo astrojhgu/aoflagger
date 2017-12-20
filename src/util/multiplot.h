@@ -1,8 +1,6 @@
 #ifndef MULTIPLOT_H
 #define MULTIPLOT_H
 
-#include "plot.h"
-
 #include "../structures/types.h"
 
 #include <vector>

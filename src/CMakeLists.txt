@@ -95,6 +95,7 @@ set(GUI_FILES
   rfigui/rfiguiwindow.cpp
   rfigui/strategywizardwindow.cpp
   strategy/plots/rfiplots.cpp
+  util/multiplot.cpp
   ${PLOT_FILES} ${AOQPLOT_FILES})
 
 set(IMAGING_FILES
@@ -176,8 +177,7 @@ set(STRATEGY_ALGORITHMS_FILES
 set(STRATEGY_PLOTS_FILES
   strategy/plots/frequencypowerplot.cpp
   strategy/plots/iterationsplot.cpp
-  strategy/plots/timeflagcountplot.cpp
-  util/multiplot.cpp)
+  strategy/plots/timeflagcountplot.cpp)
 
 set(STRATEGY_CONTROL_FILES
   strategy/control/actionblock.cpp
