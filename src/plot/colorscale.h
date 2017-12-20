@@ -4,17 +4,14 @@
 #include <string>
 #include <map>
 
-#include <gtkmm/drawingarea.h>
-
 #include "verticalplotscale.h"
+
+#include <gtkmm/drawingarea.h>
 
 class ColorScale {
 	public:
 		ColorScale();
 		
-		virtual ~ColorScale()
-		{
-		}
 		void SetPlotDimensions(double plotWidth, double plotHeight, double topMargin, bool textOnLeft)
 		{
 			_plotWidth = plotWidth;
