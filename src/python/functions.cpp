@@ -9,7 +9,9 @@
 #include "../structures/samplerow.h"
 #include "../structures/timefrequencydata.h"
 
+#ifdef HAVE_GTKMM
 #include "../plot/heatmapplot.h"
+#endif
 
 #include "../strategy/algorithms/polarizationstatistics.h"
 
@@ -98,11 +100,15 @@ void high_pass_filter(Data& data, size_t kernelWidth, size_t kernelHeight, doubl
 
 void save_heat_map(const char* filename, const Data& data)
 {
+#ifdef HAVE_GTKMM
 	const TimeFrequencyData tfData = data.TFData();
 	HeatMapPlot plot;
 	plot.SetImage(tfData.GetSingleImage());
 	plot.SetAlternativeMask(tfData.GetSingleMask());
 	plot.SaveByExtension(filename, 800, 500);
+#else
+	throw std::runtime_error("Compiled without GTKMM -- can not save heat map");
+#endif
 }
 
 void print_polarization_statistics(const Data& data)
