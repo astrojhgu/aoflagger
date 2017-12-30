@@ -127,11 +127,8 @@ class Image2D {
 		 * Creates an image containing zeros.
 		 * @param width Width of the new image.
 		 * @param height Height of the new image.
-		 * @return The new created image. Should be deleted by the caller.
+		 * @return The new created image.
 		 */
-		[[ deprecated("Use the make() functions") ]]
-		static Image2D *CreateZeroImage(size_t width, size_t height);
-		
 		static Image2D MakeZeroImage(size_t width, size_t height)
 		{
 			return MakeSetImage(width, height, 0.0);
