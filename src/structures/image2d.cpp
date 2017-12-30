@@ -143,13 +143,6 @@ Image2D *Image2D::CreateSetImage(size_t width, size_t height, num_t initialValue
 	return image;
 }
 
-Image2D *Image2D::CreateZeroImage(size_t width, size_t height) 
-{
-	Image2D *image = new Image2D(width, height);
-	image->SetAll(0.0);
-	return image;
-}
-
 Image2D Image2D::MakeFromSum(const Image2D &imageA, const Image2D &imageB)
 {
 	if(imageA.Width() != imageB.Width() || imageA.Height() != imageB.Height())
