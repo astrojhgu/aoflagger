@@ -27,6 +27,6 @@ void BaselinePlotPage::onMouseMoved(size_t x, size_t y)
 	const std::string &kindName = QualityTablesFormatter::KindToName(kind);
 	
 	std::stringstream text;
-	text << "Correlation " << antenna1Name << " x " << antenna2Name << ", " << kindName << " = " << grayScaleWidget().Plot().Image()->Value(x, y);
+	text << "Correlation " << antenna1Name << " (" << x << ") x " << antenna2Name << " (" << y << "), " << kindName << " = " << grayScaleWidget().Plot().Image()->Value(x, y);
 	_signalStatusChange(text.str());
 }
