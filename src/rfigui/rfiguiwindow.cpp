@@ -1324,6 +1324,7 @@ void RFIGuiWindow::keepPolarisation(PolarizationEnum polarisation)
 		try {
 			_controller->TFController().SetNewData(
 				_controller->TFController().GetActiveData().Make(polarisation), _controller->TFController().Plot().GetSelectedMetaData());
+			_controller->CheckPolarizations();
 			_timeFrequencyWidget.Update();
 		} catch(std::exception &e)
 		{

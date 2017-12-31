@@ -64,7 +64,7 @@ class RFIGuiController
 						_showQP = false;
 					}
 				}
-				_signalStateChange();
+				CheckPolarizations(true);
 			}
 		}
 		void SetShowPQ(bool showPQ)
@@ -80,7 +80,7 @@ class RFIGuiController
 						_showQQ = false;
 					}
 				}
-				_signalStateChange();
+				CheckPolarizations(true);
 			}
 		}
 		void SetShowQP(bool showQP)
@@ -96,7 +96,7 @@ class RFIGuiController
 						_showQQ = false;
 					}
 				}
-				_signalStateChange();
+				CheckPolarizations(true);
 			}
 		}
 		void SetShowQQ(bool showQQ)
@@ -112,7 +112,7 @@ class RFIGuiController
 						_showQP = false;
 					}
 				}
-				_signalStateChange();
+				CheckPolarizations(true);
 			}
 		}
 		sigc::signal<void> &SignalStateChange()
@@ -176,19 +176,21 @@ class RFIGuiController
 		
 		void LoadPath(const std::string& filename);
 		
+		void CheckPolarizations(bool forceSignal = false);
 	private:
 		void plotMeanSpectrum(bool weight);
+		
 		
 		bool _showOriginalFlags, _showAlternativeFlags;
 		bool _showPP, _showPQ, _showQP, _showQQ;
 		
 		sigc::signal<void> _signalStateChange;
-		class RFIGuiWindow *_rfiGuiWindow;
+		class RFIGuiWindow* _rfiGuiWindow;
 		class StrategyController* _strategyController;
 		class ImageComparisonController _tfController;
 		std::unique_ptr<class SpatialMatrixMetaData> _spatialMetaData;
 		
-		class PlotManager *_plotManager;
+		class PlotManager* _plotManager;
 		PythonStrategy _pythonStrategy;
 		std::unique_ptr<rfiStrategy::ImageSet> _imageSet;
 		std::unique_ptr<rfiStrategy::ImageSetIndex> _imageSetIndex;

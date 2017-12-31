@@ -356,7 +356,7 @@ void RFIGuiController::Open(const std::string& filename, BaselineIOMode ioMode, 
 		std::unique_ptr<rfiStrategy::ImageSet> imageSet(rfiStrategy::ImageSet::Create(filename, ioMode));
 		rfiStrategy::MSImageSet* msImageSet =
 			dynamic_cast<rfiStrategy::MSImageSet*>(imageSet.get());
-		if(msImageSet != 0)
+		if(msImageSet != nullptr)
 		{
 			msImageSet->SetSubtractModel(subtractModel);
 			msImageSet->SetDataColumnName(dataColumn);
@@ -460,11 +460,13 @@ void RFIGuiController::SetImageSetIndex(std::unique_ptr<rfiStrategy::ImageSetInd
 
 void RFIGuiController::LoadCurrentTFData()
 {
-	if(HasImageSet()) {
+	if(HasImageSet())
+	{
 		std::unique_lock<std::mutex> lock(_ioMutex);
 		_imageSet->AddReadRequest(*_imageSetIndex);
 		_imageSet->PerformReadRequests();
-		std::unique_ptr<rfiStrategy::BaselineData> baseline = _imageSet->GetNextRequested();
+		std::unique_ptr<rfiStrategy::BaselineData> baseline =
+			_imageSet->GetNextRequested();
 		lock.unlock();
 		
 		_tfController.SetNewData(baseline->Data(), baseline->MetaData());
@@ -549,4 +551,12 @@ void RFIGuiController::LoadSpatialTime(const std::string& filename)
 	imageSet->Initialize();
 	lock.unlock();
 	SetImageSet(std::move(imageSet));
+}
+
+void RFIGuiController::CheckPolarizations(bool forceSignal)
+{
+	const bool pp = _showPP, pq = _showPQ, qp = _showQP, qq = _showQQ;
+	_tfController.TryVisualizePolarizations(_showPP, _showPQ, _showQP, _showQQ);
+	if(forceSignal || _showPP!=pp || _showPQ!=pq || _showQP!=qp || _showQQ!=qq)
+		_signalStateChange();
 }

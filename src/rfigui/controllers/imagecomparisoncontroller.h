@@ -47,6 +47,7 @@ class ImageComparisonController {
 				updateVisualizedImage();
 			}
 		}
+		void TryVisualizePolarizations(bool& pp, bool& pq, bool& qp, bool& qq) const;
 		void SetVisualizedPolarization(bool pp, bool pq, bool qp, bool qq)
 		{
 			if(_showPP != pp || _showPQ != pq || _showQP != qp || _showQQ != qq)
@@ -62,6 +63,9 @@ class ImageComparisonController {
 		HeatMapPlot& Plot() { return _plot; }
 		const HeatMapPlot& Plot() const { return _plot; }
 	private:
+		TimeFrequencyData* getSelectedData();
+		void getFirstAvailablePolarization(bool& pp, bool& pq, bool& qp, bool& qq) const;
+		const TimeFrequencyData* getSelectedData() const;
 		void updateVisualizedImage();
 		const TimeFrequencyData getActiveDataWithOriginalFlags() const
 		{

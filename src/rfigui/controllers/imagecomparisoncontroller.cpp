@@ -42,23 +42,137 @@ void ImageComparisonController::SetNewData(const TimeFrequencyData &data, TimeFr
 	_plot.ZoomFit();
 }
 
-void ImageComparisonController::updateVisualizedImage()
+TimeFrequencyData* ImageComparisonController::getSelectedData()
 {
-  Image2DCPtr image;
-	const TimeFrequencyData* selectedData;
   switch(_visualizedImage)
 	{
 	default:
 	case TFOriginalImage:
-		selectedData = &_original;
-		break;
+		return &_original;
 	case TFRevisedImage:
-		selectedData = &_revised;
-		break;
+		return &_revised;
 	case TFContaminatedImage:
-		selectedData = &_contaminated;
-		break;
+		return &_contaminated;
 	}
+}
+
+const TimeFrequencyData* ImageComparisonController::getSelectedData() const
+{
+  switch(_visualizedImage)
+	{
+	default:
+	case TFOriginalImage:
+		return &_original;
+	case TFRevisedImage:
+		return &_revised;
+	case TFContaminatedImage:
+		return &_contaminated;
+	}
+}
+
+void ImageComparisonController::getFirstAvailablePolarization(bool& pp, bool& pq, bool& qp, bool& qq) const
+{
+	const TimeFrequencyData* selectedData = getSelectedData();
+	if(selectedData->IsEmpty()) {
+		pp = true; pq = false; qp = false; qq = true;
+	}
+	else {
+		bool
+			hasXX = selectedData->HasPolarization(Polarization::XX),
+			hasXY = selectedData->HasPolarization(Polarization::XY),
+			hasYX = selectedData->HasPolarization(Polarization::YX),
+			hasYY = selectedData->HasPolarization(Polarization::YY),
+			hasRR = selectedData->HasPolarization(Polarization::RR),
+			hasRL = selectedData->HasPolarization(Polarization::RL),
+			hasLR = selectedData->HasPolarization(Polarization::LR),
+			hasLL = selectedData->HasPolarization(Polarization::LL),
+			hasI = selectedData->HasPolarization(Polarization::StokesI),
+			hasQ = selectedData->HasPolarization(Polarization::StokesQ),
+			hasU = selectedData->HasPolarization(Polarization::StokesU),
+			hasV = selectedData->HasPolarization(Polarization::StokesV);
+		if(hasXX || hasRR || hasI) {
+			pp = true; pq = false; qp = false; qq = false;
+		}
+		else if(hasYY || hasLL || hasV) {
+			pp = false; pq = false; qp = false; qq = true;
+		}
+		else if(hasXY || hasRL || hasQ) {
+			pp = false; pq = true; qp = false; qq = false;
+		}
+		else if(hasYX || hasLR || hasU) {
+			pp = false; pq = false; qp = true; qq = false;
+		}
+		else {
+			pp = true; pq = false; qp = false; qq = true;
+		}
+	}
+}
+
+void ImageComparisonController::TryVisualizePolarizations(bool& pp, bool& pq, bool& qp, bool& qq) const
+{
+	const TimeFrequencyData* selectedData = getSelectedData();
+	if(!selectedData->IsEmpty())
+	{
+		bool
+			hasXX = selectedData->HasPolarization(Polarization::XX),
+			hasXY = selectedData->HasPolarization(Polarization::XY),
+			hasYX = selectedData->HasPolarization(Polarization::YX),
+			hasYY = selectedData->HasPolarization(Polarization::YY),
+			hasRR = selectedData->HasPolarization(Polarization::RR),
+			hasRL = selectedData->HasPolarization(Polarization::RL),
+			hasLR = selectedData->HasPolarization(Polarization::LR),
+			hasLL = selectedData->HasPolarization(Polarization::LL),
+			hasI = selectedData->HasPolarization(Polarization::StokesI),
+			hasQ = selectedData->HasPolarization(Polarization::StokesQ),
+			hasU = selectedData->HasPolarization(Polarization::StokesU),
+			hasV = selectedData->HasPolarization(Polarization::StokesV);
+		if(pp && qq)
+		{
+			pq = false; qp = false;
+			if((hasXX && !hasYY) || (hasRR && !hasLL))
+				qq = false;
+			else if((hasYY && !hasXX) || (hasLL && !hasRR))
+				pp = false;
+			else if(!hasXX && !hasYY && !hasRR && !hasLL && !hasI)
+				getFirstAvailablePolarization(pp, pq, qp, qq);
+		}
+		else if(pq && qp)
+		{
+			pp = false; qq = false;
+			if((hasXY && !hasYX) || (hasRL && !hasLR) || hasQ)
+				qp = false;
+			else if((hasYX && !hasXY) || (hasLR && !hasRL) || hasU)
+				pq = false;
+			else if(!hasXY && !hasYX && !hasRL && !hasLR && !hasU)
+				getFirstAvailablePolarization(pp, pq, qp, qq);
+		}
+		else if(pp)
+		{
+			if(!hasXX && !hasRR && !hasI)
+				getFirstAvailablePolarization(pp, pq, qp, qq);
+		}
+		else if(pq)
+		{
+			if(!hasXY && !hasRL && !hasQ)
+				getFirstAvailablePolarization(pp, pq, qp, qq);
+		}
+		else if(qp)
+		{
+			if(!hasYX && !hasLR && !hasU)
+				getFirstAvailablePolarization(pp, pq, qp, qq);
+		}
+		else if(qq)
+		{
+			if(!hasYY && !hasLL && !hasV)
+				getFirstAvailablePolarization(pp, pq, qp, qq);
+		}
+	}
+}
+
+void ImageComparisonController::updateVisualizedImage()
+{
+  Image2DCPtr image;
+	const TimeFrequencyData* selectedData = getSelectedData();
 	if(!selectedData->IsEmpty())
 	{
 		if(_showPP && _showQQ)
