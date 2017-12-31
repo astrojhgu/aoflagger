@@ -177,6 +177,8 @@ class RFIGuiController
 		void LoadPath(const std::string& filename);
 		
 		void CheckPolarizations(bool forceSignal = false);
+		
+		void GetAvailablePolarizations(bool& pp, bool& pq, bool& qp, bool& qq) const;
 	private:
 		void plotMeanSpectrum(bool weight);
 		

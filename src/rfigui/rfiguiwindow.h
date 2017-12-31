@@ -203,6 +203,8 @@ class RFIGuiWindow : public Gtk::Window, private StrategyController {
 		
 		void onExecutePythonStrategy();
 		
+		void updatePolarizations();
+		
 		class RFIGuiController* _controller;
 		
 		Gtk::Box _mainVBox;

@@ -1317,6 +1317,17 @@ void RFIGuiWindow::keepPhasePart(enum TimeFrequencyData::ComplexRepresentation p
 	}
 }
 
+void RFIGuiWindow::updatePolarizations()
+{
+	_controller->CheckPolarizations();
+	bool pp, pq, qp, qq;
+	_controller->GetAvailablePolarizations(pp, pq, qp, qq);
+	_showPPButton->set_sensitive(pp);
+	_showPQButton->set_sensitive(pq);
+	_showQPButton->set_sensitive(qp);
+	_showQQButton->set_sensitive(qq);
+}
+
 void RFIGuiWindow::keepPolarisation(PolarizationEnum polarisation)
 {
 	if(HasImage())
@@ -1324,7 +1335,7 @@ void RFIGuiWindow::keepPolarisation(PolarizationEnum polarisation)
 		try {
 			_controller->TFController().SetNewData(
 				_controller->TFController().GetActiveData().Make(polarisation), _controller->TFController().Plot().GetSelectedMetaData());
-			_controller->CheckPolarizations();
+			updatePolarizations();
 			_timeFrequencyWidget.Update();
 		} catch(std::exception &e)
 		{
@@ -1930,5 +1941,6 @@ void RFIGuiWindow::SetBaselineInfo(bool multipleBaselines, const std::string& na
 	_imageSetName = name;
 	_imageSetIndexDescription = description;
 	setSetNameInStatusBar();
+	updatePolarizations();
 	_timeFrequencyWidget.Update();
 }

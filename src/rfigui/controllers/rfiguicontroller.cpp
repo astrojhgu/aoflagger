@@ -560,3 +560,20 @@ void RFIGuiController::CheckPolarizations(bool forceSignal)
 	if(forceSignal || _showPP!=pp || _showPQ!=pq || _showQP!=qp || _showQQ!=qq)
 		_signalStateChange();
 }
+
+void RFIGuiController::GetAvailablePolarizations(bool& pp, bool& pq, bool& qp, bool& qq) const
+{
+	bool b[4];
+	for(size_t i=0; i!=4; ++i)
+	{
+		for(size_t j=0; j!=4; ++j)
+			b[j] = (j==i);
+		_tfController.TryVisualizePolarizations(b[0], b[1], b[2], b[3]);
+		switch(i) {
+			case 0: pp = b[0]; break;
+			case 1: pq = b[1]; break;
+			case 2: qp = b[2]; break;
+			case 3: qq = b[3]; break;
+		}
+	}
+}
