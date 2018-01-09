@@ -189,60 +189,60 @@ void sumthreshold(Data& data, double thresholdFactor, bool horizontal, bool vert
 
 void threshold_channel_rms(Data& data, double threshold, bool thresholdLowValues)
 {
-	Image2DCPtr image = data.TFData().GetSingleImage();
-	SampleRowPtr channels = SampleRow::CreateEmpty(image->Height());
+	Image2DCPtr image(data.TFData().GetSingleImage());
+	SampleRow channels = SampleRow::MakeEmpty(image->Height());
 	Mask2DPtr mask(new Mask2D(*data.TFData().GetSingleMask()));
 	for(size_t y=0;y<image->Height();++y)
 	{
-		SampleRowPtr row = SampleRow::CreateFromRowWithMissings(image.get(), mask.get(), y);
-		channels->SetValue(y, row->RMSWithMissings());
+		SampleRow row = SampleRow::MakeFromRowWithMissings(image.get(), mask.get(), y);
+		channels.SetValue(y, row.RMSWithMissings());
 	}
 	bool change;
 	do {
-		num_t median = channels->MedianWithMissings();
-		num_t stddev = channels->StdDevWithMissings(median);
+		num_t median = channels.MedianWithMissings();
+		num_t stddev = channels.StdDevWithMissings(median);
 		change = false;
 		double effectiveThreshold = threshold * stddev;
-		for(size_t y=0;y<channels->Size();++y)
+		for(size_t y=0;y<channels.Size();++y)
 		{
-			if(!channels->ValueIsMissing(y) && (channels->Value(y) - median > effectiveThreshold || (thresholdLowValues && median - channels->Value(y) > effectiveThreshold)))
+			if(!channels.ValueIsMissing(y) && (channels.Value(y) - median > effectiveThreshold || (thresholdLowValues && median - channels.Value(y) > effectiveThreshold)))
 			{
 				mask->SetAllHorizontally<true>(y);
-				channels->SetValueMissing(y);
+				channels.SetValueMissing(y);
 				change = true;
 			}
 		}
 	} while(change);
-	data.TFData().SetGlobalMask(mask);
+	data.TFData().SetGlobalMask(std::move(mask));
 }
 
 void threshold_timestep_rms(Data& data, double threshold)
 {
 	Image2DCPtr image = data.TFData().GetSingleImage();
-	SampleRowPtr timesteps = SampleRow::CreateEmpty(image->Width());
+	SampleRow timesteps = SampleRow::MakeEmpty(image->Width());
 	Mask2DPtr mask(new Mask2D(*data.TFData().GetSingleMask()));
 	for(size_t x=0;x<image->Width();++x)
 	{
-		SampleRowPtr row = SampleRow::CreateFromColumnWithMissings(image.get(), mask.get(), x);
-		timesteps->SetValue(x, row->RMSWithMissings());
+		SampleRow row = SampleRow::MakeFromColumnWithMissings(image.get(), mask.get(), x);
+		timesteps.SetValue(x, row.RMSWithMissings());
 	}
 	bool change;
 	MedianWindow<num_t>::SubtractMedian(timesteps, 512);
 	do {
 		num_t median = 0.0;
-		num_t stddev = timesteps->StdDevWithMissings(0.0);
+		num_t stddev = timesteps.StdDevWithMissings(0.0);
 		change = false;
-		for(size_t x=0;x<timesteps->Size();++x)
+		for(size_t x=0;x<timesteps.Size();++x)
 		{
-			if(!timesteps->ValueIsMissing(x) && (timesteps->Value(x) - median > stddev * threshold || median - timesteps->Value(x) > stddev * threshold))
+			if(!timesteps.ValueIsMissing(x) && (timesteps.Value(x) - median > stddev * threshold || median - timesteps.Value(x) > stddev * threshold))
 			{
 				mask->SetAllVertically<true>(x);
-				timesteps->SetValueMissing(x);
+				timesteps.SetValueMissing(x);
 				change = true;
 			}
 		}
 	} while(change);
-	data.TFData().SetGlobalMask(mask);
+	data.TFData().SetGlobalMask(std::move(mask));
 }
 
 }

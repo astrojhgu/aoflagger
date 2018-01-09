@@ -30,9 +30,9 @@ void HeatMapPageController::updateImageImpl(QualityTablesFormatter::StatisticKin
 		if(_page != nullptr)
 		{
 			if(_page->NormalizeXAxis())
-				image = normalizeXAxis(image);
+				image = Image2D::MakePtr(normalizeXAxis(*image));
 			if(_page->NormalizeYAxis())
-				image = normalizeYAxis(image);
+				image = Image2D::MakePtr(normalizeYAxis(*image));
 		}
 		
 		_heatMap.SetZAxisDescription(StatisticsDerivator::GetDescWithUnits(statisticKind));
@@ -46,40 +46,40 @@ void HeatMapPageController::updateImageImpl(QualityTablesFormatter::StatisticKin
 	}
 }
 
-Image2DCPtr HeatMapPageController::normalizeXAxis(Image2DCPtr input)
+Image2D HeatMapPageController::normalizeXAxis(const Image2D& input)
 {
-	Image2DPtr output = Image2D::CreateUnsetImagePtr(input->Width(), input->Height());
-	for(size_t x=0;x<input->Width();++x)
+	Image2D output = Image2D::MakeUnsetImage(input.Width(), input.Height());
+	for(size_t x=0;x<input.Width();++x)
 	{
-		SampleRowPtr row = SampleRow::CreateFromColumn(input.get(), x);
+		SampleRow row = SampleRow::MakeFromColumn(&input, x);
 		num_t norm;
 		if(_normalization == Mean)
-			norm = 1.0 / row->MeanWithMissings();
+			norm = 1.0 / row.MeanWithMissings();
 		else if(_normalization == Winsorized)
-			norm = 1.0 / row->WinsorizedMeanWithMissings();
+			norm = 1.0 / row.WinsorizedMeanWithMissings();
 		else // _medianNormButton
-			norm = 1.0 / row->MedianWithMissings();
-		for(size_t y=0;y<input->Height();++y)
-			output->SetValue(x, y, input->Value(x, y) * norm);
+			norm = 1.0 / row.MedianWithMissings();
+		for(size_t y=0;y<input.Height();++y)
+			output.SetValue(x, y, input.Value(x, y) * norm);
 	}
 	return output;
 }
 
-Image2DCPtr HeatMapPageController::normalizeYAxis(Image2DCPtr input)
+Image2D HeatMapPageController::normalizeYAxis(const Image2D& input)
 {
-	Image2DPtr output = Image2D::CreateUnsetImagePtr(input->Width(), input->Height());
-	for(size_t y=0;y<input->Height();++y)
+	Image2D output = Image2D::MakeUnsetImage(input.Width(), input.Height());
+	for(size_t y=0;y<input.Height();++y)
 	{
-		SampleRowPtr row = SampleRow::CreateFromRow(input.get(), y);
+		SampleRow row = SampleRow::MakeFromRow(&input, y);
 		num_t norm;
 		if(_normalization == Mean)
-			norm = 1.0 / row->MeanWithMissings();
+			norm = 1.0 / row.MeanWithMissings();
 		else if(_normalization == Winsorized)
-			norm = 1.0 / row->WinsorizedMeanWithMissings();
+			norm = 1.0 / row.WinsorizedMeanWithMissings();
 		else // _medianNormButton
-			norm = 1.0 / row->MedianWithMissings();
-		for(size_t x=0;x<input->Width();++x)
-			output->SetValue(x, y, input->Value(x, y) * norm);
+			norm = 1.0 / row.MedianWithMissings();
+		for(size_t x=0;x<input.Width();++x)
+			output.SetValue(x, y, input.Value(x, y) * norm);
 	}
 	return output;
 }

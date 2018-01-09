@@ -8,13 +8,16 @@
 #include "../baseexception.h"
 #include "types.h"
 
+#include <boost/smart_ptr/intrusive_ptr.hpp>
+#include <boost/smart_ptr/intrusive_ref_counter.hpp>
+
 #include <memory>
 
 #include <exception>
 #include <cmath>
 
-typedef std::shared_ptr<class Image2D> Image2DPtr;
-typedef std::shared_ptr<const class Image2D> Image2DCPtr;
+typedef boost::intrusive_ptr<class Image2D> Image2DPtr;
+typedef boost::intrusive_ptr<const class Image2D> Image2DCPtr;
 
 void swap(Image2D& left, Image2D& right);
 void swap(Image2D& left, Image2D&& right);
@@ -25,17 +28,31 @@ void swap(Image2D&& left, Image2D& right);
  * read from and written to a @c .fits file and written to a @c .png file. A new Image2D can
  * be constructed with e.g. the CreateFromFits(), CreateUnsetImage() or CreateFromDiff() static methods.
  */
-class Image2D {
+class Image2D : public boost::intrusive_ref_counter<Image2D> {
 	public:
-		Image2D();
+		Image2D() noexcept;
 		
 		Image2D(const Image2D& source);
 		
-		Image2D(Image2D&& source);
+		Image2D(Image2D&& source) noexcept;
 		
 		Image2D& operator=(const Image2D& rhs);
 		
-		Image2D& operator=(Image2D&& rhs);
+		Image2D& operator=(Image2D&& rhs) noexcept;
+		
+		template<typename... Args>
+		static Image2DPtr MakePtr(Args&&... args)
+		{
+			// This function is to have a generic 'make_<ptr>' function, that e.g. calls
+			// the more efficient make_shared() when Image2DPtr is a shared_ptr, but
+			// also works when Image2DPtr is a boost::intrusive_ptr.
+			return Image2DPtr(new Image2D(std::forward<Args>(args)...));
+		}
+		
+		/**
+		 * Destructor.
+		 */
+		~Image2D() noexcept;
 		
 		static Image2D MakeUnsetImage(size_t width, size_t height)
 		{
@@ -146,11 +163,6 @@ class Image2D {
 			return Image2DPtr(new Image2D(MakeZeroImage(width, height)));
 		}
 
-		/**
-		 * Destructor.
-		 */
-		~Image2D();
-		
 		bool Empty() const { return _width==0 || _height==0; }
 		
 		/**

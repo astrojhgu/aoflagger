@@ -48,8 +48,8 @@ protected:
 	virtual std::pair<TimeFrequencyData, TimeFrequencyMetaDataCPtr> constructImage(QualityTablesFormatter::StatisticKind kind) = 0;
 
 private:
-	Image2DCPtr normalizeXAxis(Image2DCPtr input);
-	Image2DCPtr normalizeYAxis(Image2DCPtr input);
+	Image2D normalizeXAxis(const Image2D& input);
+	Image2D normalizeYAxis(const Image2D& input);
 	void updateImageImpl(QualityTablesFormatter::StatisticKind statisticKind, PolarizationEnum polarisation, enum TimeFrequencyData::ComplexRepresentation phase);
 	void setToPolarization(TimeFrequencyData &data, PolarizationEnum polarisation);
 	void setToPhase(TimeFrequencyData &data, enum TimeFrequencyData::ComplexRepresentation phase);

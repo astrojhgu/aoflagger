@@ -4,26 +4,38 @@
 #include <cstring>
 #include <memory>
 
+#include <boost/smart_ptr/intrusive_ptr.hpp>
+#include <boost/smart_ptr/intrusive_ref_counter.hpp>
+
 #include "image2d.h"
 
-typedef std::shared_ptr<class Mask2D> Mask2DPtr;
-typedef std::shared_ptr<const class Mask2D> Mask2DCPtr;
+typedef boost::intrusive_ptr<class Mask2D> Mask2DPtr;
+typedef boost::intrusive_ptr<const class Mask2D> Mask2DCPtr;
 
 void swap(Mask2D&, Mask2D&);
 void swap(Mask2D&, Mask2D&&);
 void swap(Mask2D&&, Mask2D&);
 
-class Mask2D {
+class Mask2D : public boost::intrusive_ref_counter<Mask2D> {
 	public:
 		Mask2D(const Mask2D& source);
 		
-		Mask2D(Mask2D&& source);
+		Mask2D(Mask2D&& source) noexcept;
 		
-		~Mask2D();
+		~Mask2D() noexcept;
 
 		Mask2D& operator=(const Mask2D& rhs);
 		
-		Mask2D& operator=(Mask2D&& rhs);
+		Mask2D& operator=(Mask2D&& rhs) noexcept;
+		
+		template<typename... Args>
+		static Mask2DPtr MakePtr(Args&&... args)
+		{
+			// This function is to have a generic 'make_<ptr>' function, that e.g. calls
+			// the more efficient make_shared() when Mask2DPtr is a shared_ptr, but
+			// also works when Mask2DPtr is a boost::intrusive_ptr.
+			return Mask2DPtr(new Mask2D(std::forward<Args>(args)...));
+		}
 		
 		static Mask2D MakeUnsetMask(size_t width, size_t height)
 		{

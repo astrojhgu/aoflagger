@@ -92,11 +92,11 @@ class FringeStoppingFitter final : public SurfaceFitMethod {
 		num_t GetFringeFrequency(size_t x, size_t y);
 
 		void GetRFIValue(num_t &r, num_t &i, int x, int y, num_t rfiPhase, num_t rfiStrength);
-		void GetMeanValue(num_t &rMean, num_t &iMean, num_t phase, num_t amplitude, SampleRowCPtr real, SampleRowCPtr imaginary, unsigned xStart, unsigned xEnd, unsigned y);
-		void MinimizeRFIFitError(num_t &phase, num_t &amplitude, SampleRowCPtr real, SampleRowCPtr imaginary, unsigned xStart, unsigned xEnd, unsigned y) const throw();
+		void GetMeanValue(num_t &rMean, num_t &iMean, num_t phase, num_t amplitude, const SampleRow& real, const SampleRow& imaginary, unsigned xStart, unsigned xEnd, unsigned y);
+		void MinimizeRFIFitError(num_t &phase, num_t &amplitude, const SampleRow& real, const SampleRow& imaginary, unsigned xStart, unsigned xEnd, unsigned y) const throw();
 		
-		void PerformDynamicFrequencyFitOnOneRow(SampleRowCPtr real, SampleRowCPtr imaginary, unsigned y);
-		void PerformDynamicFrequencyFitOnOneRow(SampleRowCPtr real, SampleRowCPtr imaginary, unsigned y, unsigned windowSize);
+		void PerformDynamicFrequencyFitOnOneRow(const SampleRow& real, const SampleRow& imaginary, unsigned y);
+		void PerformDynamicFrequencyFitOnOneRow(const SampleRow& real, const SampleRow& imaginary, unsigned y, unsigned windowSize);
 
 		Mask2DCPtr _originalMask;
 		const class TimeFrequencyData *_originalData;

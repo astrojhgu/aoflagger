@@ -21,7 +21,7 @@
 #include <xmmintrin.h>
 #endif
 
-Image2D::Image2D() :
+Image2D::Image2D() noexcept :
 	_width(0),
 	_height(0),
 	_stride(0),
@@ -79,7 +79,7 @@ Image2D::Image2D(const Image2D& source) :
 	std::copy(source._dataConsecutive, source._dataConsecutive+_stride * _height, _dataConsecutive);
 }
 
-Image2D::Image2D(Image2D&& source) :
+Image2D::Image2D(Image2D&& source) noexcept :
 	_width(source._width),
 	_height(source._height),
 	_stride(source._stride),
@@ -93,7 +93,7 @@ Image2D::Image2D(Image2D&& source) :
 	source._dataConsecutive = nullptr;
 }
 
-Image2D::~Image2D()
+Image2D::~Image2D() noexcept
 {
 	delete[] _dataPtr;
 	free(_dataConsecutive);
@@ -119,7 +119,7 @@ Image2D& Image2D::operator=(const Image2D& rhs)
 	return *this;
 }
 
-Image2D& Image2D::operator=(Image2D&& rhs)
+Image2D& Image2D::operator=(Image2D&& rhs) noexcept
 {
 	std::swap(rhs._width, _width);
 	std::swap(rhs._stride, _stride);

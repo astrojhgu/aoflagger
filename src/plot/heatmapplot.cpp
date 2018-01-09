@@ -316,12 +316,12 @@ void HeatMapPlot::update(Cairo::RefPtr<Cairo::Context> cairo, unsigned width, un
 	if(imageWidth > 30000)
 	{
 		int shrinkFactor = (imageWidth + 29999) / 30000;
-		image = std::make_shared<Image2D>(image->ShrinkHorizontally(shrinkFactor));
-		mask = std::make_shared<Mask2D>(mask->ShrinkHorizontally(shrinkFactor));
+		image = Image2D::MakePtr(image->ShrinkHorizontally(shrinkFactor));
+		mask = Mask2D::MakePtr(mask->ShrinkHorizontally(shrinkFactor));
 		if(originalMask != 0)
-			originalMask = std::make_shared<Mask2D>(originalMask->ShrinkHorizontally(shrinkFactor));
+			originalMask = Mask2D::MakePtr(originalMask->ShrinkHorizontally(shrinkFactor));
 		if(alternativeMask != 0)
-			alternativeMask = std::make_shared<Mask2D>(alternativeMask->ShrinkHorizontally(shrinkFactor));
+			alternativeMask = Mask2D::MakePtr(alternativeMask->ShrinkHorizontally(shrinkFactor));
 		startX /= shrinkFactor;
 		endX /= shrinkFactor;
 		imageWidth = endX - startX;
@@ -690,7 +690,7 @@ Mask2DCPtr HeatMapPlot::GetActiveMask() const
 	{
 		if(altActive)
 		{
-			Mask2DPtr mask = std::make_shared<Mask2D>(*_originalMask); 
+			Mask2DPtr mask = Mask2D::MakePtr(*_originalMask); 
 			mask->Join(*_alternativeMask);
 			return mask;
 		} else

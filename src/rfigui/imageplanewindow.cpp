@@ -221,7 +221,7 @@ void ImagePlaneWindow::Update()
 	if(_uvPlaneButton.get_active())
 	{
 		if(_imager.HasUV()) {
-			_heatMapPlot.SetImage(std::make_shared<Image2D>(_imager.RealUVImage()));
+			_heatMapPlot.SetImage(Image2D::MakePtr(_imager.RealUVImage()));
 			_imageWidget.Update();
 			_displayingUV = true;
 		}
@@ -232,7 +232,7 @@ void ImagePlaneWindow::Update()
 			_imager.PerformFFT();
 
 		if(_imager.HasFFT()) {
-			_heatMapPlot.SetImage(std::make_shared<Image2D>(_imager.FTReal()));
+			_heatMapPlot.SetImage(Image2D::MakePtr(_imager.FTReal()));
 			_imageWidget.Update();
 			printStats();
 			_displayingUV = false;
@@ -266,7 +266,7 @@ void ImagePlaneWindow::onMemoryMultiplyClicked()
 {
 	if(_memory != 0)
 	{
-		Image2DPtr multiplied(std::make_shared<Image2D>(*_memory));
+		Image2DPtr multiplied(Image2D::MakePtr(*_memory));
 		Image2DCPtr old = _heatMapPlot.Image();
 		for(size_t y=0;y<multiplied->Height();++y)
 		{
@@ -275,7 +275,7 @@ void ImagePlaneWindow::onMemoryMultiplyClicked()
 				multiplied->SetValue(x, y, multiplied->Value(x, y) * old->Value(x, y));
 			}
 		}
-		_heatMapPlot.SetImage(multiplied);
+		_heatMapPlot.SetImage(std::move(multiplied));
 		_imageWidget.Update();
 		printStats();
 	}
@@ -285,7 +285,7 @@ void ImagePlaneWindow::onMemorySubtractClicked()
 {
 	if(_memory != 0)
 	{
-		Image2DPtr subtracted(std::make_shared<Image2D>(*_memory));
+		Image2DPtr subtracted(Image2D::MakePtr(*_memory));
 		Image2DCPtr old = _heatMapPlot.Image();
 		for(size_t y=0;y<subtracted->Height();++y)
 		{
@@ -294,7 +294,7 @@ void ImagePlaneWindow::onMemorySubtractClicked()
 				subtracted->SetValue(x, y, subtracted->Value(x, y) - old->Value(x, y));
 			}
 		}
-		_heatMapPlot.SetImage(subtracted);
+		_heatMapPlot.SetImage(std::move(subtracted));
 		_imageWidget.Update();
 		printStats();
 	}
@@ -304,7 +304,7 @@ void ImagePlaneWindow::onSqrtClicked()
 {
 	if(_heatMapPlot.HasImage())
 	{
-		Image2DPtr sqrtImage(std::make_shared<Image2D>(*_heatMapPlot.Image()));
+		Image2DPtr sqrtImage(Image2D::MakePtr(*_heatMapPlot.Image()));
 		FFTTools::SignedSqrt(sqrtImage);
 		_heatMapPlot.SetImage(sqrtImage);
 		_imageWidget.Update();

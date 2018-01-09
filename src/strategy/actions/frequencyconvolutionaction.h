@@ -84,9 +84,9 @@ namespace rfiStrategy {
 				Image2DPtr destination = Image2D::CreateUnsetImagePtr(source->Width(), source->Height());
 				for(unsigned x=0;x<source->Width();++x)
 				{
-					SampleRowPtr row = SampleRow::CreateFromColumn(source, x);
-					row->ConvolveWithSinc(1.0 / convolutionSize);
-					row->SetVerticalImageValues(destination.get(), x);
+					SampleRow row = SampleRow::MakeFromColumn(source, x);
+					row.ConvolveWithSinc(1.0 / convolutionSize);
+					row.SetVerticalImageValues(destination.get(), x);
 				}
 				return destination;
 			}

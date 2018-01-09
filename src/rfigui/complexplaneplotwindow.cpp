@@ -183,7 +183,7 @@ void ComplexPlanePlotWindow::onPlotPressed()
 			if(_maskedValuesButton.get_active())
 			{
 				Plot2DPointSet *pointSet = &plot.StartLine("Only RFI");
-				Mask2DPtr mask = std::make_shared<Mask2D>(*_rfiGuiWindow.AltMask());
+				Mask2DPtr mask = Mask2D::MakePtr(*_rfiGuiWindow.AltMask());
 				mask->Invert();
 				RFIPlots::MakeComplexPlanePlot(*pointSet, data, x, length, y, avgSize, mask, realVersusImaginary, false);
 				if(!realVersusImaginary)

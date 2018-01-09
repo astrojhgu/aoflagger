@@ -1094,8 +1094,8 @@ void RFIGuiWindow::onSetToOne()
 		TimeFrequencyData data(GetActiveData());
 		std::array<Image2DCPtr, 2> images = data.GetSingleComplexImage();
 		Image2DPtr
-			real = std::make_shared<Image2D>(*images[0]),
-			imaginary = std::make_shared<Image2D>(*images[0]);
+			real = Image2D::MakePtr(*images[0]),
+			imaginary = Image2D::MakePtr(*images[1]);
 		real->SetAll(1.0);
 		imaginary->SetAll(0.0);
 		TimeFrequencyData newData(data.GetPolarization(0), real, imaginary);
@@ -1114,8 +1114,8 @@ void RFIGuiWindow::onSetToI()
 		TimeFrequencyData data(GetActiveData());
 		std::array<Image2DCPtr, 2> images = data.GetSingleComplexImage();
 		Image2DPtr
-			real = std::make_shared<Image2D>(*images[0]),
-			imaginary = std::make_shared<Image2D>(*images[0]);
+			real = Image2D::MakePtr(*images[0]),
+			imaginary = Image2D::MakePtr(*images[0]);
 		real->SetAll(0.0);
 		imaginary->SetAll(1.0);
 		TimeFrequencyData newData(data.GetPolarization(0), real, imaginary);
@@ -1134,8 +1134,8 @@ void RFIGuiWindow::onSetToOnePlusI()
 		TimeFrequencyData data(GetActiveData());
 		std::array<Image2DCPtr, 2> images = data.GetSingleComplexImage();
 		Image2DPtr
-			real = std::make_shared<Image2D>(*images[0]),
-			imaginary = std::make_shared<Image2D>(*images[0]);
+			real = Image2D::MakePtr(*images[0]),
+			imaginary = Image2D::MakePtr(*images[0]);
 		real->SetAll(1.0);
 		imaginary->SetAll(1.0);
 		TimeFrequencyData newData(data.GetPolarization(0), real, imaginary);
@@ -1164,7 +1164,7 @@ void RFIGuiWindow::onShowStats()
 			intersect;
 		if(original != 0 && alternative != 0)
 		{
-			intersect = std::make_shared<Mask2D>(*original);
+			intersect = Mask2D::MakePtr(*original);
 			intersect->Intersect(*alternative);
 			
 			unsigned intCount = intersect->GetCount<true>();
@@ -1615,7 +1615,7 @@ void RFIGuiWindow::onUnrollPhaseButtonPressed()
 		TimeFrequencyData data = GetActiveData().Make(TimeFrequencyData::PhasePart);
 		for(unsigned i=0;i<data.ImageCount();++i)
 		{
-			Image2DPtr image = std::make_shared<Image2D>(*data.GetImage(i));
+			Image2DPtr image = Image2D::MakePtr(*data.GetImage(i));
 			ThresholdTools::UnrollPhase(image.get());
 			data.SetImage(i, image);
 		}

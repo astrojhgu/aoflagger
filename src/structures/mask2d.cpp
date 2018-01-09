@@ -8,7 +8,7 @@ Mask2D::Mask2D(const Mask2D& source) : Mask2D(source.Width(), source.Height())
 	memcpy(_valuesConsecutive, source._valuesConsecutive, _stride * _height * sizeof(bool));
 }
 
-Mask2D::Mask2D(Mask2D&& source) :
+Mask2D::Mask2D(Mask2D&& source) noexcept :
 	_width(source._width),
 	_height(source._height),
 	_stride(source._stride),
@@ -60,7 +60,7 @@ void Mask2D::allocate()
 	}
 }
 
-Mask2D::~Mask2D()
+Mask2D::~Mask2D() noexcept
 {
 	delete[] _values;
 	delete[] _valuesConsecutive;
@@ -83,7 +83,7 @@ Mask2D& Mask2D::operator=(const Mask2D& rhs)
 	return *this;
 }
 
-Mask2D& Mask2D::operator=(Mask2D&& rhs)
+Mask2D& Mask2D::operator=(Mask2D&& rhs) noexcept
 {
 	std::swap(rhs._width, _width);
 	std::swap(rhs._stride, _stride);
