@@ -100,7 +100,7 @@ class Plot2D : public Plotable {
 			else if(_pointSets.empty())
 				return 1.0;
 			else
-				return _system.XRangeMax(**_pointSets.begin());
+				return _system.XRangeMax(*_pointSets.front());
 		}
 		double MaxPositiveX() const
 		{
@@ -109,7 +109,7 @@ class Plot2D : public Plotable {
 			else if(_pointSets.empty())
 				return 1.0;
 			else
-				return _system.XRangePositiveMax(**_pointSets.begin());
+				return _system.XRangePositiveMax(*_pointSets.front());
 		}
 		void SetMinX(double minX)
 		{
@@ -123,7 +123,7 @@ class Plot2D : public Plotable {
 			else if(_pointSets.empty())
 				return 0.1;
 			else
-				return _system.XRangeMin(**_pointSets.begin());
+				return _system.XRangeMin(*_pointSets.front());
 		}
 		double MinPositiveX() const
 		{
@@ -132,7 +132,7 @@ class Plot2D : public Plotable {
 			else if(_pointSets.empty())
 				return 0.1;
 			else
-				return _system.XRangePositiveMin(**_pointSets.begin());
+				return _system.XRangePositiveMin(*_pointSets.front());
 		}
 		void SetMaxY(double maxY)
 		{
@@ -155,7 +155,7 @@ class Plot2D : public Plotable {
 			else if(_pointSets.empty())
 				return 1.0;
 			else
-				return _system.YRangePositiveMax(**_pointSets.begin());
+				return _system.YRangePositiveMax(*_pointSets.front());
 		}
 		void SetMinY(double minY)
 		{
@@ -169,7 +169,7 @@ class Plot2D : public Plotable {
 			else if(_pointSets.empty())
 				return -1.0;
 			else
-				return _system.YRangeMin(**_pointSets.begin());
+				return _system.YRangeMin(*_pointSets.front());
 		}
 		double MinPositiveY() const
 		{
@@ -178,7 +178,7 @@ class Plot2D : public Plotable {
 			else if(_pointSets.empty())
 				return 0.1;
 			else
-				return _system.YRangePositiveMin(**_pointSets.begin());
+				return _system.YRangePositiveMin(*_pointSets.front());
 		}
 		void SetShowAxes(bool showAxes) {
 			_showAxes = showAxes;
