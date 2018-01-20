@@ -5,7 +5,7 @@
 #include "../../../structures/mask2d.h"
 #include "../../../structures/timefrequencydata.h"
 
-#include "../../../strategy/algorithms/mitigationtester.h"
+#include "../../../strategy/algorithms/testsetgenerator.h"
 #include "../../../strategy/algorithms/thresholdconfig.h"
 #include "../../../strategy/algorithms/thresholdmitigater.h"
 
@@ -51,8 +51,8 @@ void SumThresholdTest::VerticalSumThresholdSSE::operator()()
 		mask1 = Mask2D::CreateUnsetMaskPtr(width, height),
 		mask2 = Mask2D::CreateUnsetMaskPtr(width, height);
 	Image2DPtr
-		real = MitigationTester::CreateTestSet(26, mask1, width, height),
-		imag = MitigationTester::CreateTestSet(26, mask2, width, height);
+		real = Image2D::MakePtr(TestSetGenerator::MakeTestSet(26, *mask1, width, height)),
+		imag = Image2D::MakePtr(TestSetGenerator::MakeTestSet(26, *mask2, width, height));
 	TimeFrequencyData data(Polarization::XX, real, imag);
 	Image2DCPtr image = data.GetSingleImage();
 	
@@ -84,15 +84,15 @@ void SumThresholdTest::HorizontalSumThresholdSSE::operator()()
 	const unsigned
 		width = 2048,
 		height = 256;
-	Mask2DPtr
-		mask1 = Mask2D::CreateUnsetMaskPtr(width, height),
-		mask2 = Mask2D::CreateUnsetMaskPtr(width, height);
+	Mask2D
+		mask1 = Mask2D::MakeUnsetMask(width, height),
+		mask2 = Mask2D::MakeUnsetMask(width, height);
 	Image2DPtr
-		real = MitigationTester::CreateTestSet(26, mask1, width, height),
-		imag = MitigationTester::CreateTestSet(26, mask2, width, height);
+		real = Image2D::MakePtr(TestSetGenerator::MakeTestSet(26, mask1, width, height)),
+		imag = Image2D::MakePtr(TestSetGenerator::MakeTestSet(26, mask2, width, height));
 		
-	mask1->SwapXY();
-	mask2->SwapXY();
+	mask1.SwapXY();
+	mask2.SwapXY();
 	real->SwapXY();
 	imag->SwapXY();
 		
@@ -105,14 +105,14 @@ void SumThresholdTest::HorizontalSumThresholdSSE::operator()()
 	config.InitializeThresholdsFromFirstThreshold(6.0 * mode, ThresholdConfig::Rayleigh);
 	for(unsigned i=0;i<9;++i)
 	{
-		mask1->SetAll<false>();
-		mask2->SetAll<false>();
+		mask1.SetAll<false>();
+		mask2.SetAll<false>();
 		
 		const unsigned length = config.GetHorizontalLength(i);
 		const double threshold = config.GetHorizontalThreshold(i);
 		
-		ThresholdMitigater::HorizontalSumThresholdLargeReference(image.get(), mask1.get(), length, threshold);
-		ThresholdMitigater::HorizontalSumThresholdLargeSSE(image.get(), mask2.get(), length, threshold);
+		ThresholdMitigater::HorizontalSumThresholdLargeReference(image.get(), &mask1, length, threshold);
+		ThresholdMitigater::HorizontalSumThresholdLargeSSE(image.get(), &mask2, length, threshold);
 		
 		std::stringstream s;
 		s << "Equal SSE and reference masks produced by SumThreshold length " << length << ", threshold " << threshold;
@@ -122,16 +122,16 @@ void SumThresholdTest::HorizontalSumThresholdSSE::operator()()
 
 void SumThresholdTest::Stability::operator()()
 {
-	Mask2DPtr
-		maskA = Mask2D::CreateSetMaskPtr<false>(1, 1),
-		maskB = Mask2D::CreateSetMaskPtr<false>(2, 2),
-		maskC = Mask2D::CreateSetMaskPtr<false>(3, 3),
-		maskD = Mask2D::CreateSetMaskPtr<false>(4, 4);
-	Image2DPtr
-		realA = Image2D::CreateZeroImagePtr(1, 1),
-		realB = Image2D::CreateZeroImagePtr(2, 2),
-		realC = Image2D::CreateZeroImagePtr(3, 3),
-		realD = Image2D::CreateZeroImagePtr(4, 4);
+	Mask2D
+		maskA = Mask2D::MakeSetMask<false>(1, 1),
+		maskB = Mask2D::MakeSetMask<false>(2, 2),
+		maskC = Mask2D::MakeSetMask<false>(3, 3),
+		maskD = Mask2D::MakeSetMask<false>(4, 4);
+	Image2D
+		realA = Image2D::MakeZeroImage(1, 1),
+		realB = Image2D::MakeZeroImage(2, 2),
+		realC = Image2D::MakeZeroImage(3, 3),
+		realD = Image2D::MakeZeroImage(4, 4);
 		
 	ThresholdConfig config;
 	config.InitializeLengthsDefault(9);
@@ -139,14 +139,14 @@ void SumThresholdTest::Stability::operator()()
 	for(unsigned i=0;i<9;++i)
 	{
 		const unsigned length = config.GetHorizontalLength(i);
-		ThresholdMitigater::HorizontalSumThresholdLargeSSE(realA.get(), maskA.get(), length, 1.0);
-		ThresholdMitigater::VerticalSumThresholdLargeSSE(realA.get(), maskA.get(), length, 1.0);
-		ThresholdMitigater::HorizontalSumThresholdLargeSSE(realA.get(), maskB.get(), length, 1.0);
-		ThresholdMitigater::VerticalSumThresholdLargeSSE(realA.get(), maskB.get(), length, 1.0);
-		ThresholdMitigater::HorizontalSumThresholdLargeSSE(realA.get(), maskC.get(), length, 1.0);
-		ThresholdMitigater::VerticalSumThresholdLargeSSE(realA.get(), maskC.get(), length, 1.0);
-		ThresholdMitigater::HorizontalSumThresholdLargeSSE(realA.get(), maskD.get(), length, 1.0);
-		ThresholdMitigater::VerticalSumThresholdLargeSSE(realA.get(), maskD.get(), length, 1.0);
+		ThresholdMitigater::HorizontalSumThresholdLargeSSE(&realA, &maskA, length, 1.0);
+		ThresholdMitigater::VerticalSumThresholdLargeSSE(&realA, &maskA, length, 1.0);
+		ThresholdMitigater::HorizontalSumThresholdLargeSSE(&realA, &maskB, length, 1.0);
+		ThresholdMitigater::VerticalSumThresholdLargeSSE(&realA, &maskB, length, 1.0);
+		ThresholdMitigater::HorizontalSumThresholdLargeSSE(&realA, &maskC, length, 1.0);
+		ThresholdMitigater::VerticalSumThresholdLargeSSE(&realA, &maskC, length, 1.0);
+		ThresholdMitigater::HorizontalSumThresholdLargeSSE(&realA, &maskD, length, 1.0);
+		ThresholdMitigater::VerticalSumThresholdLargeSSE(&realA, &maskD, length, 1.0);
 	}
 }
 #endif // __SSE__

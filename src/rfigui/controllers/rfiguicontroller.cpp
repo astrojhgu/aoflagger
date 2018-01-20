@@ -3,8 +3,8 @@
 #include "../../strategy/actions/strategy.h"
 
 #include "../../strategy/algorithms/fringestoppingfitter.h"
-#include "../../strategy/algorithms/mitigationtester.h"
 #include "../../strategy/algorithms/svdmitigater.h"
+#include "../../strategy/algorithms/testsetgenerator.h"
 
 #include "../../strategy/plots/rfiplots.h"
 #include "../../strategy/control/defaultstrategy.h"
@@ -415,18 +415,18 @@ void RFIGuiController::Open(const std::string& filename, BaselineIOMode ioMode, 
 
 void RFIGuiController::OpenTestSet(unsigned index, bool gaussianTestSets)
 {
-	unsigned width = 1024*16, height = 1024;
+	unsigned width = 1024, height = 512;
 	if(IsImageLoaded())
 	{
 		TimeFrequencyData activeData = ActiveData();
 		width = activeData.ImageWidth();
 		height = activeData.ImageHeight();
 	}
-	Mask2DPtr rfi = Mask2D::CreateSetMaskPtr<false>(width, height);
-	Image2DPtr testSetReal(MitigationTester::CreateTestSet(index, rfi, width, height, gaussianTestSets));
-	Image2DPtr testSetImaginary(MitigationTester::CreateTestSet(2, rfi, width, height, gaussianTestSets));
-	TimeFrequencyData data(Polarization::StokesI, testSetReal, testSetImaginary);
-	data.SetGlobalMask(rfi);
+	Mask2D rfi = Mask2D::MakeSetMask<false>(width, height);
+	Image2D testSetReal(TestSetGenerator::MakeTestSet(index, rfi, width, height, gaussianTestSets));
+	Image2D testSetImaginary(TestSetGenerator::MakeTestSet(2, rfi, width, height, gaussianTestSets));
+	TimeFrequencyData data(Polarization::StokesI, Image2D::MakePtr(testSetReal), Image2D::MakePtr(testSetImaginary));
+	data.SetGlobalMask(Mask2D::MakePtr(rfi));
 	
 	_tfController.SetNewData(data, SelectedMetaData());
 	_rfiGuiWindow->GetTimeFrequencyWidget().Update();

@@ -105,16 +105,16 @@ inline void DefaultStrategySpeedTest::prepareStrategy(rfiStrategy::ArtifactSet &
 	const unsigned
 		width = 10000,
 		height = 256;
-	Mask2DPtr rfi = Mask2D::CreateUnsetMaskPtr(width, height);
+	Mask2D rfi = Mask2D::MakeUnsetMask(width, height);
 	Image2DPtr
-		xxReal = MitigationTester::CreateTestSet(26, rfi, width, height),
-		xxImag = MitigationTester::CreateTestSet(26, rfi, width, height),
-		xyReal = MitigationTester::CreateTestSet(26, rfi, width, height),
-		xyImag = MitigationTester::CreateTestSet(26, rfi, width, height),
-		yxReal = MitigationTester::CreateTestSet(26, rfi, width, height),
-		yxImag = MitigationTester::CreateTestSet(26, rfi, width, height),
-		yyReal = MitigationTester::CreateTestSet(26, rfi, width, height),
-		yyImag = MitigationTester::CreateTestSet(26, rfi, width, height);
+		xxReal = Image2D::MakePtr(TestSetGenerator::MakeTestSet(26, rfi, width, height)),
+		xxImag = Image2D::MakePtr(TestSetGenerator::MakeTestSet(26, rfi, width, height)),
+		xyReal = Image2D::MakePtr(TestSetGenerator::MakeTestSet(26, rfi, width, height)),
+		xyImag = Image2D::MakePtr(TestSetGenerator::MakeTestSet(26, rfi, width, height)),
+		yxReal = Image2D::MakePtr(TestSetGenerator::MakeTestSet(26, rfi, width, height)),
+		yxImag = Image2D::MakePtr(TestSetGenerator::MakeTestSet(26, rfi, width, height)),
+		yyReal = Image2D::MakePtr(TestSetGenerator::MakeTestSet(26, rfi, width, height)),
+		yyImag = Image2D::MakePtr(TestSetGenerator::MakeTestSet(26, rfi, width, height));
 	TimeFrequencyData data = TimeFrequencyData::FromLinear(
 		xxReal, xxImag, xyReal, xyImag,
 		yxReal, yxImag, yyReal, yyImag);

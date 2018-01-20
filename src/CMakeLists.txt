@@ -161,12 +161,12 @@ set(STRATEGY_ALGORITHMS_FILES
   strategy/algorithms/fringetestcreater.cpp
 	strategy/algorithms/highpassfilter.cpp
   strategy/algorithms/localfitmethod.cpp
-  strategy/algorithms/mitigationtester.cpp
   strategy/algorithms/morphology.cpp
   strategy/algorithms/sinusfitter.cpp
   strategy/algorithms/statisticalflagger.cpp
   strategy/algorithms/sumthreshold.cpp
   strategy/algorithms/svdmitigater.cpp
+  strategy/algorithms/testsetgenerator.cpp
   strategy/algorithms/thresholdconfig.cpp
   strategy/algorithms/thresholdmitigater.cpp
   strategy/algorithms/thresholdtools.cpp
