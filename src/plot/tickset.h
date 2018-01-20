@@ -251,57 +251,104 @@ class LogarithmicTickSet : public TickSet
 					}
 				}
 				// can we add two to nine?
-				if((_ticks.size()+1)*10 < sizeRequest)
+				bool isFull = _ticks.size() >= sizeRequest;
+				if(!isFull)
 				{
+					std::vector<double> tryTickset(_ticks);
 					double base = tickStart / 10.0;
 					do {
 						for(double i=2.0;i<9.5;++i)
 						{
 							double val = base * i;
 							if(val >= _min && val <= _max)
-								_ticks.push_back(val);
+								tryTickset.push_back(val);
 						}
 						base *= 10.0;
 					} while(base < _max);
+					if(tryTickset.size() <= sizeRequest)
+					{
+						_ticks = tryTickset;
+						isFull = true;
+						
+						// can we add 1.5 ?
+						base = tickStart / 10.0;
+						do {
+							double val = base * 1.5;
+							if(val >= _min && val <= _max)
+								tryTickset.push_back(val);
+							base *= 10.0;
+						} while(base < _max);
+						if(tryTickset.size() <= sizeRequest)
+							_ticks = std::move(tryTickset);
+					}
 				}
 				// can we add two, four, ... eight?
-				else if((_ticks.size()+1)*5 < sizeRequest)
+				if(!isFull)
 				{
+					std::vector<double> tryTickset(_ticks);
 					double base = tickStart / 10.0;
 					do {
 						for(double i=2.0;i<9.0;i+=2.0)
 						{
 							double val = base * i;
 							if(val >= _min && val <= _max)
-								_ticks.push_back(val);
+								tryTickset.push_back(val);
 						}
 						base *= 10.0;
 					} while(base < _max);
+					if(tryTickset.size() <= sizeRequest)
+					{
+						_ticks = tryTickset;
+						isFull = true;
+						
+						// can we add 1.5 ?
+						base = tickStart / 10.0;
+						do {
+							double val = base * 1.5;
+							if(val >= _min && val <= _max)
+								tryTickset.push_back(val);
+							base *= 10.0;
+						} while(base < _max);
+						if(tryTickset.size() <= sizeRequest)
+							_ticks = std::move(tryTickset);
+					}
 				}
 				// can we add two and five?
-				else if((_ticks.size()+1)*3 < sizeRequest)
+				if(!isFull)
 				{
+					std::vector<double> tryTickset(_ticks);
 					double base = tickStart / 10.0;
 					do {
 						for(double i=2.0;i<6.0;i+=3.0)
 						{
 							double val = base * i;
 							if(val >= _min && val <= _max)
-								_ticks.push_back(val);
+								tryTickset.push_back(val);
 						}
 						base *= 10.0;
 					} while(base < _max);
+					if(tryTickset.size() <= sizeRequest)
+					{
+						_ticks = std::move(tryTickset);
+						isFull = true;
+					}
 				}
-				// can we add five?
-				else if((_ticks.size()+1)*2 < sizeRequest)
+				// can we add fives?
+				if(!isFull)
 				{
+					std::vector<double> tryTickset(_ticks);
 					double base = tickStart / 10.0;
 					do {
 						double val = base * 5.0;
 						if(val >= _min && val <= _max)
-							_ticks.push_back(val);
+							tryTickset.push_back(val);
 						base *= 10.0;
 					} while(base < _max);
+					if(tryTickset.size() <= sizeRequest)
+					{
+						_ticks = std::move(tryTickset);
+						isFull = true;
+					}
 				}
 				std::sort(_ticks.begin(), _ticks.end());
 			}
