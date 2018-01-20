@@ -39,7 +39,7 @@ class Dimension {
 				if(_yRangeMax < pointSet.YRangeMax() && std::isfinite(pointSet.YRangeMax()))
 					_yRangeMax = pointSet.YRangeMax();
 				if(_yRangePositiveMax < pointSet.YRangePositiveMax() && std::isfinite(pointSet.YRangePositiveMax())) 
-					_yRangePositiveMin = pointSet.YRangePositiveMax();
+					_yRangePositiveMax = pointSet.YRangePositiveMax();
 			}
 			++_pointSets;
 		}
