@@ -10,9 +10,6 @@
 #include "image2d.h"
 #include "mask2d.h"
 
-typedef std::shared_ptr<class SampleRow> SampleRowPtr;
-typedef std::shared_ptr<const class SampleRow> SampleRowCPtr;
-
 #include "../strategy/algorithms/convolutions.h"
 
 class SampleRow {

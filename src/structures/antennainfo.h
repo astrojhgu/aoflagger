@@ -206,8 +206,6 @@ public:
 	unsigned fieldId;
 	num_t delayDirectionRA;
 	num_t delayDirectionDec;
-	//num_t delayDirectionDecNegSin;
-	//num_t delayDirectionDecNegCos;
 	std::string name;
 };
 

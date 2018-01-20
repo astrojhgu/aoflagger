@@ -25,8 +25,6 @@ class RFIPlots{
 		
 		static void MakeFrequencyScatterPlot(class MultiPlot &plot, size_t plotIndex, const Image2DCPtr& image, const Mask2DCPtr& mask, const TimeFrequencyMetaDataCPtr& metaData);
 		static void MakeFrequencyScatterPlot(class MultiPlot& plot, const TimeFrequencyData& data, const TimeFrequencyMetaDataCPtr& metaData, unsigned startIndex = 0);
-		
-		static void MakeScatterPlot(class MultiPlot &plot, size_t plotIndex, SampleRowCPtr row);
 	private:
 		/**
 		 * Make a distribution curve for the provided image, ignoring masked values.

@@ -96,12 +96,12 @@ namespace rfiStrategy {
 				throw std::runtime_error("Could not find any IF's in this set");
 			_bandIndexToNumber.clear();
 			Logger::Debug << _bandCount << " IF's in set: [" << *ifSet.begin();
-			for(std::set<int>::const_iterator i=ifSet.begin(); i!=ifSet.end(); ++i)
+			for(int i : ifSet)
 			{
-				_bandInfos.insert(std::pair<int, BandInfo>(*i, BandInfo()));
+				_bandInfos.insert(std::pair<int, BandInfo>(i, BandInfo()));
 				if(_bandIndexToNumber.size()>0)
-					Logger::Debug << ", " << *i;
-				_bandIndexToNumber.push_back(*i);
+					Logger::Debug << ", " << i;
+				_bandIndexToNumber.push_back(i);
 			}
 			Logger::Debug << "]\n";
 		}
@@ -388,7 +388,7 @@ namespace rfiStrategy {
 		const int totalSize = _file->GetTableColumnArraySize(dataColumn);
 		Logger::Debug << "Shape of data cells: " << freqCount << " channels x " << polarizationCount << " pols x " << raCount << " RAs x " << decCount << " decs" << "=" << totalSize << '\n';
 		std::vector<long double> cellData(totalSize);
-		bool *flagData = new bool[totalSize];
+		std::unique_ptr<bool[]> flagData(new bool[totalSize]);
 		std::vector<Image2DPtr> images(polarizationCount);
 		std::vector<Mask2DPtr> masks(polarizationCount);
 		for(int i=0;i<polarizationCount;++i)
@@ -442,7 +442,7 @@ namespace rfiStrategy {
 				}
 
 				long double *dataPtr = &cellData[0];
-				bool *flagPtr = flagData;
+				bool *flagPtr = flagData.get();
 				for(int p=0;p<polarizationCount;++p)
 				{
 					for(int f=0;f<freqCount;++f)
@@ -456,7 +456,7 @@ namespace rfiStrategy {
 				++timeIndex;
 			}
 		}
-		delete[] flagData;
+		flagData.reset();
 		if(timeIndex == 0)
 		{
 			throw std::runtime_error("Couldn't find any rows in the fits image set for the requested IF");

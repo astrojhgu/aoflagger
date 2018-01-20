@@ -139,8 +139,6 @@ class BaselineReader {
 			initObservationTimes();
 			initializePolarizations();
 		}
-		//casacore::ROArrayColumn<casacore::Complex> *CreateDataColumn(const std::string &columnName, class casacore::Table &table);
-		//casacore::ArrayColumn<casacore::Complex> *CreateDataColumnRW(const std::string &columnName, class casacore::Table &table);
 
 		std::vector<ReadRequest> _readRequests;
 		std::vector<FlagWriteRequest> _writeRequests;

@@ -1,14 +1,6 @@
 #include "colormap.h"
 
-ColorMap::ColorMap()
-{
-}
-
-ColorMap::~ColorMap()
-{
-}
-
-std::unique_ptr<ColorMap> ColorMap::CreateColorMap(const std::string &type) throw()
+std::unique_ptr<ColorMap> ColorMap::CreateColorMap(const std::string& type)
 {
 	using UC=std::unique_ptr<ColorMap>;
 	if(type == "monochrome" || type == "bw")

@@ -35,7 +35,7 @@ public:
 	virtual std::string File() final override
 	{ return _filename; }
 	
-	BaselineData *Read() final override
+	std::unique_ptr<BaselineData> Read() final override
 	{
 		QualityTablesFormatter formatter(_filename);
 		StatisticsCollection statCollection;
@@ -59,8 +59,7 @@ public:
 		}
 		tfData.SetGlobalMask(mask);
 
-		BaselineData* baselineData = new BaselineData(tfData, metaData);
-		return baselineData;
+		return std::unique_ptr<BaselineData>(new BaselineData(tfData, metaData));
 	}
 	
 	virtual std::unique_ptr<ImageSet> Clone() final override
@@ -99,7 +98,7 @@ public:
 			}
 			size_t timeIndex = size_t(-1);
 			double time = -1.0;
-			bool* timestepFlags = new bool[channelCount*polCount];
+			std::unique_ptr<bool[]> timestepFlags(new bool[channelCount*polCount]);
 			for(size_t row=0; row!=ms.nrow(); ++row)
 			{
 				if(time != timeColumn(row))
@@ -107,7 +106,7 @@ public:
 					time = timeColumn(row);
 					timeIndex++;
 					
-					bool* iter = timestepFlags;
+					bool* iter = timestepFlags.get();
 					for(size_t ch=0; ch!=channelCount; ++ch)
 					{
 						for(size_t p=0; p!=polCount; ++p)
@@ -126,7 +125,7 @@ public:
 				}
 				flagColumn.put(row, flagArray);
 			}
-			delete[] timestepFlags;
+			timestepFlags.reset();
 		}
 	}
 	

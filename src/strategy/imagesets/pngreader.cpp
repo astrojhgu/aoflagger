@@ -2,7 +2,7 @@
 
 #include <png.h>
 
-rfiStrategy::BaselineData* rfiStrategy::PngReader::Read()
+std::unique_ptr<rfiStrategy::BaselineData> rfiStrategy::PngReader::Read()
 {
 	FILE *fp = fopen(_path.c_str(), "rb");
 	if(fp==0)
@@ -62,5 +62,5 @@ rfiStrategy::BaselineData* rfiStrategy::PngReader::Read()
 	TimeFrequencyData tfData(TimeFrequencyData::AmplitudePart,
 		Polarization::StokesI,
 		image);
-	return new BaselineData(tfData, TimeFrequencyMetaDataCPtr());
+	return std::unique_ptr<rfiStrategy::BaselineData>(new BaselineData(tfData, TimeFrequencyMetaDataCPtr()));
 }

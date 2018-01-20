@@ -32,14 +32,8 @@ namespace rfiStrategy {
 	class SingleImageSet : public ImageSet {
 		public:
 			SingleImageSet() : ImageSet(), _readCount(0), _lastRead(nullptr), _writeFlagsIndex()
-			{
-			}
+			{ }
 			
-			virtual ~SingleImageSet()
-			{
-				delete _lastRead;
-			}
-
 			virtual std::unique_ptr<ImageSetIndex> StartIndex() override
 			{
 				return std::unique_ptr<ImageSetIndex>(new SingleImageSetIndex(*this, Name()));
@@ -50,10 +44,9 @@ namespace rfiStrategy {
 			
 			virtual void AddReadRequest(const ImageSetIndex &) override
 			{
-				if(_lastRead != 0)
+				if(_lastRead != nullptr)
 				{
-					delete _lastRead;
-					_lastRead = 0;
+					_lastRead.reset();
 					_readCount = 1;
 				} else {
 					++_readCount;
@@ -73,9 +66,9 @@ namespace rfiStrategy {
 				return std::unique_ptr<BaselineData>(new BaselineData(*_lastRead));
 			}
 			
-			virtual BaselineData *Read() = 0;
+			virtual std::unique_ptr<BaselineData> Read() = 0;
 			
-			virtual void Write(const std::vector<Mask2DCPtr>& flags)
+			virtual void Write(const std::vector<Mask2DCPtr>&)
 			{
 				throw std::runtime_error("Flag writing is not implemented for this file (SingleImageSet)");
 			}
@@ -98,7 +91,7 @@ namespace rfiStrategy {
 			
 		private:
 			int _readCount;
-			BaselineData *_lastRead;
+			std::unique_ptr<BaselineData> _lastRead;
 			std::unique_ptr<ImageSetIndex> _writeFlagsIndex;
 			std::vector<Mask2DCPtr> _writeFlagsMasks;
 	};

@@ -40,7 +40,7 @@ namespace rfiStrategy {
 				return _path;
 			}
 			
-			virtual BaselineData *Read() final override;
+			virtual std::unique_ptr<BaselineData> Read() final override;
 
 		private:
 			std::string _path;

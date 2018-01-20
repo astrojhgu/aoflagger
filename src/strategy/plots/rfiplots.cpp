@@ -366,14 +366,6 @@ void RFIPlots::MakeFrequencyScatterPlot(class MultiPlot &plot, size_t plotIndex,
 	}
 }
 
-void RFIPlots::MakeScatterPlot(class MultiPlot &plot, size_t plotIndex, SampleRowCPtr row)
-{
-	for(size_t x=0;x<row->Size();++x) {
-		if(!row->ValueIsMissing(x))
-			plot.AddPoint(plotIndex, x, row->Value(x));
-	}
-}
-
 void RFIPlots::MakeTimeScatterPlot(class MultiPlot &plot, const TimeFrequencyData &data, const TimeFrequencyMetaDataCPtr& metaData, unsigned startIndex)
 {
 	for(size_t polIndex = 0; polIndex!=data.PolarizationCount(); ++polIndex)
