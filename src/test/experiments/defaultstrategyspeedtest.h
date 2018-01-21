@@ -4,9 +4,9 @@
 #include "../testingtools/asserter.h"
 #include "../testingtools/unittest.h"
 
+#include "../../strategy/algorithms/combinatorialthresholder.h"
 #include "../../strategy/algorithms/mitigationtester.h"
 #include "../../strategy/algorithms/siroperator.h"
-#include "../../strategy/algorithms/thresholdmitigater.h"
 
 #include "../../strategy/actions/baselineselectionaction.h"
 #include "../../strategy/actions/changeresolutionaction.h"

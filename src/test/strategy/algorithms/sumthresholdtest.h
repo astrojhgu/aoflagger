@@ -5,9 +5,9 @@
 #include "../../../structures/mask2d.h"
 #include "../../../structures/timefrequencydata.h"
 
+#include "../../../strategy/algorithms/combinatorialthresholder.h"
 #include "../../../strategy/algorithms/testsetgenerator.h"
 #include "../../../strategy/algorithms/thresholdconfig.h"
-#include "../../../strategy/algorithms/thresholdmitigater.h"
 
 #include "../../testingtools/asserter.h"
 #include "../../testingtools/maskasserter.h"
