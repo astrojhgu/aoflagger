@@ -10,14 +10,12 @@
 #include <cmath>
 #include <iostream>
 
-LocalFitMethod::LocalFitMethod() : _background(0), _weights(0)
+LocalFitMethod::LocalFitMethod() : _weights(0)
 {
 }
 
 LocalFitMethod::~LocalFitMethod()
 {
-	if(_background!=0)
-		delete _background;
 	ClearWeights();
 }
 
@@ -26,9 +24,7 @@ void LocalFitMethod::Initialize(const TimeFrequencyData &input)
 	ClearWeights();
 	_original = input.GetSingleImage();
 	_background2D = Image2D::CreateZeroImagePtr(_original->Width(), _original->Height());
-	if(_background!=0)
-		delete _background;
-	_background = new TimeFrequencyData(input.ComplexRepresentation(), input.Polarizations()[0], _background2D);
+	_background = TimeFrequencyData(input.ComplexRepresentation(), input.Polarizations()[0], _background2D);
 	_mask = input.GetSingleMask();
 	if(_hSquareSize * 2 > _original->Width())
 		_hSquareSize = _original->Width()/2;

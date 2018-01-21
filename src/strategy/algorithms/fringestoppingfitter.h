@@ -32,20 +32,16 @@ class FringeStoppingFitter final : public SurfaceFitMethod {
 			_originalMask =
 				input.GetSingleMask();
 		}
-		virtual unsigned int TaskCount() final override
+		unsigned int TaskCount() const
 		{
 			return _fringeFit ? _originalData->ImageHeight() : _originalData->ImageWidth();
 		}
 		virtual void PerformFit(unsigned taskNumber) final override;
 		void PerformStaticFrequencyFitOnOneChannel(unsigned y);
 		void PerformFringeStop();
-		virtual class TimeFrequencyData Background() final override
+		class TimeFrequencyData Background() const
 		{
 			return TimeFrequencyData(Polarization::StokesI, _realBackground, _imaginaryBackground);
-		}
-		virtual enum TimeFrequencyData::ComplexRepresentation ComplexRepresentation() const final override
-		{
-			return TimeFrequencyData::ComplexParts;
 		}
 		void SetFringesToConsider(long double fringesToConsider)
 		{

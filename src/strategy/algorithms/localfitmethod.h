@@ -58,13 +58,10 @@ class LocalFitMethod final : public SurfaceFitMethod {
 			_method = method;
 		}
 		virtual void Initialize(const TimeFrequencyData &input) final override;
-		virtual unsigned TaskCount() final override;
+		//[[ deprecated("Trying to make surfacemethod go away") ]]
+		unsigned TaskCount();
 		virtual void PerformFit(unsigned taskNumber) final override;
-		virtual TimeFrequencyData Background() final override { return *_background; }
-		virtual enum TimeFrequencyData::ComplexRepresentation ComplexRepresentation() const final override
-		{
-			return TimeFrequencyData::AmplitudePart;
-		}
+		TimeFrequencyData Background() const { return _background; }
 	private:
 		struct ThreadLocal {
 			LocalFitMethod *image;
@@ -86,7 +83,7 @@ class LocalFitMethod final : public SurfaceFitMethod {
 		void ElementWiseDivide(Image2DPtr leftHand, Image2DCPtr rightHand);
 
 		Image2DCPtr _original;
-		class TimeFrequencyData *_background;
+		TimeFrequencyData _background;
 		Image2DPtr _background2D;
 		Mask2DCPtr _mask;
 		unsigned _hSquareSize, _vSquareSize;

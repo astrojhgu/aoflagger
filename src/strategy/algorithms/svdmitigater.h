@@ -20,11 +20,14 @@ class SVDMitigater final : public SurfaceFitMethod {
 			_data = data;
 			_iteration = 0;
 		}
-		virtual unsigned TaskCount() final override { return 1; }
-		virtual void PerformFit(unsigned) final override
+		void PerformFit()
 		{
 			_iteration++;
 			RemoveSingularValues(_removeCount);
+		}
+		virtual void PerformFit(unsigned) final override
+		{
+			PerformFit();
 		}
 
 		void RemoveSingularValues(unsigned singularValueCount)
@@ -36,12 +39,12 @@ class SVDMitigater final : public SurfaceFitMethod {
 			Compose();
 		}
 
-		virtual TimeFrequencyData Background() final override
+		TimeFrequencyData Background() const
 		{
 			return *_background;
 		}
 
-		virtual enum TimeFrequencyData::ComplexRepresentation ComplexRepresentation() const final override
+		enum TimeFrequencyData::ComplexRepresentation ComplexRepresentation() const
 		{
 			return TimeFrequencyData::ComplexParts;
 		}
