@@ -426,21 +426,21 @@ void RFIGuiWindow::createToolbar()
 	_actionGroup->add(_rayleighTestSetsButton, sigc::mem_fun(*this, &RFIGuiWindow::onRayleighTestSets) );
 	_actionGroup->add(_zeroTestSetsButton, sigc::mem_fun(*this, &RFIGuiWindow::onZeroTestSets) );
 	
-	_actionGroup->add( Gtk::Action::create("OpenTestSetA", "Test set A"),
+	_actionGroup->add( Gtk::Action::create("OpenTestSetA", "A Full spikes"),
 	sigc::mem_fun(*this, &RFIGuiWindow::onOpenTestSetA) );
-	_actionGroup->add( Gtk::Action::create("OpenTestSetB", "Test set B"),
+	_actionGroup->add( Gtk::Action::create("OpenTestSetB", "B Half spikes"),
 	sigc::mem_fun(*this, &RFIGuiWindow::onOpenTestSetB) );
-	_actionGroup->add( Gtk::Action::create("OpenTestSetC", "Test set C"),
+	_actionGroup->add( Gtk::Action::create("OpenTestSetC", "C Varying spikes"),
 	sigc::mem_fun(*this, &RFIGuiWindow::onOpenTestSetC) );
-	_actionGroup->add( Gtk::Action::create("OpenTestSetD", "Test set D"),
+	_actionGroup->add( Gtk::Action::create("OpenTestSetD", "D 3 srcs + spikes"),
 	sigc::mem_fun(*this, &RFIGuiWindow::onOpenTestSetD) );
-	_actionGroup->add( Gtk::Action::create("OpenTestSetE", "Test set E"),
+	_actionGroup->add( Gtk::Action::create("OpenTestSetE", "E 5 srcs + spikes"),
 	sigc::mem_fun(*this, &RFIGuiWindow::onOpenTestSetE) );
-	_actionGroup->add( Gtk::Action::create("OpenTestSetF", "Test set F"),
+	_actionGroup->add( Gtk::Action::create("OpenTestSetF", "F 5 srcs + spikes"),
 	sigc::mem_fun(*this, &RFIGuiWindow::onOpenTestSetF) );
-	_actionGroup->add( Gtk::Action::create("OpenTestSetG", "Test set G"),
+	_actionGroup->add( Gtk::Action::create("OpenTestSetG", "G Test set G"),
 	sigc::mem_fun(*this, &RFIGuiWindow::onOpenTestSetG) );
-	_actionGroup->add( Gtk::Action::create("OpenTestSetH", "Test set H"),
+	_actionGroup->add( Gtk::Action::create("OpenTestSetH", "H filtered srcs + spikes"),
 	sigc::mem_fun(*this, &RFIGuiWindow::onOpenTestSetH) );
 	_actionGroup->add( Gtk::Action::create("OpenTestSetNoise", "Noise"),
 	sigc::mem_fun(*this, &RFIGuiWindow::onOpenTestSetNoise));

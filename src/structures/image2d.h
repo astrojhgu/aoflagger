@@ -165,12 +165,14 @@ class Image2D : public boost::intrusive_ref_counter<Image2D> {
 
 		bool Empty() const { return _width==0 || _height==0; }
 		
+		Image2D& operator+=(const Image2D& rhs);
+		
 		/**
-		 * Creates a new image by subtracting two images of the same size.
+		 * Creates a new image by adding two images of the same size together.
 		 * @param imageA first image.
 		 * @param imageB second image.
-		 * @return The new created image. Should be deleted by the caller.
-		 * @throws FitsIOException if the images do not match in size.
+		 * @return The new created image.
+		 * @throws IOException if the images do not match in size.
 		 */
 		static Image2D MakeFromSum(const Image2D &imageA, const Image2D &imageB);
 		
@@ -179,7 +181,7 @@ class Image2D : public boost::intrusive_ref_counter<Image2D> {
 		 * @param imageA first image.
 		 * @param imageB second image.
 		 * @return The new created image. Should be deleted by the caller.
-		 * @throws FitsIOException if the images do not match in size.
+		 * @throws IOException if the images do not match in size.
 		 */
 		static Image2D MakeFromDiff(const Image2D &imageA, const Image2D &imageB);
 
@@ -254,12 +256,6 @@ class Image2D : public boost::intrusive_ref_counter<Image2D> {
 		void SetValue(size_t x, size_t y, num_t newValue)
 		{
 			_dataPtr[y][x] = newValue;
-		}
-
-		void SetValues(const Image2D &source);
-		void SetValues(const Image2DCPtr &source)
-		{
-			SetValues(*source);
 		}
 
 		void SetAll(num_t value);

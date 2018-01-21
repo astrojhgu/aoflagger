@@ -1,6 +1,6 @@
 #include "../../structures/image2d.h"
 
-#include "thresholdmitigater.h"
+#include "combinatorialthresholder.h"
 #include "thresholdtools.h"
 
 #ifdef __SSE__
@@ -8,7 +8,7 @@
 #endif
 
 template<size_t Length>
-void ThresholdMitigater::HorizontalSumThreshold(const Image2D* input, Mask2D* mask, num_t threshold)
+void CombinatorialThresholder::HorizontalSumThreshold(const Image2D* input, Mask2D* mask, num_t threshold)
 {
 	if(Length <= input->Width())
 	{
@@ -33,7 +33,7 @@ void ThresholdMitigater::HorizontalSumThreshold(const Image2D* input, Mask2D* ma
 }
 
 template<size_t Length>
-void ThresholdMitigater::VerticalSumThreshold(const Image2D* input, Mask2D* mask, num_t threshold)
+void CombinatorialThresholder::VerticalSumThreshold(const Image2D* input, Mask2D* mask, num_t threshold)
 {
 	if(Length <= input->Height())
 	{
@@ -58,7 +58,7 @@ void ThresholdMitigater::VerticalSumThreshold(const Image2D* input, Mask2D* mask
 }
 
 template<size_t Length>
-void ThresholdMitigater::HorizontalSumThresholdLarge(const Image2D* input, Mask2D* mask, num_t threshold)
+void CombinatorialThresholder::HorizontalSumThresholdLarge(const Image2D* input, Mask2D* mask, num_t threshold)
 {
 	Mask2D maskCopy(*mask);
 	const size_t width = mask->Width(), height = mask->Height();
@@ -107,7 +107,7 @@ void ThresholdMitigater::HorizontalSumThresholdLarge(const Image2D* input, Mask2
 }
 
 template<size_t Length>
-void ThresholdMitigater::VerticalSumThresholdLarge(const Image2D* input, Mask2D* mask, num_t threshold)
+void CombinatorialThresholder::VerticalSumThresholdLarge(const Image2D* input, Mask2D* mask, num_t threshold)
 {
 	Mask2D maskCopy(*mask);
 	const size_t width = mask->Width(), height = mask->Height();
@@ -156,7 +156,7 @@ void ThresholdMitigater::VerticalSumThresholdLarge(const Image2D* input, Mask2D*
 	*mask = std::move(maskCopy);
 }
 
-void ThresholdMitigater::HorizontalSumThresholdLargeReference(const Image2D* input, Mask2D* mask, size_t length, num_t threshold)
+void CombinatorialThresholder::HorizontalSumThresholdLargeReference(const Image2D* input, Mask2D* mask, size_t length, num_t threshold)
 {
 	switch(length)
 	{
@@ -173,7 +173,7 @@ void ThresholdMitigater::HorizontalSumThresholdLargeReference(const Image2D* inp
 	}	
 }
 
-void ThresholdMitigater::VerticalSumThresholdLargeReference(const Image2D* input, Mask2D* mask, size_t length, num_t threshold)
+void CombinatorialThresholder::VerticalSumThresholdLargeReference(const Image2D* input, Mask2D* mask, size_t length, num_t threshold)
 {
 	switch(length)
 	{
@@ -191,7 +191,7 @@ void ThresholdMitigater::VerticalSumThresholdLargeReference(const Image2D* input
 }
 
 #ifdef USE_INTRINSICS
-void ThresholdMitigater::VerticalSumThresholdLargeSSE(const Image2D* input, Mask2D* mask, size_t length, num_t threshold)
+void CombinatorialThresholder::VerticalSumThresholdLargeSSE(const Image2D* input, Mask2D* mask, size_t length, num_t threshold)
 {
 	switch(length)
 	{
@@ -208,7 +208,7 @@ void ThresholdMitigater::VerticalSumThresholdLargeSSE(const Image2D* input, Mask
 	}	
 }
 
-void ThresholdMitigater::HorizontalSumThresholdLargeSSE(const Image2D* input, Mask2D* mask, size_t length, num_t threshold)
+void CombinatorialThresholder::HorizontalSumThresholdLargeSSE(const Image2D* input, Mask2D* mask, size_t length, num_t threshold)
 {
 	switch(length)
 	{
@@ -226,7 +226,7 @@ void ThresholdMitigater::HorizontalSumThresholdLargeSSE(const Image2D* input, Ma
 }
 #endif
 
-void ThresholdMitigater::HorizontalVarThreshold(const Image2D* input, Mask2D* mask, size_t length, num_t threshold)
+void CombinatorialThresholder::HorizontalVarThreshold(const Image2D* input, Mask2D* mask, size_t length, num_t threshold)
 {
 	size_t width = input->Width()-length+1;
 	for(size_t y=0;y<input->Height();++y) {
@@ -246,7 +246,7 @@ void ThresholdMitigater::HorizontalVarThreshold(const Image2D* input, Mask2D* ma
 	}
 }
 
-void ThresholdMitigater::VerticalVarThreshold(const Image2D* input, Mask2D* mask, size_t length, num_t threshold)
+void CombinatorialThresholder::VerticalVarThreshold(const Image2D* input, Mask2D* mask, size_t length, num_t threshold)
 {
 	size_t height = input->Height()-length+1; 
 	for(size_t y=0;y<height;++y) {
@@ -266,7 +266,7 @@ void ThresholdMitigater::VerticalVarThreshold(const Image2D* input, Mask2D* mask
 	}
 }
 
-void ThresholdMitigater::VarThreshold(const Image2D* input, Mask2D* mask, size_t length, num_t threshold)
+void CombinatorialThresholder::VarThreshold(const Image2D* input, Mask2D* mask, size_t length, num_t threshold)
 {
 	HorizontalVarThreshold(input, mask, length, threshold);
 	VerticalVarThreshold(input, mask, length, threshold);

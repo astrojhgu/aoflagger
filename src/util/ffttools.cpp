@@ -81,14 +81,14 @@ void FFTTools::CreateFFTImage(const Image2D &real, const Image2D &imaginary, Ima
 	bool centerBefore = true;
 	if(centerBefore) {
 		Image2D *tmp = CreateShiftedImageFromFFT(real);
-		realOut.SetValues(*tmp);
+		realOut = *tmp;
 		delete tmp;
 		tmp = CreateShiftedImageFromFFT(imaginary);
-		imaginaryOut.SetValues(*tmp);
+		imaginaryOut = *tmp;
 		delete tmp;
 	} else {
-		realOut.SetValues(real);
-		imaginaryOut.SetValues(imaginary);
+		realOut = real;
+		imaginaryOut = imaginary;
 	}
 
 	unsigned long ptr = 0;
@@ -121,10 +121,10 @@ void FFTTools::CreateFFTImage(const Image2D &real, const Image2D &imaginary, Ima
 	fftw_free(out);
 	if(centerAfter) {
 		Image2D *tmp = CreateShiftedImageFromFFT(realOut);
-		realOut.SetValues(*tmp);
+		realOut = *tmp;
 		delete tmp;
 		tmp = CreateShiftedImageFromFFT(imaginaryOut);
-		imaginaryOut.SetValues(*tmp);
+		imaginaryOut = *tmp;
 		delete tmp;
 	}
 }
@@ -176,22 +176,17 @@ Image2DPtr FFTTools::CreatePhaseImage(Image2DCPtr real, Image2DCPtr imaginary)
 void FFTTools::FFTConvolve(const Image2D &realIn, const Image2D &imaginaryIn, const Image2D &realKernel, const Image2D &imaginaryKernel, Image2D &outReal, Image2D &outImaginary)
 {
 	Image2D
-		*realFFTIn = Image2D::CreateUnsetImage(realIn.Width(), realIn.Height()),
-		*imaginaryFFTIn = Image2D::CreateUnsetImage(imaginaryIn.Width(), imaginaryIn.Height());
-	CreateFFTImage(realIn, imaginaryIn, *realFFTIn, *imaginaryFFTIn); 
+		realFFTIn = Image2D::MakeUnsetImage(realIn.Width(), realIn.Height()),
+		imaginaryFFTIn = Image2D::MakeUnsetImage(imaginaryIn.Width(), imaginaryIn.Height());
+	CreateFFTImage(realIn, imaginaryIn, realFFTIn, imaginaryFFTIn); 
 	Image2D
-		*realFFTKernel = Image2D::CreateUnsetImage(realKernel.Width(), realKernel.Height()),
-		*imaginaryFFTKernel = Image2D::CreateUnsetImage(imaginaryKernel.Width(), imaginaryKernel.Height());
-	CreateFFTImage(realKernel, imaginaryKernel, *realFFTKernel, *imaginaryFFTKernel);
+		realFFTKernel = Image2D::MakeUnsetImage(realKernel.Width(), realKernel.Height()),
+		imaginaryFFTKernel = Image2D::MakeUnsetImage(imaginaryKernel.Width(), imaginaryKernel.Height());
+	CreateFFTImage(realKernel, imaginaryKernel, realFFTKernel, imaginaryFFTKernel);
 
-	Multiply(*realFFTIn, *imaginaryFFTIn, *realFFTKernel, *imaginaryFFTKernel);
+	Multiply(realFFTIn, imaginaryFFTIn, realFFTKernel, imaginaryFFTKernel);
 
-	CreateFFTImage(*realFFTIn, *imaginaryFFTIn, outReal, outImaginary, true, true);
-	
-	delete imaginaryFFTKernel;
-	delete realFFTKernel;
-	delete imaginaryFFTIn;
-	delete realFFTIn;
+	CreateFFTImage(realFFTIn, imaginaryFFTIn, outReal, outImaginary, true, true);
 }
 
 /*void FFTTools::FFTConvolve(num_t *realValues, num_t *imagValues, num_t *realKernel, num_t *imagKernel, size_t count)
@@ -367,8 +362,8 @@ void FFTTools::CreateDynamicHorizontalFFTImage(Image2DPtr real, Image2DPtr imagi
 	}
 	fftw_free(out);
 	fftw_free(in);
-	real->SetValues(destReal);
-	imaginary->SetValues(destImag);
+	*real = destReal;
+	*imaginary = destImag;
 }
 
 Image2DPtr FFTTools::AngularTransform(Image2DCPtr image)

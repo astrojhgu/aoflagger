@@ -79,7 +79,7 @@ class TestSetGenerator {
 		static void AddBroadbandToTestSet(Image2D& image, Mask2D& rfi, long double length, double strength=1.0, bool align=false, enum BroadbandShape shape=UniformShape);
 		static void AddSlewedBroadbandToTestSet(Image2D& image, Mask2D& rfi, long double length, double strength=1.0, double slewrate=0.02, enum BroadbandShape shape=GaussianShape);
 		static void AddVarBroadbandToTestSet(Image2D& image, Mask2D& rfi);
-		static void AddModelData(Image2D& image, unsigned sources);
+		static void SetModelData(Image2D& image, Mask2D& rfi, unsigned sources);
 		static void SubtractBackground(Image2D& image);
 		static Image2D sampleRFIDistribution(unsigned width, unsigned height, double ig_over_rsq);
 

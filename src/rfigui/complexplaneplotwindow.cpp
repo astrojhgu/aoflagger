@@ -11,7 +11,7 @@
 
 #include "../strategy/plots/rfiplots.h"
 
-#include "../strategy/algorithms/thresholdmitigater.h"
+#include "../strategy/algorithms/combinatorialthresholder.h"
 #include "../strategy/algorithms/fringestoppingfitter.h"
 
 #include "../plot/plotmanager.h"

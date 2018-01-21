@@ -1,5 +1,5 @@
-#ifndef THRESHOLDMITIGATER_H
-#define THRESHOLDMITIGATER_H
+#ifndef COMBINATORIAL_THRESHOLDER_H
+#define COMBINATORIAL_THRESHOLDER_H
 
 #include <cstddef>
 #include <cstring>
@@ -11,7 +11,7 @@
 #define USE_INTRINSICS
 #endif
 
-class ThresholdMitigater{
+class CombinatorialThresholder {
 	public:
 		//static void Threshold(class Image2D &image, num_t threshold);
 
@@ -77,7 +77,7 @@ class ThresholdMitigater{
 		
 		static void VerticalVarThreshold(const Image2D* input, Mask2D* mask, size_t length, num_t threshold);
 	private:
-		ThresholdMitigater() { }
+		CombinatorialThresholder() { }
 };
 
 #undef USE_INSTRINSICS

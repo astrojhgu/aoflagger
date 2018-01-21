@@ -74,8 +74,11 @@ void Image2D::allocate()
 }
 
 Image2D::Image2D(const Image2D& source) :
-	Image2D(source.Width(), source.Height())
+	_width(source._width),
+	_height(source._height),
+	_stride(source._stride)
 {
+	allocate();
 	std::copy(source._dataConsecutive, source._dataConsecutive+_stride * _height, _dataConsecutive);
 }
 
@@ -146,7 +149,7 @@ Image2D *Image2D::CreateSetImage(size_t width, size_t height, num_t initialValue
 Image2D Image2D::MakeFromSum(const Image2D &imageA, const Image2D &imageB)
 {
 	if(imageA.Width() != imageB.Width() || imageA.Height() != imageB.Height())
-		throw IOException("Images do not match in size");
+		throw BadUsageException("Images do not match in size");
 	Image2D image(imageA.Width(), imageA.Height());
 	const size_t total = imageA._stride * imageA.Height();
 	for(size_t i=0;i<total;++i) {
@@ -158,7 +161,7 @@ Image2D Image2D::MakeFromSum(const Image2D &imageA, const Image2D &imageB)
 Image2D Image2D::MakeFromDiff(const Image2D &imageA, const Image2D &imageB)
 {
 	if(imageA.Width() != imageB.Width() || imageA.Height() != imageB.Height())
-		throw IOException("Images do not match in size");
+		throw BadUsageException("Images do not match in size");
 	Image2D image(imageA.Width(), imageA.Height());
 	const float *lhsPtr = &(imageA._dataConsecutive[0]);
 	const float *rhsPtr = &(imageB._dataConsecutive[0]);
@@ -179,14 +182,6 @@ Image2D Image2D::MakeFromDiff(const Image2D &imageA, const Image2D &imageB)
 #endif
 	}
 	return image;
-}
-
-void Image2D::SetValues(const Image2D &source)
-{
-	const size_t size = _stride*_height;
-	for(size_t i=0;i<size;++i) {
-		_dataConsecutive[i] = source._dataConsecutive[i];
-	}
 }
 
 void Image2D::SetAll(num_t value)
@@ -644,6 +639,17 @@ num_t Image2D::GetMinimum(size_t xOffset, size_t yOffset, size_t width, size_t h
 void Image2D::ResizeWithoutReallocation(size_t newWidth)
 {
 	if(newWidth > _stride)
-		throw IOException("Bug: ResizeWithoutReallocation called with newWidth > Stride !");
+		throw BadUsageException("Bug: ResizeWithoutReallocation called with newWidth > Stride !");
 	_width = newWidth;
+}
+
+Image2D& Image2D::operator+=(const Image2D& rhs)
+{
+	if(Width() != rhs.Width() || Height() != rhs.Height() || Stride() != rhs.Stride())
+		throw BadUsageException("Images do not match in size");
+	const size_t total = rhs._stride * rhs.Height();
+	for(size_t i=0;i<total;++i) {
+		_dataConsecutive[i] += rhs._dataConsecutive[i];
+	}
+	return *this;
 }

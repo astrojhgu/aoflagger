@@ -243,7 +243,7 @@ long double LocalFitMethod::CalculateWeightedAverage(unsigned x, unsigned y, Thr
 
 void LocalFitMethod::CalculateWeightedAverageFast()
 {
-	_background2D->SetValues(*_original);
+	*_background2D = *_original;
 	ThresholdTools::SetFlaggedValuesToZero(_background2D.get(), _mask.get());
 	PerformGaussianConvolution(_background2D);
 	Image2DPtr flagWeights = CreateFlagWeightsMatrix();

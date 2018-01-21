@@ -363,25 +363,25 @@ inline void DefaultStrategySpeedTest::TimeSumThresholdN::operator()()
 		
 		Mask2DPtr maskA(new Mask2D(*artifacts.OriginalData().GetSingleMask()));
 		Stopwatch watchA(true);
-		ThresholdMitigater::HorizontalSumThresholdLargeReference(input.get(), maskA.get(), length, threshold);
+		CombinatorialThresholder::HorizontalSumThresholdLargeReference(input.get(), maskA.get(), length, threshold);
 		Logger::Info << "Horizontal, length " << length << ": " << watchA.ToString() << '\n';
 		
 #ifdef __SSE__
 		Mask2DPtr maskC(new Mask2D(*artifacts.OriginalData().GetSingleMask()));
 		Stopwatch watchC(true);
-		ThresholdMitigater::HorizontalSumThresholdLargeSSE(input.get(), maskC.get(), length, threshold);
+		CombinatorialThresholder::HorizontalSumThresholdLargeSSE(input.get(), maskC.get(), length, threshold);
 		Logger::Info << "Horizontal SSE, length " << length << ": " << watchC.ToString() << '\n';
 #endif
 		
 		Mask2DPtr maskB(new Mask2D(*artifacts.OriginalData().GetSingleMask()));
 		Stopwatch watchB(true);
-		ThresholdMitigater::VerticalSumThresholdLargeReference(input.get(), maskB.get(), length, threshold);
+		CombinatorialThresholder::VerticalSumThresholdLargeReference(input.get(), maskB.get(), length, threshold);
 		Logger::Info << "Vertical, length " << length << ": " << watchB.ToString() << '\n';
 		
 #ifdef __SSE__
 		Mask2DPtr maskD(new Mask2D(*artifacts.OriginalData().GetSingleMask()));
 		Stopwatch watchD(true);
-		ThresholdMitigater::VerticalSumThresholdLargeSSE(input.get(), maskD.get(), length, threshold);
+		CombinatorialThresholder::VerticalSumThresholdLargeSSE(input.get(), maskD.get(), length, threshold);
 		Logger::Info << "SSE Vertical, length " << length << ": " << watchD.ToString() << '\n';
 #endif
 	}

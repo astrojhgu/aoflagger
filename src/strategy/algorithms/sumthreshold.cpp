@@ -10,7 +10,7 @@
 
 #include "../../structures/image2d.h"
 
-#include "thresholdmitigater.h"
+#include "combinatorialthresholder.h"
 
 #include "../../util/logger.h"
 
@@ -34,7 +34,7 @@
  * computing a sumthreshold has a lot of overhead, hence is not optimal at that size.
  */
 template<size_t Length>
-void ThresholdMitigater::VerticalSumThresholdLargeSSE(const Image2D* input, Mask2D* mask, num_t threshold)
+void CombinatorialThresholder::VerticalSumThresholdLargeSSE(const Image2D* input, Mask2D* mask, num_t threshold)
 {
 	Mask2D maskCopy(*mask);
 	const size_t width = mask->Width(), height = mask->Height();
@@ -151,7 +151,7 @@ void ThresholdMitigater::VerticalSumThresholdLargeSSE(const Image2D* input, Mask
 }
 
 template<size_t Length>
-void ThresholdMitigater::HorizontalSumThresholdLargeSSE(const Image2D* input, Mask2D* mask, num_t threshold)
+void CombinatorialThresholder::HorizontalSumThresholdLargeSSE(const Image2D* input, Mask2D* mask, num_t threshold)
 {
 	// The idea of the horizontal SSE version is to read four ('y') rows and
 	// process them simultaneously. 
@@ -336,42 +336,42 @@ void ThresholdMitigater::HorizontalSumThresholdLargeSSE(const Image2D* input, Ma
 }
 
 template
-void ThresholdMitigater::VerticalSumThresholdLargeSSE<1>(const Image2D* input, Mask2D* mask, num_t threshold);
+void CombinatorialThresholder::VerticalSumThresholdLargeSSE<1>(const Image2D* input, Mask2D* mask, num_t threshold);
 template
-void ThresholdMitigater::VerticalSumThresholdLargeSSE<2>(const Image2D* input, Mask2D* mask, num_t threshold);
+void CombinatorialThresholder::VerticalSumThresholdLargeSSE<2>(const Image2D* input, Mask2D* mask, num_t threshold);
 template
-void ThresholdMitigater::VerticalSumThresholdLargeSSE<4>(const Image2D* input, Mask2D* mask, num_t threshold);
+void CombinatorialThresholder::VerticalSumThresholdLargeSSE<4>(const Image2D* input, Mask2D* mask, num_t threshold);
 template
-void ThresholdMitigater::VerticalSumThresholdLargeSSE<8>(const Image2D* input, Mask2D* mask, num_t threshold);
+void CombinatorialThresholder::VerticalSumThresholdLargeSSE<8>(const Image2D* input, Mask2D* mask, num_t threshold);
 template
-void ThresholdMitigater::VerticalSumThresholdLargeSSE<16>(const Image2D* input, Mask2D* mask, num_t threshold);
+void CombinatorialThresholder::VerticalSumThresholdLargeSSE<16>(const Image2D* input, Mask2D* mask, num_t threshold);
 template
-void ThresholdMitigater::VerticalSumThresholdLargeSSE<32>(const Image2D* input, Mask2D* mask, num_t threshold);
+void CombinatorialThresholder::VerticalSumThresholdLargeSSE<32>(const Image2D* input, Mask2D* mask, num_t threshold);
 template
-void ThresholdMitigater::VerticalSumThresholdLargeSSE<64>(const Image2D* input, Mask2D* mask, num_t threshold);
+void CombinatorialThresholder::VerticalSumThresholdLargeSSE<64>(const Image2D* input, Mask2D* mask, num_t threshold);
 template
-void ThresholdMitigater::VerticalSumThresholdLargeSSE<128>(const Image2D* input, Mask2D* mask, num_t threshold);
+void CombinatorialThresholder::VerticalSumThresholdLargeSSE<128>(const Image2D* input, Mask2D* mask, num_t threshold);
 template
-void ThresholdMitigater::VerticalSumThresholdLargeSSE<256>(const Image2D* input, Mask2D* mask, num_t threshold);
+void CombinatorialThresholder::VerticalSumThresholdLargeSSE<256>(const Image2D* input, Mask2D* mask, num_t threshold);
 
 
 template
-void ThresholdMitigater::HorizontalSumThresholdLargeSSE<1>(const Image2D* input, Mask2D* mask, num_t threshold);
+void CombinatorialThresholder::HorizontalSumThresholdLargeSSE<1>(const Image2D* input, Mask2D* mask, num_t threshold);
 template
-void ThresholdMitigater::HorizontalSumThresholdLargeSSE<2>(const Image2D* input, Mask2D* mask, num_t threshold);
+void CombinatorialThresholder::HorizontalSumThresholdLargeSSE<2>(const Image2D* input, Mask2D* mask, num_t threshold);
 template
-void ThresholdMitigater::HorizontalSumThresholdLargeSSE<4>(const Image2D* input, Mask2D* mask, num_t threshold);
+void CombinatorialThresholder::HorizontalSumThresholdLargeSSE<4>(const Image2D* input, Mask2D* mask, num_t threshold);
 template
-void ThresholdMitigater::HorizontalSumThresholdLargeSSE<8>(const Image2D* input, Mask2D* mask, num_t threshold);
+void CombinatorialThresholder::HorizontalSumThresholdLargeSSE<8>(const Image2D* input, Mask2D* mask, num_t threshold);
 template
-void ThresholdMitigater::HorizontalSumThresholdLargeSSE<16>(const Image2D* input, Mask2D* mask, num_t threshold);
+void CombinatorialThresholder::HorizontalSumThresholdLargeSSE<16>(const Image2D* input, Mask2D* mask, num_t threshold);
 template
-void ThresholdMitigater::HorizontalSumThresholdLargeSSE<32>(const Image2D* input, Mask2D* mask, num_t threshold);
+void CombinatorialThresholder::HorizontalSumThresholdLargeSSE<32>(const Image2D* input, Mask2D* mask, num_t threshold);
 template
-void ThresholdMitigater::HorizontalSumThresholdLargeSSE<64>(const Image2D* input, Mask2D* mask, num_t threshold);
+void CombinatorialThresholder::HorizontalSumThresholdLargeSSE<64>(const Image2D* input, Mask2D* mask, num_t threshold);
 template
-void ThresholdMitigater::HorizontalSumThresholdLargeSSE<128>(const Image2D* input, Mask2D* mask, num_t threshold);
+void CombinatorialThresholder::HorizontalSumThresholdLargeSSE<128>(const Image2D* input, Mask2D* mask, num_t threshold);
 template
-void ThresholdMitigater::HorizontalSumThresholdLargeSSE<256>(const Image2D* input, Mask2D* mask, num_t threshold);
+void CombinatorialThresholder::HorizontalSumThresholdLargeSSE<256>(const Image2D* input, Mask2D* mask, num_t threshold);
 
 #endif

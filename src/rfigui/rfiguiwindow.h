@@ -167,7 +167,6 @@ class RFIGuiWindow : public Gtk::Window, private StrategyController {
 		void onClassify();
 		void onRemoveSmallSegments();
 		void onTimeGraphButtonPressed();
-//		void onFrequencyGraphButtonPressed();
 		void onUnrollPhaseButtonPressed();
 		void onVertEVD();
 		void onApplyTimeProfile();

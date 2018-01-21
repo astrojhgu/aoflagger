@@ -17,8 +17,8 @@
 
 #include "../../types.h"
 
+#include "combinatorialthresholder.h"
 #include "localfitmethod.h"
-#include "thresholdmitigater.h"
 
 void TestSetGenerator::AddBroadbandLine(Image2D& data, Mask2D& rfi, double lineStrength, size_t startTime, size_t duration, double frequencyRatio, double frequencyOffsetRatio)
 {
@@ -161,7 +161,7 @@ Image2D TestSetGenerator::MakeTestSet(int number, Mask2D& rfi, unsigned width, u
 		AddVarBroadbandToTestSet(image, rfi);
 		for(unsigned y=0;y<image.Height();++y) {
 			for(unsigned x=0;x<image.Width();++x) {
-				image.AddValue(x, y, sinn((long double) x*M_PIn*5.0 / image.Width()) + 0.1);
+				image.AddValue(x, y, sinn(num_t(x)*M_PIn*5.0 / image.Width()) + 0.1);
 			}
 		}
 		} break;
@@ -230,51 +230,58 @@ Image2D TestSetGenerator::MakeTestSet(int number, Mask2D& rfi, unsigned width, u
 		AddBroadbandToTestSet(image, rfi, 1.0);
 		} break;
 		case 13: { // Model of three point sources with broadband RFI
-		image = MakeNoise(width, height, gaussianNoise);
-		AddModelData(image, 3);
-		AddBroadbandToTestSet(image, rfi, 1.0L);
+		SetModelData(image, rfi, 3);
+		Image2D noise = MakeNoise(image.Width(), image.Height(), gaussianNoise);
+		image += noise;
+		AddBroadbandToTestSet(image, rfi, 1.0);
 		} break;
 		case 14: { // Model of five point sources with broadband RFI
-		image = MakeNoise(width, height, gaussianNoise);
-		AddModelData(image, 5);
-		AddBroadbandToTestSet(image, rfi, 1.0L);
+		SetModelData(image, rfi, 5);
+		Image2D noise = MakeNoise(image.Width(), image.Height(), gaussianNoise);
+		image += noise;
+		AddBroadbandToTestSet(image, rfi, 1.0);
 		} break;
 		case 15: { // Model of five point sources with partial broadband RFI
-		image = MakeNoise(width, height, gaussianNoise);
-		AddModelData(image, 5);
-		AddBroadbandToTestSet(image, rfi, 0.5L);
+		SetModelData(image, rfi, 5);
+		Image2D noise = MakeNoise(image.Width(), image.Height(), gaussianNoise);
+		image += noise;
+		AddBroadbandToTestSet(image, rfi, 0.5);
 		} break;
 		case 16: { // Model of five point sources with random broadband RFI
-		image = MakeNoise(width, height, gaussianNoise);
-		AddModelData(image, 5);
+		SetModelData(image, rfi, 5);
+		Image2D noise = MakeNoise(image.Width(), image.Height(), gaussianNoise);
+		image += noise;
 		AddVarBroadbandToTestSet(image, rfi);
 		} break;
 		case 17: { // Background-fitted model of five point sources with random broadband RFI
-		image = MakeNoise(width, height, gaussianNoise);
-		AddModelData(image, 5);
+		SetModelData(image, rfi, 5);
+		Image2D noise = MakeNoise(image.Width(), image.Height(), gaussianNoise);
+		image += noise;
 		SubtractBackground(image);
 		AddVarBroadbandToTestSet(image, rfi);
 		} break;
 		case 18: { // Model of three point sources with random RFI
-		image = MakeNoise(width, height, gaussianNoise);
-		AddModelData(image, 3);
+		SetModelData(image, rfi, 3);
+		Image2D noise = MakeNoise(image.Width(), image.Height(), gaussianNoise);
+		image += noise;
 		AddVarBroadbandToTestSet(image, rfi);
 		} break;
 		case 19: { // Model of three point sources with noise
-		image = MakeNoise(width, height, gaussianNoise);
-		AddModelData(image, 3);
+		SetModelData(image, rfi, 3);
+		Image2D noise = MakeNoise(image.Width(), image.Height(), gaussianNoise);
+		image += noise;
 		} break;
 		case 20: { // Model of five point sources with noise
-		image = MakeNoise(width, height, gaussianNoise);
-		AddModelData(image, 5);
+		SetModelData(image, rfi, 5);
+		Image2D noise = MakeNoise(image.Width(), image.Height(), gaussianNoise);
+		image += noise;
 		} break;
 		case 21: { // Model of three point sources
-		image = Image2D::MakeZeroImage(width, height);
-		AddModelData(image, 3);
+		SetModelData(image, rfi, 3);
 		} break;
 		case 22: { // Model of five point sources
 		image = Image2D::MakeZeroImage(width, height);
-		AddModelData(image, 5);
+		SetModelData(image, rfi, 5);
 		} break;
 		case 23:
 			image = MakeNoise(width, height, gaussianNoise);
@@ -414,10 +421,8 @@ void TestSetGenerator::AddVarBroadbandToTestSet(Image2D& image, Mask2D& rfi)
 	AddBroadbandLine(image, rfi, 1.6, step*10, 1, 0.444377,0.240526);
 }
 
-void TestSetGenerator::AddModelData(Image2D& , unsigned /*sources*/)
+void TestSetGenerator::SetModelData(Image2D& image, Mask2D& rfi, unsigned sources)
 {
-	//TODO
-	/*
 	class Model model;
 	if(sources>=5) {
 		model.AddSource(0.1,0.1,0.5);
@@ -433,11 +438,11 @@ void TestSetGenerator::AddModelData(Image2D& , unsigned /*sources*/)
 		if(sources>=3)
 			model.AddSource(1.0,0.0,1.0);
 	}
-	//WSRTObservatorium wsrt(0,1);
-	//std::pair<TimeFrequencyData,TimeFrequencyMetaDataCPtr> data =
-	//	model.SimulateObservation(wsrt, 0.05, 0.05, 130.0e+6, 0, 1);
-	//image->SetValues(data.first.GetRealPart());
-	*/
+	WSRTObservatorium wsrt(size_t(0), size_t(1));
+	std::pair<TimeFrequencyData,TimeFrequencyMetaDataCPtr> data =
+		model.SimulateObservation(wsrt, 0.05, 0.05, 0, 1);
+	image = *data.first.GetRealPart();
+	rfi = Mask2D::MakeSetMask<false>(image.Width(), image.Height());
 }
 
 void TestSetGenerator::SubtractBackground(Image2D& image)
@@ -454,7 +459,7 @@ void TestSetGenerator::SubtractBackground(Image2D& image)
 	image = Image2D::MakeFromDiff(image, *fittedImage.Background().GetSingleImage());
 	for(unsigned y=0;y<image.Height();++y) {
 		for(unsigned x=0;x<image.Width();++x) {
-			image.AddValue(x, y, 1.0); 
+			image.AddValue(x, y, 1.0);
 		}
 	}
 }

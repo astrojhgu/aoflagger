@@ -7,8 +7,8 @@
 
 #include "../../util/rng.h"
 
+#include "combinatorialthresholder.h"
 #include "localfitmethod.h"
-#include "thresholdmitigater.h"
 #include "thresholdtools.h"
 
 ThresholdConfig::ThresholdConfig() :
@@ -231,11 +231,11 @@ void ThresholdConfig::Execute(const Image2D* image, Mask2D* mask, bool additive,
 				if(_verbose)
 					std::cout << "Performing SumThreshold with length " << _horizontalOperations[i].length 
 						<< ", threshold " << _horizontalOperations[i].threshold*factor << "..." << std::endl;
-				ThresholdMitigater::HorizontalSumThresholdLarge(image, mask, _horizontalOperations[i].length, _horizontalOperations[i].threshold*factor);
+				CombinatorialThresholder::HorizontalSumThresholdLarge(image, mask, _horizontalOperations[i].length, _horizontalOperations[i].threshold*factor);
 			}
 			
 			if(i < _verticalOperations.size())
-				ThresholdMitigater::VerticalSumThresholdLarge(image, mask, _verticalOperations[i].length, _verticalOperations[i].threshold*factor);
+				CombinatorialThresholder::VerticalSumThresholdLarge(image, mask, _verticalOperations[i].length, _verticalOperations[i].threshold*factor);
 			break;
 			case VarThreshold:
 			if(i < _horizontalOperations.size())
@@ -243,10 +243,10 @@ void ThresholdConfig::Execute(const Image2D* image, Mask2D* mask, bool additive,
 				if(_verbose)
 					std::cout << "Performing VarThreshold with length " << _horizontalOperations[i].length 
 						<< ", threshold " << _horizontalOperations[i].threshold*factor << "..." << std::endl;
-				ThresholdMitigater::HorizontalVarThreshold(image, mask, _horizontalOperations[i].length, _horizontalOperations[i].threshold*factor);
+				CombinatorialThresholder::HorizontalVarThreshold(image, mask, _horizontalOperations[i].length, _horizontalOperations[i].threshold*factor);
 			}
 			if(i < _verticalOperations.size())
-				ThresholdMitigater::HorizontalVarThreshold(image, mask, _verticalOperations[i].length, _verticalOperations[i].threshold*factor);
+				CombinatorialThresholder::HorizontalVarThreshold(image, mask, _verticalOperations[i].length, _verticalOperations[i].threshold*factor);
 			break;
 		}
 	}

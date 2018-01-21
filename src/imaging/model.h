@@ -72,7 +72,6 @@ class Model {
 	
 	public:
 		Model();
-		~Model();
 		void AddSource(long double dec, long double ra, long double fluxIntensity)
 		{
 			StablePointSource *source = new StablePointSource();
