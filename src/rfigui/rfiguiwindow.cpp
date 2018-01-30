@@ -766,6 +766,8 @@ void RFIGuiWindow::createToolbar()
   sigc::mem_fun(*this, &RFIGuiWindow::onClassify) );
 	_actionGroup->add( Gtk::Action::create("RemoveSmallSegments", "Remove small segments"),
   sigc::mem_fun(*this, &RFIGuiWindow::onRemoveSmallSegments) );
+	_actionGroup->add( Gtk::Action::create("InterpolateFlagged", "Interpolate flagged"),
+  sigc::mem_fun(_controller, &RFIGuiController::InterpolateFlagged) );
 	_actionGroup->add( Gtk::Action::create("StoreData", "Store"),
 		Gtk::AccelKey("<control>M"),
   sigc::mem_fun(*this, &RFIGuiWindow::onStoreData) );
@@ -956,6 +958,7 @@ void RFIGuiWindow::createToolbar()
     "      <menuitem action='Cluster'/>"
     "      <menuitem action='Classify'/>"
     "      <menuitem action='RemoveSmallSegments'/>"
+    "      <menuitem action='InterpolateFlagged'/>"
     "      <separator/>"
     "      <menuitem action='VertEVD'/>"
     "      <menuitem action='ApplyTimeProfile'/>"

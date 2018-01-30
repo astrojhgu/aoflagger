@@ -4,6 +4,7 @@
 
 #include "../../strategy/algorithms/fringestoppingfitter.h"
 #include "../../strategy/algorithms/svdmitigater.h"
+#include "../../strategy/algorithms/interpolatenansalgorithm.h"
 #include "../../strategy/algorithms/testsetgenerator.h"
 
 #include "../../strategy/plots/rfiplots.h"
@@ -575,5 +576,28 @@ void RFIGuiController::GetAvailablePolarizations(bool& pp, bool& pq, bool& qp, b
 			case 2: qp = b[2]; break;
 			case 3: qq = b[3]; break;
 		}
+	}
+}
+
+void RFIGuiController::InterpolateFlagged()
+{
+	if(IsImageLoaded())
+	{
+		TimeFrequencyData activeData = ActiveData();
+		size_t polCount = activeData.PolarizationCount();
+		for(size_t p=0; p!=polCount; ++p)
+		{
+			TimeFrequencyData polData = activeData.MakeFromPolarizationIndex(p);
+			Mask2DCPtr mask = polData.GetMask(0);
+			for(size_t i=0; i!=polData.ImageCount(); ++i)
+			{
+				Image2DPtr image = Image2D::MakePtr(*polData.GetImage(i));
+				InterpolateNansAlgorithm::InterpolateFlags(*image, *mask);
+				polData.SetImage(i, image);
+			}
+			activeData.SetPolarizationData(p, std::move(polData));
+		}
+		_tfController.SetNewData(activeData, SelectedMetaData());
+		_rfiGuiWindow->GetTimeFrequencyWidget().Update();
 	}
 }

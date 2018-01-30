@@ -179,6 +179,8 @@ class RFIGuiController
 		void CheckPolarizations(bool forceSignal = false);
 		
 		void GetAvailablePolarizations(bool& pp, bool& pq, bool& qp, bool& qq) const;
+		
+		void InterpolateFlagged();
 	private:
 		void plotMeanSpectrum(bool weight);
 		

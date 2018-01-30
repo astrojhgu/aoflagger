@@ -1,6 +1,5 @@
 #include <limits>
-
-#include <boost/bind.hpp>
+#include <functional>
 
 #include "datawindow.h"
 #include "twodimensionalplotpage.h"
@@ -9,6 +8,8 @@
 #include "../quality/statisticsderivator.h"
 
 #include "../plot/plotpropertieswindow.h"
+
+#include <gtkmm/icontheme.h>
 
 TwoDimensionalPlotPage::TwoDimensionalPlotPage(AOQPlotPageController* controller) :
 	_controller(controller),
@@ -20,11 +21,10 @@ TwoDimensionalPlotPage::TwoDimensionalPlotPage(AOQPlotPageController* controller
 	_dMeanButton("Δμ"),
 	_dStdDevButton("Δσ"),
 	_rfiPercentageButton("%"),
-	_polXXButton("XX"),
-	_polXYButton("XY"),
-	_polYXButton("YX"),
-	_polYYButton("YY"),
-	_polIButton("I"),
+	_polPPButton("pp"),
+	_polPQButton("pq"),
+	_polQPButton("qp"),
+	_polQQButton("qq"),
 	_amplitudeButton("A"),
 	_phaseButton("ϕ"),
 	_realButton("r"),
@@ -34,6 +34,7 @@ TwoDimensionalPlotPage::TwoDimensionalPlotPage(AOQPlotPageController* controller
 	_plotPropertiesButton("P"),
 	_dataExportButton("D"),
 	_plotPropertiesWindow(nullptr),
+	_dataWindow(new DataWindow()),
 	_customButtonsCreated(false)
 {
 	_plotWidget.SetPlot(_controller->Plot());
@@ -41,17 +42,11 @@ TwoDimensionalPlotPage::TwoDimensionalPlotPage(AOQPlotPageController* controller
 	
 	show_all_children();
 	
-	_dataWindow = new DataWindow();
-	
 	_controller->Attach(this);
 }
 
 TwoDimensionalPlotPage::~TwoDimensionalPlotPage()
-{
-	delete _dataWindow;
-	if(_plotPropertiesWindow != 0)
-		delete _plotPropertiesWindow;
-}
+{ }
 
 void TwoDimensionalPlotPage::updatePlotConfig()
 {
@@ -85,16 +80,14 @@ std::set<QualityTablesFormatter::StatisticKind> TwoDimensionalPlotPage::GetSelec
 std::set<std::pair<unsigned int, unsigned int> > TwoDimensionalPlotPage::GetSelectedPolarizations() const
 {
 	std::set<std::pair<unsigned, unsigned> > pols;
-	if(_polXXButton.get_active())
+	if(_polPPButton.get_active())
 		pols.insert(std::make_pair(0, 0));
-	if(_polXYButton.get_active())
+	if(_polPQButton.get_active())
 		pols.insert(std::make_pair(1, 1));
-	if(_polYXButton.get_active())
+	if(_polQPButton.get_active())
 		pols.insert(std::make_pair(2, 2));
-	if(_polYYButton.get_active())
+	if(_polQQButton.get_active())
 		pols.insert(std::make_pair(3, 3));
-	if(_polIButton.get_active())
-		pols.insert(std::make_pair(0, 3));
 	return pols;
 }
 
@@ -114,7 +107,15 @@ std::set<AOQPlotPageController::PhaseType> TwoDimensionalPlotPage::GetSelectedPh
 
 void TwoDimensionalPlotPage::InitializeToolbar(Gtk::Toolbar& toolbar)
 {
-	toolbar.set_toolbar_style(Gtk::TOOLBAR_TEXT);
+	if(Gtk::IconTheme::get_default()->has_icon("aoflagger"))
+	{
+		toolbar.set_toolbar_style(Gtk::TOOLBAR_ICONS);
+		toolbar.set_icon_size(Gtk::ICON_SIZE_LARGE_TOOLBAR);
+	}
+	else {
+		toolbar.set_toolbar_style(Gtk::TOOLBAR_TEXT);
+		toolbar.set_icon_size(Gtk::ICON_SIZE_SMALL_TOOLBAR);
+	}
 	initStatisticKindButtons(toolbar);
 	initPolarizationButtons(toolbar);
 	initPhaseButtons(toolbar);
@@ -167,26 +168,29 @@ void TwoDimensionalPlotPage::initPolarizationButtons(Gtk::Toolbar& toolbar)
 {
 	toolbar.append(_separator2);
 	
-	_polXXButton.signal_clicked().connect(sigc::mem_fun(*_controller, &AOQPlotPageController::UpdatePlot));
-	_polXXButton.set_tooltip_text("XX polarization");
-	toolbar.append(_polXXButton);
+	_polPPButton.signal_clicked().connect(sigc::mem_fun(*_controller, &AOQPlotPageController::UpdatePlot));
+	_polPPButton.set_active(_polarizationController.IsPPSelected());
+	_polPPButton.set_icon_name("showpp");
+	_polPPButton.set_tooltip_text("Display statistics for the PP polarization. Depending on the polarization configuration of the measurement set, this will show XX or RR. Select in combination with QQ to show Stokes I.");
+	toolbar.append(_polPPButton);
 	
-	_polXYButton.signal_clicked().connect(sigc::mem_fun(*_controller, &AOQPlotPageController::UpdatePlot));
-	_polXYButton.set_tooltip_text("XY polarization");
-	toolbar.append(_polXYButton);
+	_polPQButton.signal_clicked().connect(sigc::mem_fun(*_controller, &AOQPlotPageController::UpdatePlot));
+	_polPQButton.set_active(_polarizationController.IsPQSelected());
+	_polPQButton.set_icon_name("showpq");
+	_polPQButton.set_tooltip_text("Display statistics for the PQ polarization. Depending on the polarization configuration of the measurement set, this will show XY or RL. This button can be selected in combination with QP.");
+	toolbar.append(_polPQButton);
 	
-	_polYXButton.signal_clicked().connect(sigc::mem_fun(*_controller, &AOQPlotPageController::UpdatePlot));
-	_polYXButton.set_tooltip_text("YX polarization");
-	toolbar.append(_polYXButton);
+	_polQPButton.signal_clicked().connect(sigc::mem_fun(*_controller, &AOQPlotPageController::UpdatePlot));
+	_polQPButton.set_active(_polarizationController.IsQPSelected());
+	_polQPButton.set_icon_name("showqp");
+	_polPQButton.set_tooltip_text("Display statistics for the QP polarization. Depending on the polarization configuration of the measurement set, this will show YX or LR. This button can be selected in combination with PQ.");
+	toolbar.append(_polQPButton);
 	
-	_polYYButton.signal_clicked().connect(sigc::mem_fun(*_controller, &AOQPlotPageController::UpdatePlot));
-	_polYYButton.set_tooltip_text("YY polarization");
-	toolbar.append(_polYYButton);
-	
-	_polIButton.signal_clicked().connect(sigc::mem_fun(*_controller, &AOQPlotPageController::UpdatePlot));
-	_polIButton.set_active(true);
-	_polIButton.set_tooltip_text("Stokes I polarization");
-	toolbar.append(_polIButton);
+	_polQQButton.signal_clicked().connect(sigc::mem_fun(*_controller, &AOQPlotPageController::UpdatePlot));
+	_polQQButton.set_active(_polarizationController.IsQQSelected());
+	_polQQButton.set_icon_name("showqq");
+	_polQQButton.set_tooltip_text("Display statistics for the QQ polarization. Depending on the polarization configuration of the measurement set, this will show YY or LL. Select in combination with PP to show Stokes I.");
+	toolbar.append(_polQQButton);
 }
 
 void TwoDimensionalPlotPage::initPhaseButtons(Gtk::Toolbar& toolbar)
@@ -232,10 +236,10 @@ void TwoDimensionalPlotPage::initPlotButtons(Gtk::Toolbar& toolbar)
 
 void TwoDimensionalPlotPage::onPlotPropertiesClicked()
 {
-	if(_plotPropertiesWindow == 0)
+	if(_plotPropertiesWindow == nullptr)
 	{
-		_plotPropertiesWindow = new PlotPropertiesWindow(_controller->Plot(), "Plot properties");
-		_plotPropertiesWindow->OnChangesApplied = boost::bind(&AOQPlotPageController::UpdatePlot, _controller);
+		_plotPropertiesWindow.reset(new PlotPropertiesWindow(_controller->Plot(), "Plot properties"));
+		_plotPropertiesWindow->OnChangesApplied = std::bind(&AOQPlotPageController::UpdatePlot, _controller);
 	}
 	
 	_plotPropertiesWindow->show();

@@ -38,14 +38,13 @@ public:
 	enum PhaseType { AmplitudePhaseType, PhasePhaseType, RealPhaseType, ImaginaryPhaseType} ;
 protected:
 	virtual void processStatistics(const StatisticsCollection *, const std::vector<AntennaInfo> &)
-	{
-	}
+	{ }
 	
 	virtual const std::map<double, class DefaultStatistics> &getStatistics() const = 0;
 	
-	virtual void startLine(Plot2D &plot, const std::string &name, const std::string &yAxisDesc) = 0;
+	virtual void startLine(Plot2D& plot, const std::string &name, const std::string &yAxisDesc) = 0;
 	
-	virtual void processPlot(Plot2D &plot)
+	virtual void processPlot(Plot2D& plot)
 	{ }
 	
 	const StatisticsCollection *getStatCollection() const

@@ -165,8 +165,8 @@ namespace rfiStrategy {
 						unsigned imageCount = contaminatedData.ImageCount();
 						for(unsigned i=0;i<imageCount;++i)
 						{
-							Image2DPtr image(new Image2D(*contaminatedData.GetImage(i)));
-							InterpolateNansAlgorithms::InterpolateFlags(image, mask);
+							Image2DPtr image(Image2D::MakePtr(*contaminatedData.GetImage(i)));
+							InterpolateNansAlgorithm::InterpolateFlags(*image, *mask);
 							contaminatedData.SetImage(i, image);
 						}
 						break;

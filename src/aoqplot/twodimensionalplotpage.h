@@ -2,6 +2,7 @@
 #define GUI_QUALITY__2DPLOTPAGE_H
 
 #include "controllers/aoqplotpagecontroller.h"
+#include "controllers/polbuttonsetcontroller.h"
 
 #include "../quality/qualitytablesformatter.h"
 
@@ -51,12 +52,13 @@ class TwoDimensionalPlotPage : public PlotSheet {
 		void onDataExportClicked();
 		
 		AOQPlotPageController* _controller;
+		PolButtonSetController _polarizationController;
 		
 		Gtk::SeparatorToolItem _separator1, _separator2, _separator3, _separator4;
 		
 		Gtk::ToggleToolButton _countButton, _meanButton, _stdDevButton, _varianceButton, _dCountButton, _dMeanButton, _dStdDevButton,  _rfiPercentageButton;
 		
-		Gtk::ToggleToolButton _polXXButton, _polXYButton, _polYXButton, _polYYButton, _polIButton;
+		Gtk::ToggleToolButton _polPPButton, _polPQButton, _polQPButton, _polQQButton;
 		
 		Gtk::ToggleToolButton _amplitudeButton, _phaseButton, _realButton, _imaginaryButton;
 		
@@ -65,8 +67,8 @@ class TwoDimensionalPlotPage : public PlotSheet {
 		
 		PlotWidget _plotWidget;
 		
-		class PlotPropertiesWindow* _plotPropertiesWindow;
-		class DataWindow* _dataWindow;
+		std::unique_ptr<class PlotPropertiesWindow> _plotPropertiesWindow;
+		std::unique_ptr<class DataWindow> _dataWindow;
 		
 		bool _customButtonsCreated;
 };

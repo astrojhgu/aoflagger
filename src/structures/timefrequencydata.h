@@ -693,6 +693,18 @@ class TimeFrequencyData
 				_data[polarizationIndex] = data._data[0];
 		}
 
+		void SetPolarizationData(size_t polarizationIndex, TimeFrequencyData&& data)
+		{
+			if(data.PolarizationCount() != 1)
+				throw BadUsageException("Trying to set multiple polarizations by single polarization index");
+			else if(data.ComplexRepresentation() != ComplexRepresentation())
+				throw BadUsageException("Trying to combine TFData's with different complex representations");
+			else {
+				_data[polarizationIndex] = std::move(data._data[0]);
+				data._data.clear();
+			}
+		}
+
 		void SetImageSize(size_t width, size_t height)
 		{
 			for(size_t i=0;i<_data.size();++i)

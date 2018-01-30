@@ -15,14 +15,14 @@
 #include <gtkmm/scale.h>
 #include <gtkmm/window.h>
 
-#include <boost/function.hpp>
+#include <functional>
 
 class PlotPropertiesWindow : public Gtk::Window {
 	public:
 		PlotPropertiesWindow(class Plot2D &plot, const std::string &title);
 		~PlotPropertiesWindow() { }
 		
-		boost::function<void()> OnChangesApplied;
+		std::function<void()> OnChangesApplied;
 	private:
 		void onApplyClicked();
 		void onCloseClicked();
