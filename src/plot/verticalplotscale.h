@@ -14,10 +14,11 @@ class VerticalPlotScale final {
 		VerticalPlotScale();
 		~VerticalPlotScale();
 		
-		void SetPlotDimensions(double plotWidth, double plotHeight, bool isSecondAxis)
+		void SetPlotDimensions(double plotWidth, double plotHeight, double fromTop, bool isSecondAxis)
 		{
 			_plotWidth = plotWidth;
 			_plotHeight = plotHeight;
+			_fromTop = fromTop;
 			_isSecondAxis = isSecondAxis;
 			_metricsAreInitialized = false;
 		}
@@ -63,7 +64,7 @@ class VerticalPlotScale final {
 		void initializeMetrics(Cairo::RefPtr<Cairo::Context> cairo); 
 		double getTickYPosition(const Tick& tick);
 
-		double _plotWidth, _plotHeight;
+		double _plotWidth, _plotHeight, _fromTop;
 		bool _isSecondAxis;
 		bool _metricsAreInitialized;
 		double _width, _captionSize;

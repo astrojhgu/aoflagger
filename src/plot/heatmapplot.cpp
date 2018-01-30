@@ -406,7 +406,7 @@ void HeatMapPlot::update(Cairo::RefPtr<Cairo::Context> cairo, unsigned width, un
 		_bottomBorderSize = _horiScale->GetHeight(cairo);
 		_rightBorderSize = _horiScale->GetRightMargin(cairo);
 	
-		_vertScale->SetPlotDimensions(width - _rightBorderSize + 5.0, height - _topBorderSize - _bottomBorderSize, false);
+		_vertScale->SetPlotDimensions(width - _rightBorderSize + 5.0, height - _topBorderSize - _bottomBorderSize, _topBorderSize, false);
 		_leftBorderSize = _vertScale->GetWidth(cairo);
 	} else {
 		_bottomBorderSize = 0.0;

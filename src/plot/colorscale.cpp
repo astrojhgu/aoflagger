@@ -19,7 +19,7 @@ void ColorScale::initWidth(Cairo::RefPtr<Cairo::Context> cairo)
 	{
 		_textHeight = _verticalPlotScale.GetTextHeight(cairo);
 		const double scaleHeight = _plotHeight - 2.0*_textHeight - _topMargin;
-		_verticalPlotScale.SetPlotDimensions(_plotWidth, scaleHeight, !_textOnLeft);
+		_verticalPlotScale.SetPlotDimensions(_plotWidth, scaleHeight, 0.0, !_textOnLeft);
 		_scaleWidth = _verticalPlotScale.GetWidth(cairo);
 		_width = _scaleWidth + BAR_WIDTH;
 	}

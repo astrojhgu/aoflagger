@@ -34,6 +34,7 @@ double VerticalPlotScale::AxisToUnit(double axisValue) const
 
 void VerticalPlotScale::Draw(Cairo::RefPtr<Cairo::Context> cairo, double offsetX, double offsetY)
 {
+	offsetY += _fromTop;
 	initializeMetrics(cairo);
 	cairo->set_source_rgb(0.0, 0.0, 0.0);
 	cairo->set_font_size(_tickValuesFontSize);

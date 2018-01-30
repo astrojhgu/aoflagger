@@ -116,7 +116,7 @@ void Plot2D::render(Cairo::RefPtr<Cairo::Context> cr)
 			else
 				_verticalScale.InitializeNumericTicks(MinY(), MaxY());
 			_verticalScale.SetUnitsCaption(_customVAxisDescription.empty() ? refPointSet.YUnits() : _customVAxisDescription);
-			_verticalScale.SetPlotDimensions(_width - rightMargin, _height - horiScaleHeight - _topMargin, false);
+			_verticalScale.SetPlotDimensions(_width - rightMargin, _height - horiScaleHeight - _topMargin, 0.0, false);
 
 			verticalScaleWidth =  _verticalScale.GetWidth(cr);
 			_horizontalScale.SetPlotDimensions(_width - rightMargin, _height - horiScaleHeight, verticalScaleWidth, 0.0, false);
