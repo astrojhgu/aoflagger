@@ -27,7 +27,7 @@ class Title
 			_metricsAreInitialized = false;
 			_text = text;
 		}
-		const std::string &Text() { return _text; }
+		const std::string &Text() const { return _text; }
 		
 	private:
 		void initializeMetrics(Cairo::RefPtr<Cairo::Context> &cairo);

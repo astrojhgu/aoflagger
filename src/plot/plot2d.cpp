@@ -92,6 +92,19 @@ void Plot2D::render(Cairo::RefPtr<Cairo::Context> cr)
 		
 		double verticalScaleWidth, horiScaleHeight;
 	
+		_topMargin = 0.0;
+		
+		double titleHeight = 0.0;
+		if(!_title.Text().empty())
+		{
+			_title.SetPlotDimensions(_width, _height, _topMargin);
+			titleHeight = _title.GetHeight(cr);
+		}
+		if(_showAxes)
+			_topMargin += std::max(10.0, titleHeight);
+		else
+			_topMargin += titleHeight;
+		
 		if(_showAxes)
 		{
 			_horizontalScale.SetDrawWithDescription(_showAxisDescriptions);
@@ -105,7 +118,6 @@ void Plot2D::render(Cairo::RefPtr<Cairo::Context> cr)
 			else
 				_horizontalScale.InitializeNumericTicks(MinX(), MaxX());
 			_horizontalScale.SetUnitsCaption(_customHAxisDescription.empty() ? refPointSet.XUnits() : _customHAxisDescription);
-			_topMargin = 10.0;
 			_horizontalScale.SetPlotDimensions(_width, _height, 0.0, _topMargin, false);
 			horiScaleHeight = _horizontalScale.GetHeight(cr);
 			
@@ -116,7 +128,7 @@ void Plot2D::render(Cairo::RefPtr<Cairo::Context> cr)
 			else
 				_verticalScale.InitializeNumericTicks(MinY(), MaxY());
 			_verticalScale.SetUnitsCaption(_customVAxisDescription.empty() ? refPointSet.YUnits() : _customVAxisDescription);
-			_verticalScale.SetPlotDimensions(_width - rightMargin, _height - horiScaleHeight - _topMargin, 0.0, false);
+			_verticalScale.SetPlotDimensions(_width - rightMargin, _height - horiScaleHeight - _topMargin, _topMargin, false);
 
 			verticalScaleWidth =  _verticalScale.GetWidth(cr);
 			_horizontalScale.SetPlotDimensions(_width - rightMargin, _height - horiScaleHeight, verticalScaleWidth, 0.0, false);
@@ -152,6 +164,10 @@ void Plot2D::render(Cairo::RefPtr<Cairo::Context> cr)
 			rightMargin = _horizontalScale.GetRightMargin(cr);
 		} else {
 			rightMargin = 0.0;
+		}
+		if(!_title.Text().empty())
+		{
+			_title.Draw(cr);
 		}
 		
 		cr->set_source_rgb(0.0, 0.0, 0.0);
