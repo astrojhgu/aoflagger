@@ -13,6 +13,9 @@
 class AOQPlotPageController : public AOQPageController
 {
 public:
+	enum SelectedPol {
+		PolPP, PolPQ, PolQP, PolQQ, PolI
+	};
 	AOQPlotPageController();
 	
 	void Attach(class TwoDimensionalPlotPage* page) { _page = page; }
@@ -58,13 +61,13 @@ private:
 	
 	void updatePlotForSettings(
 		const std::set<QualityTablesFormatter::StatisticKind>& kinds,
-		const std::set<std::pair<unsigned int, unsigned int> >& pols,
+		const std::set<SelectedPol>& pols,
 		const std::set<PhaseType>& phases
 	);
 	
 	double getValue(enum PhaseType Phase, const std::complex<long double>& val);
 	
-	void plotStatistic(QualityTablesFormatter::StatisticKind kind, unsigned polA, unsigned polB, PhaseType phase, const std::string& yDesc);
+	void plotStatistic(QualityTablesFormatter::StatisticKind kind, SelectedPol pol, PhaseType phase, const std::string& yDesc);
 	const StatisticsCollection *_statCollection;
 	Plot2D _plot;
 	std::string getYDesc(const std::set<QualityTablesFormatter::StatisticKind>& kinds) const;

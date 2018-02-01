@@ -25,6 +25,7 @@ TwoDimensionalPlotPage::TwoDimensionalPlotPage(AOQPlotPageController* controller
 	_polPQButton("pq"),
 	_polQPButton("qp"),
 	_polQQButton("qq"),
+	_polIButton("I"),
 	_amplitudeButton("A"),
 	_phaseButton("ϕ"),
 	_realButton("r"),
@@ -77,17 +78,19 @@ std::set<QualityTablesFormatter::StatisticKind> TwoDimensionalPlotPage::GetSelec
 	return kinds;
 }
 
-std::set<std::pair<unsigned int, unsigned int> > TwoDimensionalPlotPage::GetSelectedPolarizations() const
+std::set<AOQPlotPageController::SelectedPol> TwoDimensionalPlotPage::GetSelectedPolarizations() const
 {
-	std::set<std::pair<unsigned, unsigned> > pols;
+	std::set<AOQPlotPageController::SelectedPol> pols;
 	if(_polPPButton.get_active())
-		pols.insert(std::make_pair(0, 0));
+		pols.insert(AOQPlotPageController::PolPP);
 	if(_polPQButton.get_active())
-		pols.insert(std::make_pair(1, 1));
+		pols.insert(AOQPlotPageController::PolPQ);
 	if(_polQPButton.get_active())
-		pols.insert(std::make_pair(2, 2));
+		pols.insert(AOQPlotPageController::PolQP);
 	if(_polQQButton.get_active())
-		pols.insert(std::make_pair(3, 3));
+		pols.insert(AOQPlotPageController::PolQQ);
+	if(_polIButton.get_active())
+		pols.insert(AOQPlotPageController::PolI);
 	return pols;
 }
 
@@ -169,28 +172,33 @@ void TwoDimensionalPlotPage::initPolarizationButtons(Gtk::Toolbar& toolbar)
 	toolbar.append(_separator2);
 	
 	_polPPButton.signal_clicked().connect(sigc::mem_fun(*_controller, &AOQPlotPageController::UpdatePlot));
-	_polPPButton.set_active(_polarizationController.IsPPSelected());
+	_polPPButton.set_active(false);
 	_polPPButton.set_icon_name("showpp");
-	_polPPButton.set_tooltip_text("Display statistics for the PP polarization. Depending on the polarization configuration of the measurement set, this will show XX or RR. Select in combination with QQ to show Stokes I.");
+	_polPPButton.set_tooltip_text("Display statistics for the PP polarization. Depending on the polarization configuration of the measurement set, this will show XX or RR.");
 	toolbar.append(_polPPButton);
 	
 	_polPQButton.signal_clicked().connect(sigc::mem_fun(*_controller, &AOQPlotPageController::UpdatePlot));
-	_polPQButton.set_active(_polarizationController.IsPQSelected());
+	_polPQButton.set_active(false);
 	_polPQButton.set_icon_name("showpq");
-	_polPQButton.set_tooltip_text("Display statistics for the PQ polarization. Depending on the polarization configuration of the measurement set, this will show XY or RL. This button can be selected in combination with QP.");
+	_polPQButton.set_tooltip_text("Display statistics for the PQ polarization. Depending on the polarization configuration of the measurement set, this will show XY or RL.");
 	toolbar.append(_polPQButton);
 	
 	_polQPButton.signal_clicked().connect(sigc::mem_fun(*_controller, &AOQPlotPageController::UpdatePlot));
-	_polQPButton.set_active(_polarizationController.IsQPSelected());
+	_polQPButton.set_active(false);
 	_polQPButton.set_icon_name("showqp");
-	_polPQButton.set_tooltip_text("Display statistics for the QP polarization. Depending on the polarization configuration of the measurement set, this will show YX or LR. This button can be selected in combination with PQ.");
+	_polPQButton.set_tooltip_text("Display statistics for the QP polarization. Depending on the polarization configuration of the measurement set, this will show YX or LR.");
 	toolbar.append(_polQPButton);
 	
 	_polQQButton.signal_clicked().connect(sigc::mem_fun(*_controller, &AOQPlotPageController::UpdatePlot));
-	_polQQButton.set_active(_polarizationController.IsQQSelected());
+	_polQQButton.set_active(false);
 	_polQQButton.set_icon_name("showqq");
-	_polQQButton.set_tooltip_text("Display statistics for the QQ polarization. Depending on the polarization configuration of the measurement set, this will show YY or LL. Select in combination with PP to show Stokes I.");
+	_polQQButton.set_tooltip_text("Display statistics for the QQ polarization. Depending on the polarization configuration of the measurement set, this will show YY or LL.");
 	toolbar.append(_polQQButton);
+	
+	_polIButton.signal_clicked().connect(sigc::mem_fun(*_controller, &AOQPlotPageController::UpdatePlot));
+	_polIButton.set_active(true);
+	_polIButton.set_tooltip_text("Display statistics for QQ + PP.");
+	toolbar.append(_polIButton);
 }
 
 void TwoDimensionalPlotPage::initPhaseButtons(Gtk::Toolbar& toolbar)
