@@ -112,7 +112,7 @@ void AOQPlotPageController::plotStatistic(QualityTablesFormatter::StatisticKind 
 				val = valA*0.5l + valB*0.5l;
 			}
 			else {
-				val = derivator.GetComplexStatistic(kind, i->second, pol);
+				val = derivator.GetComplexStatistic(kind, i->second, polIndex);
 			}
 			_plot.PushDataPoint(x, getValue(phase, val));
 		}
