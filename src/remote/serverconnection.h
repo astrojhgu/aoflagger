@@ -5,6 +5,7 @@
 #include <memory>
 
 #include <boost/asio/ip/tcp.hpp>
+#include <boost/asio/io_service.hpp>
 
 #include <boost/signals2/signal.hpp>
 
