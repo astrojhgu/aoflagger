@@ -1,5 +1,7 @@
 #include <limits>
 
+#include <gtkmm/icontheme.h>
+
 #include "controllers/heatmappagecontroller.h"
 
 #include "grayscaleplotpage.h"
@@ -15,10 +17,10 @@ GrayScalePlotPage::GrayScalePlotPage(HeatMapPageController* controller) :
 	_dMeanButton(_statisticGroup, "Δμ"),
 	_dStdDevButton(_statisticGroup, "Δσ"),
 	_rfiPercentageButton(_statisticGroup, "%"),
-	_polXXButton(_polGroup, "XX"),
-	_polXYButton(_polGroup, "XY"),
-	_polYXButton(_polGroup, "YX"),
-	_polYYButton(_polGroup, "YY"),
+	_polPPButton(_polGroup, "pp"),
+	_polPQButton(_polGroup, "pq"),
+	_polQPButton(_polGroup, "qp"),
+	_polQQButton(_polGroup, "qq"),
 	_polIButton(_polGroup, "I"),
 	_amplitudePhaseButton(_phaseGroup, "A"),
 	_phasePhaseButton(_phaseGroup, "ϕ"),
@@ -59,7 +61,15 @@ GrayScalePlotPage::~GrayScalePlotPage()
 
 void GrayScalePlotPage::InitializeToolbar(Gtk::Toolbar& toolbar)
 {
-	toolbar.set_toolbar_style(Gtk::TOOLBAR_TEXT);
+	if(Gtk::IconTheme::get_default()->has_icon("aoflagger"))
+	{
+		toolbar.set_toolbar_style(Gtk::TOOLBAR_ICONS);
+		toolbar.set_icon_size(Gtk::ICON_SIZE_LARGE_TOOLBAR);
+	}
+	else {
+		toolbar.set_toolbar_style(Gtk::TOOLBAR_TEXT);
+		toolbar.set_icon_size(Gtk::ICON_SIZE_SMALL_TOOLBAR);
+	}
 	initStatisticKinds(toolbar);
 	initPolarizations(toolbar);
 	initPhaseButtons(toolbar);
@@ -105,21 +115,25 @@ void GrayScalePlotPage::initPolarizations(Gtk::Toolbar& toolbar)
 {
 	toolbar.append(_separator2);
 	
-	_polXXButton.signal_clicked().connect(sigc::mem_fun(*this, &GrayScalePlotPage::updateImage));
-	_polXXButton.set_tooltip_text("XX polarization");
-	toolbar.append(_polXXButton);
+	_polPPButton.signal_clicked().connect(sigc::mem_fun(*this, &GrayScalePlotPage::updateImage));
+	_polPPButton.set_icon_name("showpp");
+	_polPPButton.set_tooltip_text("Display statistics for the PP polarization. Depending on the polarization configuration of the measurement set, this will show XX or RR.");
+	toolbar.append(_polPPButton);
 	
-	_polXYButton.signal_clicked().connect(sigc::mem_fun(*this, &GrayScalePlotPage::updateImage));
-	_polXYButton.set_tooltip_text("XY polarization");
-	toolbar.append(_polXYButton);
+	_polPQButton.signal_clicked().connect(sigc::mem_fun(*this, &GrayScalePlotPage::updateImage));
+	_polPQButton.set_icon_name("showpq");
+	_polPQButton.set_tooltip_text("Display statistics for the PQ polarization. Depending on the polarization configuration of the measurement set, this will show XY or RL.");
+	toolbar.append(_polPQButton);
 
-	_polYXButton.signal_clicked().connect(sigc::mem_fun(*this, &GrayScalePlotPage::updateImage));
-	_polYXButton.set_tooltip_text("YX polarization");
-	toolbar.append(_polYXButton);
+	_polQPButton.signal_clicked().connect(sigc::mem_fun(*this, &GrayScalePlotPage::updateImage));
+	_polQPButton.set_icon_name("showqp");
+	_polPQButton.set_tooltip_text("Display statistics for the QP polarization. Depending on the polarization configuration of the measurement set, this will show YX or LR.");
+	toolbar.append(_polQPButton);
 
-	_polYYButton.signal_clicked().connect(sigc::mem_fun(*this, &GrayScalePlotPage::updateImage));
-	_polYYButton.set_tooltip_text("YY polarization");
-	toolbar.append(_polYYButton);
+	_polQQButton.signal_clicked().connect(sigc::mem_fun(*this, &GrayScalePlotPage::updateImage));
+	_polQQButton.set_icon_name("showqq");
+	_polQQButton.set_tooltip_text("Display statistics for the QQ polarization. Depending on the polarization configuration of the measurement set, this will show YY or LL.");
+	toolbar.append(_polQQButton);
 
 	_polIButton.signal_clicked().connect(sigc::mem_fun(*this, &GrayScalePlotPage::updateImage));
 	_polIButton.set_tooltip_text("Stokes I polarization");
@@ -207,13 +221,13 @@ void GrayScalePlotPage::updateImage()
 
 PolarizationEnum GrayScalePlotPage::getSelectedPolarization() const
 {
-	if(_polXXButton.get_active())
+	if(_polPPButton.get_active())
 		return Polarization::XX;
-	else if(_polXYButton.get_active())
+	else if(_polPQButton.get_active())
 		return Polarization::XY;
-	else if(_polYXButton.get_active())
+	else if(_polQPButton.get_active())
 		return Polarization::YX;
-	else if(_polYYButton.get_active())
+	else if(_polQQButton.get_active())
 		return Polarization::YY;
 	else
 		return Polarization::StokesI;

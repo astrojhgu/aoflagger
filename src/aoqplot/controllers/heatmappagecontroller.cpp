@@ -86,14 +86,16 @@ Image2D HeatMapPageController::normalizeYAxis(const Image2D& input)
 
 void HeatMapPageController::setToPolarization(TimeFrequencyData &data, PolarizationEnum polarisation)
 {
-	try {
+	if( (polarisation == Polarization::StokesI && data.HasPolarization(Polarization::XX) && data.HasPolarization(Polarization::YY))
+			||
+			(polarisation != Polarization::StokesI && data.HasPolarization(polarisation)))
+	{
 		data = data.Make(polarisation);
 		if(polarisation == Polarization::StokesI)
 			data.MultiplyImages(0.5);
-	} catch(std::exception& e)
-	{
-		// probably a conversion error -- polarisation was not available.
-		// Best solution is probably to ignore.
+	}
+	else {
+		data.SetImagesToZero();
 	}
 }
 

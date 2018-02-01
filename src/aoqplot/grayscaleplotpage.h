@@ -84,7 +84,7 @@ class GrayScalePlotPage : public PlotSheet {
 		Gtk::RadioToolButton _countButton, _meanButton, _stdDevButton, _dCountButton, _dMeanButton, _dStdDevButton, _rfiPercentageButton;
 		
 		Gtk::RadioButtonGroup _polGroup;
-		Gtk::RadioToolButton _polXXButton, _polXYButton, _polYXButton, _polYYButton, _polIButton;
+		Gtk::RadioToolButton _polPPButton, _polPQButton, _polQPButton, _polQQButton, _polIButton;
 		
 		Gtk::RadioButtonGroup _phaseGroup;
 		Gtk::RadioToolButton _amplitudePhaseButton, _phasePhaseButton, _realPhaseButton, _imaginaryPhaseButton;
