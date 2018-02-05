@@ -9,7 +9,7 @@
 
 class Plot {
 	public:
-		[[ deprecated("Superceded by plot2d class") ]]
+		//[[ deprecated("Superceded by plot2d class") ]]
 		explicit Plot(const std::string &pdfFile);
 		~Plot();
 		void StartLine() { StartLine(""); }
