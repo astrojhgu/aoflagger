@@ -530,7 +530,7 @@ bool FitsFile::HasGroupParameter(const std::string &parameterName, int number)
 	return false;
 }
 
-bool FitsFile::HasTableColumn(const std::string &columnName, int columnIndex)
+bool FitsFile::HasTableColumn(const std::string &columnName, int& columnIndex)
 {
 	int colCount = GetColumnCount();
 	for(int i=1;i<=colCount;++i)

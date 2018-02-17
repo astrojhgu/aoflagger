@@ -82,7 +82,10 @@ namespace rfiStrategy {
       
 			// find number of bands
 			_file->MoveToHDU(2);
-			int ifColumn = _file->GetTableColumnIndex("IF");
+			int ifColumn = 0;
+			bool hasIF = _file->HasTableColumn("IF", ifColumn);
+			if(!hasIF)
+				ifColumn = _file->GetTableColumnIndex("IFNUM");
 			int rowCount = _file->GetRowCount();
 			std::set<int> ifSet;
 			for(int i=1;i<=rowCount;++i)
@@ -371,8 +374,11 @@ namespace rfiStrategy {
 			freqRefPixColumn = _file->GetTableColumnIndex("CRPIX1"),
 			freqDeltaColumn = _file->GetTableColumnIndex("CDELT1"),
 			freqResColumn = _file->GetTableColumnIndex("FREQRES"),
-			freqBandwidthColumn = _file->GetTableColumnIndex("BANDWID"),
-			ifColumn = _file->GetTableColumnIndex("IF");
+			freqBandwidthColumn = _file->GetTableColumnIndex("BANDWID");
+		int ifColumn = 0;
+		bool hasIF = _file->HasTableColumn("IF", ifColumn);
+		if(!hasIF)
+			ifColumn = _file->GetTableColumnIndex("IFNUM");
 		//int
 		//	beamColumn = 0;
 		//const bool hasBeamColumn = _file->HasTableColumn("BEAM", beamColumn);
@@ -505,8 +511,11 @@ namespace rfiStrategy {
 		Logger::Debug << "Writing single dish table for band " << ifIndex << " with " << _file->GetRowCount() << " rows.\n";
 		const int
 			dataColumn = _file->GetTableColumnIndex("DATA"),
-			flagColumn = _file->GetTableColumnIndex("FLAGGED"),
-			ifColumn = _file->GetTableColumnIndex("IF");
+			flagColumn = _file->GetTableColumnIndex("FLAGGED");
+		int ifColumn = 0;
+		bool hasIF = _file->HasTableColumn("IF", ifColumn);
+		if(!hasIF)
+			ifColumn = _file->GetTableColumnIndex("IFNUM");
 		const int
 			freqCount = _file->GetTableDimensionSize(dataColumn, 0),
 			polarizationCount = _file->GetTableDimensionSize(dataColumn, 1);
