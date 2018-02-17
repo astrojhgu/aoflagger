@@ -366,16 +366,18 @@ namespace rfiStrategy {
 		const int rowCount = _file->GetRowCount();
 		Logger::Debug << "Found single dish table with " << rowCount << " rows.\n";
 		const int
-			timeColumn = _file->GetTableColumnIndex("TIME"),
 			dateObsColumn = _file->GetTableColumnIndex("DATE-OBS"),
 			dataColumn = _file->GetTableColumnIndex("DATA"),
-			flagColumn = _file->GetTableColumnIndex("FLAGGED"),
 			freqValColumn = _file->GetTableColumnIndex("CRVAL1"),
 			freqRefPixColumn = _file->GetTableColumnIndex("CRPIX1"),
 			freqDeltaColumn = _file->GetTableColumnIndex("CDELT1"),
 			freqResColumn = _file->GetTableColumnIndex("FREQRES"),
 			freqBandwidthColumn = _file->GetTableColumnIndex("BANDWID");
-		int ifColumn = 0;
+		int timeColumn;
+		bool hasTime = _file->HasTableColumn("TIME", timeColumn); // optional
+		int flagColumn;
+		bool hasFlags = _file->HasTableColumn("FLAGGED", flagColumn); // optional
+		int ifColumn;
 		bool hasIF = _file->HasTableColumn("IF", ifColumn);
 		if(!hasIF)
 			ifColumn = _file->GetTableColumnIndex("IFNUM");
@@ -395,6 +397,8 @@ namespace rfiStrategy {
 		Logger::Debug << "Shape of data cells: " << freqCount << " channels x " << polarizationCount << " pols x " << raCount << " RAs x " << decCount << " decs" << "=" << totalSize << '\n';
 		std::vector<long double> cellData(totalSize);
 		std::unique_ptr<bool[]> flagData(new bool[totalSize]);
+		for(size_t i=0; i!=totalSize; ++i)
+			flagData[i] = false;
 		std::vector<Image2DPtr> images(polarizationCount);
 		std::vector<Mask2DPtr> masks(polarizationCount);
 		for(int i=0;i<polarizationCount;++i)
@@ -413,12 +417,16 @@ namespace rfiStrategy {
 			
 			if(ifNumber == requestedIFNumber)
 			{
-				_file->ReadTableCell(row, timeColumn, &time, 1);
+				if(hasTime)
+				{
+					_file->ReadTableCell(row, timeColumn, &time, 1);
+					observationTimes[timeIndex] = time;
+				}
 				_file->ReadTableCell(row, dateObsColumn, &date, 1);
 				_file->ReadTableCell(row, dataColumn, &cellData[0], totalSize);
-				_file->ReadTableCell(row, flagColumn, &flagData[0], totalSize);
+				if(hasFlags)
+					_file->ReadTableCell(row, flagColumn, &flagData[0], totalSize);
 			
-				observationTimes[timeIndex] = time;
 				
 				if(!hasBand)
 				{
@@ -472,8 +480,11 @@ namespace rfiStrategy {
 			images[p]->SetTrim(0, 0, timeIndex, images[p]->Height());
 			masks[p].reset(new Mask2D(masks[p]->Trim(0, 0, timeIndex, images[p]->Height())));
 		}
-		observationTimes.resize(timeIndex);
-		metaData.SetObservationTimes(observationTimes);
+		if(hasTime)
+		{
+			observationTimes.resize(timeIndex);
+			metaData.SetObservationTimes(observationTimes);
+		}
 		if(polarizationCount == 1)
 		{
 			data = TimeFrequencyData(TimeFrequencyData::AmplitudePart, Polarization::StokesI, images[0]);
