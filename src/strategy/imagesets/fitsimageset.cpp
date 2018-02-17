@@ -397,7 +397,7 @@ namespace rfiStrategy {
 		Logger::Debug << "Shape of data cells: " << freqCount << " channels x " << polarizationCount << " pols x " << raCount << " RAs x " << decCount << " decs" << "=" << totalSize << '\n';
 		std::vector<long double> cellData(totalSize);
 		std::unique_ptr<bool[]> flagData(new bool[totalSize]);
-		for(size_t i=0; i!=totalSize; ++i)
+		for(int i=0; i!=totalSize; ++i)
 			flagData[i] = false;
 		std::vector<Image2DPtr> images(polarizationCount);
 		std::vector<Mask2DPtr> masks(polarizationCount);
@@ -494,7 +494,11 @@ namespace rfiStrategy {
 			data = TimeFrequencyData(TimeFrequencyData::AmplitudePart, Polarization::XX, images[0], Polarization::YY, images[1]);
 			data.SetIndividualPolarizationMasks(masks[0], masks[1]);
 		}
-		else throw std::runtime_error("Don't know how to convert polarizations in file");
+		else {
+			std::ostringstream s;
+			s << "SDFits file has " << polarizationCount << " polarizations: don't know how to convert these";
+			throw std::runtime_error(s.str());
+		}
 	}
 	
 	void FitsImageSet::AddWriteFlagsTask(const ImageSetIndex &index, std::vector<Mask2DCPtr> &flags)
