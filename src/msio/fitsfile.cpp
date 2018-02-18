@@ -569,7 +569,19 @@ int FitsFile::GetTableColumnArraySize(int columnIndex)
 	return repeat;
 }
 
-long FitsFile::GetTableDimensionSize(int columnIndex, int dimension)
+std::vector<long> FitsFile::GetColumnDimensions(int columnIndex)
+{
+	CheckOpen();
+	int naxis = 0, status = 0;
+	constexpr int maxdim = 10;
+	std::vector<long> axes(maxdim, 0);
+	fits_read_tdim(_fptr, columnIndex, maxdim, &naxis, axes.data(), &status);
+	CheckStatus(status);
+	axes.resize(naxis);
+	return axes;
+}
+
+long FitsFile::GetColumnDimensionSize(int columnIndex, int dimension)
 {
 	CheckOpen();
 	int naxis = 0, status = 0, maxdim = 10;
@@ -577,7 +589,22 @@ long FitsFile::GetTableDimensionSize(int columnIndex, int dimension)
 	for(size_t i=0;i!=10;++i) naxes[i] = 0;
 	fits_read_tdim(_fptr, columnIndex, maxdim, &naxis, naxes, &status);
 	CheckStatus(status);
+	if(dimension >= naxis)
+		throw FitsIOException("Requested dimension index not available in fits file");
 	return naxes[dimension];
+}
+
+std::string FitsFile::GetTableDimensionName(int index)
+{
+	CheckOpen();
+	std::ostringstream name;
+	name << "CTYPE" << (index+1);
+	int status = 0;
+	char valueStr[256], commentStr[256];
+	fits_read_key(_fptr, TSTRING, name.str().c_str(), valueStr, commentStr, &status);
+	CheckStatus(status);
+	std::string val(valueStr);
+	return val;
 }
 
 void FitsFile::ReadTableCell(int row, int col, double *output, size_t size)

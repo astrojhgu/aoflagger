@@ -10,6 +10,7 @@
 #include <fitsio.h>
 #include <string>
 #include <exception>
+#include <vector>
 
 #include <math.h>
 
@@ -170,8 +171,7 @@ class FitsFile {
 		FitsFile::ImageType GetCurrentImageType();
 		
 		/**
-		 * Retrieve the number of dimensions of an image. This is often more than
-		 * 2, although the FITS file actually contains (several) 2D images.
+		 * Retrieve the number of dimensions of an image.
 		 * @return The number of dimensions.
 		 * @see GetCurrentImageSize()
 		 * @throws FitsIOException in case reading failed due to an IO error.
@@ -252,7 +252,9 @@ class FitsFile {
 		bool HasTableColumn(const std::string &columnName, int& columnIndex);
 		int GetTableColumnIndex(const std::string &columnName);
 		int GetTableColumnArraySize(int columnIndex);
-		long GetTableDimensionSize(int columnIndex, int dimension);
+		std::string GetTableDimensionName(int index);
+		std::vector<long> GetColumnDimensions(int columnIndex);
+		long GetColumnDimensionSize(int columnIndex, int dimension);
 		int GetGroupParameterIndex(const std::string &parameterName);
 		int GetGroupParameterIndex(const std::string &parameterName, int number);
 		bool HasGroupParameter(const std::string &parameterName);

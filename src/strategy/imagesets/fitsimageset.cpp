@@ -381,14 +381,19 @@ namespace rfiStrategy {
 		bool hasIF = _file->HasTableColumn("IF", ifColumn);
 		if(!hasIF)
 			ifColumn = _file->GetTableColumnIndex("IFNUM");
-		//int
-		//	beamColumn = 0;
-		//const bool hasBeamColumn = _file->HasTableColumn("BEAM", beamColumn);
-		const int
-			freqCount = _file->GetTableDimensionSize(dataColumn, 0),
-			polarizationCount = _file->GetTableDimensionSize(dataColumn, 1),
-			raCount = _file->GetTableDimensionSize(dataColumn, 2),
-			decCount = _file->GetTableDimensionSize(dataColumn, 3);
+		std::vector<long> axisDims = _file->GetColumnDimensions(dataColumn);
+		int freqCount = 1, polarizationCount = 1, raCount = 1, decCount = 1;
+		for(size_t i=0; i!=axisDims.size(); ++i) {
+			std::string name = _file->GetTableDimensionName(i);
+			if(name == "FREQ")
+				freqCount = axisDims[i];
+			else if(name == "STOKES")
+				polarizationCount = axisDims[i];
+			else if(name == "RA")
+				raCount = axisDims[i];
+			else if(name == "DEC")
+				decCount = axisDims[i];
+		}
 			
 		const std::string telescopeName = _file->GetKeywordValue("TELESCOP");
 		_antennaInfos[0].name = telescopeName;
@@ -532,8 +537,8 @@ namespace rfiStrategy {
 		if(!hasIF)
 			ifColumn = _file->GetTableColumnIndex("IFNUM");
 		const int
-			freqCount = _file->GetTableDimensionSize(dataColumn, 0),
-			polarizationCount = _file->GetTableDimensionSize(dataColumn, 1);
+			freqCount = _file->GetColumnDimensionSize(dataColumn, 0),
+			polarizationCount = _file->GetColumnDimensionSize(dataColumn, 1);
 			
 		const int totalSize = _file->GetTableColumnArraySize(dataColumn);
 		const int rowCount = _file->GetRowCount();
