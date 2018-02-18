@@ -603,8 +603,7 @@ std::string FitsFile::GetTableDimensionName(int index)
 	char valueStr[256], commentStr[256];
 	fits_read_key(_fptr, TSTRING, name.str().c_str(), valueStr, commentStr, &status);
 	std::string val;
-	if(status) {
-		CheckStatus(status);
+	if(!status) {
 		val = valueStr;
 	}
 	return val;
@@ -620,26 +619,24 @@ void FitsFile::ReadTableCell(int row, int col, double *output, size_t size)
 
 void FitsFile::ReadTableCell(int row, int col, long double *output, size_t size)
 {
-	double *data = new double[size];
+	std::vector<double> data(size);
 	int status = 0;
 	double nulValue = std::numeric_limits<double>::quiet_NaN();
 	int anynul = 0;
-	fits_read_col(_fptr, TDOUBLE, col, row, 1, size, &nulValue, data, &anynul, &status);
+	fits_read_col(_fptr, TDOUBLE, col, row, 1, size, &nulValue, data.data(), &anynul, &status);
 	for(size_t i = 0;i<size;++i)
 		output[i] = data[i];
-	delete[] data;
 }
 
 void FitsFile::ReadTableCell(int row, int col, bool *output, size_t size)
 {
-	char *data = new char[size];
+	std::vector<char> data(size);
 	int status = 0;
 	char nulValue = 0;
 	int anynul = 0;
-	fits_read_col(_fptr, TBIT, col, row, 1, size, &nulValue, data, &anynul, &status);
+	fits_read_col(_fptr, TBIT, col, row, 1, size, &nulValue, data.data(), &anynul, &status);
 	for(size_t i = 0;i<size;++i)
 		output[i] = data[i]!=0;
-	delete[] data;
 }
 
 void FitsFile::ReadTableCell(int row, int col, char *output)
@@ -659,12 +656,11 @@ void FitsFile::WriteTableCell(int row, int col, double *data, size_t size)
 
 void FitsFile::WriteTableCell(int row, int col, const bool *data, size_t size)
 {
-	char *dataChar = new char[size];
+	std::vector<char> dataChar(size);
 	int status = 0;
 	for(size_t i = 0;i<size;++i)
 	{
 		dataChar[i] = data[i] ? 1 : 0;
 	}
-	fits_write_col(_fptr, TBIT, col, row, 1, size, dataChar, &status);
-	delete[] dataChar;
+	fits_write_col(_fptr, TBIT, col, row, 1, size, dataChar.data(), &status);
 }
