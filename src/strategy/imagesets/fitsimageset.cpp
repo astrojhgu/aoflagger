@@ -382,7 +382,7 @@ namespace rfiStrategy {
 		if(!hasIF)
 			ifColumn = _file->GetTableColumnIndex("IFNUM");
 		std::vector<long> axisDims = _file->GetColumnDimensions(dataColumn);
-		int freqCount = 1, polarizationCount = 1, raCount = 1, decCount = 1;
+		int freqCount = 0, polarizationCount = 0, raCount = 0, decCount = 0;
 		for(size_t i=0; i!=axisDims.size(); ++i) {
 			std::string name = _file->GetTableDimensionName(i);
 			if(name == "FREQ")
@@ -394,11 +394,18 @@ namespace rfiStrategy {
 			else if(name == "DEC")
 				decCount = axisDims[i];
 		}
-			
+		const int totalSize = _file->GetTableColumnArraySize(dataColumn);
+		if(freqCount == 0)
+		{
+			freqCount = totalSize;
+			polarizationCount = 1;
+			raCount = 1;
+			decCount = 1;
+		}
+		
 		const std::string telescopeName = _file->GetKeywordValue("TELESCOP");
 		_antennaInfos[0].name = telescopeName;
 			
-		const int totalSize = _file->GetTableColumnArraySize(dataColumn);
 		Logger::Debug << "Shape of data cells: " << freqCount << " channels x " << polarizationCount << " pols x " << raCount << " RAs x " << decCount << " decs" << "=" << totalSize << '\n';
 		std::vector<long double> cellData(totalSize);
 		std::unique_ptr<bool[]> flagData(new bool[totalSize]);
@@ -431,7 +438,7 @@ namespace rfiStrategy {
 				_file->ReadTableCell(row, dataColumn, &cellData[0], totalSize);
 				if(hasFlags)
 					_file->ReadTableCell(row, flagColumn, &flagData[0], totalSize);
-			
+				
 				
 				if(!hasBand)
 				{
