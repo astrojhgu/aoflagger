@@ -602,8 +602,11 @@ std::string FitsFile::GetTableDimensionName(int index)
 	int status = 0;
 	char valueStr[256], commentStr[256];
 	fits_read_key(_fptr, TSTRING, name.str().c_str(), valueStr, commentStr, &status);
-	CheckStatus(status);
-	std::string val(valueStr);
+	std::string val;
+	if(status) {
+		CheckStatus(status);
+		val = valueStr;
+	}
 	return val;
 }
 
