@@ -305,7 +305,26 @@ void HeatMapPlot::update(Cairo::RefPtr<Cairo::Context> cairo, unsigned width, un
 		startX = (unsigned int) round(_startHorizontal * _image->Width()),
 		startY = (unsigned int) round(_startVertical * _image->Height()),
 		endX = (unsigned int) round(_endHorizontal * _image->Width()),
-		endY = (unsigned int) round(_endVertical * _image->Height()),
+		endY = (unsigned int) round(_endVertical * _image->Height());
+	if(startX >= endX)
+	{
+		endX = startX+1;
+		if(endX >= _image->Width())
+		{
+			startX -= endX - _image->Width();
+			endX = _image->Width();
+		}
+	}
+	if(startY >= endY)
+	{
+		endY = startY+1;
+		if(endY >= _image->Height())
+		{
+			startY -= endY - _image->Height();
+			endY = _image->Height();
+		}
+	}
+	unsigned int
 		startTimestep = startX,
 		endTimestep = endX;
 	size_t
