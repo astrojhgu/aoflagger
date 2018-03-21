@@ -38,7 +38,9 @@ namespace aoflagger {
 		/** @brief Parkes, the single dish telescope in New South Wales. */
 		PARKES_TELESCOPE,
 		/** @brief WSRT, the Westerbork Synthesis Radio Telescope in the Netherlands. */
-		WSRT_TELESCOPE
+		WSRT_TELESCOPE,
+		/** @brief The AARTFAAC telescope, correlating the superterp antennas of LOFAR. */
+		AARTFAAC_TELESCOPE
 	};
 
 	/** @brief Lists the flags that can be used to alter a default strategy.
