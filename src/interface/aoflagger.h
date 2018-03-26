@@ -171,6 +171,9 @@ namespace aoflagger {
 		public:
 			friend class AOFlagger;
 			
+			/** @brief Construct an empty ImageSet. */
+			ImageSet();
+			
 			/** @brief Copy the image set. Only references to images are copied. */
 			ImageSet(const ImageSet& sourceImageSet);
 			
@@ -284,6 +287,11 @@ namespace aoflagger {
 		public:
 			friend class AOFlagger;
 			
+			/** @brief Construct an empty FlagMask.
+			 * The properties of empty FlagMask can not be accessed.
+			 */
+			FlagMask();
+			
 			/** @brief Copy a flag mask. Only copies a reference, not the data. */
 			FlagMask(const FlagMask& sourceMask);
 			
@@ -333,7 +341,6 @@ namespace aoflagger {
 			const bool *Buffer() const;
 			
 		private:
-			FlagMask();
 			FlagMask(size_t width, size_t height);
 			FlagMask(size_t width, size_t height, bool initialValue);
 			
