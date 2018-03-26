@@ -461,16 +461,16 @@ void actionSummarize(const std::string &filename)
 	HistogramCollection histogramCollection;
 	if(remote)
 	{
-		aoRemote::ClusteredObservation *observation = aoRemote::ClusteredObservation::Load(filename);
+		std::unique_ptr<aoRemote::ClusteredObservation> observation =
+			aoRemote::ClusteredObservation::Load(filename);
 		aoRemote::ProcessCommander commander(*observation);
 		commander.PushReadQualityTablesTask(&statisticsCollection, &histogramCollection);
 		commander.Run();
-		delete observation;
 	}
 	else {
-		MeasurementSet *ms = new MeasurementSet(filename);
+		std::unique_ptr<MeasurementSet> ms(new MeasurementSet(filename));
 		const unsigned polarizationCount = ms->PolarizationCount();
-		delete ms;
+		ms.reset();
 		
 		statisticsCollection.SetPolarizationCount(polarizationCount);
 		QualityTablesFormatter qualityData(filename);

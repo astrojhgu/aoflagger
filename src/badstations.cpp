@@ -23,25 +23,24 @@ void checkStations(const std::string &filename)
 	std::vector<AntennaInfo> antennae;
 	if(remote)
 	{
-		aoRemote::ClusteredObservation *observation = aoRemote::ClusteredObservation::Load(filename);
+		std::unique_ptr<aoRemote::ClusteredObservation> observation =
+			aoRemote::ClusteredObservation::Load(filename);
 		aoRemote::ProcessCommander commander(*observation);
 		commander.PushReadAntennaTablesTask();
 		commander.PushReadQualityTablesTask(&statisticsCollection, &histogramCollection);
 		commander.Run();
 		antennae = commander.Antennas();
-		delete observation;
 	}
 	else {
-		MeasurementSet *ms = new MeasurementSet(filename);
-		const unsigned polarizationCount = ms->PolarizationCount();
+		MeasurementSet ms(filename);
+		const unsigned polarizationCount = ms.PolarizationCount();
 		
 		statisticsCollection.SetPolarizationCount(polarizationCount);
 		QualityTablesFormatter qualityData(filename);
 		statisticsCollection.Load(qualityData);
-		unsigned antennaCount = ms->AntennaCount();
+		unsigned antennaCount = ms.AntennaCount();
 		for(unsigned a=0;a<antennaCount;++a)
-			antennae.push_back(ms->GetAntennaInfo(a));
-		delete ms;
+			antennae.push_back(ms.GetAntennaInfo(a));
 	}
 	
 	rfiStrategy::BaselineSelector selector;
