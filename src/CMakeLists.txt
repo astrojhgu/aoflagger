@@ -154,6 +154,7 @@ set(STRATEGY_ACTION_FILES
   strategy/actions/writeflagsaction.cpp)
 
 set(STRATEGY_ALGORITHMS_FILES
+  strategy/algorithms/antennaselector.cpp
   strategy/algorithms/baselineselector.cpp
 	strategy/algorithms/baselinetimeplaneimager.cpp
   strategy/algorithms/combinatorialthresholder.cpp
