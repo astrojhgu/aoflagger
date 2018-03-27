@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "strategy/algorithms/baselineselector.h"
+#include "strategy/algorithms/antennaselector.h"
 
 #include "structures/measurementset.h"
 
@@ -15,7 +15,7 @@
 
 #include "quality/histogramtablesformatter.h"
 
-void checkStations(const std::string &filename)
+void checkStations(const std::string& filename)
 {
 	bool remote = aoRemote::ClusteredObservation::IsClusteredFilename(filename);
 	StatisticsCollection statisticsCollection;
@@ -43,6 +43,10 @@ void checkStations(const std::string &filename)
 			antennae.push_back(ms.GetAntennaInfo(a));
 	}
 	
+	rfiStrategy::AntennaSelector selector;
+	std::vector<size_t> badStations = selector.Run(statisticsCollection);
+	
+	/*
 	rfiStrategy::BaselineSelector selector;
 	selector.SetUseLog(true);
 	
@@ -61,11 +65,12 @@ void checkStations(const std::string &filename)
 	
 	selector.Search(markedBaselines);
 	selector.ImplyStations(markedBaselines, 0.3, badStations);
+	*/
 	
 	std::cout << "List of " << badStations.size() << " bad stations:\n";
-	for(std::set<unsigned>::const_iterator i=badStations.begin();i!=badStations.end();++i)
+	for(size_t ant : badStations)
 	{
-		std::cout << antennae[*i].name << " (" << *i << ")\n";
+		std::cout << antennae[ant].name << " (" << ant << ")\n";
 	}
 }
 
