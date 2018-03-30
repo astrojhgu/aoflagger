@@ -5,6 +5,7 @@
 #include "../testingtools/unittest.h"
 
 #include "../../strategy/algorithms/combinatorialthresholder.h"
+#include "../../strategy/algorithms/polarizationstatistics.h"
 #include "../../strategy/algorithms/testsetgenerator.h"
 #include "../../strategy/algorithms/siroperator.h"
 
@@ -127,6 +128,8 @@ inline void DefaultStrategySpeedTest::prepareStrategy(rfiStrategy::ArtifactSet &
 inline void DefaultStrategySpeedTest::TimeStrategy::operator()()
 {
 	rfiStrategy::ArtifactSet artifacts(0);
+	artifacts.SetPolarizationStatistics(std::unique_ptr<PolarizationStatistics>(
+		new PolarizationStatistics() ));
 	std::unique_ptr<rfiStrategy::Strategy> strategy = rfiStrategy::DefaultStrategy::CreateStrategy(
 		rfiStrategy::DefaultStrategy::GENERIC_TELESCOPE, rfiStrategy::DefaultStrategy::FLAG_NONE
 	);
@@ -453,10 +456,9 @@ inline void DefaultStrategySpeedTest::TimeSSEHighPassFilterStrategy::operator()(
 	current->Add(std::move(t2));
 
 	std::unique_ptr<rfiStrategy::CombineFlagResults> cfr2(new rfiStrategy::CombineFlagResults());
-	current->Add(std::move(cfr2));
-
 	cfr2->Add(std::unique_ptr<rfiStrategy::FrequencySelectionAction>(new rfiStrategy::FrequencySelectionAction()));
 	cfr2->Add(std::unique_ptr<rfiStrategy::TimeSelectionAction>(new rfiStrategy::TimeSelectionAction()));
+	current->Add(std::move(cfr2));
 
 	current->Add(std::unique_ptr<rfiStrategy::SetImageAction>(new rfiStrategy::SetImageAction()));
 	std::unique_ptr<rfiStrategy::ChangeResolutionAction>
@@ -500,6 +502,8 @@ inline void DefaultStrategySpeedTest::TimeSSEHighPassFilterStrategy::operator()(
 	block.Add(std::move(orWithOriginals));
 
 	rfiStrategy::ArtifactSet artifacts(0);
+	artifacts.SetPolarizationStatistics(std::unique_ptr<PolarizationStatistics>(
+		new PolarizationStatistics() ));
 	prepareStrategy(artifacts);
 	DummyProgressListener progressListener;
 	Stopwatch watch(true);
