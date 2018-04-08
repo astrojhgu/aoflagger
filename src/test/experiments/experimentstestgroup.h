@@ -22,7 +22,7 @@ class ExperimentsTestGroup : public TestGroup {
 			// Optionals:
 			//Add(new RankOperatorROCExperiment());
 			//Add(new FilterResultsTest());
-			Add(new ScaleInvariantDilationExperiment());
+			//Add(new ScaleInvariantDilationExperiment());
 		}
 };
 

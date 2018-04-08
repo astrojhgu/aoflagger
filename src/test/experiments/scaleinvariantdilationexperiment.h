@@ -37,7 +37,7 @@ class ScaleInvariantDilationExperiment : public UnitTest {
 		};*/
 };
 
-const unsigned ScaleInvariantDilationExperiment::_repeatCount = 100;
+const unsigned ScaleInvariantDilationExperiment::_repeatCount = 3;
 
 inline void ScaleInvariantDilationExperiment::TestTimingN::operator()()
 {
