@@ -104,6 +104,7 @@ void ThresholdConfig::Execute(const Image2D* image, Mask2D* mask, bool additive,
 
 	if(!additive)
 		mask->SetAll<false>();
+	Mask2D scratch(*mask);
 
 	size_t operationCount = _horizontalOperations.size() > _verticalOperations.size() ?
 		_horizontalOperations.size() : _verticalOperations.size();
@@ -116,11 +117,11 @@ void ThresholdConfig::Execute(const Image2D* image, Mask2D* mask, bool additive,
 				if(_verbose)
 					std::cout << "Performing SumThreshold with length " << _horizontalOperations[i].length 
 						<< ", threshold " << _horizontalOperations[i].threshold*factor << "..." << std::endl;
-				CombinatorialThresholder::HorizontalSumThresholdLarge(image, mask, _horizontalOperations[i].length, _horizontalOperations[i].threshold*factor);
+				CombinatorialThresholder::HorizontalSumThresholdLarge(image, mask, &scratch, _horizontalOperations[i].length, _horizontalOperations[i].threshold*factor);
 			}
 			
 			if(i < _verticalOperations.size())
-				CombinatorialThresholder::VerticalSumThresholdLarge(image, mask, _verticalOperations[i].length, _verticalOperations[i].threshold*factor);
+				CombinatorialThresholder::VerticalSumThresholdLarge(image, mask, &scratch, _verticalOperations[i].length, _verticalOperations[i].threshold*factor);
 			break;
 			case VarThreshold:
 			if(i < _horizontalOperations.size())
