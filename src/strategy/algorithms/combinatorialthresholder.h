@@ -9,8 +9,6 @@
 
 class CombinatorialThresholder {
 	public:
-		//static void Threshold(class Image2D &image, num_t threshold);
-
 		template<size_t Length>
 		static void HorizontalSumThreshold(const Image2D* input, Mask2D* mask, num_t threshold);
 		
@@ -54,9 +52,9 @@ class CombinatorialThresholder {
 #if defined(__AVX2__)
 			VerticalSumThresholdLargeAVX(input, mask, scratch, length, threshold);
 #elif defined(__SSE__)
-			VerticalSumThresholdLargeSSE(input, mask, length, threshold);
+			VerticalSumThresholdLargeSSE(input, mask, scratch, length, threshold);
 #else
-			VerticalSumThresholdLargeReference(input, mask, length, threshold);
+			VerticalSumThresholdLargeReference(input, mask, scratch, length, threshold);
 #endif
 		}
 		
@@ -66,7 +64,7 @@ class CombinatorialThresholder {
 		
 		static void HorizontalSumThresholdLarge(const Image2D* input, Mask2D* mask, Mask2D* scratch, size_t length, num_t threshold)
 		{
-#ifdef USE_INTRINSICS
+#ifdef __SSE__
 			HorizontalSumThresholdLargeSSE(input, mask, scratch, length, threshold);
 #else
 			HorizontalSumThresholdLargeReference(input, mask, scratch, length, threshold);

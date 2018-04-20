@@ -11,7 +11,7 @@ CHECK_CXX_SYMBOL_EXISTS(exp10 "cmath" HAVE_EXP10)
 # -march=native speeds up the flagger with about 6% - 7%, but is not supported prior gcc 4.2.
 # Hence, only enable it if it is supported.
 if(PORTABLE)
-  message(STATUS "Portable build requested; a generic build will be created with slightly decreased performance")
+  message(STATUS "Portable build requested; a generic build will be created with slightly decreased performance.")
 else()	
 	CHECK_CXX_COMPILER_FLAG("-march=native" COMPILER_SUPPORTS_MARCH_NATIVE)
 	if(COMPILER_SUPPORTS_MARCH_NATIVE)

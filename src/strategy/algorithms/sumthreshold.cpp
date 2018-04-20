@@ -604,10 +604,6 @@ void CombinatorialThresholder::VerticalSumThresholdLargeAVX(const Image2D* input
 	std::swap(*mask, *scratch);
 }
 
-#else
-#warning "AVX2 optimization of SumThreshold algorithm is not used"
-#endif
-
 template
 void CombinatorialThresholder::VerticalSumThresholdLargeAVX<2>(const Image2D* input, Mask2D* mask, Mask2D* scratch, num_t threshold);
 template
@@ -624,3 +620,7 @@ template
 void CombinatorialThresholder::VerticalSumThresholdLargeAVX<128>(const Image2D* input, Mask2D* mask, Mask2D* scratch, num_t threshold);
 template
 void CombinatorialThresholder::VerticalSumThresholdLargeAVX<256>(const Image2D* input, Mask2D* mask, Mask2D* scratch, num_t threshold);
+
+#else
+#warning "AVX2 optimization of SumThreshold algorithm is not used"
+#endif
