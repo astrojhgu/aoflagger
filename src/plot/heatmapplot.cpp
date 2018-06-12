@@ -477,7 +477,7 @@ void HeatMapPlot::update(Cairo::RefPtr<Cairo::Context> cairo, unsigned width, un
 	if(_highlighting)
 	{
 		highlightMask = Mask2D::CreateSetMaskPtr<false>(image->Width(), image->Height());
-		_highlightConfig->Execute(image.get(), highlightMask.get(), true, 10.0);
+		_highlightConfig->Execute(image.get(), highlightMask.get(), true, 10.0, 10.0);
 	}
 	const bool
 		originalActive = _showOriginalMask && originalMask != 0,

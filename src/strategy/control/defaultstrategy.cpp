@@ -213,7 +213,8 @@ namespace rfiStrategy {
 		current = scratch;
 		
 		std::unique_ptr<SumThresholdAction> t1(new SumThresholdAction());
-		t1->SetBaseSensitivity(sumThresholdSensitivity);
+		t1->SetTimeDirectionSensitivity(sumThresholdSensitivity);
+		t1->SetFrequencyDirectionSensitivity(sumThresholdSensitivity);
 		if(keepTransients)
 			t1->SetFrequencyDirectionFlagging(false);
 		current->Add(std::move(t1));
@@ -265,7 +266,8 @@ namespace rfiStrategy {
 			current->Add(std::unique_ptr<CalibratePassbandAction>(new CalibratePassbandAction()));
 		
 		std::unique_ptr<SumThresholdAction> t2(new SumThresholdAction());
-		t2->SetBaseSensitivity(sumThresholdSensitivity);
+		t2->SetTimeDirectionSensitivity(sumThresholdSensitivity);
+		t2->SetFrequencyDirectionSensitivity(sumThresholdSensitivity);
 		if(keepTransients)
 			t2->SetFrequencyDirectionFlagging(false);
 		current->Add(std::move(t2));

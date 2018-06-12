@@ -24,7 +24,7 @@ PythonStrategy::PythonStrategy() : _code(
 	"      print(\'Flagging polarization \' + str(polarization) + \' (\' + str(representation) + \')\')\n"
 	"      repr_data = pol_data.convert_to_polarization(polarization)\n"
 	"      \n"
-	"      aoflagger.sumthreshold(repr_data, 1.0, True, True)\n"
+	"      aoflagger.sumthreshold(repr_data, 1.0, 1.0, True, True)\n"
 	"\n"
 	"aoflagger.set_flag_function(flag)\n"
 	"\n"
