@@ -136,7 +136,8 @@ inline rfiStrategy::Strategy* RankOperatorROCExperiment::createThresholdStrategy
 	
 	std::unique_ptr<rfiStrategy::SumThresholdAction> t2(
 		new rfiStrategy::SumThresholdAction());
-	t2->SetBaseSensitivity(1.0);
+	t2->SetTimeDirectionSensitivity(1.0);
+	t2->SetFrequencyDirectionSensitivity(1.0);
 	current->Add(std::move(t2));
 
 	current->Add(std::unique_ptr<rfiStrategy::SetImageAction>(

@@ -324,7 +324,8 @@ inline void DefaultStrategySpeedTest::TimeSumThreshold::operator()()
 	iteration->SetSensitivityStart(4.0);
 	
 	std::unique_ptr<rfiStrategy::SumThresholdAction> t2(new rfiStrategy::SumThresholdAction());
-	t2->SetBaseSensitivity(1.0);
+	t2->SetTimeDirectionSensitivity(1.0);
+	t2->SetFrequencyDirectionSensitivity(1.0);
 	iteration->Add(std::move(t2));
 		
 	std::unique_ptr<rfiStrategy::ChangeResolutionAction> changeResAction2(new rfiStrategy::ChangeResolutionAction());
@@ -501,7 +502,8 @@ inline void DefaultStrategySpeedTest::TimeSSEHighPassFilterStrategy::operator()(
 	current = scratch;
 	
 	std::unique_ptr<rfiStrategy::SumThresholdAction> t2(new rfiStrategy::SumThresholdAction());
-	t2->SetBaseSensitivity(1.0);
+	t2->SetTimeDirectionSensitivity(1.0);
+	t2->SetFrequencyDirectionSensitivity(1.0);
 	current->Add(std::move(t2));
 
 	std::unique_ptr<rfiStrategy::CombineFlagResults> cfr2(new rfiStrategy::CombineFlagResults());
