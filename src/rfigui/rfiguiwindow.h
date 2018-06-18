@@ -43,12 +43,12 @@ class RFIGuiWindow : public Gtk::Window, private StrategyController {
 		const TimeFrequencyData &GetOriginalData() const;
 		const TimeFrequencyData &GetContaminatedData() const;
 
-		class ImageComparisonWidget &GetTimeFrequencyWidget()
+		class HeatMapWidget& GetTimeFrequencyWidget()
 		{
 			return _timeFrequencyWidget;
 		}
 		
-		class ThresholdConfig &HighlightConfig();
+		class ThresholdConfig& HighlightConfig();
 		void SetHighlighting(bool newValue);
 		TimeFrequencyMetaDataCPtr SelectedMetaData();
 		
@@ -208,7 +208,7 @@ class RFIGuiWindow : public Gtk::Window, private StrategyController {
 		
 		Gtk::Box _mainVBox;
 		Gtk::Paned _panedArea;
-		ImageComparisonWidget _timeFrequencyWidget;
+		HeatMapWidget _timeFrequencyWidget;
 		Glib::RefPtr<Gtk::ActionGroup> _actionGroup;
 		Gtk::Statusbar _statusbar;
 		PlotFrame _plotFrame;

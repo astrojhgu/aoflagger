@@ -84,7 +84,6 @@ set(GUI_FILES
   rfigui/editstrategywindow.cpp
   rfigui/gotowindow
   rfigui/highlightwindow.cpp
-  rfigui/imagecomparisonwidget.cpp
   rfigui/imageplanewindow
   rfigui/imagepropertieswindow.cpp
   rfigui/heatmapwidget.cpp
