@@ -19,7 +19,7 @@ public:
 	size_t MouseX() { return _mouseX; }
 	size_t MouseY() { return _mouseY; }
 	
-	void Update();
+	void Update() { update(true); }
 	
 	void SavePdf(const std::string &filename)
 	{
@@ -36,13 +36,18 @@ public:
 	HeatMapPlot& Plot() { return *_plot; }
 	const HeatMapPlot& Plot() const { return *_plot; }
 private:
+	void update(bool invalidated);
 	bool onDraw(const Cairo::RefPtr<Cairo::Context>& cr);
 	bool onMotion(GdkEventMotion *event);
 	bool onLeave(GdkEventCrossing *event);
-	bool onButtonReleased(GdkEventButton *event);
+	bool onButtonPress(GdkEventButton *event);
+	bool onButtonRelease(GdkEventButton *event);
 
+	bool _invalidated;
 	bool _mouseIsIn;
-	size_t _mouseX, _mouseY;
+	int _mouseX, _mouseY;
+	bool _isButtonPressed;
+	int _bpressStartX, _bpressStartY;
 
 	sigc::signal<void, size_t, size_t> _onMouseMoved;
 	sigc::signal<void> _onMouseLeft;

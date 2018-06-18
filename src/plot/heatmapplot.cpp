@@ -766,4 +766,19 @@ bool HeatMapPlot::ConvertToUnits(double mouseX, double mouseY, int &posX, int &p
 	return inDomain;
 }
 
-
+bool HeatMapPlot::ConvertToScreen(int posX, int posY, double& mouseX, double& mouseY) const
+{
+	const unsigned int
+		startX = (unsigned int) round(_startHorizontal * _image->Width()),
+		startY = (unsigned int) round(_startVertical * _image->Height()),
+		endX = (unsigned int) round(_endHorizontal * _image->Width()),
+		endY = (unsigned int) round(_endVertical * _image->Height());
+	const unsigned
+		width = endX - startX,
+		height = endY - startY;
+	posX -= startX;
+	posY = endY - posY - 1;
+	mouseX = (posX + 0.5) * (_initializedWidth - _rightBorderSize - _leftBorderSize) / width + _leftBorderSize;
+	mouseY = (posY + 0.5) *(_initializedHeight - _bottomBorderSize - _topBorderSize) / height + _topBorderSize;
+	return true;
+}

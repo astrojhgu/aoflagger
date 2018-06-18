@@ -199,6 +199,7 @@ public:
 	sigc::signal<void> &OnZoomChanged() { return _onZoomChanged; }
 
 	bool ConvertToUnits(double mouseX, double mouseY, int &posX, int &posY) const;
+	bool ConvertToScreen(int posX, int posY, double& mouseX, double& mouseY) const;
 	
 private:
 	void redrawWithoutChanges(Cairo::RefPtr<Cairo::Context> cairo, unsigned width, unsigned height);

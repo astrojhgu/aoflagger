@@ -20,8 +20,8 @@
 
 #include "../plot/plotwidget.h"
 
+#include "heatmapwidget.h"
 #include "plotframe.h"
-#include "imagecomparisonwidget.h"
 #include "interfaces.h"
 
 #include "../imaging/defaultmodels.h"
