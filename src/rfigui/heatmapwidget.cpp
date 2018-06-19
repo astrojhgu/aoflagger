@@ -5,6 +5,7 @@ HeatMapWidget::HeatMapWidget(HeatMapPlot* plot) :
 	_mouseIsIn(false),
 	_mouseX(0), _mouseY(0),
 	_isButtonPressed(false),
+	_isZooming(false),
 	_bpressStartX(0), _bpressStartY(0),
 	_plot(plot)
 {
@@ -25,8 +26,8 @@ bool HeatMapWidget::onDraw(const Cairo::RefPtr<Cairo::Context>& cr)
 	Glib::RefPtr<Gdk::Window> window = get_window();
 	if(window && get_width() > 0 && get_height() > 0)
 	{
-		_plot->Draw(cr, get_width(), get_height(), false);
-		if(_isButtonPressed)
+		_plot->Draw(cr, get_width(), get_height(), _invalidated);
+		if(_isZooming)
 		{
 			double x1, y1, x2, y2;
 			_plot->ConvertToScreen(_bpressStartX, _bpressStartY, x1, y1);
@@ -42,11 +43,8 @@ void HeatMapWidget::update(bool invalidated) {
 	Glib::RefPtr<Gdk::Window> window = get_window();
 	if(window && get_width() > 0 && get_height() > 0)
 	{
-		//get_clip_extents();
-		//get_window()->begin_draw_frame();
-		queue_draw();
-		Cairo::RefPtr<Cairo::Context> context = get_window()->create_cairo_context();
 		_invalidated = _invalidated || invalidated;
+		queue_draw();
 	}
 }
 
@@ -100,6 +98,7 @@ bool HeatMapWidget::onButtonPress(GdkEventButton *event)
 			_mouseY = posY;
 			_bpressStartX = posX;
 			_bpressStartY = posY;
+			_isZooming = true;
 			_onButtonReleased(posX, posY);
 		}
 	}
@@ -111,7 +110,6 @@ bool HeatMapWidget::onButtonRelease(GdkEventButton *event)
 	_isButtonPressed = false;
 	if(_plot->HasImage())
 	{
-		update(false);
 		int posX, posY;
 		if(_plot->ConvertToUnits(event->x, event->y, posX, posY))
 		{
@@ -119,6 +117,13 @@ bool HeatMapWidget::onButtonRelease(GdkEventButton *event)
 			_mouseY = posY;
 			_onButtonReleased(posX, posY);
 		}
+		if(_isZooming)
+		{
+			_isZooming = false;
+			_plot->ZoomTo(_bpressStartX, _bpressStartY, _mouseX, _mouseY);
+		}
+		
+		update(true);
 	}
 	return true;
 }

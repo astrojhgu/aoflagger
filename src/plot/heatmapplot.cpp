@@ -201,6 +201,19 @@ void HeatMapPlot::ZoomOut()
 	}
 }
 
+void HeatMapPlot::ZoomTo(size_t x1, size_t y1, size_t x2, size_t y2)
+{
+	if(x1 > x2)
+		std::swap(x1, x2);
+	if(y1 > y2)
+		std::swap(y1, y2);
+	_startHorizontal = std::max(0.0, std::min(1.0, double(x1) / _image->Width()));
+	_endHorizontal = std::max(0.0, std::min(1.0, double(x2+1) / _image->Width()));
+	_startVertical = std::max(0.0, std::min(1.0, double(y1) / _image->Height()));
+	_endVertical = std::max(0.0, std::min(1.0, double(y2+1) / _image->Height()));
+	_onZoomChanged.emit();
+}
+	
 void HeatMapPlot::Draw(Cairo::RefPtr<Cairo::Context> cairo, unsigned width, unsigned height, bool isInvalidated)
 {
 	if(!isInvalidated && width == _initializedWidth && height == _initializedHeight)
