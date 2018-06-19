@@ -5,7 +5,7 @@ HeatMapWidget::HeatMapWidget(HeatMapPlot* plot) :
 	_mouseIsIn(false),
 	_mouseX(0), _mouseY(0),
 	_isButtonPressed(false),
-	_isZooming(false),
+	_isZooming(false), _isPanning(false),
 	_bpressStartX(0), _bpressStartY(0),
 	_plot(plot)
 {
@@ -32,7 +32,11 @@ bool HeatMapWidget::onDraw(const Cairo::RefPtr<Cairo::Context>& cr)
 			double x1, y1, x2, y2;
 			_plot->ConvertToScreen(_bpressStartX, _bpressStartY, x1, y1);
 			_plot->ConvertToScreen(_mouseX, _mouseY, x2, y2);
+			cr->set_line_width(2.0);
 			cr->rectangle(x1, y1, x2-x1, y2-y1);
+			cr->set_source_rgba(0.35, 0.35, 1.0, 0.4);
+			cr->fill_preserve();
+			cr->set_source_rgb(0.0, 0.0, 0.0);
 			cr->stroke();
 		}
 	}
@@ -54,11 +58,21 @@ bool HeatMapWidget::onMotion(GdkEventMotion *event)
 	{
 		int posX, posY;
 		bool isInside = _plot->ConvertToUnits(event->x, event->y, posX, posY);
-		if(_isButtonPressed)
+		if(_isZooming)
 		{
 			_mouseX = posX;
 			_mouseY = posY;
 			update(false);
+		}
+		else if(_isPanning)
+		{
+			int
+				panX = _mouseX-posX,
+				panY = _mouseY-posY;
+			_plot->Pan(panX, panY);
+			_mouseX = posX + panX;
+			_mouseY = posY + panY;
+			update(true);
 		}
 		else {
 			if(isInside)
@@ -86,7 +100,7 @@ bool HeatMapWidget::onLeave(GdkEventCrossing *event)
 	return true;
 }
 
-bool HeatMapWidget::onButtonPress(GdkEventButton *event)
+bool HeatMapWidget::onButtonPress(GdkEventButton* event)
 {
 	_isButtonPressed = true;
 	if(_plot->HasImage())
@@ -98,8 +112,10 @@ bool HeatMapWidget::onButtonPress(GdkEventButton *event)
 			_mouseY = posY;
 			_bpressStartX = posX;
 			_bpressStartY = posY;
-			_isZooming = true;
-			_onButtonReleased(posX, posY);
+			if(event->button == 1) // left
+				_isZooming = true;
+			else if(event->button == 3) // right
+				_isPanning = true;
 		}
 	}
 	return true;
@@ -110,6 +126,7 @@ bool HeatMapWidget::onButtonRelease(GdkEventButton *event)
 	_isButtonPressed = false;
 	if(_plot->HasImage())
 	{
+		int oldMouseX = _mouseX, oldMouseY = _mouseY;
 		int posX, posY;
 		if(_plot->ConvertToUnits(event->x, event->y, posX, posY))
 		{
@@ -121,6 +138,11 @@ bool HeatMapWidget::onButtonRelease(GdkEventButton *event)
 		{
 			_isZooming = false;
 			_plot->ZoomTo(_bpressStartX, _bpressStartY, _mouseX, _mouseY);
+		}
+		if(_isPanning)
+		{
+			_isPanning = false;
+			_plot->Pan(oldMouseX-posX, oldMouseY-posY);
 		}
 		
 		update(true);

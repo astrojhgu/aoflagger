@@ -214,6 +214,26 @@ void HeatMapPlot::ZoomTo(size_t x1, size_t y1, size_t x2, size_t y2)
 	_onZoomChanged.emit();
 }
 	
+void HeatMapPlot::Pan(int xDisplacement, int yDisplacement)
+{
+	double
+		dx = double(xDisplacement) / _image->Width(),
+		dy = double(yDisplacement) / _image->Height();
+	if(_startHorizontal + dx < 0.0)
+		dx = -_startHorizontal;
+	if(_startVertical + dy < 0.0)
+		dy = -_startVertical;
+	if(_endHorizontal + dx > 1.0)
+		dx = 1.0 - _endHorizontal;
+	if(_endVertical + dy > 1.0)
+		dy = 1.0 - _endVertical;
+	_startHorizontal += dx;
+	_endHorizontal += dx;
+	_startVertical += dy;
+	_endVertical += dy;
+	_onZoomChanged.emit();
+}
+	
 void HeatMapPlot::Draw(Cairo::RefPtr<Cairo::Context> cairo, unsigned width, unsigned height, bool isInvalidated)
 {
 	if(!isInvalidated && width == _initializedWidth && height == _initializedHeight)

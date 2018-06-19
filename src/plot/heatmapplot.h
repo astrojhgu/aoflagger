@@ -58,23 +58,13 @@ public:
 	}
 	enum ScaleOption ScaleOption() const { return _scaleOption; }
 	
-	void SetHorizontalDomain(double start, double end)
-	{
-		_startHorizontal = start;
-		_endHorizontal = end;
-		_onZoomChanged.emit();
-	}
-	void SetVerticalDomain(double start, double end)
-	{
-		_startVertical = start;
-		_endVertical = end;
-		_onZoomChanged.emit();
-	}
 	void ZoomFit();
 	void ZoomIn();
 	void ZoomInOn(size_t x, size_t y);
 	void ZoomOut();
 	void ZoomTo(size_t x1, size_t y1, size_t x2, size_t y2);
+	void Pan(int xDisplacement, int yDisplacement);
+	
 	double StartHorizontal() const { return _startHorizontal; }
 	double EndHorizontal() const { return _endHorizontal; }
 	double StartVertical() const { return _startVertical; }

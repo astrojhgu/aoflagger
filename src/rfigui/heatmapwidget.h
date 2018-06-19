@@ -46,7 +46,7 @@ private:
 	bool _invalidated;
 	bool _mouseIsIn;
 	int _mouseX, _mouseY;
-	bool _isButtonPressed, _isZooming;
+	bool _isButtonPressed, _isZooming, _isPanning;
 	int _bpressStartX, _bpressStartY;
 
 	sigc::signal<void, size_t, size_t> _onMouseMoved;
