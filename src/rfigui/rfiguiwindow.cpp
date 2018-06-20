@@ -79,14 +79,12 @@ RFIGuiWindow::RFIGuiWindow(RFIGuiController* controller) :
 	_timeFrequencyWidget.Plot().SetShowXAxisDescription(false);
 	_timeFrequencyWidget.Plot().SetShowYAxisDescription(false);
 	_timeFrequencyWidget.Plot().SetShowZAxisDescription(false);
-	_timeFrequencyWidget.show();
 
 	_mainVBox.pack_end(_statusbar, Gtk::PACK_SHRINK);
 	_statusbar.push("Ready. For suggestions, contact offringa@gmail.com .");
-	_statusbar.show();
 
 	add(_mainVBox);
-	_mainVBox.show();
+	_mainVBox.show_all();
 
 	set_default_size(800,600);
 	set_default_icon_name("aoflagger");
@@ -1579,20 +1577,23 @@ void RFIGuiWindow::onTimeGraphButtonPressed()
 {
 	if(_timeGraphButton->get_active())
 	{
-		_mainVBox.remove(_timeFrequencyWidget);
-		_mainVBox.pack_start(_panedArea);
-		_panedArea.pack1(_timeFrequencyWidget, true, true);
-		_panedArea.pack2(_plotFrame, true, true);
-
-		_panedArea.show();
-		_timeFrequencyWidget.show();
-		_plotFrame.show();
+		//_mainVBox.remove(_timeFrequencyWidget);
+		//_mainVBox.pack_start(_panedArea, Gtk::PACK_EXPAND_WIDGET);
+		//_panedArea.add1(_timeFrequencyWidget);
+		//_panedArea.add2(_plotFrame);
+		_mainVBox.pack_start(_plotFrame, true, true);
+		_mainVBox.show_all();
+		//_panedArea.set_position(_panedArea.get_height()/2);
+		std::cout << "size of _panedArea: " << _panedArea.get_width() <<',' << _panedArea.get_height() << '\n';
+		std::cout << "size of tf: " << _timeFrequencyWidget.get_height() << '\n';
+		std::cout << "plotframe: " << _plotFrame.get_height() << '\n';
 	} else {
-		_mainVBox.remove(_panedArea);
-		_panedArea.remove(_timeFrequencyWidget);
-		_panedArea.remove(_plotFrame);
+		//_mainVBox.remove(_panedArea);
+		//_panedArea.remove(_timeFrequencyWidget);
+		//_panedArea.remove(_plotFrame);
+		//_mainVBox.pack_start(_timeFrequencyWidget);
+		_mainVBox.remove(_plotFrame);
 
-		_mainVBox.pack_start(_timeFrequencyWidget);
 		_timeFrequencyWidget.show();
 	}
 }
