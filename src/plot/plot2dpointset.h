@@ -10,10 +10,11 @@
 
 class Plot2DPointSet{
 	public:
-		Plot2DPointSet() :
+		Plot2DPointSet(size_t colorIndex) :
 			_xIsTime(false),
 			_rotateUnits(false),
-			_drawingStyle(DrawLines)
+			_drawingStyle(DrawLines),
+			_colorIndex(colorIndex)
 		{ }
 		~Plot2DPointSet() { }
 		
@@ -209,6 +210,29 @@ class Plot2DPointSet{
 		void SetYRange(double yMin, double yMax)
 		{
 		}
+		
+		struct Color {
+			Color(double r_, double g_, double b_, double a_) :
+				r(r_), g(g_), b(b_), a(a_)
+			{
+			}
+			double r,g,b,a;
+		};
+		
+		Color GetColor() const
+		{
+			switch(_colorIndex%8)
+			{
+				case 0: return Color(1, 0, 0, 1);
+				case 1: return Color(0, 1, 0, 1);
+				case 2: return Color(0, 0, 1, 1);
+				case 3: return Color(0, 0, 0, 1);
+				case 4: return Color(1, 1, 0, 1);
+				case 5: return Color(1, 0, 1, 1); 
+				case 6: return Color(0, 1, 1, 1);
+				case 7: return Color(0.5, 0.5, 0.5, 1);
+			}
+		}
 	private:
 		struct Point2D
 		{
@@ -233,6 +257,7 @@ class Plot2DPointSet{
 		std::vector<std::string> _tickLabels;
 		bool _rotateUnits;
 		enum DrawingStyle _drawingStyle;
+		size_t _colorIndex;
 };
 
 #endif

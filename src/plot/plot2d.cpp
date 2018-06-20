@@ -138,22 +138,11 @@ void Plot2D::render(Cairo::RefPtr<Cairo::Context> cr)
 			horiScaleHeight = 0.0;
 		}
 		
-		for(std::unique_ptr<Plot2DPointSet>& set : _pointSets)
+		for(size_t i=0; i!=_pointSets.size(); ++i)
 		{
-			switch(c)
-			{
-				case 0: cr->set_source_rgba(1, 0, 0, 1); break;
-				case 1: cr->set_source_rgba(0, 1, 0, 1); break;
-				case 2: cr->set_source_rgba(0, 0, 1, 1); break;
-				case 3: cr->set_source_rgba(0, 0, 0, 1); break;
-				case 4: cr->set_source_rgba(1, 1, 0, 1); break;
-				case 5: cr->set_source_rgba(1, 0, 1, 1); break;
-				case 6: cr->set_source_rgba(0, 1, 1, 1); break;
-				case 7: cr->set_source_rgba(0.5, 0.5, 0.5, 1); break;
-			}
-			c = (c+1)%8;
-
-			render(cr, *set);
+			auto c = _pointSets[i]->GetColor();
+			cr->set_source_rgba(c.r, c.g, c.b, c.a);
+			render(cr, *_pointSets[i]);
 		}
 		
 		double rightMargin;

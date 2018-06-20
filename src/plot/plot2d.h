@@ -23,7 +23,7 @@ public:
 	void Clear();
 	Plot2DPointSet &StartLine(const std::string &label, const std::string &xDesc = "x", const std::string &yDesc = "y", bool xIsTime = false, enum Plot2DPointSet::DrawingStyle drawingStyle = Plot2DPointSet::DrawLines)
 	{
-		_pointSets.emplace_back(new Plot2DPointSet());
+		_pointSets.emplace_back(new Plot2DPointSet(_pointSets.size()));
 		Plot2DPointSet& newSet = *_pointSets.back();
 		newSet.SetLabel(label);
 		newSet.SetXIsTime(xIsTime);
