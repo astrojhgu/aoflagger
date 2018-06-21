@@ -77,7 +77,7 @@ void HeatMapPlot::Clear()
 	_isInitialized = false;
 }
 
-void HeatMapPlot::redrawWithoutChanges(Cairo::RefPtr<Cairo::Context> cairo, unsigned width, unsigned height)
+void HeatMapPlot::redrawWithoutChanges(const Cairo::RefPtr<Cairo::Context>& cairo, unsigned width, unsigned height)
 {
 	cairo->set_source_rgb(1.0, 1.0, 1.0);
 	cairo->set_line_width(1.0);
@@ -233,8 +233,8 @@ void HeatMapPlot::Pan(int xDisplacement, int yDisplacement)
 	_endVertical += dy;
 	_onZoomChanged.emit();
 }
-	
-void HeatMapPlot::Draw(Cairo::RefPtr<Cairo::Context> cairo, unsigned width, unsigned height, bool isInvalidated)
+
+void HeatMapPlot::Draw(const Cairo::RefPtr<Cairo::Context>& cairo, unsigned width, unsigned height, bool isInvalidated)
 {
 	if(!isInvalidated && width == _initializedWidth && height == _initializedHeight)
 		redrawWithoutChanges(cairo, width, height);
@@ -330,7 +330,7 @@ void HeatMapPlot::SaveText(const std::string &filename)
 	}
 }
 
-void HeatMapPlot::update(Cairo::RefPtr<Cairo::Context> cairo, unsigned width, unsigned height)
+void HeatMapPlot::update(const Cairo::RefPtr<Cairo::Context>& cairo, unsigned width, unsigned height)
 {
 	Mask2DCPtr mask = GetActiveMask(), originalMask = _originalMask, alternativeMask = _alternativeMask;
 	

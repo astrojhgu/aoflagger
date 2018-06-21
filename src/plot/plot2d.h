@@ -6,6 +6,7 @@
 #include <stdexcept>
 #include <string>
 
+#include "legend.h"
 #include "plotable.h"
 #include "plot2dpointset.h"
 #include "system.h"
@@ -204,9 +205,10 @@ public:
 	
 	const std::string& Title() const { return _title.Text(); }
 private:
-	void render(Cairo::RefPtr<Cairo::Context> cr);
-	void render(Cairo::RefPtr<Cairo::Context> cr, Plot2DPointSet &pointSet);
+	void render(Cairo::RefPtr<Cairo::Context>& cr);
+	void render(Cairo::RefPtr<Cairo::Context>& cr, Plot2DPointSet &pointSet);
 
+	Legend _legend;
 	HorizontalPlotScale _horizontalScale;
 	VerticalPlotScale _verticalScale;
 	std::vector<std::unique_ptr<Plot2DPointSet>> _pointSets;

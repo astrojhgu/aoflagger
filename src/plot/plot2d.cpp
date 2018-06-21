@@ -72,7 +72,7 @@ void Plot2D::SavePng(const std::string &filename)
 	surface->write_to_png(filename);
 }
 
-void Plot2D::render(Cairo::RefPtr<Cairo::Context> cr)
+void Plot2D::render(Cairo::RefPtr<Cairo::Context>& cr)
 {
 	_system.Clear();
 	for(std::unique_ptr<Plot2DPointSet>& set : _pointSets)
@@ -86,8 +86,6 @@ void Plot2D::render(Cairo::RefPtr<Cairo::Context> cr)
 
 	if(!_pointSets.empty())
 	{
-		size_t c = 0;
-	
 		Plot2DPointSet &refPointSet = **_pointSets.begin();
 		
 		double verticalScaleWidth, horiScaleHeight;
@@ -100,6 +98,7 @@ void Plot2D::render(Cairo::RefPtr<Cairo::Context> cr)
 			_title.SetPlotDimensions(_width, _height, _topMargin);
 			titleHeight = _title.GetHeight(cr);
 		}
+		
 		if(_showAxes)
 			_topMargin += std::max(10.0, titleHeight);
 		else
@@ -154,6 +153,11 @@ void Plot2D::render(Cairo::RefPtr<Cairo::Context> cr)
 		} else {
 			rightMargin = 0.0;
 		}
+		_legend.Initialize(cr, *this);
+		// For top left:
+		//_legend.SetPosition(verticalScaleWidth+10, _topMargin+10);
+		_legend.SetPosition(_width - rightMargin-10 - _legend.Width(), _topMargin+10);
+		
 		if(!_title.Text().empty())
 		{
 			_title.Draw(cr);
@@ -162,10 +166,12 @@ void Plot2D::render(Cairo::RefPtr<Cairo::Context> cr)
 		cr->set_source_rgb(0.0, 0.0, 0.0);
 		cr->rectangle(verticalScaleWidth, _topMargin, _width - verticalScaleWidth - rightMargin, _height - horiScaleHeight - _topMargin);
 		cr->stroke();
+		
+		_legend.Draw(cr, *this);
 	}
 }
 
-void Plot2D::render(Cairo::RefPtr<Cairo::Context> cr, Plot2DPointSet &pointSet)
+void Plot2D::render(Cairo::RefPtr<Cairo::Context>& cr, Plot2DPointSet& pointSet)
 {
 	pointSet.Sort();
 
@@ -326,5 +332,6 @@ void Plot2D::render(Cairo::RefPtr<Cairo::Context> cr, Plot2DPointSet &pointSet)
 		cr->line_to(plotWidth + plotLeftMargin, yMax * plotHeight / (yMax - yMin) + _topMargin);
 		cr->stroke();
 	}
+	
 	cr->reset_clip();
 }

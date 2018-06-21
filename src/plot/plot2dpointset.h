@@ -223,6 +223,7 @@ class Plot2DPointSet{
 		{
 			switch(_colorIndex%8)
 			{
+				default:
 				case 0: return Color(1, 0, 0, 1);
 				case 1: return Color(0, 1, 0, 1);
 				case 2: return Color(0, 0, 1, 1);

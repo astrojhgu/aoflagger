@@ -31,7 +31,7 @@ public:
 	TFMap GetColorMap() const { return _colorMap; }
 	void SetColorMap(TFMap colorMap) { _colorMap = colorMap; }
 	
-	void Draw(Cairo::RefPtr<Cairo::Context> cairo, unsigned width, unsigned height, bool isInvalidated); 
+	void Draw(const Cairo::RefPtr<Cairo::Context>& cairo, unsigned width, unsigned height, bool isInvalidated); 
 
 	Image2DCPtr Image() const { return _image; }
 	void SetImage(Image2DCPtr image) { _image = image; }
@@ -193,7 +193,7 @@ public:
 	bool ConvertToScreen(int posX, int posY, double& mouseX, double& mouseY) const;
 	
 private:
-	void redrawWithoutChanges(Cairo::RefPtr<Cairo::Context> cairo, unsigned width, unsigned height);
+	void redrawWithoutChanges(const Cairo::RefPtr<Cairo::Context>& cairo, unsigned width, unsigned height);
 
 	bool _isInitialized;
 	unsigned _initializedWidth, _initializedHeight;
@@ -232,7 +232,7 @@ private:
 	std::unique_ptr<class ThresholdConfig> _highlightConfig;
 	
 	void findMinMax(const Image2D* image, const Mask2D* mask, num_t& min, num_t& max);
-	void update(Cairo::RefPtr<Cairo::Context> cairo, unsigned width, unsigned height);
+	void update(const Cairo::RefPtr<Cairo::Context>& cairo, unsigned width, unsigned height);
 	void downsampleImageBuffer(unsigned newWidth, unsigned newHeight);
 	std::unique_ptr<class ColorMap> createColorMap();
 	std::string actualTitleText() const

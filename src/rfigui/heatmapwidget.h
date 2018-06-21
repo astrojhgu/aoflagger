@@ -21,15 +21,15 @@ public:
 	
 	void Update() { update(true); }
 	
-	void SavePdf(const std::string &filename)
+	void SavePdf(const std::string& filename)
 	{
 		_plot->SavePdf(filename, get_width(), get_height());
 	}
-	void SaveSvg(const std::string &filename)
+	void SaveSvg(const std::string& filename)
 	{
 		_plot->SaveSvg(filename, get_width(), get_height());
 	}
-	void SavePng(const std::string &filename)
+	void SavePng(const std::string& filename)
 	{
 		_plot->SavePng(filename, get_width(), get_height());
 	}

@@ -72,6 +72,7 @@ set(PLOT_FILES
   plot/colorscale.cpp
   plot/heatmapplot.cpp
   plot/horizontalplotscale.cpp
+  plot/legend.cpp
   plot/plot2d.cpp
   plot/plotpropertieswindow.cpp
   plot/title.cpp
