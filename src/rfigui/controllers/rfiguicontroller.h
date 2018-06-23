@@ -127,7 +127,6 @@ class RFIGuiController
 		void PlotPowerSpectrumComparison();
 		void PlotFrequencyScatter();
 		void PlotPowerRMS();
-		void PlotPowerSNR();
 		void PlotPowerTime();
 		void PlotPowerTimeComparison();
 		void PlotTimeScatter();
@@ -142,8 +141,8 @@ class RFIGuiController
 		
 		TimeFrequencyData ActiveData() const;
 		TimeFrequencyData OriginalData() const;
-		TimeFrequencyData RevisedData() const;
-		TimeFrequencyData ContaminatedData() const;
+		//TimeFrequencyData RevisedData() const;
+		//TimeFrequencyData ContaminatedData() const;
 		
 		TimeFrequencyMetaDataCPtr SelectedMetaData() const;
 		
@@ -181,6 +180,7 @@ class RFIGuiController
 		void GetAvailablePolarizations(bool& pp, bool& pq, bool& qp, bool& qq) const;
 		
 		void InterpolateFlagged();
+		
 	private:
 		void plotMeanSpectrum(bool weight);
 		

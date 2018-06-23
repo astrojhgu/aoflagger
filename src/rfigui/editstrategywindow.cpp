@@ -90,16 +90,11 @@ EditStrategyWindow::EditStrategyWindow(StrategyController &strategyController)
 	fillStore();
 }
 
-EditStrategyWindow::~EditStrategyWindow()
-{
-	delete _addMenu;
-}
-
 void EditStrategyWindow::initEditButtons()
 {
 	_strategyEditButtonBox.pack_start(_addActionButton);
 	_addActionButton.set_sensitive(false);
-	_addMenu = new AddStrategyActionMenu(*this);
+	_addMenu.reset( new AddStrategyActionMenu(*this) );
 	_addActionButton.set_menu(*_addMenu);
 
 	_strategyEditButtonBox.pack_start(_moveUpButton);

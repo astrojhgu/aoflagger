@@ -617,7 +617,7 @@ class TimeFrequencyData
 
 		static TimeFrequencyData MakeFromPolarizationCombination(const TimeFrequencyData &xx, const TimeFrequencyData &xy, const TimeFrequencyData &yx, const TimeFrequencyData &yy);
 
-		static TimeFrequencyData MakeFromPolarizationCombination(const TimeFrequencyData &xx, const TimeFrequencyData &yy);
+		static TimeFrequencyData MakeFromPolarizationCombination(const TimeFrequencyData &first, const TimeFrequencyData &second);
 
 		void SetImagesToZero();
 		template<bool Value>

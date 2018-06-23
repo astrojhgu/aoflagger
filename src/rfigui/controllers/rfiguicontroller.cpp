@@ -59,6 +59,7 @@ TimeFrequencyData RFIGuiController::OriginalData() const
 	return _tfController.OriginalData();
 }
 
+/*
 TimeFrequencyData RFIGuiController::RevisedData() const
 {
 	return _tfController.RevisedData();
@@ -67,7 +68,7 @@ TimeFrequencyData RFIGuiController::RevisedData() const
 TimeFrequencyData RFIGuiController::ContaminatedData() const
 {
 	return _tfController.ContaminatedData();
-}
+}*/
 
 TimeFrequencyMetaDataCPtr RFIGuiController::SelectedMetaData() const
 {
@@ -183,7 +184,7 @@ void RFIGuiController::PlotPowerSpectrumComparison()
 		Plot2DPointSet &originalSet = plot.StartLine("Original");
 		RFIPlots::MakePowerSpectrumPlot(originalSet, image, mask, SelectedMetaData());
 
-		data = ContaminatedData();
+		data = ActiveData();
 		image = data.GetSingleImage();
 		mask = data.GetSingleMask();
 		Plot2DPointSet &alternativeSet = plot.StartLine("Alternative");
@@ -233,36 +234,6 @@ void RFIGuiController::PlotPowerRMS()
 	}
 }
 
-void RFIGuiController::PlotPowerSNR()
-{
-	Image2DCPtr
-		image = ActiveData().GetSingleImage(),
-		model = RevisedData().GetSingleImage();
-	if(IsImageLoaded())
-	{
-		Plot2D &plot = _plotManager->NewPlot2D("SNR spectrum");
-		plot.SetLogarithmicYAxis(true);
-
-		Mask2DPtr mask =
-			Mask2D::CreateSetMaskPtr<false>(image->Width(), image->Height());
-		Plot2DPointSet &totalPlot = plot.StartLine("Total");
-		RFIPlots::MakeSNRSpectrumPlot(totalPlot, image, model, mask);
-
-		mask = Mask2D::MakePtr(*ActiveData().GetSingleMask());
-		if(!mask->AllFalse())
-		{
-			Plot2DPointSet &uncontaminatedPlot = plot.StartLine("Uncontaminated");
-			RFIPlots::MakeSNRSpectrumPlot(uncontaminatedPlot, image, model, mask);
-	
-			mask->Invert();
-			Plot2DPointSet &rfiPlot = plot.StartLine("RFI");
-			RFIPlots::MakeSNRSpectrumPlot(rfiPlot, image, model, mask);
-		}
-
-		_plotManager->Update();
-	}
-}
-
 void RFIGuiController::PlotPowerTime()
 {
 	if(IsImageLoaded())
@@ -304,7 +275,7 @@ void RFIGuiController::PlotPowerTimeComparison()
 		Plot2DPointSet &originalPlot = plot.StartLine("Original");
 		RFIPlots::MakePowerTimePlot(originalPlot, image, mask, SelectedMetaData());
 
-		data = ContaminatedData();
+		data = ActiveData();
 		mask = data.GetSingleMask();
 		image = data.GetSingleImage();
 		Plot2DPointSet &alternativePlot = plot.StartLine("Original");
@@ -332,7 +303,7 @@ void RFIGuiController::PlotTimeScatterComparison()
 	{
 		MultiPlot plot(_plotManager->NewPlot2D("Time scatter comparison"), 8);
 		RFIPlots::MakeTimeScatterPlot(plot, OriginalData(), SelectedMetaData(), 0);
-		RFIPlots::MakeTimeScatterPlot(plot, ContaminatedData(), SelectedMetaData(), 4);
+		RFIPlots::MakeTimeScatterPlot(plot, ActiveData(), SelectedMetaData(), 4);
 		plot.Finish();
 		_plotManager->Update();
 	}
@@ -435,9 +406,12 @@ void RFIGuiController::OpenTestSet(unsigned index, bool gaussianTestSets)
 
 void RFIGuiController::ExecutePythonStrategy()
 {
+	_tfController.ClearAllButOriginal();
 	TimeFrequencyData data = OriginalData(); 
+	
 	_pythonStrategy.Execute(data);
-	_tfController.SetContaminatedData(data);
+	
+	_tfController.AddVisualization("Script result", data);
 	_rfiGuiWindow->GetTimeFrequencyWidget().Update();
 }
 
@@ -504,11 +478,6 @@ void RFIGuiController::LoadCurrentTFData()
 			_rfiGuiWindow->SetBaselineInfo(multipleBaselines, name, description);
 		}
 	}
-}
-
-void RFIGuiController::SetRevisedData(const TimeFrequencyData& data)
-{
-	_tfController.SetRevisedData(data);
 }
 
 void RFIGuiController::LoadPath(const std::string& filename)

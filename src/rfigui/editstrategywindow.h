@@ -21,7 +21,6 @@ class EditStrategyWindow : public Gtk::Window
 {
 	public:
 		explicit EditStrategyWindow(class StrategyController &strategyController);
-		~EditStrategyWindow();
 
 		void AddAction(std::unique_ptr<rfiStrategy::Action> newAction);
 		void UpdateAction(rfiStrategy::Action *action);
@@ -84,7 +83,7 @@ class EditStrategyWindow : public Gtk::Window
 		Gtk::ScrolledWindow _viewScrollWindow;
 		Gtk::TreeView _view;
 		Glib::RefPtr<Gtk::TreeStore> _store;
-		Gtk::Menu *_addMenu;
+		std::unique_ptr<Gtk::Menu> _addMenu;
 		bool _disableUpdates;
 
 		Gtk::Frame *_rightFrame;

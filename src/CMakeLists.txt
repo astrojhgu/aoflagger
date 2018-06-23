@@ -151,6 +151,7 @@ set(STRATEGY_ACTION_FILES
   strategy/actions/svdaction.cpp
   strategy/actions/timeconvolutionaction.cpp
   strategy/actions/timeselectionaction.cpp
+  strategy/actions/visualizeaction.cpp
   strategy/actions/writeflagsaction.cpp)
 
 set(STRATEGY_ALGORITHMS_FILES

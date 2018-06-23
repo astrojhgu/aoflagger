@@ -14,16 +14,21 @@
 
 class ImageComparisonController {
 	public:
-		enum TFImage { TFOriginalImage, TFRevisedImage, TFContaminatedImage };
 		ImageComparisonController();
 		void SetNewData(const class TimeFrequencyData &image, TimeFrequencyMetaDataCPtr metaData);
 
 		TimeFrequencyData GetActiveData() const;
 
-		TimeFrequencyData &OriginalData() { return _original; }
-		const TimeFrequencyData &OriginalData() const { return _original; }
+		TimeFrequencyData &OriginalData() { return _dataList.front().data; }
+		const TimeFrequencyData &OriginalData() const { return _dataList.front().data; }
 
-		TimeFrequencyData &RevisedData() { return _revised; }
+		size_t AddVisualization(const std::string& label, const TimeFrequencyData& data)
+		{
+			_dataList.emplace_back(label, data);
+			return _dataList.size() - 1;
+		}
+		
+		/*TimeFrequencyData &RevisedData() { return _revised; }
 		const TimeFrequencyData &RevisedData() const { return _revised; }
 
 		void SetRevisedData(const TimeFrequencyData &data)
@@ -38,12 +43,23 @@ class ImageComparisonController {
 			_contaminated = data;
 			_plot.SetAlternativeMask(data.GetSingleMask());
 		  updateVisualizedImage();
-		} 
-		void SetVisualizedImage(TFImage visualizedImage)
+		}*/
+		TimeFrequencyData& VisualizedData() { return _dataList[_visualizedImage].data; }
+		const TimeFrequencyData& VisualizedData() const { return _dataList[_visualizedImage].data; }
+		size_t VisualizedIndex() const { return _visualizedImage; }
+		const TimeFrequencyData& GetVisualizedData(size_t index) const { return _dataList[index].data; }
+		const std::string& GetVisualizedLabel(size_t index) { return _dataList[index].label; }
+		size_t VisualizationCount() const { return _dataList.size(); }
+		
+		void SetVisualization(size_t visualizationIndex)
 		{
-			if(_visualizedImage != visualizedImage)
+			if(_visualizedImage != visualizationIndex)
 			{
-				_visualizedImage = visualizedImage;
+				_visualizedImage = visualizationIndex;
+				if(_visualizedImage == 0)
+					_plot.SetAlternativeMask(_dataList.back().data.GetSingleMask());
+				else
+					_plot.SetAlternativeMask(_dataList[_visualizedImage].data.GetSingleMask());
 				updateVisualizedImage();
 			}
 		}
@@ -59,47 +75,41 @@ class ImageComparisonController {
 				updateVisualizedImage();
 			}
 		}
-		void ClearBackground();
+		
+		void ClearAllButOriginal();
+		
 		HeatMapPlot& Plot() { return _plot; }
 		const HeatMapPlot& Plot() const { return _plot; }
 	private:
-		TimeFrequencyData* getSelectedData();
 		void getFirstAvailablePolarization(bool& pp, bool& pq, bool& qp, bool& qq) const;
-		const TimeFrequencyData* getSelectedData() const;
 		void updateVisualizedImage();
-		const TimeFrequencyData getActiveDataWithOriginalFlags() const
-		{
-			switch(_visualizedImage)
-			{
-				case TFOriginalImage:
-				default:
-					return _original;
-				case TFRevisedImage:
-					return _revised;
-				case TFContaminatedImage:
-					return _contaminated;
-			}
-		}
 		void setActiveMask(TimeFrequencyData& data) const
 		{
-			bool orActive = _plot.ShowOriginalMask() && _original.MaskCount()!=0;
-			bool altActive = _plot.ShowAlternativeMask() && _contaminated.MaskCount()!=0;
+			bool orActive = _plot.ShowOriginalMask() && _dataList[0].data.MaskCount()!=0;
+			bool altActive = _plot.ShowAlternativeMask() && _visualizedImage!=0 && _dataList[_visualizedImage].data.MaskCount()!=0;
 			if(orActive && altActive)
 			{
-				data.SetMask(_original);
-				data.JoinMask(_contaminated);
+				data.SetMask(_dataList[0].data);
+				data.JoinMask(_dataList[_visualizedImage].data);
 			}
 			else if(orActive)
-				data.SetMask(_original);
+				data.SetMask(_dataList[0].data);
 			else if(altActive)
-				data.SetMask(_contaminated);
+				data.SetMask(_dataList[_visualizedImage].data);
 			else
 				data.SetMasksToValue<false>();
 		}
 		HeatMapPlot _plot;
-		enum TFImage _visualizedImage;
 		bool _showPP, _showPQ, _showQP, _showQQ;
-		TimeFrequencyData _original, _revised, _contaminated;
+		size_t _visualizedImage;
+		struct DataEntry
+		{
+			DataEntry(const std::string& _label, const TimeFrequencyData& _data)
+			{ label = _label; data = _data; }
+			std::string label;
+			TimeFrequencyData data;
+		};
+		std::vector<DataEntry> _dataList;
 		TimeFrequencyMetaDataCPtr _metaData;
 };
 

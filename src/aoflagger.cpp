@@ -317,14 +317,14 @@ int main(int argc, char **argv)
 		
 		overallStrategy.InitializeAll();
 		overallStrategy.StartPerformThread(artifacts, progress);
-		rfiStrategy::ArtifactSet *set = overallStrategy.JoinThread();
+		std::unique_ptr<rfiStrategy::ArtifactSet> set = overallStrategy.JoinThread();
 		overallStrategy.FinishAll();
 
 		set->AntennaFlagCountPlot().Report();
 		set->FrequencyFlagCountPlot().Report();
 		set->PolarizationStatistics().Report();
 
-		delete set;
+		set.reset();
 
 		Logger::Debug << "Time: " << watch.ToString() << "\n";
 		

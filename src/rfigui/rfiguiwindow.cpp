@@ -98,6 +98,8 @@ RFIGuiWindow::RFIGuiWindow(RFIGuiController* controller) :
 	
 	_controller->SignalStateChange().connect(
 		sigc::mem_fun(*this, &RFIGuiWindow::onControllerStateChange));
+	
+	updateTFVisualizationMenu();
 }
 
 RFIGuiWindow::~RFIGuiWindow()
@@ -206,13 +208,9 @@ TimeFrequencyData RFIGuiWindow::GetActiveData() const
 {
 	return _controller->TFController().GetActiveData();
 }
-const TimeFrequencyData &RFIGuiWindow::GetOriginalData() const
+const TimeFrequencyData& RFIGuiWindow::GetOriginalData() const
 {
 	return _controller->TFController().OriginalData();
-}
-const TimeFrequencyData &RFIGuiWindow::GetContaminatedData() const
-{
-	return _controller->TFController().ContaminatedData();
 }
 class ThresholdConfig &RFIGuiWindow::HighlightConfig()
 {
@@ -295,7 +293,7 @@ void RFIGuiWindow::onExecuteStrategyPressed()
 	if(HasImage())
 	{
 		artifacts.SetOriginalData(GetOriginalData());
-		artifacts.SetContaminatedData(GetContaminatedData());
+		artifacts.SetContaminatedData(GetActiveData());
 		TimeFrequencyData zero(GetOriginalData());
 		zero.SetImagesToZero();
 		artifacts.SetRevisedData(zero);
@@ -307,6 +305,7 @@ void RFIGuiWindow::onExecuteStrategyPressed()
 		artifacts.SetImageSet(_controller->GetImageSet().Clone());
 		artifacts.SetImageSetIndex(_controller->GetImageSetIndex().Clone());
 	}
+	artifacts.SetCanVisualize(true);
 	_strategy->InitializeAll();
 	try {
 		_strategy->StartPerformThread(artifacts, static_cast<ProgressWindow&>(*_progressWindow));
@@ -318,21 +317,28 @@ void RFIGuiWindow::onExecuteStrategyPressed()
 
 void RFIGuiWindow::onExecuteStrategyFinished()
 {
-	rfiStrategy::ArtifactSet *artifacts = _strategy->JoinThread();
-	if(artifacts != nullptr)
+	std::unique_ptr<rfiStrategy::ArtifactSet> artifacts = _strategy->JoinThread();
+	_controller->TFController().ClearAllButOriginal();
+	if(artifacts)
 	{
 		bool update = false;
-		if(!artifacts->RevisedData().IsEmpty())
+		
+		const auto& vis = artifacts->Visualizations();
+		for(const auto& v : vis)
 		{
-			_controller->TFController().SetRevisedData(artifacts->RevisedData());
+			_controller->TFController().AddVisualization(v.first, v.second);
 			update = true;
 		}
-
+		
 		if(!artifacts->ContaminatedData().IsEmpty())
 		{
-			_controller->TFController().SetContaminatedData(artifacts->ContaminatedData());
+			size_t index = 
+				_controller->TFController().AddVisualization("Estimated RFI", artifacts->ContaminatedData());
+			_controller->TFController().SetVisualization(index);
 			update = true;
 		}
+		
+		updateTFVisualizationMenu();
 		
 		if(update)
 			_timeFrequencyWidget.Update();
@@ -351,24 +357,11 @@ void RFIGuiWindow::onExecuteStrategyFinished()
 			artifacts->PolarizationStatistics().Report();
 		if(artifacts->IterationsPlot().HasData())
 			artifacts->IterationsPlot().MakePlot();
-		
-		delete artifacts;
 	}
 	if(_closeExecuteFrameButton->get_active())
 	{
 		_progressWindow.reset();
 	}
-}
-
-void RFIGuiWindow::onToggleImage()
-{
-	ImageComparisonController::TFImage image = ImageComparisonController::TFOriginalImage;
-	if(_backgroundImageButton->get_active())
-		image = ImageComparisonController::TFRevisedImage;
-	else if(_diffImageButton->get_active())
-		image = ImageComparisonController::TFContaminatedImage;
-	_controller->TFController().SetVisualizedImage(image);
-	_timeFrequencyWidget.Update();
 }
 
 void RFIGuiWindow::UpdateImageSetIndex()
@@ -518,8 +511,6 @@ void RFIGuiWindow::createToolbar()
 	_actionGroup->add( Gtk::Action::create("PlotRMSSpectrum", "Plot _rms spectrum"),
 		Gtk::AccelKey("<alt>R"),
 		sigc::mem_fun(*this, &RFIGuiWindow::onPlotPowerRMSPressed) );
-	_actionGroup->add( Gtk::Action::create("PlotSNRSpectrum", "Plot spectrum snr"),
-		sigc::mem_fun(*this, &RFIGuiWindow::onPlotPowerSNRPressed) );
 	_actionGroup->add( Gtk::Action::create("PlotPowerTime", "Plot power vs _time"),
 		Gtk::AccelKey("<alt>T"),
 		sigc::mem_fun(*this, &RFIGuiWindow::onPlotPowerTimePressed) );
@@ -683,31 +674,30 @@ void RFIGuiWindow::createToolbar()
 	_toggleConnections.push_back(_showQQButton->signal_activate().connect(sigc::mem_fun(*this, &RFIGuiWindow::onTogglePolarizations)));
 	_actionGroup->add(_showQQButton);
 	
-	Gtk::RadioButtonGroup imageGroup;
-	_originalImageButton = Gtk::RadioAction::create(imageGroup, "ImageOriginal", "Original");
-	_originalImageButton->set_active(true);
-	_originalImageButton->set_icon_name("showoriginalvisibilities");
-	_originalImageButton->set_tooltip("Display the original visibilities (before any processing)");
-	_backgroundImageButton = Gtk::RadioAction::create(imageGroup, "ImageBackground", "Background");
+	//Gtk::RadioButtonGroup imageGroup;
+	//_originalImageButton = Gtk::Action::create("ImageOriginal", "Original");
+	//_originalImageButton->set_active(true);
+	//_originalImageButton->set_icon_name("showoriginalvisibilities");
+	//_originalImageButton->set_tooltip("Display the original visibilities (before any processing)");
+	/*_backgroundImageButton = Gtk::RadioAction::create(imageGroup, "ImageBackground", "Background");
 	_backgroundImageButton->set_icon_name("showsmoothedvisibilities");
 	_backgroundImageButton->set_tooltip("Display the smoothed visibilities (only available if strategy has run and has created smoothed visibilities)");
 	_diffImageButton = Gtk::RadioAction::create(imageGroup, "ImageDiff", "Difference");
 	_diffImageButton->set_icon_name("showresidualvisibilities");
-	_diffImageButton->set_tooltip("Display the residual visibilities (only available if strategy has run and has created residual visibilities)");
-	_actionGroup->add(_originalImageButton,
+	_diffImageButton->set_tooltip("Display the residual visibilities (only available if strategy has run and has created residual visibilities)");*/
+	//_actionGroup->add(_originalImageButton);
+	/*,
 		Gtk::AccelKey("<control>1"),
-		sigc::mem_fun(*this, &RFIGuiWindow::onToggleImage) );
+		sigc::mem_fun(*this, &RFIGuiWindow::onOpenVisualizationMenu) );
 	_actionGroup->add(_backgroundImageButton,
 		Gtk::AccelKey("<control>2"),
-		sigc::mem_fun(*this, &RFIGuiWindow::onToggleImage) );
+		sigc::mem_fun(*this, &RFIGuiWindow::onOpenVisualizationMenu) );
 	_actionGroup->add(_diffImageButton,
 		Gtk::AccelKey("<control>3"),
-		sigc::mem_fun(*this, &RFIGuiWindow::onToggleImage) );
+		sigc::mem_fun(*this, &RFIGuiWindow::onOpenVisualizationMenu) );*/
 
-	_actionGroup->add( Gtk::Action::create("DiffToOriginal", "Diff->Original"),
-  sigc::mem_fun(*this, &RFIGuiWindow::onDifferenceToOriginalPressed) );
-	_actionGroup->add( Gtk::Action::create("BackToOriginal", "Background->Original"),
-  sigc::mem_fun(*this, &RFIGuiWindow::onBackgroundToOriginalPressed) );
+	_actionGroup->add( Gtk::Action::create("VisToOriginal", "Current->Original"),
+  sigc::mem_fun(*this, &RFIGuiWindow::onVisualizedToOriginalPressed) );
 
 	_actionGroup->add( Gtk::Action::create("KeepReal", "Keep _real part"),
 		Gtk::AccelKey("<control>,"),
@@ -881,7 +871,6 @@ void RFIGuiWindow::createToolbar()
     "      <menuitem action='PlotPowerSpectrum'/>"
     "      <menuitem action='PlotFrequencyScatter'/>"
     "      <menuitem action='PlotRMSSpectrum'/>"
-    "      <menuitem action='PlotSNRSpectrum'/>"
     "      <menuitem action='PlotPowerTime'/>"
     "      <menuitem action='PlotTimeScatter'/>"
     "      <menuitem action='PlotSingularValues'/>"
@@ -915,8 +904,7 @@ void RFIGuiWindow::createToolbar()
     "      <menuitem action='SimulateOnAxisSource'/>"
 	  "    </menu>"
 	  "    <menu action='MenuData'>"
-    "      <menuitem action='DiffToOriginal'/>"
-    "      <menuitem action='BackToOriginal'/>"
+    "      <menuitem action='VisToOriginal'/>"
     "      <separator/>"
     "      <menuitem action='KeepReal'/>"
     "      <menuitem action='KeepImaginary'/>"
@@ -1009,42 +997,43 @@ void RFIGuiWindow::createToolbar()
 		pToolbar->set_icon_size(Gtk::ICON_SIZE_SMALL_TOOLBAR);
 	}
 	_mainVBox.pack_start(*pToolbar, Gtk::PACK_SHRINK);
+	
+	_originalImageButton.set_tooltip_text("Switch visualization");
+	_originalImageButton.set_arrow_tooltip_text("Select visualization");
+	_originalImageButton.set_icon_name("showoriginalvisibilities");
+	pToolbar->append(_originalImageButton);
+	_originalImageButton.set_menu(_tfVisualizationMenu);
+	_originalImageButton.signal_clicked().connect(sigc::mem_fun(*this, &RFIGuiWindow::onToggleImage));
+	//_originalImageButton.show();
+	
+	//pToolbar->
+	//Gtk::ToolItem* visMenuBt = static_cast<Gtk::ToolItem *>(uiManager->get_widget("/ToolBar/ImageOriginal"));
+	//visMenuBt->signal_button_press_event().connect_notify(sigc::mem_fun(this, &RFIGuiWindow::onOpenVisualizationMenu));
+
+	
 	pMenubar->show();
 }
 
 void RFIGuiWindow::onClearAltFlagsPressed()
 {
-	TimeFrequencyData& data = _controller->TFController().ContaminatedData();
+	TimeFrequencyData& data = _controller->TFController().VisualizedData();
 	data.SetMasksToValue<false>();
-	_controller->TFController().SetContaminatedData(data);
 	_timeFrequencyWidget.Update();
 }
 
-void RFIGuiWindow::onDifferenceToOriginalPressed()
+void RFIGuiWindow::onVisualizedToOriginalPressed()
 {
 	if(HasImage())
 	{
-		TimeFrequencyData data(_controller->TFController().ContaminatedData());
+		TimeFrequencyData data(_controller->TFController().VisualizedData());
 		_controller->TFController().SetNewData(data, _timeFrequencyWidget.Plot().GetFullMetaData());
 	}
-	if(_originalImageButton->get_active())
+	// TODO
+	/*if(_originalImageButton->get_active())
 		_timeFrequencyWidget.Update();
 	else
 		_originalImageButton->set_active();
-}
-
-void RFIGuiWindow::onBackgroundToOriginalPressed()
-{
-	if(HasImage())
-	{
-		TimeFrequencyData data(_controller->TFController().RevisedData());
-		_controller->TFController().ClearBackground();
-		_controller->TFController().SetNewData(data, _timeFrequencyWidget.Plot().GetFullMetaData());
-	}
-	if(_originalImageButton->get_active())
-		_timeFrequencyWidget.Update();
-	else
-		_originalImageButton->set_active();
+	*/
 }
 
 void RFIGuiWindow::onHightlightPressed()
@@ -1235,11 +1224,6 @@ void RFIGuiWindow::onPlotFrequencyScatterPressed()
 void RFIGuiWindow::onPlotPowerRMSPressed()
 {
 	_controller->PlotPowerRMS();
-}
-
-void RFIGuiWindow::onPlotPowerSNRPressed()
-{
-	_controller->PlotPowerSNR();
 }
 
 void RFIGuiWindow::onPlotPowerTimePressed()
@@ -1677,7 +1661,6 @@ void RFIGuiWindow::onVertEVD()
 			TimeFrequencyData old(data);
 			VertEVD::Perform(data, true);
 			_controller->TFController().SetNewData(data, _timeFrequencyWidget.Plot().GetSelectedMetaData());
-			_controller->TFController().SetRevisedData(TimeFrequencyData::MakeFromDiff(old, data));
 			_timeFrequencyWidget.Update();
 		} catch(std::exception &e)
 		{
@@ -1947,4 +1930,51 @@ void RFIGuiWindow::SetBaselineInfo(bool multipleBaselines, const std::string& na
 	setSetNameInStatusBar();
 	updatePolarizations();
 	_timeFrequencyWidget.Update();
+}
+
+void RFIGuiWindow::onSelectImage()
+{
+	size_t index = getActiveTFVisualization();
+	_controller->TFController().SetVisualization(index);
+	_timeFrequencyWidget.Update();
+}
+
+void RFIGuiWindow::updateTFVisualizationMenu()
+{
+	std::vector<Gtk::Widget*> children = _tfVisualizationMenu.get_children();
+	for(Gtk::Widget* child : children)
+		_tfVisualizationMenu.remove(*child);
+	
+	_tfVisualizationMenuItems.clear();
+	Gtk::RadioButtonGroup group;
+	for(size_t i=0; i!=_controller->TFController().VisualizationCount(); ++i)
+	{
+		std::string label = _controller->TFController().GetVisualizedLabel(i);
+		_tfVisualizationMenuItems.emplace_back(label);
+		Gtk::RadioMenuItem& item = _tfVisualizationMenuItems.back();
+		item.set_group(group);
+		item.signal_activate().connect(sigc::mem_fun(*this, &RFIGuiWindow::onSelectImage));
+		_tfVisualizationMenu.add(item);
+	}
+	_tfVisualizationMenuItems.front().activate();
+	_tfVisualizationMenu.show_all_children();
+}
+
+void RFIGuiWindow::onToggleImage()
+{
+	size_t index = getActiveTFVisualization();
+	++index;
+	if(index == _tfVisualizationMenuItems.size())
+		index = 0;
+	_tfVisualizationMenuItems[index].set_active(true);
+}
+
+size_t RFIGuiWindow::getActiveTFVisualization()
+{
+	for(size_t index=0; index!=_tfVisualizationMenuItems.size(); ++index)
+	{
+		if(_tfVisualizationMenuItems[index].get_active())
+			return index;
+	}
+	return 0;
 }

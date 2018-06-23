@@ -21,7 +21,8 @@ namespace rfiStrategy {
 	class	ArtifactSet
 	{
 		public:
-			explicit ArtifactSet(std::mutex *ioMutex) :
+			explicit ArtifactSet(std::mutex* ioMutex) :
+			_visualizationData(),
 			_metaData(),
 			_sensitivity(1.0L),
 			_projectedDirectionRad(0.0L),
@@ -70,6 +71,41 @@ namespace rfiStrategy {
 			const TimeFrequencyData &ContaminatedData() const { return _contaminatedData; }
 			TimeFrequencyData &ContaminatedData() { return _contaminatedData; }
 
+			void SetCanVisualize(bool canVisualize) { _canVisualize = canVisualize; }
+			void AddVisualization(const std::string& label, const TimeFrequencyData& data)
+			{
+				if(_canVisualize)
+				{
+					if(data.PolarizationCount() == 1)
+					{
+						PolarizationEnum p = data.GetPolarization(0);
+						for(auto& v : _visualizationData)
+						{
+							if(v.first == label)
+							{
+								if(v.second.HasPolarization(p))
+								{
+									// Can't merge, just add like normal
+									_visualizationData.emplace_back(label, data);
+									return;
+								}
+								else {
+									// Merge
+									v.second = TimeFrequencyData::MakeFromPolarizationCombination(v.second, data);
+									return;
+								}
+							}
+						}
+						// Label not found, add
+						_visualizationData.emplace_back(label, data);
+					}
+					else {
+						_visualizationData.emplace_back(label, data);
+					}
+				}
+			}
+			const std::vector<std::pair<std::string, TimeFrequencyData>>& Visualizations() const { return _visualizationData; }
+
 			class ImageSet& ImageSet() const { return *_imageSet; }
 			void SetImageSet(std::unique_ptr<class ImageSet> imageSet);
 			void SetNoImageSet();
@@ -94,7 +130,7 @@ namespace rfiStrategy {
 				_metaData = metaData;
 			}
 
-			std::mutex &IOMutex()
+			std::mutex& IOMutex()
 			{
 				return *_ioMutex;
 			}
@@ -164,6 +200,8 @@ namespace rfiStrategy {
 			TimeFrequencyData _originalData;
 			TimeFrequencyData _contaminatedData;
 			TimeFrequencyData _revisedData;
+			bool _canVisualize;
+			std::vector<std::pair<std::string, TimeFrequencyData>> _visualizationData;
 			TimeFrequencyMetaDataCPtr _metaData;
 			numl_t _sensitivity;
 			numl_t _projectedDirectionRad;
