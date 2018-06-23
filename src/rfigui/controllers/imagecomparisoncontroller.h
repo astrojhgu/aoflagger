@@ -39,7 +39,7 @@ class ImageComparisonController {
 		
 		void SetVisualization(size_t visualizationIndex)
 		{
-			if(_visualizedImage != visualizationIndex)
+			if(_visualizedImage != visualizationIndex && _visualizedImage < _dataList.size())
 			{
 				_visualizedImage = visualizationIndex;
 				if(_visualizedImage == 0)

@@ -223,7 +223,7 @@ class RFIGuiWindow : public Gtk::Window, private StrategyController {
 		Glib::RefPtr<Gtk::Action>
 			_previousButton, _reloadButton, _nextButton,
 			_zoomToFitButton, _zoomInButton, _zoomOutButton;
-		Gtk::MenuToolButton _originalImageButton;
+		Gtk::MenuToolButton _selectVisualizationButton;
 		Glib::RefPtr<Gtk::ToggleAction>
 			_originalFlagsButton, _altFlagsButton,
 			_showPPButton, _showPQButton,

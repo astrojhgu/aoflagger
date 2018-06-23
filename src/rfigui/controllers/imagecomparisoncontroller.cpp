@@ -33,6 +33,7 @@ void ImageComparisonController::SetNewData(const TimeFrequencyData &data, TimeFr
 	
 	_dataList.clear();
 	_dataList.emplace_back("Original data", data);
+	_visualizedImage = 0;
 	updateVisualizedImage();
 	
 	_plot.SetOriginalMask(data.GetSingleMask());

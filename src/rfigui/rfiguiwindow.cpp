@@ -1000,18 +1000,12 @@ void RFIGuiWindow::createToolbar()
 	}
 	_mainVBox.pack_start(*pToolbar, Gtk::PACK_SHRINK);
 	
-	_originalImageButton.set_tooltip_text("Switch visualization");
-	_originalImageButton.set_arrow_tooltip_text("Select visualization");
-	_originalImageButton.set_icon_name("showoriginalvisibilities");
-	pToolbar->append(_originalImageButton);
-	_originalImageButton.set_menu(_tfVisualizationMenu);
-	_originalImageButton.signal_clicked().connect(sigc::mem_fun(*this, &RFIGuiWindow::onToggleImage));
-	//_originalImageButton.show();
-	
-	//pToolbar->
-	//Gtk::ToolItem* visMenuBt = static_cast<Gtk::ToolItem *>(uiManager->get_widget("/ToolBar/ImageOriginal"));
-	//visMenuBt->signal_button_press_event().connect_notify(sigc::mem_fun(this, &RFIGuiWindow::onOpenVisualizationMenu));
-
+	_selectVisualizationButton.set_tooltip_text("Switch visualization");
+	_selectVisualizationButton.set_arrow_tooltip_text("Select visualization");
+	_selectVisualizationButton.set_icon_name("showoriginalvisibilities");
+	pToolbar->append(_selectVisualizationButton);
+	_selectVisualizationButton.set_menu(_tfVisualizationMenu);
+	_selectVisualizationButton.signal_clicked().connect(sigc::mem_fun(*this, &RFIGuiWindow::onToggleImage));
 	
 	pMenubar->show();
 }
@@ -1958,6 +1952,9 @@ void RFIGuiWindow::updateTFVisualizationMenu()
 		item.signal_activate().connect(sigc::mem_fun(*this, &RFIGuiWindow::onSelectImage));
 		_tfVisualizationMenu.add(item);
 	}
+	
+	_selectVisualizationButton.set_sensitive(_tfVisualizationMenuItems.size() > 1);
+	
 	_tfVisualizationMenuItems.front().activate();
 	_tfVisualizationMenu.show_all_children();
 }
