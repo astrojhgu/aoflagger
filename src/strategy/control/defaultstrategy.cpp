@@ -20,6 +20,7 @@
 #include "../actions/strategy.h"
 #include "../actions/sumthresholdaction.h"
 #include "../actions/timeselectionaction.h"
+#include "../actions/visualizeaction.h"
 #include "../actions/writeflagsaction.h"
 
 #include "../imagesets/bhfitsimageset.h"
@@ -208,25 +209,24 @@ namespace rfiStrategy {
 		std::unique_ptr<IterationBlock> iteration(new IterationBlock());
 		iteration->SetIterationCount(iterationCount);
 		iteration->SetSensitivityStart(2.0 * pow(2.0, iterationCount/2.0));
-		scratch = iteration.get();
+		IterationBlock* iterationRoot = iteration.get();
 		current->Add(std::move(iteration));
-		current = scratch;
 		
 		std::unique_ptr<SumThresholdAction> t1(new SumThresholdAction());
 		t1->SetTimeDirectionSensitivity(sumThresholdSensitivity);
 		t1->SetFrequencyDirectionSensitivity(sumThresholdSensitivity);
 		if(keepTransients)
 			t1->SetFrequencyDirectionFlagging(false);
-		current->Add(std::move(t1));
+		iterationRoot->Add(std::move(t1));
 
 		std::unique_ptr<CombineFlagResults> cfr1(new CombineFlagResults());
 		if(channelSelection)
 			cfr1->Add(std::unique_ptr<FrequencySelectionAction>(new FrequencySelectionAction()));
 		if(!keepTransients)
 			cfr1->Add(std::unique_ptr<TimeSelectionAction>(new TimeSelectionAction()));
-		current->Add(std::move(cfr1));
+		iterationRoot->Add(std::move(cfr1));
 	
-		current->Add(std::unique_ptr<SetImageAction>(new SetImageAction()));
+		iterationRoot->Add(std::unique_ptr<SetImageAction>(new SetImageAction()));
 		
 		if(!keepTransients || changeResVertically)
 		{
@@ -240,8 +240,11 @@ namespace rfiStrategy {
 			else
 				changeResAction->SetFrequencyDecreaseFactor(1);
 			scratch = changeResAction.get();
-			current->Add(std::move(changeResAction));
+			iterationRoot->Add(std::move(changeResAction));
 			current = scratch;
+		}
+		else {
+			current = iterationRoot;
 		}
 
 		std::unique_ptr<HighPassFilterAction> hpAction(new HighPassFilterAction());
@@ -258,9 +261,20 @@ namespace rfiStrategy {
 			hpAction->SetMode(HighPassFilterAction::StoreRevised);
 		else
 			hpAction->SetMode(HighPassFilterAction::StoreContaminated);
-		scratch = focActionPtr;
 		current->Add(std::move(hpAction));
-		current = scratch;
+		
+		std::unique_ptr<VisualizeAction> visAction(new VisualizeAction());
+		visAction->SetLabel("Iteration residual");
+		iterationRoot->Add(std::move(visAction));
+		
+		visAction.reset(new VisualizeAction());
+		visAction->SetLabel("Iteration fit");
+		visAction->SetSource(VisualizeAction::FromRevised);
+		iterationRoot->Add(std::move(visAction));
+		//
+		// End of strategy loop
+		//
+		current = focActionPtr;
 		
 		if(calPassband)
 			current->Add(std::unique_ptr<CalibratePassbandAction>(new CalibratePassbandAction()));
@@ -271,6 +285,10 @@ namespace rfiStrategy {
 		if(keepTransients)
 			t2->SetFrequencyDirectionFlagging(false);
 		current->Add(std::move(t2));
+		
+		visAction.reset(new VisualizeAction());
+		visAction->SetLabel("Iteration residual");
+		current->Add(std::move(visAction));
 		
 		if(assembleStatistics)
 		{

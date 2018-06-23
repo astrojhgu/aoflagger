@@ -79,6 +79,8 @@ RFIGuiWindow::RFIGuiWindow(RFIGuiController* controller) :
 	_timeFrequencyWidget.Plot().SetShowXAxisDescription(false);
 	_timeFrequencyWidget.Plot().SetShowYAxisDescription(false);
 	_timeFrequencyWidget.Plot().SetShowZAxisDescription(false);
+	
+	_controller->TFController().VisualizationListChange().connect(sigc::mem_fun(*this, &RFIGuiWindow::updateTFVisualizationMenu));
 
 	_mainVBox.pack_end(_statusbar, Gtk::PACK_SHRINK);
 	_statusbar.push("Ready. For suggestions, contact offringa@gmail.com .");

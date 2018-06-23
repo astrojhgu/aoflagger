@@ -25,25 +25,11 @@ class ImageComparisonController {
 		size_t AddVisualization(const std::string& label, const TimeFrequencyData& data)
 		{
 			_dataList.emplace_back(label, data);
-			return _dataList.size() - 1;
+			size_t v = _dataList.size() - 1;
+			_visualizationListChange.emit();
+			return v;
 		}
 		
-		/*TimeFrequencyData &RevisedData() { return _revised; }
-		const TimeFrequencyData &RevisedData() const { return _revised; }
-
-		void SetRevisedData(const TimeFrequencyData &data)
-		{
-			_revised = data;
-		  updateVisualizedImage();
-		}
-		const TimeFrequencyData &ContaminatedData() const { return _contaminated; }
-		TimeFrequencyData &ContaminatedData() { return _contaminated; }
-		void SetContaminatedData(const TimeFrequencyData &data)
-		{
-			_contaminated = data;
-			_plot.SetAlternativeMask(data.GetSingleMask());
-		  updateVisualizedImage();
-		}*/
 		TimeFrequencyData& VisualizedData() { return _dataList[_visualizedImage].data; }
 		const TimeFrequencyData& VisualizedData() const { return _dataList[_visualizedImage].data; }
 		size_t VisualizedIndex() const { return _visualizedImage; }
@@ -80,6 +66,9 @@ class ImageComparisonController {
 		
 		HeatMapPlot& Plot() { return _plot; }
 		const HeatMapPlot& Plot() const { return _plot; }
+		
+		sigc::signal<void> &VisualizationListChange()
+		{ return _visualizationListChange; }
 	private:
 		void getFirstAvailablePolarization(bool& pp, bool& pq, bool& qp, bool& qq) const;
 		void updateVisualizedImage();
@@ -111,6 +100,7 @@ class ImageComparisonController {
 		};
 		std::vector<DataEntry> _dataList;
 		TimeFrequencyMetaDataCPtr _metaData;
+		sigc::signal<void> _visualizationListChange;
 };
 
 #endif

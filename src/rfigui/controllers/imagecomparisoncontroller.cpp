@@ -38,6 +38,8 @@ void ImageComparisonController::SetNewData(const TimeFrequencyData &data, TimeFr
 	_plot.SetOriginalMask(data.GetSingleMask());
 	_plot.SetMetaData(metaData);
 	_plot.ZoomFit();
+	
+	_visualizationListChange.emit();
 }
 
 void ImageComparisonController::getFirstAvailablePolarization(bool& pp, bool& pq, bool& qp, bool& qq) const
@@ -204,6 +206,10 @@ void ImageComparisonController::updateVisualizedImage()
 
 void ImageComparisonController::ClearAllButOriginal()
 {
-	_dataList.erase(_dataList.begin()+1, _dataList.end());
-	SetVisualization(0);
+	if(_dataList.size() > 1)
+	{
+		_dataList.erase(_dataList.begin()+1, _dataList.end());
+		SetVisualization(0);
+		_visualizationListChange.emit();
+	}
 }

@@ -14,7 +14,15 @@ public:
 	
 	virtual std::string Description() final override
 	{
-		return "Visualize in UI";
+		switch(_source)
+		{
+		case FromOriginal:
+			return "Visualize original in UI";
+		case FromRevised:
+			return "Visualize fit in UI";
+		case FromContaminated:
+			return "Visualize residual in UI";
+		}
 	}
 	
 	virtual void Perform(class ArtifactSet& artifacts, class ProgressListener& listener) final override;
