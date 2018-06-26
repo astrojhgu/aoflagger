@@ -252,7 +252,7 @@ class RFIGuiWindow : public Gtk::Window, private StrategyController {
 		TimeFrequencyData _storedData;
 		TimeFrequencyMetaDataCPtr _storedMetaData;
 		Gtk::Menu _tfVisualizationMenu;
-		std::vector<Gtk::RadioMenuItem> _tfVisualizationMenuItems;
+		std::vector<std::unique_ptr<Gtk::RadioMenuItem>> _tfVisualizationMenuItems;
 };
 
 #endif

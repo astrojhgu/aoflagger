@@ -1946,15 +1946,15 @@ void RFIGuiWindow::updateTFVisualizationMenu()
 	for(size_t i=0; i!=_controller->TFController().VisualizationCount(); ++i)
 	{
 		std::string label = _controller->TFController().GetVisualizedLabel(i);
-		_tfVisualizationMenuItems.emplace_back(group, label);
-		Gtk::RadioMenuItem& item = _tfVisualizationMenuItems.back();
+		_tfVisualizationMenuItems.emplace_back(std::unique_ptr<Gtk::RadioMenuItem>(new Gtk::RadioMenuItem(group, label)));
+		Gtk::RadioMenuItem& item = *_tfVisualizationMenuItems.back();
 		item.signal_activate().connect(sigc::mem_fun(*this, &RFIGuiWindow::onSelectImage));
 		_tfVisualizationMenu.add(item);
 	}
 	
 	_selectVisualizationButton.set_sensitive(_tfVisualizationMenuItems.size() > 1);
 	
-	_tfVisualizationMenuItems.front().activate();
+	_tfVisualizationMenuItems.front()->activate();
 	_tfVisualizationMenu.show_all_children();
 }
 
@@ -1964,14 +1964,14 @@ void RFIGuiWindow::onToggleImage()
 	++index;
 	if(index == _tfVisualizationMenuItems.size())
 		index = 0;
-	_tfVisualizationMenuItems[index].set_active(true);
+	_tfVisualizationMenuItems[index]->set_active(true);
 }
 
 size_t RFIGuiWindow::getActiveTFVisualization()
 {
 	for(size_t index=0; index!=_tfVisualizationMenuItems.size(); ++index)
 	{
-		if(_tfVisualizationMenuItems[index].get_active())
+		if(_tfVisualizationMenuItems[index]->get_active())
 			return index;
 	}
 	return 0;
