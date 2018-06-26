@@ -1946,9 +1946,8 @@ void RFIGuiWindow::updateTFVisualizationMenu()
 	for(size_t i=0; i!=_controller->TFController().VisualizationCount(); ++i)
 	{
 		std::string label = _controller->TFController().GetVisualizedLabel(i);
-		_tfVisualizationMenuItems.emplace_back(label);
+		_tfVisualizationMenuItems.emplace_back(group, label);
 		Gtk::RadioMenuItem& item = _tfVisualizationMenuItems.back();
-		item.set_group(group);
 		item.signal_activate().connect(sigc::mem_fun(*this, &RFIGuiWindow::onSelectImage));
 		_tfVisualizationMenu.add(item);
 	}
