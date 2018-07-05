@@ -220,7 +220,18 @@ namespace aoflagger {
 	
 	FlagMask& FlagMask::operator=(const FlagMask& flagMask)
 	{
-		*_data = *flagMask._data;
+		if(flagMask._data == nullptr)
+		{
+			delete _data;
+			_data = nullptr;
+		}
+		else if(_data == nullptr)
+		{
+			_data = new FlagMaskData(*flagMask._data);
+		}
+		else {
+			*_data = *flagMask._data;
+		}
 		return *this;
 	}
 	
