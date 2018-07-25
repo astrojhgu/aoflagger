@@ -112,20 +112,28 @@ void Plot2D::render(Cairo::RefPtr<Cairo::Context>& cr)
 				_horizontalScale.InitializeTextTicks(refPointSet.TickLabels());
 			else if(refPointSet.XIsTime())
 				_horizontalScale.InitializeTimeTicks(_system.XRangeMin(refPointSet), _system.XRangeMax(refPointSet));
-			else if(_logarithmicXAxis)
-				_horizontalScale.InitializeLogarithmicTicks(MinPositiveX(), MaxPositiveX());
-			else
-				_horizontalScale.InitializeNumericTicks(MinX(), MaxX());
+			else if(_logarithmicXAxis) {
+				auto range = RangePositiveX();
+				_horizontalScale.InitializeLogarithmicTicks(range.first, range.second);
+			}
+			else {
+				auto range = RangeX();
+				_horizontalScale.InitializeNumericTicks(range.first, range.second);
+			}
 			_horizontalScale.SetUnitsCaption(_customHAxisDescription.empty() ? refPointSet.XUnits() : _customHAxisDescription);
 			_horizontalScale.SetPlotDimensions(_width, _height, 0.0, _topMargin, false);
 			horiScaleHeight = _horizontalScale.GetHeight(cr);
 			
 			double rightMargin = _horizontalScale.GetRightMargin(cr);
 			_verticalScale.SetDrawWithDescription(_showAxisDescriptions);
-			if(_logarithmicYAxis)
-				_verticalScale.InitializeLogarithmicTicks(MinPositiveY(), MaxPositiveY());
-			else
-				_verticalScale.InitializeNumericTicks(MinY(), MaxY());
+			if(_logarithmicYAxis) {
+				auto range = RangePositiveY();
+				_verticalScale.InitializeLogarithmicTicks(range.first, range.second);
+			}
+			else {
+				auto range = RangeY();
+				_verticalScale.InitializeNumericTicks(range.first, range.second);
+			}
 			_verticalScale.SetUnitsCaption(_customVAxisDescription.empty() ? refPointSet.YUnits() : _customVAxisDescription);
 			_verticalScale.SetPlotDimensions(_width - rightMargin, _height - horiScaleHeight - _topMargin, _topMargin, false);
 
@@ -175,11 +183,11 @@ void Plot2D::render(Cairo::RefPtr<Cairo::Context>& cr, Plot2DPointSet& pointSet)
 {
 	pointSet.Sort();
 
-	double
-		xLeft = _logarithmicXAxis ? MinPositiveX() : MinX(),
-		xRight = _logarithmicXAxis ? MaxPositiveX() : MaxX(),
-		yMin = _logarithmicYAxis ? MinPositiveY() : MinY(),
-		yMax = _logarithmicYAxis ? MaxPositiveY() : MaxY();
+	auto xRange = _logarithmicXAxis ? RangePositiveX() : RangeX();
+	auto yRange = _logarithmicYAxis ? RangePositiveY() : RangeY();
+	double xLeft = xRange.first, xRight = xRange.second;
+	double yMin = yRange.first, yMax = yRange.second;
+		
 	if(!std::isfinite(xLeft) || !std::isfinite(xRight))
 	{
 		xLeft = -1;
