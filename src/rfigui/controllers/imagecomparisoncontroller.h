@@ -75,19 +75,19 @@ class ImageComparisonController {
 		void getActiveMask(TimeFrequencyData& data) const
 		{
 			bool orActive = _plot.ShowOriginalMask() && _dataList[0].data.MaskCount()!=0;
-			size_t altMask = _visualizedImage;
-			if(altMask == 0)
-				altMask = _dataList.size()-1;
-			bool altActive = _plot.ShowAlternativeMask() && _visualizedImage!=0 && _dataList[_visualizedImage].data.MaskCount()!=0;
+			size_t altMaskIndex = _visualizedImage;
+			if(altMaskIndex == 0)
+				altMaskIndex = _dataList.size()-1;
+			bool altActive = _plot.ShowAlternativeMask() && _dataList[altMaskIndex].data.MaskCount()!=0;
 			if(orActive && altActive)
 			{
 				data.SetMask(_dataList[0].data);
-				data.JoinMask(_dataList[_visualizedImage].data);
+				data.JoinMask(_dataList[altMaskIndex].data);
 			}
 			else if(orActive)
 				data.SetMask(_dataList[0].data);
 			else if(altActive)
-				data.SetMask(_dataList[_visualizedImage].data);
+				data.SetMask(_dataList[altMaskIndex].data);
 			else
 				data.SetMasksToValue<false>();
 		}
