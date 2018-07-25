@@ -5,6 +5,7 @@
 #include <gtkmm/button.h>
 #include <gtkmm/frame.h>
 #include <gtkmm/label.h>
+#include <gtkmm/radiobutton.h>
 #include <gtkmm/scale.h>
 
 #include "../../strategy/actions/highpassfilteraction.h"

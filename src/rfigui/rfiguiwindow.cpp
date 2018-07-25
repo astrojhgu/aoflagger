@@ -978,10 +978,6 @@ void RFIGuiWindow::createToolbar()
     "    <toolitem action='DisplayPQ'/>"
     "    <toolitem action='DisplayQP'/>"
     "    <toolitem action='DisplayQQ'/>"
-    "    <separator/>"
-    "    <toolitem action='ImageOriginal'/>"
-    "    <toolitem action='ImageBackground'/>"
-    "    <toolitem action='ImageDiff'/>"
     "  </toolbar>"
     "</ui>";
 
