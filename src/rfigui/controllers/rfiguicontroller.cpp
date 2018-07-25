@@ -158,13 +158,13 @@ void RFIGuiController::PlotPowerSpectrum()
 		Image2DCPtr image = data.GetSingleImage();
 		Mask2DPtr mask =
 			Mask2D::CreateSetMaskPtr<false>(image->Width(), image->Height());
-		Plot2DPointSet &beforeSet = plot.StartLine("Before");
+		Plot2DPointSet &beforeSet = plot.StartLine("Flags not applied");
 		RFIPlots::MakePowerSpectrumPlot(beforeSet, image, mask, SelectedMetaData());
 
 		mask = Mask2D::MakePtr(*data.GetSingleMask());
 		if(!mask->AllFalse())
 		{
-			Plot2DPointSet &afterSet = plot.StartLine("After");
+			Plot2DPointSet &afterSet = plot.StartLine("Flags applied");
 			RFIPlots::MakePowerSpectrumPlot(afterSet, image, mask, SelectedMetaData());
 		}
 		
