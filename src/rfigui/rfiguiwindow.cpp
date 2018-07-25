@@ -676,28 +676,6 @@ void RFIGuiWindow::createToolbar()
 	_toggleConnections.push_back(_showQQButton->signal_activate().connect(sigc::mem_fun(*this, &RFIGuiWindow::onTogglePolarizations)));
 	_actionGroup->add(_showQQButton);
 	
-	//Gtk::RadioButtonGroup imageGroup;
-	//_originalImageButton = Gtk::Action::create("ImageOriginal", "Original");
-	//_originalImageButton->set_active(true);
-	//_originalImageButton->set_icon_name("showoriginalvisibilities");
-	//_originalImageButton->set_tooltip("Display the original visibilities (before any processing)");
-	/*_backgroundImageButton = Gtk::RadioAction::create(imageGroup, "ImageBackground", "Background");
-	_backgroundImageButton->set_icon_name("showsmoothedvisibilities");
-	_backgroundImageButton->set_tooltip("Display the smoothed visibilities (only available if strategy has run and has created smoothed visibilities)");
-	_diffImageButton = Gtk::RadioAction::create(imageGroup, "ImageDiff", "Difference");
-	_diffImageButton->set_icon_name("showresidualvisibilities");
-	_diffImageButton->set_tooltip("Display the residual visibilities (only available if strategy has run and has created residual visibilities)");*/
-	//_actionGroup->add(_originalImageButton);
-	/*,
-		Gtk::AccelKey("<control>1"),
-		sigc::mem_fun(*this, &RFIGuiWindow::onOpenVisualizationMenu) );
-	_actionGroup->add(_backgroundImageButton,
-		Gtk::AccelKey("<control>2"),
-		sigc::mem_fun(*this, &RFIGuiWindow::onOpenVisualizationMenu) );
-	_actionGroup->add(_diffImageButton,
-		Gtk::AccelKey("<control>3"),
-		sigc::mem_fun(*this, &RFIGuiWindow::onOpenVisualizationMenu) );*/
-
 	_actionGroup->add( Gtk::Action::create("VisToOriginal", "Current->Original"),
   sigc::mem_fun(*this, &RFIGuiWindow::onVisualizedToOriginalPressed) );
 

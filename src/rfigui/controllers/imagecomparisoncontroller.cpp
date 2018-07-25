@@ -13,7 +13,7 @@ ImageComparisonController::ImageComparisonController() :
 TimeFrequencyData ImageComparisonController::GetActiveData() const
 {
 	TimeFrequencyData data(_dataList[_visualizedImage].data);
-	setActiveMask(data);
+	getActiveMask(data);
 	if(_plot.StartHorizontal() != 0.0 ||
 		_plot.EndHorizontal() != 1.0 ||
 		_plot.StartVertical() != 0.0 ||

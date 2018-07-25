@@ -72,9 +72,12 @@ class ImageComparisonController {
 	private:
 		void getFirstAvailablePolarization(bool& pp, bool& pq, bool& qp, bool& qq) const;
 		void updateVisualizedImage();
-		void setActiveMask(TimeFrequencyData& data) const
+		void getActiveMask(TimeFrequencyData& data) const
 		{
 			bool orActive = _plot.ShowOriginalMask() && _dataList[0].data.MaskCount()!=0;
+			size_t altMask = _visualizedImage;
+			if(altMask == 0)
+				altMask = _dataList.size()-1;
 			bool altActive = _plot.ShowAlternativeMask() && _visualizedImage!=0 && _dataList[_visualizedImage].data.MaskCount()!=0;
 			if(orActive && altActive)
 			{
