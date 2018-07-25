@@ -51,8 +51,6 @@ if(GSL_LIB AND GSL_CBLAS_LIB AND GSL_INCLUDE_DIR)
   message(STATUS "GSL found.")
 endif(GSL_LIB AND GSL_CBLAS_LIB AND GSL_INCLUDE_DIR)
 
-add_executable(rficonsole rficonsole.cpp)
-
 set(AOQPLOT_FILES
   aoqplot/aoqplotwindow.cpp
   aoqplot/baselineplotpage.cpp
@@ -320,7 +318,6 @@ add_executable(aotest EXCLUDE_FROM_ALL aotest.cpp)
 add_test(aotest aotest)
 add_custom_target(check COMMAND aotest DEPENDS aotest)
 
-install (TARGETS rficonsole aoflagger-bin DESTINATION bin)
 if(GTKMM_FOUND)
 	install (TARGETS rfigui aoqplot DESTINATION bin)
 endif(GTKMM_FOUND)
