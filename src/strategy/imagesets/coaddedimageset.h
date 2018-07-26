@@ -129,6 +129,7 @@ namespace rfiStrategy {
 				pol.SetImage(1, zeroImage);
 				tfData.SetPolarizationData(i, std::move(pol));
 			}
+			data->SetData(tfData);
 			return std::move(data);
 		}
 		
