@@ -191,14 +191,13 @@ namespace rfiStrategy {
 			return _msImageSets.front()->SequenceCount();
 		}
 		
-		virtual ImageSetIndex* Index(size_t antenna1, size_t antenna2, size_t bandIndex, size_t sequenceId) override final
+		virtual std::unique_ptr<ImageSetIndex> Index(size_t antenna1, size_t antenna2, size_t bandIndex, size_t sequenceId) override final
 		{
-			CoaddedImageSetIndex* index = new CoaddedImageSetIndex(*this);
+			std::unique_ptr<CoaddedImageSetIndex> index(new CoaddedImageSetIndex(*this));
 			for(size_t i=0; i!=_msImageSets.size(); ++i)
 			{
-				MSImageSetIndex* msIndex = _msImageSets[i]->Index(antenna1, antenna2, bandIndex, sequenceId);
-				index->_iterators[i] = *msIndex;
-				delete msIndex;
+				std::unique_ptr<ImageSetIndex> msIndex = _msImageSets[i]->Index(antenna1, antenna2, bandIndex, sequenceId);
+				index->_iterators[i] = static_cast<MSImageSetIndex&>(*msIndex);
 			}
 			return std::move(index);
 		}

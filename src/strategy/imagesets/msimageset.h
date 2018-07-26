@@ -134,11 +134,11 @@ namespace rfiStrategy {
 				return _sequences[static_cast<const MSImageSetIndex&>(index)._sequenceIndex].sequenceId;
 			}
 	
-			virtual MSImageSetIndex *Index(size_t antenna1, size_t antenna2, size_t bandIndex, size_t sequenceId) final override
+			virtual std::unique_ptr<ImageSetIndex> Index(size_t antenna1, size_t antenna2, size_t bandIndex, size_t sequenceId) final override
 			{
-				MSImageSetIndex *index = new MSImageSetIndex(*this);
+				std::unique_ptr<MSImageSetIndex> index(new MSImageSetIndex(*this));
 				index->_sequenceIndex = FindBaselineIndex(antenna1, antenna2, bandIndex, sequenceId);
-				return index;
+				return std::move(index);
 			}
 			
 			const std::string &DataColumnName() const { return _dataColumnName; }

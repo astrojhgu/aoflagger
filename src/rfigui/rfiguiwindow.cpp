@@ -1369,8 +1369,7 @@ void RFIGuiWindow::onLoadLongestBaselinePressed()
 				}
 				index->Next();
 			}
-			_controller->SetImageSetIndex(std::unique_ptr<rfiStrategy::MSImageSetIndex>(
-				msSet->Index(longestA1, longestA2, band, sequenceId)));
+			_controller->SetImageSetIndex(msSet->Index(longestA1, longestA2, band, sequenceId));
 		}
 	}
 }
@@ -1410,8 +1409,7 @@ void RFIGuiWindow::onLoadShortestBaselinePressed()
 				}
 				index->Next();
 			}
-			_controller->SetImageSetIndex(std::unique_ptr<rfiStrategy::MSImageSetIndex>(
-				msSet->Index(smallestA1, smallestA2, band, sequenceId)));
+			_controller->SetImageSetIndex(msSet->Index(smallestA1, smallestA2, band, sequenceId));
 		}
 	}
 }
