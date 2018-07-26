@@ -448,12 +448,12 @@ namespace rfiStrategy {
 			"time resolution=" << timeRes << " s, frequency resolution=" << Frequency::ToString(frequencyRes) << '\n';
 	}
 	
-	void DefaultStrategy::DetermineSettings(ImageSet& measurementSet, DefaultStrategy::TelescopeId& telescopeId, unsigned int& flags, double& frequency, double& timeRes, double& frequencyRes)
+	void DefaultStrategy::DetermineSettings(ImageSet& imageSet, DefaultStrategy::TelescopeId& telescopeId, unsigned int& flags, double& frequency, double& timeRes, double& frequencyRes)
 	{
-		IndexableSet *indexableSet = dynamic_cast<IndexableSet*>(&measurementSet);
-		FitsImageSet *fitsImageSet = dynamic_cast<FitsImageSet*>(&measurementSet);
-		BHFitsImageSet *bhFitsImageSet = dynamic_cast<BHFitsImageSet*>(&measurementSet);
-		FilterBankSet *fbImageSet = dynamic_cast<FilterBankSet*>(&measurementSet);
+		IndexableSet *indexableSet = dynamic_cast<IndexableSet*>(&imageSet);
+		FitsImageSet *fitsImageSet = dynamic_cast<FitsImageSet*>(&imageSet);
+		BHFitsImageSet *bhFitsImageSet = dynamic_cast<BHFitsImageSet*>(&imageSet);
+		FilterBankSet *fbImageSet = dynamic_cast<FilterBankSet*>(&imageSet);
 
 		if(indexableSet != 0)
 		{

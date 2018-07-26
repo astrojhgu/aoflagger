@@ -202,6 +202,7 @@ namespace rfiStrategy {
 			const std::vector<MeasurementSet::Sequence>& Sequences() const {
 				return _sequences;
 			}
+			
 		private:
 			friend class MSImageSetIndex;
 			MSImageSet(const std::string &location, BaselineReaderPtr reader) :

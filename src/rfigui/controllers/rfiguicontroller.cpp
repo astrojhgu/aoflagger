@@ -320,12 +320,15 @@ void RFIGuiController::PlotSingularValues()
 	}
 }
 
-void RFIGuiController::Open(const std::string& filename, BaselineIOMode ioMode, bool readUVW, const std::string& dataColumn, bool subtractModel, size_t polCountToRead, bool loadStrategy, bool combineSPW)
+void RFIGuiController::Open(const std::vector<std::string>& filenames, BaselineIOMode ioMode, bool readUVW, const std::string& dataColumn, bool subtractModel, size_t polCountToRead, bool loadStrategy, bool combineSPW)
 {
-	Logger::Info << "Opening " << filename << '\n';
+	if(filenames.size() == 1)
+		Logger::Info << "Opening " << filenames[0] << '\n';
+	else
+		Logger::Info << "Opening multiple files.\n";
 	try
 	{
-		std::unique_ptr<rfiStrategy::ImageSet> imageSet(rfiStrategy::ImageSet::Create(filename, ioMode));
+		std::unique_ptr<rfiStrategy::ImageSet> imageSet(rfiStrategy::ImageSet::Create(filenames, ioMode));
 		rfiStrategy::MSImageSet* msImageSet =
 			dynamic_cast<rfiStrategy::MSImageSet*>(imageSet.get());
 		if(msImageSet != nullptr)
@@ -480,10 +483,10 @@ void RFIGuiController::LoadCurrentTFData()
 	}
 }
 
-void RFIGuiController::LoadPath(const std::string& filename)
+void RFIGuiController::LoadPaths(const std::vector<std::string>& filenames)
 {
 	std::unique_lock<std::mutex> lock(_ioMutex);
-	std::unique_ptr<rfiStrategy::ImageSet> imageSet(rfiStrategy::ImageSet::Create(filename, DirectReadMode));
+	std::unique_ptr<rfiStrategy::ImageSet> imageSet(rfiStrategy::ImageSet::Create(filenames, DirectReadMode));
 	imageSet->Initialize();
 	lock.unlock();
 	

@@ -50,7 +50,7 @@ void ForEachMSAction::Perform(ArtifactSet &artifacts, ProgressListener &progress
 		
 		if(!skip)
 		{
-			std::unique_ptr<ImageSet> imageSet(ImageSet::Create(filename, _baselineIOMode));
+			std::unique_ptr<ImageSet> imageSet(ImageSet::Create(std::vector<std::string>{filename}, _baselineIOMode));
 			bool isMS = dynamic_cast<MSImageSet*>(&*imageSet) != 0;
 			if(isMS)
 			{ 

@@ -606,7 +606,7 @@ class Action *StrategyReader::parseTimeSelectionAction(xmlNode *node)
 
 class Action *StrategyReader::parseVisualizeAction(xmlNode *node)
 {
-	VisualizeAction *newAction = new VisualizeAction();
+	VisualizeAction* newAction = new VisualizeAction();
 	newAction->SetLabel(getString(node, "label"));
 	std::string sourceStr = getString(node, "source");
 	if(sourceStr == "original")

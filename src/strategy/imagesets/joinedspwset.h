@@ -309,7 +309,7 @@ namespace rfiStrategy {
 			return _msImageSet->GetFieldInfo(fieldIndex);
 		}
 	private:
-		JoinedSPWSet() { }
+		JoinedSPWSet() = default;
 		
 		std::unique_ptr<MSImageSet> _msImageSet;
 		std::map<Sequence, std::vector<std::pair<size_t, size_t>>> _joinedSequences;

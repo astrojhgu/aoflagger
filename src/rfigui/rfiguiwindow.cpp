@@ -136,7 +136,7 @@ void RFIGuiWindow::onActionDirectoryOpen()
 
   if(result == Gtk::RESPONSE_OK)
 	{
-		OpenPath(dialog.get_filename());
+		OpenPaths(std::vector<std::string>{dialog.get_filename()});
 	}
 }
 
@@ -189,20 +189,20 @@ void RFIGuiWindow::onActionFileOpen()
 
   if(result == Gtk::RESPONSE_OK)
 	{
-		OpenPath(dialog.get_filename());
+		OpenPaths(std::vector<std::string>{dialog.get_filename()});
 	}
 }
 
-void RFIGuiWindow::OpenPath(const std::string &path)
+void RFIGuiWindow::OpenPaths(const std::vector<std::string>& paths)
 {
 	_optionWindow.reset();
-	if(rfiStrategy::ImageSet::IsMSFile(path))
+	if(paths.size()>1 || rfiStrategy::ImageSet::IsMSFile(paths.front()))
 	{
-		_optionWindow.reset(new MSOptionWindow(*_controller, path));
+		_optionWindow.reset(new MSOptionWindow(*_controller, paths));
 		_optionWindow->present();
 	}
 	else {
-		_controller->LoadPath(path);
+		_controller->LoadPaths(paths);
 	}
 }
 

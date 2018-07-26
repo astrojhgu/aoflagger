@@ -56,7 +56,7 @@ class RFIGuiWindow : public Gtk::Window, private StrategyController {
 		TimeFrequencyMetaDataCPtr SelectedMetaData();
 		
 		void onExecuteStrategyFinished();
-		void OpenPath(const std::string &path);
+		void OpenPaths(const std::vector<std::string>& paths);
 		void ShowHistogram(class HistogramCollection &histogramCollection);
 		
 		class RFIGuiController& Controller() { return *_controller; }

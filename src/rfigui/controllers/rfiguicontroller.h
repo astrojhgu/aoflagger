@@ -133,7 +133,7 @@ class RFIGuiController
 		void PlotTimeScatterComparison();
 		void PlotSingularValues();
 		
-		void Open(const std::string& filename, BaselineIOMode ioMode, bool readUVW, const std::string& dataColumn, bool subtractModel, size_t polCountToRead, bool loadStrategy, bool combineSPW);
+		void Open(const std::vector<std::string>& filenames, BaselineIOMode ioMode, bool readUVW, const std::string& dataColumn, bool subtractModel, size_t polCountToRead, bool loadStrategy, bool combineSPW);
 		
 		void OpenTestSet(unsigned index, bool gaussianTestSets);
 		
@@ -173,7 +173,7 @@ class RFIGuiController
 		
 		void LoadSpatialTime(const std::string& filename);
 		
-		void LoadPath(const std::string& filename);
+		void LoadPaths(const std::vector<std::string>& filenames);
 		
 		void CheckPolarizations(bool forceSignal = false);
 		
