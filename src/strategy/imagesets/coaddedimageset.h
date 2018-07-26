@@ -118,7 +118,7 @@ namespace rfiStrategy {
 				TimeFrequencyData polAmplitude = addedData->Data().MakeFromPolarizationIndex(i).Make(TimeFrequencyData::AmplitudePart);
 				for(size_t j=0; j!=images.size(); ++j)
 				{
-					images[i]->operator+=(*polAmplitude.GetImage(0));
+					images[j]->operator+=(*polAmplitude.GetImage(0));
 				}
 			}
 			Image2DCPtr zeroImage = Image2D::CreateSetImagePtr(images.front()->Width(), images.front()->Height(), 0.0);
@@ -162,7 +162,7 @@ namespace rfiStrategy {
 		
 		virtual size_t GetField(const ImageSetIndex &index) override final
 		{
-			return _msImageSets.front()->GetBand(static_cast<const CoaddedImageSetIndex&>(index)._iterators.front());
+			return _msImageSets.front()->GetField(static_cast<const CoaddedImageSetIndex&>(index)._iterators.front());
 		}
 		
 		virtual size_t GetSequenceId(const ImageSetIndex &index) override final
