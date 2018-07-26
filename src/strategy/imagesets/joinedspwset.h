@@ -228,6 +228,11 @@ namespace rfiStrategy {
 		
 		MSImageSet& msImageSet() { return *_msImageSet; }
 		
+		virtual size_t AntennaCount() const override final
+		{
+			return _msImageSet->AntennaCount();
+		}
+		
 		virtual size_t GetAntenna1(const ImageSetIndex &index) override final
 		{
 			return static_cast<const JoinedSPWSetIndex&>(index)._iterator->first.antenna1;

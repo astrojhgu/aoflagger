@@ -18,6 +18,7 @@ namespace rfiStrategy
 		virtual size_t GetBand(const ImageSetIndex &index) = 0;
 		virtual size_t GetField(const ImageSetIndex &index) = 0;
 		virtual size_t GetSequenceId(const ImageSetIndex &index) = 0;
+		virtual size_t AntennaCount() const = 0;
 		virtual AntennaInfo GetAntennaInfo(unsigned antennaIndex) = 0;
 		virtual size_t BandCount() const = 0;
 		virtual BandInfo GetBandInfo(unsigned bandIndex) = 0;

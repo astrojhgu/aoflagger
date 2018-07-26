@@ -24,7 +24,7 @@ namespace rfiStrategy {
 			virtual void Previous() override final;
 			virtual void Next() override final;
 			virtual std::string Description() const override final;
-			virtual bool IsValid() const override final { return _isValid; }
+			virtual bool IsValid() const override final;
 			virtual std::unique_ptr<ImageSetIndex> Clone() const override final
 			{ return std::unique_ptr<CoaddedImageSetIndex>(new CoaddedImageSetIndex(*this) ); }
 			
@@ -35,7 +35,6 @@ namespace rfiStrategy {
 			virtual void reattach() final override;
 			
 			std::vector<MSImageSetIndex> _iterators;
-			bool _isValid;
 	};
 	
 	class CoaddedImageSet : public IndexableSet
@@ -146,6 +145,11 @@ namespace rfiStrategy {
 			return _msImageSets.front()->Reader();
 		}
 		
+		virtual size_t AntennaCount() const override final
+		{
+			return _msImageSets.front()->AntennaCount();
+		}
+		
 		virtual size_t GetAntenna1(const ImageSetIndex &index) override final
 		{
 			return _msImageSets.front()->GetAntenna1(static_cast<const CoaddedImageSetIndex&>(index)._iterators.front());
@@ -216,8 +220,7 @@ namespace rfiStrategy {
 	
 	CoaddedImageSetIndex::CoaddedImageSetIndex(CoaddedImageSet& set) :
 		ImageSetIndex(set),
-		_iterators(),
-		_isValid(true)
+		_iterators()
 	{
 		_iterators.reserve(set.MSImageSets().size());
 		for(const std::unique_ptr<MSImageSet>& imageSet : set.MSImageSets())
@@ -249,6 +252,14 @@ namespace rfiStrategy {
 	std::string CoaddedImageSetIndex::Description() const
 	{
 		return _iterators[0].Description() + " (coadded)";
+	}
+	
+	bool CoaddedImageSetIndex::IsValid() const
+	{
+		bool isValid = _iterators[0].IsValid();
+		for(size_t i=1; i!=_iterators.size(); ++i)
+			isValid = isValid && _iterators[i].IsValid();
+		return isValid;
 	}
 }
 

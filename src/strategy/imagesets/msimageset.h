@@ -188,7 +188,7 @@ namespace rfiStrategy {
 			}
 			virtual size_t SequenceCount() const final override { return _sequencesPerBaselineCount; }
 			
-			size_t AntennaCount() { return _set.AntennaCount(); }
+			virtual size_t AntennaCount() const final override { return _set.AntennaCount(); }
 			virtual class ::FieldInfo GetFieldInfo(unsigned fieldIndex) override final
 			{
 				return _set.GetFieldInfo(fieldIndex);

@@ -1338,8 +1338,8 @@ void RFIGuiWindow::onLoadLongestBaselinePressed()
 {
 	if(_controller->HasImageSet())
 	{
-		rfiStrategy::MSImageSet *msSet =
-			dynamic_cast<rfiStrategy::MSImageSet*>(&_controller->GetImageSet());
+		rfiStrategy::IndexableSet *msSet =
+			dynamic_cast<rfiStrategy::IndexableSet*>(&_controller->GetImageSet());
 		if(msSet != nullptr)
 		{
 			double longestSq = 0.0;
@@ -1378,8 +1378,8 @@ void RFIGuiWindow::onLoadShortestBaselinePressed()
 {
 	if(_controller->HasImageSet())
 	{
-		rfiStrategy::MSImageSet *msSet =
-			dynamic_cast<rfiStrategy::MSImageSet*>(&_controller->GetImageSet());
+		rfiStrategy::IndexableSet *msSet =
+			dynamic_cast<rfiStrategy::IndexableSet*>(&_controller->GetImageSet());
 		if(msSet != nullptr)
 		{
 			double smallestSq = 1e26;

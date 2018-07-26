@@ -98,11 +98,6 @@ namespace rfiStrategy {
 		file.find("txt") != std::string::npos;
 	}
 	
-	bool ImageSet::IsHarishFile(const std::string &file)
-	{
-		return file.substr(file.size()-4) == ".har";
-	}
-	
 	bool ImageSet::IsPngFile(const std::string &file)
 	{
 		return file.size()>=4 && file.substr(file.size()-4) == ".png";
