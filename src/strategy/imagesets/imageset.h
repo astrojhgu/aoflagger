@@ -27,13 +27,15 @@ namespace rfiStrategy {
 				_set = &imageSet;
 				reattach();
 			}
-		protected:
-			virtual void reattach() { }
+			
 			ImageSetIndex(const ImageSetIndex&) = default;
 			ImageSetIndex(ImageSetIndex&&) = default;
 			ImageSetIndex& operator=(const ImageSetIndex&) = default;
 			ImageSetIndex& operator=(ImageSetIndex&&) = default;
+		protected:
+			virtual void reattach() { }
 			ImageSet &imageSet() const { return *_set; }
+			
 		private:
 			class ImageSet *_set;
 	};

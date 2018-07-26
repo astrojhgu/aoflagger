@@ -38,7 +38,8 @@ namespace rfiStrategy {
 				return std::move(index);
 			}
 			size_t SequenceIndex() const { return _sequenceIndex; }
-		private:
+
+	private:
 			size_t _sequenceIndex;
 			bool _isValid;
 	};

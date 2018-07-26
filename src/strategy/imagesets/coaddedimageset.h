@@ -5,6 +5,7 @@
 #include "msimageset.h"
 
 #include "../../structures/measurementset.h"
+#include "../../util/logger.h"
 
 #include <vector>
 #include <list>
@@ -115,9 +116,9 @@ namespace rfiStrategy {
 				std::unique_ptr<BaselineData> addedData = _msImageSets[i]->GetNextRequested();
 				if(addedData->Data().PolarizationCount() != images.size())
 					throw std::runtime_error("Coadded images have different number of polarizations");
-				TimeFrequencyData polAmplitude = addedData->Data().MakeFromPolarizationIndex(i).Make(TimeFrequencyData::AmplitudePart);
 				for(size_t j=0; j!=images.size(); ++j)
 				{
+					TimeFrequencyData polAmplitude = addedData->Data().MakeFromPolarizationIndex(j).Make(TimeFrequencyData::AmplitudePart);
 					images[j]->operator+=(*polAmplitude.GetImage(0));
 				}
 			}
@@ -196,7 +197,7 @@ namespace rfiStrategy {
 			for(size_t i=0; i!=_msImageSets.size(); ++i)
 			{
 				MSImageSetIndex* msIndex = _msImageSets[i]->Index(antenna1, antenna2, bandIndex, sequenceId);
-				index->_iterators.emplace_back(*msIndex);
+				index->_iterators[i] = *msIndex;
 				delete msIndex;
 			}
 			return std::move(index);
