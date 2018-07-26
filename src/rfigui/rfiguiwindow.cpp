@@ -1875,7 +1875,7 @@ void RFIGuiWindow::onHelpAbout()
 	authors.push_back("André Offringa <offringa@gmail.com>");
 	aboutDialog.set_authors(authors);
 	
-	aboutDialog.set_copyright("Copyright 2008 - 2017 A. R. Offringa");
+	aboutDialog.set_copyright("Copyright 2008 - 2018 A. R. Offringa");
 	aboutDialog.set_license_type(Gtk::LICENSE_GPL_3_0);
 	aboutDialog.set_logo_icon_name("aoflagger");
 	aboutDialog.set_program_name("AOFlagger's RFI Gui");

@@ -9,13 +9,14 @@ class VisualizeAction : public Action {
 public:
 	enum Source { FromOriginal, FromRevised, FromContaminated };
 	
-	VisualizeAction() : _label("Intermediate"), _source(FromContaminated)
+	VisualizeAction() : _label("Intermediate"), _source(FromContaminated), _sortingIndex(0)
 	{ }
 	
 	virtual std::string Description() final override
 	{
 		switch(_source)
 		{
+		default:
 		case FromOriginal:
 			return "Visualize original in UI";
 		case FromRevised:
@@ -36,9 +37,13 @@ public:
 	enum Source Source() const { return _source; }
 	void SetSource(enum Source source) { _source = source; }
 	
+	size_t SortingIndex() const { return _sortingIndex; }
+	void SetSortingIndex(size_t index) { _sortingIndex = index; }
+	
 private:
 	std::string _label;
 	enum Source _source;
+	size_t _sortingIndex;
 };
 
 }

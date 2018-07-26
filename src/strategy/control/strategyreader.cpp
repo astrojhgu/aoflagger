@@ -61,7 +61,7 @@ std::unique_ptr<Strategy> StrategyReader::CreateStrategyFromFile(const std::stri
 			if(formatVersion < STRATEGY_FILE_FORMAT_VERSION_REQUIRED)
 			{
 				std::stringstream s;
-				s << "This file is too old for the software, please recreate the strategy. File format version: " << formatVersion << ", oldest version that this software understands: " << STRATEGY_FILE_FORMAT_VERSION_REQUIRED << " (these versions are numbered differently from the software).";
+				s << "This file is too old for the software, please recreate the strategy. File format version: " << formatVersion << ", oldest version that this software understands: " << STRATEGY_FILE_FORMAT_VERSION_REQUIRED << " (these numbered are for the file format version, which is different from the version of the software).";
 				throw StrategyReaderError(s.str());
 			}
 			
@@ -254,6 +254,8 @@ Action *StrategyReader::parseAction(xmlNode *node)
 		newAction = parseTimeConvolutionAction(node);
 	else if(typeStr == "TimeSelectionAction")
 		newAction = parseTimeSelectionAction(node);
+	else if(typeStr == "VisualizeAction")
+		newAction = parseVisualizeAction(node);
 	else if(typeStr == "WriteDataAction")
 		newAction = parseWriteDataAction(node);
 	else if(typeStr == "WriteFlagsAction")
@@ -599,6 +601,23 @@ class Action *StrategyReader::parseTimeSelectionAction(xmlNode *node)
 {
 	TimeSelectionAction *newAction = new TimeSelectionAction();
 	newAction->SetThreshold(getDouble(node, "threshold"));
+	return newAction;
+}
+
+class Action *StrategyReader::parseVisualizeAction(xmlNode *node)
+{
+	VisualizeAction *newAction = new VisualizeAction();
+	newAction->SetLabel(getString(node, "label"));
+	std::string sourceStr = getString(node, "source");
+	if(sourceStr == "original")
+		newAction->SetSource(VisualizeAction::FromOriginal);
+	else if(sourceStr == "revised")
+		newAction->SetSource(VisualizeAction::FromRevised);
+	else if(sourceStr == "contaminated")
+		newAction->SetSource(VisualizeAction::FromContaminated);
+	else
+		throw StrategyReaderError("Incorrect 'source' given in visualize action");
+	newAction->SetSortingIndex(getInt(node, "sorting-index"));
 	return newAction;
 }
 

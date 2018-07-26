@@ -134,6 +134,9 @@ namespace rfiStrategy {
 			case TimeSelectionActionType:
 				writeTimeSelectionAction(static_cast<const TimeSelectionAction&>(action));
 				break;
+			case VisualizeActionType:
+				writeVisualizeAction(static_cast<const VisualizeAction&>(action));
+				break;
 			case WriteDataActionType:
 				writeWriteDataAction(static_cast<const WriteDataAction&>(action));
 				break;
@@ -406,6 +409,26 @@ namespace rfiStrategy {
 	{
 		Attribute("type", "TimeSelectionAction");
 		Write<double>("threshold", action.Threshold());
+	}
+	
+	void StrategyWriter::writeVisualizeAction(const VisualizeAction& action)
+	{
+		Attribute("type", "VisualizeAction");
+		Write("label", action.Label());
+		switch(action.Source())
+		{
+			default:
+			case VisualizeAction::FromOriginal:
+				Write("source", "original");
+				break;
+			case VisualizeAction::FromRevised:
+				Write("source", "revised");
+				break;
+			case VisualizeAction::FromContaminated:
+				Write("source", "contaminated");
+				break;
+		}
+		Write("sorting-index", action.SortingIndex());
 	}
 
 	void StrategyWriter::writeWriteDataAction(const WriteDataAction &)

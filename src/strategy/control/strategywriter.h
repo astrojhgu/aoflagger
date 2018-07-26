@@ -81,6 +81,7 @@ namespace rfiStrategy {
 			void writeSumThresholdAction(const class SumThresholdAction &action);
 			void writeTimeConvolutionAction(const class TimeConvolutionAction &action);
 			void writeTimeSelectionAction(const class TimeSelectionAction &action);
+			void writeVisualizeAction(const class VisualizeAction &action);
 			void writeWriteDataAction(const class WriteDataAction &action);
 			void writeWriteFlagsAction(const class WriteFlagsAction &action);
 

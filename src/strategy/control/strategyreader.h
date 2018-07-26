@@ -65,6 +65,7 @@ class StrategyReader {
 		class Action *parseSumThresholdAction(xmlNode *node);
 		class Action *parseTimeConvolutionAction(xmlNode *node);
 		class Action *parseTimeSelectionAction(xmlNode *node);
+		class Action *parseVisualizeAction(xmlNode *node);
 		class Action *parseWriteDataAction(xmlNode *node);
 		class Action *parseWriteFlagsAction(xmlNode *node);
 
