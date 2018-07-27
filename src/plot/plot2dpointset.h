@@ -57,81 +57,101 @@ class Plot2DPointSet{
 			if(_points.empty())
 				return std::numeric_limits<double>::quiet_NaN();
 			double max = std::numeric_limits<double>::quiet_NaN();
-			for(std::vector<Point2D>::const_iterator i = _points.begin();i!=_points.end();++i)
+			for(const Point2D& p : _points)
 			{
-				if((i->x > max || (!std::isfinite(max))) && std::isfinite(i->x) ) max = i->x;
+				if(std::isfinite(p.x) &&
+					(p.x > max || !std::isfinite(max)))
+				{
+					max = p.x;
+				}
 			}
 			return max;
 		}
+		
 		double MinX() const
 		{
 			if(_points.empty())
 				return std::numeric_limits<double>::quiet_NaN();
 			double min = std::numeric_limits<double>::quiet_NaN();
-			for(std::vector<Point2D>::const_iterator i = _points.begin();i!=_points.end();++i)
+			for(const Point2D& p : _points)
 			{
-				if((i->x < min || (!std::isfinite(min))) && std::isfinite(i->x) ) min = i->x;
+				if(std::isfinite(p.x) &&
+				  (p.x < min || !std::isfinite(min)))
+				{
+					min = p.x;
+				}
 			}
 			return min;
 		}
+		
 		double MaxY() const
 		{
 			if(_points.empty())
 				return std::numeric_limits<double>::quiet_NaN();
 			double max = std::numeric_limits<double>::quiet_NaN();
-			for(std::vector<Point2D>::const_iterator i = _points.begin();i!=_points.end();++i)
+			for(const Point2D& p : _points)
 			{
-				if((i->y > max || (!std::isfinite(max))) && std::isfinite(i->y) ) max = i->y;
+				if(std::isfinite(p.y) &&
+					(p.y > max || !std::isfinite(max)))
+				{
+					max = p.y;
+				}
 			}
 			return max;
 		}
+		
 		double MaxPositiveY() const
 		{
 			double max = 0.0;
-			for(std::vector<Point2D>::const_iterator i = _points.begin();i!=_points.end();++i)
+			for(const Point2D& p : _points)
 			{
-				if((i->y > max) && std::isfinite(i->y)) max = i->y;
+				if(std::isfinite(p.y) && p.y > max) max = p.y;
 			}
 			if(max == 0.0)
 				return std::numeric_limits<double>::quiet_NaN();
 			else
 				return max;
 		}
+		
 		double MinY() const
 		{
 			if(_points.empty())
 				return std::numeric_limits<double>::quiet_NaN();
 			double min = std::numeric_limits<double>::quiet_NaN();
-			for(std::vector<Point2D>::const_iterator i = _points.begin();i!=_points.end();++i)
+			for(const Point2D& p : _points)
 			{
-				if((i->y < min || (!std::isfinite(min))) && std::isfinite(i->y) ) min = i->y;
+				if(std::isfinite(p.y) &&
+					(p.y < min || !std::isfinite(min)))
+				{
+					min = p.y;
+				}
 			}
 			return min;
 		}
+		
 		double MinPositiveY() const
 		{
 			std::vector<Point2D>::const_iterator i;
-			double min = 0.0;
+			double min = -1.0;
 			// Find first positive element
-			for(i = _points.begin();i!=_points.end();++i)
+			for(const Point2D& p : _points)
 			{
-				if((i->y > 0.0) && std::isfinite(i->y))
+				if(std::isfinite(p.y) && p.y > 0.0 && p.y > min)
 				{
-					min = i->y;
-					break;
+					min = p.y;
 				}
 			}
-			if(min == 0.0) return std::numeric_limits<double>::quiet_NaN();
-			for(;i!=_points.end();++i)
-			{
-				if((i->y > 0.0) && (i->y < min) && std::isfinite(i->y)) min = i->y;
-			}
-			return min;
+			if(min == -1.0)
+				return std::numeric_limits<double>::quiet_NaN();
+			else
+				return min;
 		}
+		
 		void Sort()
 		{
 			std::sort(_points.begin(), _points.end());
 		}
+		
 		double XRangeMin() const
 		{
 			if(_points.empty())
@@ -139,6 +159,7 @@ class Plot2DPointSet{
 			else
 				return _points.begin()->x;
 		}
+		
 		double XRangePositiveMin() const
 		{
 			if(_points.empty())
