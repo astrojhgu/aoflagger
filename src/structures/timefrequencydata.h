@@ -369,6 +369,16 @@ class TimeFrequencyData
 							break;
 						}
 					}
+					else {
+						switch(polarization)
+						{
+						case Polarization::StokesI:
+							newData = TimeFrequencyData(_complexRepresentation, Polarization::StokesI, getFirstSum(rrPol, llPol));
+							break;
+						default:
+							throw BadUsageException("Requested conversion is not implemented for circular polarizations");
+						}
+					}
 				}
 				else
 					throw BadUsageException("Trying to convert the polarization in time frequency data in an invalid way");
