@@ -11,13 +11,13 @@ void VisualizeAction::Perform(ArtifactSet& artifacts, ProgressListener&)
 	switch(_source)
 	{
 		case FromOriginal:
-			artifacts.AddVisualization(str.str(), artifacts.OriginalData());
+			artifacts.AddVisualization(str.str(), artifacts.OriginalData(), _sortingIndex);
 			break;
 		case FromRevised:
-			artifacts.AddVisualization(str.str(), artifacts.RevisedData());
+			artifacts.AddVisualization(str.str(), artifacts.RevisedData(), _sortingIndex);
 			break;
 		case FromContaminated:
-			artifacts.AddVisualization(str.str(), artifacts.ContaminatedData());
+			artifacts.AddVisualization(str.str(), artifacts.ContaminatedData(), _sortingIndex);
 			break;
 	}
 }

@@ -264,12 +264,15 @@ namespace rfiStrategy {
 		current->Add(std::move(hpAction));
 		
 		std::unique_ptr<VisualizeAction> visAction(new VisualizeAction());
-		visAction->SetLabel("Iteration residual");
+		visAction->SetLabel("Iteration fit");
+		visAction->SetSource(VisualizeAction::FromRevised);
+		visAction->SetSortingIndex(0);
 		iterationRoot->Add(std::move(visAction));
 		
 		visAction.reset(new VisualizeAction());
-		visAction->SetLabel("Iteration fit");
-		visAction->SetSource(VisualizeAction::FromRevised);
+		visAction->SetLabel("Iteration residual");
+		visAction->SetSource(VisualizeAction::FromContaminated);
+		visAction->SetSortingIndex(1);
 		iterationRoot->Add(std::move(visAction));
 		//
 		// End of strategy loop

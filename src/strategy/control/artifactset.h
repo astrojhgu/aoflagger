@@ -3,6 +3,7 @@
 
 #include <memory>
 #include <mutex>
+#include <tuple>
 #include <vector>
 
 #include "../../structures/types.h"
@@ -72,7 +73,7 @@ namespace rfiStrategy {
 			TimeFrequencyData &ContaminatedData() { return _contaminatedData; }
 
 			void SetCanVisualize(bool canVisualize) { _canVisualize = canVisualize; }
-			void AddVisualization(const std::string& label, const TimeFrequencyData& data)
+			void AddVisualization(const std::string& label, const TimeFrequencyData& data, size_t sortingIndex)
 			{
 				if(_canVisualize)
 				{
@@ -81,30 +82,30 @@ namespace rfiStrategy {
 						PolarizationEnum p = data.GetPolarization(0);
 						for(auto& v : _visualizationData)
 						{
-							if(v.first == label)
+							if(std::get<0>(v) == label)
 							{
-								if(v.second.HasPolarization(p))
+								if(std::get<1>(v).HasPolarization(p))
 								{
 									// Can't merge, just add like normal
-									_visualizationData.emplace_back(label, data);
+									_visualizationData.emplace_back(label, data, sortingIndex);
 									return;
 								}
 								else {
 									// Merge
-									v.second = TimeFrequencyData::MakeFromPolarizationCombination(v.second, data);
+									std::get<1>(v) = TimeFrequencyData::MakeFromPolarizationCombination(std::get<1>(v), data);
 									return;
 								}
 							}
 						}
 						// Label not found, add
-						_visualizationData.emplace_back(label, data);
+						_visualizationData.emplace_back(label, data, sortingIndex);
 					}
 					else {
-						_visualizationData.emplace_back(label, data);
+						_visualizationData.emplace_back(label, data, sortingIndex);
 					}
 				}
 			}
-			const std::vector<std::pair<std::string, TimeFrequencyData>>& Visualizations() const { return _visualizationData; }
+			const std::vector<std::tuple<std::string, TimeFrequencyData, size_t>>& Visualizations() const { return _visualizationData; }
 
 			class ImageSet& ImageSet() const { return *_imageSet; }
 			void SetImageSet(std::unique_ptr<class ImageSet> imageSet);
@@ -201,7 +202,7 @@ namespace rfiStrategy {
 			TimeFrequencyData _contaminatedData;
 			TimeFrequencyData _revisedData;
 			bool _canVisualize;
-			std::vector<std::pair<std::string, TimeFrequencyData>> _visualizationData;
+			std::vector<std::tuple<std::string, TimeFrequencyData, size_t>> _visualizationData;
 			TimeFrequencyMetaDataCPtr _metaData;
 			numl_t _sensitivity;
 			numl_t _projectedDirectionRad;

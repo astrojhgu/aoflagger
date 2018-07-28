@@ -325,10 +325,15 @@ void RFIGuiWindow::onExecuteStrategyFinished()
 	{
 		bool update = false;
 		
-		const auto& vis = artifacts->Visualizations();
+		auto vis = artifacts->Visualizations();
+		// Sort the visualizations on their sorting index
+		std::sort(vis.begin(), vis.end(),
+							[](const std::tuple<std::string, TimeFrequencyData, size_t>& a,
+								 const std::tuple<std::string, TimeFrequencyData, size_t>& b)
+			{ return std::get<2>(a) < std::get<2>(b); });
 		for(const auto& v : vis)
 		{
-			_controller->TFController().AddVisualization(v.first, v.second);
+			_controller->TFController().AddVisualization(std::get<0>(v), std::get<1>(v));
 			update = true;
 		}
 		

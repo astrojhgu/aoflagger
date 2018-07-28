@@ -141,8 +141,6 @@ class RFIGuiController
 		
 		TimeFrequencyData ActiveData() const;
 		TimeFrequencyData OriginalData() const;
-		//TimeFrequencyData RevisedData() const;
-		//TimeFrequencyData ContaminatedData() const;
 		
 		TimeFrequencyMetaDataCPtr SelectedMetaData() const;
 		
@@ -183,7 +181,6 @@ class RFIGuiController
 		
 	private:
 		void plotMeanSpectrum(bool weight);
-		
 		
 		bool _showOriginalFlags, _showAlternativeFlags;
 		bool _showPP, _showPQ, _showQP, _showQQ;
