@@ -17,10 +17,11 @@
  * 
  * @author Andre Offringa
  */
+template<typename MaskLike>
 class XYSwappedMask2D
 {
 	public:
-		explicit XYSwappedMask2D(Mask2D &mask) : _mask(mask)
+		explicit XYSwappedMask2D(MaskLike &mask) : _mask(mask)
 		{
 		}
 		
@@ -45,7 +46,7 @@ class XYSwappedMask2D
 		}
 		
 	private:
-		Mask2D &_mask;
+		MaskLike &_mask;
 };
 
 #endif // XYSWAPPEDMASK2D_H

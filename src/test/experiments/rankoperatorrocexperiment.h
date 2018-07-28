@@ -336,7 +336,7 @@ void RankOperatorROCExperiment::executeTest(enum TestType testType)
 		{
 			const num_t eta = (num_t) i / (num_t) ETA_STEPS;
 			Mask2D resultMask = *input;
-			SIROperator::OperateVertically(&resultMask, eta);
+			SIROperator::OperateVertically(resultMask, eta);
 			
 			evaluateIterationResults(resultMask, mask, groundTruth, totalRFI, rocResults[i]);
 		}
@@ -450,7 +450,7 @@ inline void RankOperatorROCExperiment::TestNoisePerformance(size_t totalRFI, dou
 		{
 			Mask2D tempMask(*input);
 			const num_t eta = i/100.0;
-			SIROperator::OperateVertically(&tempMask, eta);
+			SIROperator::OperateVertically(tempMask, eta);
 			size_t falsePositives = tempMask.GetCount<true>();
 			tempMask.Invert();
 			num_t fpSum = ThresholdTools::Sum(&inputImage, &tempMask);

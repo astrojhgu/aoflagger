@@ -457,8 +457,8 @@ inline void DefaultStrategySpeedTest::TimeRankOperator::operator()()
 	Mask2DPtr input(new Mask2D(*artifacts.ContaminatedData().GetSingleMask()));
 	
 	Stopwatch operatorTimer(true);
-	SIROperator::OperateHorizontally(input.get(), 0.2);
-	SIROperator::OperateVertically(input.get(), 0.2);
+	SIROperator::OperateHorizontally(*input, 0.2);
+	SIROperator::OperateVertically(*input, 0.2);
 	operatorTimer.Pause();
 	
 	long double operatorTime = operatorTimer.Seconds();

@@ -11,13 +11,13 @@ namespace rfiStrategy {
 
 	void StatisticalFlagAction::Perform(ArtifactSet &artifacts, class ProgressListener &)
 	{
-		TimeFrequencyData &data = artifacts.ContaminatedData();
+		TimeFrequencyData& data = artifacts.ContaminatedData();
 			
 		Mask2DPtr mask(new Mask2D(*data.GetSingleMask()));
 		
 		StatisticalFlagger::DilateFlags(mask.get(), _enlargeTimeSize, _enlargeFrequencySize);
-		SIROperator::OperateHorizontally(mask.get(), _minimumGoodTimeRatio);
-		SIROperator::OperateVertically(mask.get(), _minimumGoodFrequencyRatio);
+		SIROperator::OperateHorizontally(*mask, _minimumGoodTimeRatio);
+		SIROperator::OperateVertically(*mask, _minimumGoodFrequencyRatio);
 		
 		if(_minAvailableTimesRatio > 0)
 		{
