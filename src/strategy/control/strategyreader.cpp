@@ -165,6 +165,15 @@ int StrategyReader::getInt(xmlNode *node, const char *name) const
 	return atoi((const char *) valNode->content);
 }
 
+int StrategyReader::getIntOr(xmlNode *node, const char *name, int alternative) const 
+{
+	xmlNode *valNode = getTextNode(node, name, true);
+	if(valNode == nullptr)
+		return alternative;
+	else
+		return atoi((const char *) valNode->content);
+}
+
 double StrategyReader::getDouble(xmlNode *node, const char *name) const 
 {
 	xmlNode *valNode = getTextNode(node, name);
@@ -174,7 +183,7 @@ double StrategyReader::getDouble(xmlNode *node, const char *name) const
 double StrategyReader::getDoubleOr(xmlNode *node, const char *name, double alternative) const 
 {
 	xmlNode *valNode = getTextNode(node, name, true);
-	if(valNode == 0)
+	if(valNode == nullptr)
 		return alternative;
 	else
 		return NumberParser::ToDouble((const char *) valNode->content);
@@ -243,7 +252,7 @@ Action *StrategyReader::parseAction(xmlNode *node)
 	else if(typeStr == "SlidingWindowFitAction")
 		newAction = parseSlidingWindowFitAction(node);
 	else if(typeStr == "StatisticalFlagAction")
-		newAction = parseStatisticalFlagAction(node);
+		newAction = parseMorphologicalFlagAction(node);
 	else if(typeStr == "SVDAction")
 		newAction = parseSVDAction(node);
 	else if(typeStr == "Strategy")
@@ -547,9 +556,9 @@ class Action *StrategyReader::parseSlidingWindowFitAction(xmlNode *node)
 	return newAction;
 }
 
-class Action *StrategyReader::parseStatisticalFlagAction(xmlNode *node)
+class Action *StrategyReader::parseMorphologicalFlagAction(xmlNode *node)
 {
-	MorphologicalFlagAction *newAction = new MorphologicalFlagAction();
+	MorphologicalFlagAction* newAction = new MorphologicalFlagAction();
 	newAction->SetEnlargeFrequencySize(getInt(node, "enlarge-frequency-size"));
 	newAction->SetEnlargeTimeSize(getInt(node, "enlarge-time-size"));
 	newAction->SetMinAvailableFrequenciesRatio(getDoubleOr(node, "min-available-frequencies-ratio", 0.0));
@@ -557,6 +566,7 @@ class Action *StrategyReader::parseStatisticalFlagAction(xmlNode *node)
 	newAction->SetMinAvailableTFRatio(getDoubleOr(node, "min-available-tf-ratio", 0.0));
 	newAction->SetMinimumGoodFrequencyRatio(getDouble(node, "minimum-good-frequency-ratio"));
 	newAction->SetMinimumGoodTimeRatio(getDouble(node, "minimum-good-time-ratio"));
+	getBoolOr(node, "exclude-original-flags", false);
 	return newAction;
 }
 

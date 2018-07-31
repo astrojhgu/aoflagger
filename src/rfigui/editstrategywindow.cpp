@@ -300,7 +300,7 @@ void EditStrategyWindow::onSelectionChanged()
 					showRight(new SetFlaggingFrame(*static_cast<rfiStrategy::SetFlaggingAction*>(selectedAction), *this));
 					break;
 				case StatisticalFlagActionType:
-					showRight(new StatisticalFlaggingFrame(*static_cast<rfiStrategy::MorphologicalFlagAction*>(selectedAction), *this));
+					showRight(new MorphologicalFlaggingFrame(*static_cast<rfiStrategy::MorphologicalFlagAction*>(selectedAction), *this));
 					break;
 				case SumThresholdActionType:
 					showRight(new SumThresholdFrame(*static_cast<rfiStrategy::SumThresholdAction*>(selectedAction), *this));

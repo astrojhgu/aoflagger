@@ -370,6 +370,7 @@ namespace rfiStrategy {
 		Write<num_t>("min-available-tf-ratio", action.MinAvailableTFRatio());
 		Write<num_t>("minimum-good-frequency-ratio", action.MinimumGoodFrequencyRatio());
 		Write<num_t>("minimum-good-time-ratio", action.MinimumGoodTimeRatio());
+		Write<bool>("exclude-original-flags", action.ExcludeOriginalFlags());
 	}
 
 	void StrategyWriter::writeStrategy(const class Strategy &action)

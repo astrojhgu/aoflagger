@@ -277,42 +277,45 @@ private:
 				}
 			}
 			
-			unsigned wSize = nAvailable + 1;
-			w[0] = 0.0;
-			unsigned currentMinIndex = 0;
-			minIndices[0] = 0;
-			for(unsigned i=1 ; i!=wSize ; ++i)
+			if(nAvailable != 0)
 			{
-				w[i] = w[i-1] + values[i-1];
+				unsigned wSize = nAvailable + 1;
+				w[0] = 0.0;
+				unsigned currentMinIndex = 0;
+				minIndices[0] = 0;
+				for(unsigned i=1 ; i!=wSize ; ++i)
+				{
+					w[i] = w[i-1] + values[i-1];
 
-				if(w[i] < w[currentMinIndex])
-				{
-					currentMinIndex = i;
+					if(w[i] < w[currentMinIndex])
+					{
+						currentMinIndex = i;
+					}
+					minIndices[i] = currentMinIndex;
 				}
-				minIndices[i] = currentMinIndex;
-			}
-			
-			// Calculate the maximum suffixes
-			unsigned currentMaxIndex = wSize-1;
-			for(unsigned i=nAvailable-1 ; i!=0 ; --i)
-			{
-				maxIndices[i] = currentMaxIndex;
-				if(w[i] > w[currentMaxIndex])
+				
+				// Calculate the maximum suffixes
+				unsigned currentMaxIndex = wSize-1;
+				for(unsigned i=nAvailable-1 ; i!=0 ; --i)
 				{
-					currentMaxIndex = i;
+					maxIndices[i] = currentMaxIndex;
+					if(w[i] > w[currentMaxIndex])
+					{
+						currentMaxIndex = i;
+					}
 				}
-			}
-			maxIndices[0] = currentMaxIndex;
-			
-			// See if max sequence exceeds limit.
-			nAvailable = 0;
-			for(unsigned i=0 ; i!=width ; ++i )
-			{
-				if(!missing.Value(i, row))
+				maxIndices[0] = currentMaxIndex;
+				
+				// See if max sequence exceeds limit.
+				nAvailable = 0;
+				for(unsigned i=0 ; i!=width ; ++i )
 				{
-					const num_t maxW = w[maxIndices[nAvailable]] - w[minIndices[nAvailable]];
-					mask.SetValue(i, row, (maxW >= 0.0));
-					++nAvailable;
+					if(!missing.Value(i, row))
+					{
+						const num_t maxW = w[maxIndices[nAvailable]] - w[minIndices[nAvailable]];
+						mask.SetValue(i, row, (maxW >= 0.0));
+						++nAvailable;
+					}
 				}
 			}
 		}

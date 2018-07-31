@@ -9,15 +9,25 @@
 
 namespace rfiStrategy {
 
-	void MorphologicalFlagAction::Perform(ArtifactSet &artifacts, class ProgressListener &)
+	void MorphologicalFlagAction::Perform(ArtifactSet& artifacts, class ProgressListener &)
 	{
 		TimeFrequencyData& data = artifacts.ContaminatedData();
 			
 		Mask2DPtr mask(new Mask2D(*data.GetSingleMask()));
 		
 		MorphologicalFlagger::DilateFlags(mask.get(), _enlargeTimeSize, _enlargeFrequencySize);
-		SIROperator::OperateHorizontally(*mask, _minimumGoodTimeRatio);
-		SIROperator::OperateVertically(*mask, _minimumGoodFrequencyRatio);
+		
+		if(_excludeOriginalFlags)
+		{
+			TimeFrequencyData& original = artifacts.OriginalData();
+			Mask2DCPtr originalMask = original.GetSingleMask();
+			SIROperator::OperateHorizontallyMissing(*mask, *originalMask, _minimumGoodTimeRatio);
+			SIROperator::OperateVerticallyMissing(*mask, *originalMask, _minimumGoodFrequencyRatio);
+		}
+		else {
+			SIROperator::OperateHorizontally(*mask, _minimumGoodTimeRatio);
+			SIROperator::OperateVertically(*mask, _minimumGoodFrequencyRatio);
+		}
 		
 		if(_minAvailableTimesRatio > 0)
 		{
