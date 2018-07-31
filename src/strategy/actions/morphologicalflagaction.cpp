@@ -1,21 +1,21 @@
 #include "../../util/progresslistener.h"
 
-#include "statisticalflagaction.h"
+#include "morphologicalflagaction.h"
 
-#include "../algorithms/statisticalflagger.h"
+#include "../algorithms/morphologicalflagger.h"
 #include "../algorithms/siroperator.h"
 
 #include "../control/artifactset.h"
 
 namespace rfiStrategy {
 
-	void StatisticalFlagAction::Perform(ArtifactSet &artifacts, class ProgressListener &)
+	void MorphologicalFlagAction::Perform(ArtifactSet &artifacts, class ProgressListener &)
 	{
 		TimeFrequencyData& data = artifacts.ContaminatedData();
 			
 		Mask2DPtr mask(new Mask2D(*data.GetSingleMask()));
 		
-		StatisticalFlagger::DilateFlags(mask.get(), _enlargeTimeSize, _enlargeFrequencySize);
+		MorphologicalFlagger::DilateFlags(mask.get(), _enlargeTimeSize, _enlargeFrequencySize);
 		SIROperator::OperateHorizontally(*mask, _minimumGoodTimeRatio);
 		SIROperator::OperateVertically(*mask, _minimumGoodFrequencyRatio);
 		

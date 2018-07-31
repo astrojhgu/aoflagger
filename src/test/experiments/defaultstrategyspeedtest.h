@@ -540,7 +540,7 @@ inline void DefaultStrategySpeedTest::TimeSSEHighPassFilterStrategy::operator()(
 	setFlagsInAllPolarizations->SetNewFlagging(rfiStrategy::SetFlaggingAction::PolarisationsEqual);
 	
 	block.Add(std::move(setFlagsInAllPolarizations));
-	block.Add(std::unique_ptr<rfiStrategy::StatisticalFlagAction>(new rfiStrategy::StatisticalFlagAction()));
+	block.Add(std::unique_ptr<rfiStrategy::MorphologicalFlagAction>(new rfiStrategy::MorphologicalFlagAction()));
 	block.Add(std::unique_ptr<rfiStrategy::TimeSelectionAction>(new rfiStrategy::TimeSelectionAction()));
 
 	std::unique_ptr<rfiStrategy::BaselineSelectionAction>

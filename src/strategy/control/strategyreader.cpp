@@ -549,7 +549,7 @@ class Action *StrategyReader::parseSlidingWindowFitAction(xmlNode *node)
 
 class Action *StrategyReader::parseStatisticalFlagAction(xmlNode *node)
 {
-	StatisticalFlagAction *newAction = new StatisticalFlagAction();
+	MorphologicalFlagAction *newAction = new MorphologicalFlagAction();
 	newAction->SetEnlargeFrequencySize(getInt(node, "enlarge-frequency-size"));
 	newAction->SetEnlargeTimeSize(getInt(node, "enlarge-time-size"));
 	newAction->SetMinAvailableFrequenciesRatio(getDoubleOr(node, "min-available-frequencies-ratio", 0.0));

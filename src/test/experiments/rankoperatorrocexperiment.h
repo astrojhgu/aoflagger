@@ -348,7 +348,7 @@ void RankOperatorROCExperiment::executeTest(enum TestType testType)
 			const size_t dilSize = i * MAX_DILATION / DIL_STEPS;
 			
 			Mask2D resultMask = *input;
-			StatisticalFlagger::DilateFlagsVertically(&resultMask, dilSize);
+			MorphologicalFlagger::DilateFlagsVertically(&resultMask, dilSize);
 			
 			evaluateIterationResults(resultMask, mask, groundTruth, totalRFI, dilResults[i]);
 		}
@@ -464,7 +464,7 @@ inline void RankOperatorROCExperiment::TestNoisePerformance(size_t totalRFI, dou
 		{
 			const size_t dilSize = i * height / (4 * DIL_STEPS);
 			Mask2D tempMask = *input;
-			StatisticalFlagger::DilateFlags(&tempMask, 0, dilSize);
+			MorphologicalFlagger::DilateFlags(&tempMask, 0, dilSize);
 			size_t falsePositives = tempMask.GetCount<true>();
 			tempMask.Invert();
 			num_t fpSum = ThresholdTools::Sum(&inputImage, &tempMask);

@@ -8,13 +8,13 @@
 #include <gtkmm/label.h>
 #include <gtkmm/scale.h>
 
-#include "../../strategy/actions/statisticalflagaction.h"
+#include "../../strategy/actions/morphologicalflagaction.h"
 
 #include "../editstrategywindow.h"
 
 class StatisticalFlaggingFrame : public Gtk::Frame {
 	public:
-		StatisticalFlaggingFrame(rfiStrategy::StatisticalFlagAction &action, EditStrategyWindow &editStrategyWindow)
+		StatisticalFlaggingFrame(rfiStrategy::MorphologicalFlagAction &action, EditStrategyWindow &editStrategyWindow)
 		: Gtk::Frame("Statistical flagging"),
 		_editStrategyWindow(editStrategyWindow), _action(action),
 		_dilluteTimeSizeLabel("Dillution time size:"),
@@ -92,7 +92,7 @@ class StatisticalFlaggingFrame : public Gtk::Frame {
 		}
 	private:
 		EditStrategyWindow &_editStrategyWindow;
-		rfiStrategy::StatisticalFlagAction &_action;
+		rfiStrategy::MorphologicalFlagAction &_action;
 
 		Gtk::VBox _box;
 		Gtk::ButtonBox _buttonBox;

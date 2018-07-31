@@ -144,7 +144,7 @@ set(STRATEGY_ACTION_FILES
   strategy/actions/plotaction.cpp
   strategy/actions/saveheatmapaction.cpp
   strategy/actions/slidingwindowfitaction.cpp
-  strategy/actions/statisticalflagaction.cpp
+  strategy/actions/morphologicalflagaction.cpp
   strategy/actions/strategy.cpp
   strategy/actions/svdaction.cpp
   strategy/actions/timeconvolutionaction.cpp
@@ -164,7 +164,7 @@ set(STRATEGY_ALGORITHMS_FILES
   strategy/algorithms/localfitmethod.cpp
   strategy/algorithms/morphology.cpp
   strategy/algorithms/sinusfitter.cpp
-  strategy/algorithms/statisticalflagger.cpp
+  strategy/algorithms/morphologicalflagger.cpp
   strategy/algorithms/sumthreshold.cpp
   strategy/algorithms/svdmitigater.cpp
   strategy/algorithms/testsetgenerator.cpp

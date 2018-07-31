@@ -102,7 +102,7 @@ std::unique_ptr<Action> ActionFactory::CreateAction(const std::string &action)
 	else if(action == "Sliding window fit")
 		return make<SlidingWindowFitAction>();
 	else if(action == "Statistical flagging")
-		return make<StatisticalFlagAction>();
+		return make<MorphologicalFlagAction>();
 	else if(action == "SumThreshold")
 		return make<SumThresholdAction>();
 	else if(action == "Time convolution")

@@ -16,7 +16,7 @@
 #include "../actions/setflaggingaction.h"
 #include "../actions/setimageaction.h"
 #include "../actions/slidingwindowfitaction.h"
-#include "../actions/statisticalflagaction.h"
+#include "../actions/morphologicalflagaction.h"
 #include "../actions/strategy.h"
 #include "../actions/sumthresholdaction.h"
 #include "../actions/timeselectionaction.h"
@@ -304,7 +304,7 @@ namespace rfiStrategy {
 		setFlagsInAllPolarizations->SetNewFlagging(SetFlaggingAction::PolarisationsEqual);
 		block.Add(std::move(setFlagsInAllPolarizations));
 		
-		block.Add(std::unique_ptr<StatisticalFlagAction>(new StatisticalFlagAction()));
+		block.Add(std::unique_ptr<MorphologicalFlagAction>(new MorphologicalFlagAction()));
 
 		bool pedantic = false;
 		if(pedantic)

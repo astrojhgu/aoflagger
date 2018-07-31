@@ -25,7 +25,7 @@
 #include "setflaggingaction.h"
 #include "setimageaction.h"
 #include "slidingwindowfitaction.h"
-#include "statisticalflagaction.h"
+#include "morphologicalflagaction.h"
 #include "strategy.h"
 #include "svdaction.h"
 #include "sumthresholdaction.h"

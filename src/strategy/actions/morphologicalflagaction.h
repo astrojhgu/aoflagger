@@ -7,18 +7,18 @@
 
 namespace rfiStrategy {
 
-	class StatisticalFlagAction : public Action
+	class MorphologicalFlagAction : public Action
 	{
 		public:
-			StatisticalFlagAction()
+			MorphologicalFlagAction()
 			: _enlargeTimeSize(0), _enlargeFrequencySize(0),
 			_minAvailableTimesRatio(0.0), _minAvailableFrequenciesRatio(0.0),
 			_minAvailableTFRatio(0.0),
 			_minimumGoodTimeRatio(0.2), _minimumGoodFrequencyRatio(0.2) { }
-			virtual ~StatisticalFlagAction() { }
+			virtual ~MorphologicalFlagAction() { }
 			virtual std::string Description() final override
 			{
-				return "Statistical flagging";
+				return "Morphological flagging";
 			}
 			virtual void Perform(class ArtifactSet &artifacts, class ProgressListener &listener) final override;
 			virtual ActionType Type() const final override { return StatisticalFlagActionType; }

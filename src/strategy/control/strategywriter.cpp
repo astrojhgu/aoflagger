@@ -117,7 +117,7 @@ namespace rfiStrategy {
 				writeSlidingWindowFitAction(static_cast<const SlidingWindowFitAction&>(action));
 				break;
 			case StatisticalFlagActionType:
-				writeStatisticalFlagAction(static_cast<const StatisticalFlagAction&>(action));
+				writeMorphologicalFlagAction(static_cast<const MorphologicalFlagAction&>(action));
 				break;
 			case StrategyType:
 				writeStrategy(static_cast<const Strategy&>(action));
@@ -360,7 +360,7 @@ namespace rfiStrategy {
 		Write<int>("time-direction-window-size", action.Parameters().timeDirectionWindowSize);
 	}
 
-	void StrategyWriter::writeStatisticalFlagAction(const StatisticalFlagAction &action)
+	void StrategyWriter::writeMorphologicalFlagAction(const MorphologicalFlagAction &action)
 	{
 		Attribute("type", "StatisticalFlagAction");
 		Write<size_t>("enlarge-frequency-size", action.EnlargeFrequencySize());

@@ -85,12 +85,12 @@ class DilationTest : public UnitTest {
 
 inline void DilationTest::TestHorizontalDilation::operator()()
 {
-	TestSingleDilation::testDilation<false>(StatisticalFlagger::DilateFlagsHorizontally);
+	TestSingleDilation::testDilation<false>(MorphologicalFlagger::DilateFlagsHorizontally);
 }
 
 inline void DilationTest::TestVerticalDilation::operator()()
 {
-	TestSingleDilation::testDilation<true>(StatisticalFlagger::DilateFlagsVertically);
+	TestSingleDilation::testDilation<true>(MorphologicalFlagger::DilateFlagsVertically);
 }
 
 template<bool Flip, typename DilateFunction>
