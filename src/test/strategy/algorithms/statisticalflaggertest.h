@@ -6,7 +6,7 @@
 
 #include "../../../structures/mask2d.h"
 
-#include "../../../strategy/algorithms/statisticalflagger.h"
+#include "../../../strategy/algorithms/morphologicalflagger.h"
 
 class StatisticalFlaggerTest : public UnitTest {
 	public:

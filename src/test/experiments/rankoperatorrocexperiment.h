@@ -7,7 +7,7 @@
 #include "../testingtools/unittest.h"
 
 #include "../../strategy/algorithms/siroperator.h"
-#include "../../strategy/algorithms/statisticalflagger.h"
+#include "../../strategy/algorithms/morphologicalflagger.h"
 #include "../../strategy/algorithms/testsetgenerator.h"
 #include "../../strategy/algorithms/thresholdtools.h"
 
