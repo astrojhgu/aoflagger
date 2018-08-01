@@ -8,8 +8,9 @@
 #include "../../util/rng.h"
 
 #include "combinatorialthresholder.h"
-#include "localfitmethod.h"
 #include "thresholdtools.h"
+#include "localfitmethod.h"
+#include "sumthreshold.h"
 
 ThresholdConfig::ThresholdConfig() :
 	_method(SumThreshold), _distribution(Gaussian), _verbose(false), _minConnectedSamples(1)
@@ -128,11 +129,11 @@ void ThresholdConfig::Execute(const Image2D* image, Mask2D* mask, bool additive,
 				if(_verbose)
 					std::cout << "Performing SumThreshold with length " << _horizontalOperations[i].length 
 						<< ", threshold " << _horizontalOperations[i].threshold*timeFactor << "..." << std::endl;
-				CombinatorialThresholder::HorizontalSumThresholdLarge(image, mask, &scratch, _horizontalOperations[i].length, _horizontalOperations[i].threshold*timeFactor);
+				SumThreshold::HorizontalLarge(image, mask, &scratch, _horizontalOperations[i].length, _horizontalOperations[i].threshold*timeFactor);
 			}
 			
 			if(i < _verticalOperations.size())
-				CombinatorialThresholder::VerticalSumThresholdLarge(image, mask, &scratch, _verticalOperations[i].length, _verticalOperations[i].threshold*frequencyFactor);
+				SumThreshold::VerticalLarge(image, mask, &scratch, _verticalOperations[i].length, _verticalOperations[i].threshold*frequencyFactor);
 			break;
 			case VarThreshold:
 			if(i < _horizontalOperations.size())
