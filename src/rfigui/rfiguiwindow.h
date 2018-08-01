@@ -141,6 +141,7 @@ class RFIGuiWindow : public Gtk::Window, private StrategyController {
 		void onSetToOne();
 		void onSetToI();
 		void onSetToOnePlusI();
+		void onAddCorrelatorFault();
 		void onShowStats();
 		void onPlotDistPressed();
 		void onPlotLogLogDistPressed();

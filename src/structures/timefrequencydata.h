@@ -575,6 +575,7 @@ class TimeFrequencyData
 			msg << "Invalid mask index of " << maskIndex << " in GetMask(): mask count is " << MaskCount();
 			throw BadUsageException(msg.str());
 		}
+		
 		void SetImage(size_t imageIndex, const Image2DCPtr& image)
 		{
 			size_t index = 0;
@@ -601,7 +602,35 @@ class TimeFrequencyData
 			}
 			throw BadUsageException("Invalid image index in SetImage()");
 		}
-		void SetMask(size_t maskIndex, const Mask2DCPtr &mask)
+		
+		void SetImage(size_t imageIndex, Image2DCPtr&& image)
+		{
+			size_t index = 0;
+			for(PolarizedTimeFrequencyData& data : _data)
+			{
+				if(data._images[0])
+				{
+					if(index == imageIndex)
+					{
+						data._images[0] = std::move(image);
+						return;
+					}
+					++index;
+				}
+				if(data._images[1])
+				{
+					if(index == imageIndex)
+					{
+						data._images[1] = std::move(image);
+						return;
+					}
+					++index;
+				}
+			}
+			throw BadUsageException("Invalid image index in SetImage()");
+		}
+		
+		void SetMask(size_t maskIndex, const Mask2DCPtr& mask)
 		{
 			size_t index = 0;
 			for(PolarizedTimeFrequencyData& data : _data)
@@ -618,6 +647,25 @@ class TimeFrequencyData
 			}
 			throw BadUsageException("Invalid mask index in SetMask()");
 		}
+		
+		void SetMask(size_t maskIndex, Mask2DCPtr&& mask)
+		{
+			size_t index = 0;
+			for(PolarizedTimeFrequencyData& data : _data)
+			{
+				if(data._flagging)
+				{
+					if(index == maskIndex)
+					{
+						data._flagging = std::move(mask);
+						return;
+					}
+					++index;
+				}
+			}
+			throw BadUsageException("Invalid mask index in SetMask()");
+		}
+		
 		void SetMask(const TimeFrequencyData& source)
 		{
 			source.CopyFlaggingTo(this);

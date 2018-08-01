@@ -481,6 +481,8 @@ void RFIGuiWindow::createToolbar()
 	sigc::mem_fun(*this, &RFIGuiWindow::onSetToI) );
 	_actionGroup->add( Gtk::Action::create("SetToOnePlusI", "Set to 1+i"),
 	sigc::mem_fun(*this, &RFIGuiWindow::onSetToOnePlusI) );
+	_actionGroup->add( Gtk::Action::create("AddCorrelatorFault", "Add correlator fault"),
+	sigc::mem_fun(*this, &RFIGuiWindow::onAddCorrelatorFault) );
 	_actionGroup->add( Gtk::Action::create("MultiplyData", "Multiply data..."),
 	sigc::mem_fun(*this, &RFIGuiWindow::onMultiplyData) );
 	action = Gtk::Action::create("Quit", "_Quit");
@@ -819,6 +821,7 @@ void RFIGuiWindow::createToolbar()
 		"        <menuitem action='SetToOne'/>"
 		"        <menuitem action='SetToI'/>"
 		"        <menuitem action='SetToOnePlusI'/>"
+		"        <menuitem action='AddCorrelatorFault'/>"
 		"        <menuitem action='MultiplyData'/>"
 		"      </menu>"
     "      <menuitem action='Quit'/>"
@@ -1111,6 +1114,38 @@ void RFIGuiWindow::onSetToOnePlusI()
 	{
 		showError(e.what());
 	}
+}
+
+void RFIGuiWindow::onAddCorrelatorFault()
+{
+	TimeFrequencyData data(GetActiveData());
+	size_t
+		startIndex = data.ImageWidth()*1/4,
+		endIndex = data.ImageWidth()*2/4;
+	for(size_t i=0; i!=data.ImageCount(); ++i)
+	{
+		Image2DPtr image(new Image2D(*data.GetImage(i)));
+		num_t addValue = 10.0 * image->GetStdDev();
+		for(size_t y=0; y!=image->Height(); ++y)
+		{
+			for(size_t x=startIndex; x!=endIndex; ++x)
+				image->AddValue(x, y, addValue);
+		}
+		
+		data.SetImage(i, std::move(image));
+	}
+	for(size_t i=0; i!=data.MaskCount(); ++i)
+	{
+		Mask2DPtr mask(new Mask2D(*data.GetMask(i)));
+		for(size_t y=0; y!=mask->Height(); ++y)
+		{
+			for(size_t x=startIndex; x!=endIndex; ++x)
+				mask->SetValue(x, y, true);
+		}
+		data.SetMask(i, std::move(mask));
+	}
+	_controller->TFController().SetNewData(data, _timeFrequencyWidget.Plot().GetSelectedMetaData());
+	_timeFrequencyWidget.Update();
 }
 
 void RFIGuiWindow::onShowStats()
