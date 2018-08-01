@@ -652,6 +652,8 @@ void RFIGuiWindow::createToolbar()
 	_toggleConnections.push_back(_altFlagsButton->signal_activate().connect(sigc::mem_fun(*this, &RFIGuiWindow::onToggleFlags)));
 	_actionGroup->add(_altFlagsButton,
 			Gtk::AccelKey("F4"));
+	_actionGroup->add( Gtk::Action::create("ClearOriginalFlags", "Clear ori flags"),
+  sigc::mem_fun(*this, &RFIGuiWindow::onClearOriginalFlagsPressed) );
 	_actionGroup->add( Gtk::Action::create("ClearAltFlags", "Clear alt flags"),
   sigc::mem_fun(*this, &RFIGuiWindow::onClearAltFlagsPressed) );
 
@@ -919,6 +921,7 @@ void RFIGuiWindow::createToolbar()
     "      <menuitem action='StoreData'/>"
     "      <menuitem action='RecallData'/>"
     "      <menuitem action='SubtractDataFromMem'/>"
+    "      <menuitem action='ClearOriginalFlags'/>"
     "      <menuitem action='ClearAltFlags'/>"
 	  "    </menu>"
 	  "    <menu action='MenuActions'>"
@@ -992,10 +995,19 @@ void RFIGuiWindow::createToolbar()
 	pMenubar->show();
 }
 
+void RFIGuiWindow::onClearOriginalFlagsPressed()
+{
+	TimeFrequencyData data = _controller->TFController().GetVisualizationData(0);
+	data.SetMasksToValue<false>();
+	_controller->TFController().SetVisualizationData(0, std::move(data));
+	_timeFrequencyWidget.Update();
+}
+
 void RFIGuiWindow::onClearAltFlagsPressed()
 {
-	TimeFrequencyData& data = _controller->TFController().VisualizedData();
+	TimeFrequencyData data(_controller->TFController().AltMaskData());
 	data.SetMasksToValue<false>();
+	_controller->TFController().SetAltMaskData(data);
 	_timeFrequencyWidget.Update();
 }
 
@@ -1957,7 +1969,7 @@ void RFIGuiWindow::updateTFVisualizationMenu()
 	Gtk::RadioButtonGroup group;
 	for(size_t i=0; i!=_controller->TFController().VisualizationCount(); ++i)
 	{
-		std::string label = _controller->TFController().GetVisualizedLabel(i);
+		std::string label = _controller->TFController().GetVisualizationLabel(i);
 		_tfVisualizationMenuItems.emplace_back(std::unique_ptr<Gtk::RadioMenuItem>(new Gtk::RadioMenuItem(group, label)));
 		Gtk::RadioMenuItem& item = *_tfVisualizationMenuItems.back();
 		item.signal_activate().connect(sigc::mem_fun(*this, &RFIGuiWindow::onSelectImage));

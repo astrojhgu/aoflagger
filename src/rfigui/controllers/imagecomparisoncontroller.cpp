@@ -142,6 +142,16 @@ void ImageComparisonController::TryVisualizePolarizations(bool& pp, bool& pq, bo
 	}
 }
 
+void ImageComparisonController::updateVisualizedImageAndMask()
+{
+	if(_visualizedImage == 0)
+		_plot.SetAlternativeMask(_dataList.back().data.GetSingleMask());
+	else
+		_plot.SetAlternativeMask(_dataList[_visualizedImage].data.GetSingleMask());
+	_plot.SetOriginalMask(_dataList.front().data.GetSingleMask());
+	updateVisualizedImage();
+}
+
 void ImageComparisonController::updateVisualizedImage()
 {
   Image2DCPtr image;

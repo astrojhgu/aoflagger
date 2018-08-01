@@ -3,6 +3,7 @@
 
 #include <gtkmm/drawingarea.h>
 
+#include <utility>
 #include <vector>
 
 #include "../../structures/image2d.h"
@@ -30,23 +31,51 @@ class ImageComparisonController {
 			return v;
 		}
 		
-		TimeFrequencyData& VisualizedData() { return _dataList[_visualizedImage].data; }
-		const TimeFrequencyData& VisualizedData() const { return _dataList[_visualizedImage].data; }
-		size_t VisualizedIndex() const { return _visualizedImage; }
-		const TimeFrequencyData& GetVisualizedData(size_t index) const { return _dataList[index].data; }
-		const std::string& GetVisualizedLabel(size_t index) { return _dataList[index].label; }
+		template<typename T>
+		void SetVisualizationData(size_t index, T&& data)
+		{
+			_dataList[index].data = std::forward<T>(data);
+			if(index == 0 || _visualizedImage == index ||
+				(_visualizedImage==0 && index==_dataList.size()-1) )
+				updateVisualizedImageAndMask();
+		}
+		
+		const TimeFrequencyData& VisualizedData() const {
+			return _dataList[_visualizedImage].data;
+		}
+		void SetVisualizedData(const TimeFrequencyData &data)
+		{
+			_dataList[_visualizedImage].data = data;
+			updateVisualizedImageAndMask();
+		}
+		
+		void SetAltMaskData(TimeFrequencyData& data) {
+			if(_visualizedImage == 0)
+				_dataList.back().data = data;
+			else
+				_dataList[_visualizedImage].data = data;
+			updateVisualizedImageAndMask();
+		}
+		
+		const TimeFrequencyData& AltMaskData() const {
+			if(_visualizedImage == 0)
+				return _dataList.back().data;
+			else
+				return _dataList[_visualizedImage].data;
+		}
+		
 		size_t VisualizationCount() const { return _dataList.size(); }
+		size_t VisualizedIndex() const { return _visualizedImage; }
+		
+		const TimeFrequencyData& GetVisualizationData(size_t index) const { return _dataList[index].data; }
+		const std::string& GetVisualizationLabel(size_t index) { return _dataList[index].label; }
 		
 		void SetVisualization(size_t visualizationIndex)
 		{
 			if(_visualizedImage != visualizationIndex && _visualizedImage < _dataList.size())
 			{
 				_visualizedImage = visualizationIndex;
-				if(_visualizedImage == 0)
-					_plot.SetAlternativeMask(_dataList.back().data.GetSingleMask());
-				else
-					_plot.SetAlternativeMask(_dataList[_visualizedImage].data.GetSingleMask());
-				updateVisualizedImage();
+				updateVisualizedImageAndMask();
 			}
 		}
 		void TryVisualizePolarizations(bool& pp, bool& pq, bool& qp, bool& qq) const;
@@ -71,6 +100,7 @@ class ImageComparisonController {
 		{ return _visualizationListChange; }
 	private:
 		void getFirstAvailablePolarization(bool& pp, bool& pq, bool& qp, bool& qq) const;
+		void updateVisualizedImageAndMask();
 		void updateVisualizedImage();
 		void getActiveMask(TimeFrequencyData& data) const
 		{

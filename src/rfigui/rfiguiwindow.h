@@ -89,6 +89,7 @@ class RFIGuiWindow : public Gtk::Window, private StrategyController {
 		void onShowImagePlane();
 		void onSetAndShowImagePlane();
 		void onAddToImagePlane();
+		void onClearOriginalFlagsPressed();
 		void onClearAltFlagsPressed();
 		void onVisualizedToOriginalPressed();
 		void onHightlightPressed();
