@@ -1,6 +1,9 @@
 #include "sumthresholdmissing.h"
 
-void SumThresholdMissing::Horizontal(const Image2D& input, Mask2D& mask, const Mask2D& missing, Mask2D& scratch, size_t length, num_t threshold)
+#include "../../structures/xyswappedmask2d.h"
+
+template<typename ImageLike, typename MaskLike, typename CMaskLike>
+void SumThresholdMissing::horizontal(const ImageLike& input, MaskLike& mask, const CMaskLike& missing, MaskLike& scratch, size_t length, num_t threshold)
 {
 	scratch = mask;
 	const size_t width = mask.Width(), height = mask.Height();
@@ -13,7 +16,7 @@ void SumThresholdMissing::Horizontal(const Image2D& input, Mask2D& mask, const M
 			// Find first non-missing value for the start of the summation interval
 			// xLeft points to the first element of the interval, which is marked as non-missing.
 			size_t xLeft = 0;
-			while(missing.Value(xLeft, y))
+			while(xLeft != width && missing.Value(xLeft, y))
 				++xLeft;
 			
 			// xRight points to the last non-missing element of the interval
@@ -56,12 +59,26 @@ void SumThresholdMissing::Horizontal(const Image2D& input, Mask2D& mask, const M
 				}
 				do {
 					++xRight;
-				} while(missing.Value(xRight, y) && xRight != width);
+				} while(xRight != width && missing.Value(xRight, y));
 				do {
 					++xLeft;
-				} while(missing.Value(xLeft, y));
+					// it could happen that xLeft gets to width when the length is one...
+					// for other lengths the first test is not necessary.
+				} while(xLeft != width && missing.Value(xLeft, y));
 			}
 		}
 	}
 	mask = std::move(scratch);
+}
+
+template
+void SumThresholdMissing::horizontal(const Image2D& input, Mask2D& mask, const Mask2D& missing, Mask2D& scratch, size_t length, num_t threshold);
+
+void SumThresholdMissing::Vertical(const Image2D& input, Mask2D& mask, const Mask2D& missing, Mask2D& scratch, size_t length, num_t threshold)
+{
+	XYSwappedImage2D<const Image2D> swappedInput(input);
+	XYSwappedMask2D<Mask2D> swappedMask(mask);
+	XYSwappedMask2D<const Mask2D> swappedMissing(missing);
+	XYSwappedMask2D<Mask2D> swappedScratch(scratch);
+	horizontal(swappedInput, swappedMask, swappedMissing, swappedScratch, length, threshold);
 }
