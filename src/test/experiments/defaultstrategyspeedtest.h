@@ -372,7 +372,7 @@ inline void DefaultStrategySpeedTest::TimeSumThresholdN::operator()()
 		Stopwatch watchA(true);
 		for(size_t j=0; j!=N; ++j) {
 			maskInp = maskA;
-			CombinatorialThresholder::HorizontalSumThresholdLargeReference(input.get(), &maskInp, &scratch, length, threshold);
+			SumThreshold::HorizontalLargeReference(input.get(), &maskInp, &scratch, length, threshold);
 		}
 		hor += watchA.Seconds();
 		Logger::Info << "Horizontal, length " << length << ": " << watchA.ToString() << '\n';
@@ -382,7 +382,7 @@ inline void DefaultStrategySpeedTest::TimeSumThresholdN::operator()()
 		Stopwatch watchE(true);
 		for(size_t j=0; j!=N; ++j) {
 			maskInp = maskE;
-			CombinatorialThresholder::HorizontalSumThresholdLargeSSE(input.get(), &maskInp, &scratch, length, threshold);
+			SumThreshold::HorizontalLargeSSE(input.get(), &maskInp, &scratch, length, threshold);
 		}
 		sseHor += watchE.Seconds();
 		Logger::Info << "SSE Horizontal, length " << length << ": " << watchE.ToString() << '\n';
@@ -403,7 +403,7 @@ inline void DefaultStrategySpeedTest::TimeSumThresholdN::operator()()
 		Stopwatch watchB(true);
 		for(size_t j=0; j!=N; ++j) {
 			maskInp = maskB;
-			CombinatorialThresholder::VerticalSumThresholdLargeReference(input.get(), &maskInp, &scratch, length, threshold);
+			SumThreshold::VerticalLargeReference(input.get(), &maskInp, &scratch, length, threshold);
 		}
 		vert += watchB.Seconds();
 		Logger::Info << "Vertical, length " << length << ": " << watchB.ToString() << '\n';
@@ -413,7 +413,7 @@ inline void DefaultStrategySpeedTest::TimeSumThresholdN::operator()()
 		Stopwatch watchD(true);
 		for(size_t j=0; j!=N; ++j) {
 			maskInp = maskD;
-			CombinatorialThresholder::VerticalSumThresholdLargeSSE(input.get(), &maskInp, &scratch, length, threshold);
+			SumThreshold::VerticalLargeSSE(input.get(), &maskInp, &scratch, length, threshold);
 		}
 		sseVert += watchD.Seconds();
 		Logger::Info << "SSE Vertical, length " << length << ": " << watchD.ToString() << '\n';
@@ -424,7 +424,7 @@ inline void DefaultStrategySpeedTest::TimeSumThresholdN::operator()()
 		Stopwatch watchF(true);
 		for(size_t j=0; j!=N; ++j) {
 			maskInp = maskF;
-			CombinatorialThresholder::VerticalSumThresholdLargeAVX(input.get(), &maskF, &scratch, length, threshold);
+			SumThreshold::VerticalLargeAVX(input.get(), &maskF, &scratch, length, threshold);
 		}
 		avxVert += watchF.Seconds();
 		Logger::Info << "AVX Vertical, length " << length << ": " << watchF.ToString() << '\n';

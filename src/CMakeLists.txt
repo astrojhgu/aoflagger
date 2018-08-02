@@ -166,6 +166,7 @@ set(STRATEGY_ALGORITHMS_FILES
   strategy/algorithms/sinusfitter.cpp
   strategy/algorithms/morphologicalflagger.cpp
   strategy/algorithms/sumthreshold.cpp
+  strategy/algorithms/sumthresholdmissing.cpp
   strategy/algorithms/svdmitigater.cpp
   strategy/algorithms/testsetgenerator.cpp
   strategy/algorithms/thresholdconfig.cpp
