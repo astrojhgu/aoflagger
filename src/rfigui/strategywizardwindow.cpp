@@ -6,7 +6,7 @@
 
 #include "../gtkmm-compat.h"
 
-StrategyWizardWindow::StrategyWizardWindow(class StrategyController &controller) : Window(),
+StrategyWizardWindow::StrategyWizardWindow(class StrategyController& controller) : Window(),
 	_strategyController(controller),
 	_telescopeLabel("Telescope:"),
 	_telescopeCombo(),
@@ -19,11 +19,13 @@ StrategyWizardWindow::StrategyWizardWindow(class StrategyController &controller)
 	_robustConvergenceButton("Robust convergence"), _normConvergenceButton("Normal convergence"), _fastConvergenceButton("Fast convergence"),
 	_offAxisSourcesButton("Off-axis sources"),
 	_unsensitiveButton("Unsensitive"), _normalSensitivityButton("Normal sensitivity"), _sensitiveButton("Sensitive"),
-	_guiFriendlyButton("GUI friendly"), _clearFlagsButton("Clear existing flags"), _autoCorrelationButton("Auto-correlation")
+	_useOriginalFlagsButton("Use existing flags"),
+	_autoCorrelationButton("Auto-correlation")
 {
 	_telescopeSubBox.pack_start(_telescopeLabel);
 	_telescopeList = Gtk::ListStore::create(_telescopeListColumns);
 	addTelescope("Generic", rfiStrategy::DefaultStrategy::GENERIC_TELESCOPE);
+	addTelescope("AARTFAAC", rfiStrategy::DefaultStrategy::AARTFAAC_TELESCOPE);
 	addTelescope("Arecibo (305 m single dish, Puerto Rico)", rfiStrategy::DefaultStrategy::ARECIBO_TELESCOPE);
 	addTelescope("Bighorns (low-frequency wide-band EoR instrument, Curtin uni, Australia)", rfiStrategy::DefaultStrategy::BIGHORNS_TELESCOPE);
 	addTelescope("JVLA (Jansky Very Large Array, New Mexico)", rfiStrategy::DefaultStrategy::JVLA_TELESCOPE);
@@ -105,9 +107,7 @@ void StrategyWizardWindow::initializeOptionPage()
 	_optionsRightBox.pack_start(_sensitiveButton, true, true);
 	_sensitiveButton.set_group(sensitivityGroup);
 	
-	_optionsLeftBox.pack_start(_guiFriendlyButton, true, true);
-	_guiFriendlyButton.set_active(true);
-	_optionsLeftBox.pack_start(_clearFlagsButton, true, true);
+	_optionsLeftBox.pack_start(_useOriginalFlagsButton, true, true);
 	_optionsLeftBox.pack_start(_autoCorrelationButton, true, true);
 	_optionsBox.pack_start(_optionsLeftBox);
 	_optionsBox.pack_start(_optionsRightBox);
@@ -159,10 +159,8 @@ void StrategyWizardWindow::onFinishClicked()
 		flags |= rfiStrategy::DefaultStrategy::FLAG_UNSENSITIVE;
 	if(_sensitiveButton.get_active())
 		flags |= rfiStrategy::DefaultStrategy::FLAG_SENSITIVE;
-	if(_guiFriendlyButton.get_active())
-		flags |= rfiStrategy::DefaultStrategy::FLAG_GUI_FRIENDLY;
-	if(_clearFlagsButton.get_active())
-		flags |= rfiStrategy::DefaultStrategy::FLAG_CLEAR_FLAGS;
+	if(_useOriginalFlagsButton.get_active())
+		flags |= rfiStrategy::DefaultStrategy::FLAG_USE_ORIGINAL_FLAGS;
 	if(_autoCorrelationButton.get_active())
 		flags |= rfiStrategy::DefaultStrategy::FLAG_AUTO_CORRELATION;
 	

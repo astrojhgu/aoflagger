@@ -51,8 +51,7 @@ namespace rfiStrategy {
 			FLAG_OFF_AXIS_SOURCES,
 			FLAG_UNSENSITIVE,
 			FLAG_SENSITIVE,
-			FLAG_GUI_FRIENDLY,
-			FLAG_CLEAR_FLAGS,
+			FLAG_USE_ORIGINAL_FLAGS,
 			FLAG_AUTO_CORRELATION,
 			FLAG_HIGH_TIME_RESOLUTION;
 				
@@ -65,7 +64,22 @@ namespace rfiStrategy {
 		
 		static void EncapsulateSingleStrategy(ActionBlock& destination, std::unique_ptr<ActionBlock> singleStrategy, enum TelescopeId telescopeId);
 		
-		static void LoadSingleStrategy(ActionBlock &destination, int iterationCount, bool keepTransients, bool changeResVertically, bool calPassband, bool channelSelection, bool clearFlags, bool resetContaminated, double sumThresholdSensitivity, bool onStokesIQ, bool includePolStatistics, double verticalSmoothing, bool hasBaselines, bool highTimeResolution);
+		struct StrategySetup {
+			int iterationCount;
+			bool keepTransients;
+			bool changeResVertically;
+			bool calPassband;
+			bool channelSelection;
+			bool useOriginalFlags;
+			double sumThresholdSensitivity;
+			bool onStokesIQ;
+			bool includePolStatistics;
+			double verticalSmoothing;
+			bool hasBaselines;
+			bool highTimeResolution;
+		};
+		
+		static void LoadSingleStrategy(ActionBlock &destination, const StrategySetup& setup);
 
 		static std::string TelescopeName(DefaultStrategy::TelescopeId telescopeId);
 		

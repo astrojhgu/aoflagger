@@ -120,9 +120,11 @@ namespace aoflagger {
 			 */
 			static const unsigned SENSITIVE;
 			
-			/** @brief Will keep the background images in memory so they can be displayed
-			 * in the GUI. */
-			static const unsigned GUI_FRIENDLY;
+			/** @brief Will assume that the original flags that are already set in
+			 * the observation denote bad data and should be ignored. For example, certain
+			 * observatory correlators output flagged data when the data from an antenna is
+			 * (temporarily) not received. */
+			static const unsigned USE_ORIGINAL_FLAGS;
 			
 			/** @brief Erase any flags that are already set.
 			 * 

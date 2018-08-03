@@ -47,8 +47,7 @@ namespace rfiStrategy {
 		DefaultStrategy::FLAG_OFF_AXIS_SOURCES    = aoflagger::StrategyFlags::OFF_AXIS_SOURCES,
 		DefaultStrategy::FLAG_UNSENSITIVE         = aoflagger::StrategyFlags::UNSENSITIVE,
 		DefaultStrategy::FLAG_SENSITIVE           = aoflagger::StrategyFlags::SENSITIVE,
-		DefaultStrategy::FLAG_GUI_FRIENDLY        = aoflagger::StrategyFlags::GUI_FRIENDLY,
-		DefaultStrategy::FLAG_CLEAR_FLAGS         = aoflagger::StrategyFlags::CLEAR_FLAGS,
+		DefaultStrategy::FLAG_USE_ORIGINAL_FLAGS  = aoflagger::StrategyFlags::USE_ORIGINAL_FLAGS,
 		DefaultStrategy::FLAG_AUTO_CORRELATION    = aoflagger::StrategyFlags::AUTO_CORRELATION,
 		DefaultStrategy::FLAG_HIGH_TIME_RESOLUTION= aoflagger::StrategyFlags::HIGH_TIME_RESOLUTION;
 	
@@ -101,7 +100,8 @@ namespace rfiStrategy {
 	
 	void DefaultStrategy::LoadStrategy(ActionBlock &strategy, enum TelescopeId telescopeId, unsigned flags, double frequency, double timeRes, double frequencyRes)
 	{
-		bool calPassband =
+		StrategySetup setup;
+		setup.calPassband =
 			// Default MWA observations have strong frequency dependency
 			(telescopeId==MWA_TELESCOPE && ((flags&FLAG_SMALL_BANDWIDTH) == 0)) ||
 			// JVLA observation I saw (around 1100 MHz) have steep band edges
@@ -110,66 +110,63 @@ namespace rfiStrategy {
 			(telescopeId==BIGHORNS_TELESCOPE && ((flags&FLAG_SMALL_BANDWIDTH) == 0)) ||
 			// Other cases with large bandwidth
 			((flags&FLAG_LARGE_BANDWIDTH) != 0);
-		bool keepTransients = (flags&FLAG_TRANSIENTS) != 0;
+		setup.keepTransients = (flags&FLAG_TRANSIENTS) != 0;
 		// Don't remove edges because of channel selection
-		bool channelSelection = (telescopeId != JVLA_TELESCOPE);
-		bool changeResVertically = true;
-		bool hiTimeResolution = (timeRes <= 1e-3 && timeRes != 0.0) || ((flags&FLAG_HIGH_TIME_RESOLUTION)!=0);
+		setup.channelSelection = (telescopeId != JVLA_TELESCOPE);
+		setup.changeResVertically = true;
+		setup.highTimeResolution = (timeRes <= 1e-3 && timeRes != 0.0) || ((flags&FLAG_HIGH_TIME_RESOLUTION)!=0);
 		// WSRT has automatic gain control, which strongly affect autocorrelations
 		if(((flags&FLAG_AUTO_CORRELATION) != 0) && telescopeId == WSRT_TELESCOPE)
 		{
-			changeResVertically = false;
-			keepTransients = true;
+			setup.changeResVertically = false;
+			setup.keepTransients = true;
 		}
 		// JVLA observations I saw (around 1100 MHz) have steep band edges, so smooth very little
 		if(telescopeId == JVLA_TELESCOPE)
 		{
-			changeResVertically = false;
+			setup.changeResVertically = false;
 		}
-		bool clearFlags =
-			((flags&FLAG_CLEAR_FLAGS) != 0) ||
-			((flags&FLAG_GUI_FRIENDLY) != 0);
-		bool resetContaminated =
-			((flags&FLAG_GUI_FRIENDLY) != 0);
-		int iterationCount = ((flags&FLAG_ROBUST)==0) ? 2 : 4;
+		setup.useOriginalFlags =
+			((flags&FLAG_USE_ORIGINAL_FLAGS) != 0);
+		setup.iterationCount = ((flags&FLAG_ROBUST)==0) ? 2 : 4;
 		if(telescopeId == BIGHORNS_TELESCOPE)
-			iterationCount *= 2;
-		double sumThresholdSensitivity = 1.0;
+			setup.iterationCount *= 2;
+		setup.sumThresholdSensitivity = 1.0;
 		if(telescopeId == PARKES_TELESCOPE || telescopeId == WSRT_TELESCOPE)
-			sumThresholdSensitivity = 1.4;
+			setup.sumThresholdSensitivity = 1.4;
 		else if(telescopeId == ARECIBO_TELESCOPE || telescopeId == BIGHORNS_TELESCOPE)
-			sumThresholdSensitivity = 1.2;
+			setup.sumThresholdSensitivity = 1.2;
 		if((flags&FLAG_AUTO_CORRELATION) != 0)
-			sumThresholdSensitivity *= 1.4;
+			setup.sumThresholdSensitivity *= 1.4;
 		if((flags&FLAG_SENSITIVE) != 0)
-			sumThresholdSensitivity /= 1.2;
+			setup.sumThresholdSensitivity /= 1.2;
 		if((flags&FLAG_UNSENSITIVE) != 0)
-			sumThresholdSensitivity *= 1.2;
-		bool onStokesIQ = ((flags&FLAG_FAST) != 0);
-		bool assembleStatistics = ((flags&FLAG_GUI_FRIENDLY)!=0) ||
+			setup.sumThresholdSensitivity *= 1.2;
+		setup.onStokesIQ = ((flags&FLAG_FAST) != 0);
+		setup.includePolStatistics =
 			!(telescopeId==MWA_TELESCOPE || telescopeId==AARTFAAC_TELESCOPE);
 		
-		double verticalSmoothing = 5.0;
+		setup.verticalSmoothing = 5.0;
 		if(telescopeId == JVLA_TELESCOPE)
-			verticalSmoothing = 1.0;
+			setup.verticalSmoothing = 1.0;
 		
-		bool hasBaselines = telescopeId!=PARKES_TELESCOPE && telescopeId!=ARECIBO_TELESCOPE && telescopeId!=BIGHORNS_TELESCOPE && telescopeId!=GENERIC_TELESCOPE;
+		setup.hasBaselines = telescopeId!=PARKES_TELESCOPE && telescopeId!=ARECIBO_TELESCOPE && telescopeId!=BIGHORNS_TELESCOPE && telescopeId!=GENERIC_TELESCOPE;
 		
-		LoadSingleStrategy(strategy, iterationCount, keepTransients, changeResVertically, calPassband, channelSelection, clearFlags, resetContaminated, sumThresholdSensitivity, onStokesIQ, assembleStatistics, verticalSmoothing, hasBaselines, hiTimeResolution);
+		LoadSingleStrategy(strategy, setup);
 	}
 	
-	void DefaultStrategy::LoadSingleStrategy(ActionBlock &block, int iterationCount, bool keepTransients, bool changeResVertically, bool calPassband, bool channelSelection, bool clearFlags, bool resetContaminated, double sumThresholdSensitivity, bool onStokesIQ, bool assembleStatistics, double verticalSmoothing, bool hasBaselines, bool highTimeResolution)
+	void DefaultStrategy::LoadSingleStrategy(ActionBlock &block, const StrategySetup& setup)
 	{
 		ActionBlock *current, *scratch;
 
-		if(resetContaminated)
+		if(setup.useOriginalFlags)
 			block.Add(std::unique_ptr<Action>(new SetImageAction()));
 		
 		block.Add(std::unique_ptr<Action>(new SetFlaggingAction()));
 		
 		current = &block;
 		
-		if(highTimeResolution)
+		if(setup.highTimeResolution)
 		{
 			std::unique_ptr<ChangeResolutionAction> changeResAction(new ChangeResolutionAction());
 			changeResAction->SetTimeDecreaseFactor(10);
@@ -183,7 +180,7 @@ namespace rfiStrategy {
 		}
 
 		std::unique_ptr<ForEachPolarisationBlock> fepBlock(new ForEachPolarisationBlock());
-		if(onStokesIQ)
+		if(setup.onStokesIQ)
 		{
 			fepBlock->SetOnPP(false);
 			fepBlock->SetOnPQ(false);
@@ -207,35 +204,35 @@ namespace rfiStrategy {
 		current = focActionPtr;
 
 		std::unique_ptr<IterationBlock> iteration(new IterationBlock());
-		iteration->SetIterationCount(iterationCount);
-		iteration->SetSensitivityStart(2.0 * pow(2.0, iterationCount/2.0));
+		iteration->SetIterationCount(setup.iterationCount);
+		iteration->SetSensitivityStart(2.0 * pow(2.0, setup.iterationCount/2.0));
 		IterationBlock* iterationRoot = iteration.get();
 		current->Add(std::move(iteration));
 		
 		std::unique_ptr<SumThresholdAction> t1(new SumThresholdAction());
-		t1->SetTimeDirectionSensitivity(sumThresholdSensitivity);
-		t1->SetFrequencyDirectionSensitivity(sumThresholdSensitivity);
-		if(keepTransients)
+		t1->SetTimeDirectionSensitivity(setup.sumThresholdSensitivity);
+		t1->SetFrequencyDirectionSensitivity(setup.sumThresholdSensitivity);
+		if(setup.keepTransients)
 			t1->SetFrequencyDirectionFlagging(false);
 		iterationRoot->Add(std::move(t1));
 
 		std::unique_ptr<CombineFlagResults> cfr1(new CombineFlagResults());
-		if(channelSelection)
+		if(setup.channelSelection)
 			cfr1->Add(std::unique_ptr<FrequencySelectionAction>(new FrequencySelectionAction()));
-		if(!keepTransients)
+		if(!setup.keepTransients)
 			cfr1->Add(std::unique_ptr<TimeSelectionAction>(new TimeSelectionAction()));
 		iterationRoot->Add(std::move(cfr1));
 	
 		iterationRoot->Add(std::unique_ptr<SetImageAction>(new SetImageAction()));
 		
-		if(!keepTransients || changeResVertically)
+		if(!setup.keepTransients || setup.changeResVertically)
 		{
 			std::unique_ptr<ChangeResolutionAction> changeResAction(new ChangeResolutionAction());
-			if(keepTransients)
+			if(setup.keepTransients)
 				changeResAction->SetTimeDecreaseFactor(1);
 			else
 				changeResAction->SetTimeDecreaseFactor(3);
-			if(changeResVertically)
+			if(setup.changeResVertically)
 				changeResAction->SetFrequencyDecreaseFactor(3);
 			else
 				changeResAction->SetFrequencyDecreaseFactor(1);
@@ -248,16 +245,16 @@ namespace rfiStrategy {
 		}
 
 		std::unique_ptr<HighPassFilterAction> hpAction(new HighPassFilterAction());
-		if(keepTransients)
+		if(setup.keepTransients)
 		{
 			hpAction->SetWindowWidth(1);
 		} else {
 			hpAction->SetHKernelSigmaSq(2.5);
 			hpAction->SetWindowWidth(21);
 		}
-		hpAction->SetVKernelSigmaSq(verticalSmoothing);
+		hpAction->SetVKernelSigmaSq(setup.verticalSmoothing);
 		hpAction->SetWindowHeight(31);
-		if(!keepTransients || changeResVertically)
+		if(!setup.keepTransients || setup.changeResVertically)
 			hpAction->SetMode(HighPassFilterAction::StoreRevised);
 		else
 			hpAction->SetMode(HighPassFilterAction::StoreContaminated);
@@ -279,13 +276,13 @@ namespace rfiStrategy {
 		//
 		current = focActionPtr;
 		
-		if(calPassband)
+		if(setup.calPassband)
 			current->Add(std::unique_ptr<CalibratePassbandAction>(new CalibratePassbandAction()));
 		
 		std::unique_ptr<SumThresholdAction> t2(new SumThresholdAction());
-		t2->SetTimeDirectionSensitivity(sumThresholdSensitivity);
-		t2->SetFrequencyDirectionSensitivity(sumThresholdSensitivity);
-		if(keepTransients)
+		t2->SetTimeDirectionSensitivity(setup.sumThresholdSensitivity);
+		t2->SetFrequencyDirectionSensitivity(setup.sumThresholdSensitivity);
+		if(setup.keepTransients)
 			t2->SetFrequencyDirectionFlagging(false);
 		current->Add(std::move(t2));
 		
@@ -293,7 +290,7 @@ namespace rfiStrategy {
 		visAction->SetLabel("Iteration residual");
 		current->Add(std::move(visAction));
 		
-		if(assembleStatistics)
+		if(setup.includePolStatistics)
 		{
 			std::unique_ptr<PlotAction> plotPolarizationStatistics(new PlotAction());
 			plotPolarizationStatistics->SetPlotKind(PlotAction::PolarizationStatisticsPlot);
@@ -312,27 +309,27 @@ namespace rfiStrategy {
 			std::unique_ptr<CombineFlagResults> cfr2(new CombineFlagResults());
 			block.Add(std::move(cfr2));
 			cfr2->Add(std::unique_ptr<FrequencySelectionAction>(new FrequencySelectionAction()));
-			if(!keepTransients) {
+			if(!setup.keepTransients) {
 				std::unique_ptr<TimeSelectionAction> tsAction(new TimeSelectionAction());
 				tsAction->SetThreshold(4.0);
 				cfr2->Add(std::move(tsAction));
 			}
 		} else {
-			if(!keepTransients) {
+			if(!setup.keepTransients) {
 				std::unique_ptr<TimeSelectionAction> tsAction(new TimeSelectionAction());
 				tsAction->SetThreshold(4.0);
 				block.Add(std::move(tsAction));
 			}
 		}
 
-		if(assembleStatistics && hasBaselines)
+		if(setup.includePolStatistics && setup.hasBaselines)
 		{
 			std::unique_ptr<BaselineSelectionAction> baselineSelection(new BaselineSelectionAction());
 			baselineSelection->SetPreparationStep(true);
 			block.Add(std::move(baselineSelection));
 		}
 
-		if(!clearFlags)
+		if(setup.useOriginalFlags)
 		{
 			std::unique_ptr<SetFlaggingAction> orWithOriginals(new SetFlaggingAction());
 			orWithOriginals->SetNewFlagging(SetFlaggingAction::OrOriginal);

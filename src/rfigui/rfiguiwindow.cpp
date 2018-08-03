@@ -93,7 +93,7 @@ RFIGuiWindow::RFIGuiWindow(RFIGuiController* controller) :
 
 	_strategy = rfiStrategy::DefaultStrategy::CreateStrategy(
 		rfiStrategy::DefaultStrategy::GENERIC_TELESCOPE,
-		rfiStrategy::DefaultStrategy::FLAG_GUI_FRIENDLY);
+		rfiStrategy::DefaultStrategy::FLAG_NONE);
 	_imagePlaneWindow.reset(new ImagePlaneWindow());
 	
 	onTFZoomChanged();

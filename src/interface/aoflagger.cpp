@@ -37,10 +37,9 @@ namespace aoflagger {
 	const unsigned StrategyFlags::OFF_AXIS_SOURCES     =   0x80;
 	const unsigned StrategyFlags::UNSENSITIVE          =  0x100;
 	const unsigned StrategyFlags::SENSITIVE            =  0x200;
-	const unsigned StrategyFlags::GUI_FRIENDLY         =  0x400;
-	const unsigned StrategyFlags::CLEAR_FLAGS          =  0x800;
-	const unsigned StrategyFlags::AUTO_CORRELATION     = 0x1000;
-	const unsigned StrategyFlags::HIGH_TIME_RESOLUTION = 0x2000;
+	const unsigned StrategyFlags::USE_ORIGINAL_FLAGS   =  0x400;
+	const unsigned StrategyFlags::AUTO_CORRELATION     = 0x0800;
+	const unsigned StrategyFlags::HIGH_TIME_RESOLUTION = 0x1000;
 
 	
 	class ImageSetData {

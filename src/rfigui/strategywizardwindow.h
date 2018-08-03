@@ -15,7 +15,7 @@
 class StrategyWizardWindow : public Gtk::Window
 {
 public:
-	explicit StrategyWizardWindow(class StrategyController &controller);
+	explicit StrategyWizardWindow(class StrategyController& controller);
 private:
 	class StrategyController &_strategyController;
 	
@@ -33,7 +33,7 @@ private:
 	Gtk::RadioButton _robustConvergenceButton, _normConvergenceButton, _fastConvergenceButton;
 	Gtk::CheckButton _offAxisSourcesButton;
 	Gtk::RadioButton _unsensitiveButton, _normalSensitivityButton, _sensitiveButton;
-	Gtk::CheckButton _guiFriendlyButton, _clearFlagsButton, _autoCorrelationButton;
+	Gtk::CheckButton _useOriginalFlagsButton, _autoCorrelationButton;
 	
 	void initializeOptionPage();
 	void onNextClicked();

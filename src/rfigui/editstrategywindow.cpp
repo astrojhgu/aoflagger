@@ -42,7 +42,8 @@
 using namespace rfiStrategy;
 
 EditStrategyWindow::EditStrategyWindow(StrategyController &strategyController)
- : Gtk::Window(), _strategyController(strategyController),
+ : Gtk::Window(), 
+	_strategyController(strategyController),
 	_addActionButton("Add"),
 	_removeActionButton("_Remove", true),
 	_moveUpButton("_Up", true),
@@ -430,7 +431,7 @@ void EditStrategyWindow::onLoadDefaultClicked()
 {
 	_store->clear();
 	_strategy->RemoveAll();
-	DefaultStrategy::LoadStrategy(*_strategy, rfiStrategy::DefaultStrategy::GENERIC_TELESCOPE, rfiStrategy::DefaultStrategy::FLAG_GUI_FRIENDLY);
+	DefaultStrategy::LoadStrategy(*_strategy, rfiStrategy::DefaultStrategy::GENERIC_TELESCOPE, rfiStrategy::DefaultStrategy::FLAG_NONE);
 	fillStore();
 }
 

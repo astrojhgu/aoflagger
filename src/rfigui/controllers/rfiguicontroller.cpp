@@ -365,7 +365,7 @@ void RFIGuiController::Open(const std::vector<std::string>& filenames, BaselineI
 			rfiStrategy::DefaultStrategy::LoadStrategy(
 				_strategyController->Strategy(),
 				telescopeId,
-				flags | rfiStrategy::DefaultStrategy::FLAG_GUI_FRIENDLY,
+				flags,
 				frequency,
 				timeResolution,
 				frequencyResolution
@@ -498,7 +498,7 @@ void RFIGuiController::LoadPaths(const std::vector<std::string>& filenames)
 	rfiStrategy::DefaultStrategy::LoadStrategy(
 		_strategyController->Strategy(),
 		telescopeId,
-		flags | rfiStrategy::DefaultStrategy::FLAG_GUI_FRIENDLY,
+		flags,
 		frequency,
 		timeResolution,
 		frequencyResolution
