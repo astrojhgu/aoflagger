@@ -271,7 +271,7 @@ void RFIGuiWindow::onLoadNext()
 
 void RFIGuiWindow::onEditStrategyPressed()
 {
-	_editStrategyWindow.reset(new EditStrategyWindow(*this));
+	_editStrategyWindow.reset(new EditStrategyWindow(*_controller, *this));
 	_editStrategyWindow->show();
 }
 

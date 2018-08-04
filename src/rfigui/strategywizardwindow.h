@@ -15,7 +15,7 @@
 class StrategyWizardWindow : public Gtk::Window
 {
 public:
-	explicit StrategyWizardWindow(class StrategyController& controller);
+	explicit StrategyWizardWindow(class RFIGuiController& guiController, class StrategyController& controller);
 private:
 	class StrategyController &_strategyController;
 	
@@ -31,8 +31,7 @@ private:
 	Gtk::RadioButton _lowFreqRadioButton, _normFreqRadioButton, _highFreqRadioButton;
 	Gtk::RadioButton _smallBandwidthButton, _normBandwidthButton, _largeBandwidthButton;
 	Gtk::RadioButton _robustConvergenceButton, _normConvergenceButton, _fastConvergenceButton;
-	Gtk::CheckButton _offAxisSourcesButton;
-	Gtk::RadioButton _unsensitiveButton, _normalSensitivityButton, _sensitiveButton;
+	Gtk::RadioButton _insensitiveButton, _normalSensitivityButton, _sensitiveButton;
 	Gtk::CheckButton _useOriginalFlagsButton, _autoCorrelationButton;
 	
 	void initializeOptionPage();

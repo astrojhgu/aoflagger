@@ -58,12 +58,6 @@ namespace aoflagger {
 			/** @brief No flags: use the default strategy for the telescope. */
 			static const unsigned NONE;
 			
-			/** @brief Optimize for telescope's lower frequencies. */
-			static const unsigned LOW_FREQUENCY;
-			
-			/** @brief Optimize for telescope's higher frequencies. */
-			static const unsigned HIGH_FREQUENCY;
-
 			/** @brief Observation was made at larger bandwidth than common.
 			 * 
 			 * Depending on the telescope, this might e.g. try to divide frequency
@@ -94,22 +88,13 @@ namespace aoflagger {
 			/** @brief Optimize for speed at cost of accuracy and robustness. */
 			static const unsigned FAST;
 			
-			/** @brief Optimize for strong off-axis source in the observation.
-			 * 
-			 * Strong off-axis sources can create strong rapid fringes, which
-			 * (depending on observation resolution) might trigger the flagger
-			 * falsely. This is especially the case for widefield telescopes
-			 * where each station has a large collecting area, e.g.
-			 * the LOFAR LBA stations. */
-			static const unsigned OFF_AXIS_SOURCES;
-			
 			/** @brief Make the strategy less sensitive to RFI than the default
 			 * telescope settings.
 			 * 
 			 * Can be used if the flagger seems to destroy too much data. In this
 			 * case, you might consider also using @ref ROBUST instead.
 			 */
-			static const unsigned UNSENSITIVE;
+			static const unsigned INSENSITIVE;
 			
 			/** @brief Make the strategy more sensitive to RFI than the default
 			 * telescope settings. 

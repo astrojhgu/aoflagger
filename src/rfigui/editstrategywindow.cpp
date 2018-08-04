@@ -15,6 +15,8 @@
 #include "interfaces.h"
 #include "strategywizardwindow.h"
 
+#include "controllers/rfiguicontroller.h"
+
 #include "strategyframes/absthresholdframe.h"
 #include "strategyframes/baselineselectionframe.h"
 #include "strategyframes/changeresolutionframe.h"
@@ -41,7 +43,7 @@
 
 using namespace rfiStrategy;
 
-EditStrategyWindow::EditStrategyWindow(StrategyController &strategyController)
+EditStrategyWindow::EditStrategyWindow(RFIGuiController& guiController, StrategyController &strategyController)
  : Gtk::Window(), 
 	_strategyController(strategyController),
 	_addActionButton("Add"),
@@ -54,7 +56,9 @@ EditStrategyWindow::EditStrategyWindow(StrategyController &strategyController)
 	_saveButton("_Save As...", true),
 	_openButton("_Open", true),
 	_disableUpdates(false),
-	_rightFrame(0), _wizardWindow(0)
+	_guiController(guiController),
+	_rightFrame(nullptr),
+	_wizardWindow()
 {
 	_addActionButton.set_icon_name("list-add");
 	gtkmm_set_image_from_icon_name(_removeActionButton, "edit-delete");
@@ -503,12 +507,12 @@ void EditStrategyWindow::onOpenClicked()
 
 void EditStrategyWindow::onWizardClicked()
 {
-	if(_wizardWindow == 0)
+	if(_wizardWindow)
 	{
-		_wizardWindow = new StrategyWizardWindow(_strategyController);
-		_wizardWindow->show();
-	} else {
 		_wizardWindow->show();
 		_wizardWindow->raise();
+	} else {
+		_wizardWindow.reset(new StrategyWizardWindow(_guiController, _strategyController));
+		_wizardWindow->show();
 	}
 }

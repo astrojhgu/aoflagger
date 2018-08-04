@@ -37,15 +37,12 @@ namespace rfiStrategy {
 
 	const unsigned
 		DefaultStrategy::FLAG_NONE                = aoflagger::StrategyFlags::NONE,
-		DefaultStrategy::FLAG_LOW_FREQUENCY       = aoflagger::StrategyFlags::LOW_FREQUENCY,
-		DefaultStrategy::FLAG_HIGH_FREQUENCY     = aoflagger::StrategyFlags::HIGH_FREQUENCY,
 		DefaultStrategy::FLAG_LARGE_BANDWIDTH     = aoflagger::StrategyFlags::LARGE_BANDWIDTH,
 		DefaultStrategy::FLAG_SMALL_BANDWIDTH     = aoflagger::StrategyFlags::SMALL_BANDWIDTH,
 		DefaultStrategy::FLAG_TRANSIENTS          = aoflagger::StrategyFlags::TRANSIENTS,
 		DefaultStrategy::FLAG_ROBUST              = aoflagger::StrategyFlags::ROBUST,
 		DefaultStrategy::FLAG_FAST                = aoflagger::StrategyFlags::FAST,
-		DefaultStrategy::FLAG_OFF_AXIS_SOURCES    = aoflagger::StrategyFlags::OFF_AXIS_SOURCES,
-		DefaultStrategy::FLAG_UNSENSITIVE         = aoflagger::StrategyFlags::UNSENSITIVE,
+		DefaultStrategy::FLAG_INSENSITIVE         = aoflagger::StrategyFlags::INSENSITIVE,
 		DefaultStrategy::FLAG_SENSITIVE           = aoflagger::StrategyFlags::SENSITIVE,
 		DefaultStrategy::FLAG_USE_ORIGINAL_FLAGS  = aoflagger::StrategyFlags::USE_ORIGINAL_FLAGS,
 		DefaultStrategy::FLAG_AUTO_CORRELATION    = aoflagger::StrategyFlags::AUTO_CORRELATION,
@@ -140,7 +137,7 @@ namespace rfiStrategy {
 			setup.sumThresholdSensitivity *= 1.4;
 		if((flags&FLAG_SENSITIVE) != 0)
 			setup.sumThresholdSensitivity /= 1.2;
-		if((flags&FLAG_UNSENSITIVE) != 0)
+		if((flags&FLAG_INSENSITIVE) != 0)
 			setup.sumThresholdSensitivity *= 1.2;
 		setup.onStokesIQ = ((flags&FLAG_FAST) != 0);
 		setup.includePolStatistics =
