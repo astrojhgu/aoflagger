@@ -10,6 +10,7 @@
 
 StrategyWizardWindow::StrategyWizardWindow(class RFIGuiController& guiController, class StrategyController& controller) : Window(),
 	_strategyController(controller),
+	_page(0),
 	_telescopeLabel("Telescope:"),
 	_telescopeCombo(),
 	_finishButton("_Finish", true),
@@ -24,6 +25,36 @@ StrategyWizardWindow::StrategyWizardWindow(class RFIGuiController& guiController
 	_normalSensitivityButton("Normal sensitivity"), _sensitiveButton("Sensitive"),
 	_useOriginalFlagsButton("Use existing flags"),
 	_autoCorrelationButton("Auto-correlation")
+{
+	set_default_size(500, 250);
+	
+	initializeTelescopePage(guiController);
+	
+	initializeOptionPage();
+	
+	gtkmm_set_image_from_icon_name(_previousButton, "go-previous");
+	_previousButton.signal_clicked().connect(
+		sigc::mem_fun(*this, &StrategyWizardWindow::onPreviousClicked));
+	_buttonBox.pack_start(_previousButton, true, false);
+	gtkmm_set_image_from_icon_name(_nextButton, "go-next");
+	_nextButton.signal_clicked().connect(
+		sigc::mem_fun(*this, &StrategyWizardWindow::onNextClicked));
+	_buttonBox.pack_start(_nextButton, true, false);
+	gtkmm_set_image_from_icon_name(_finishButton, "gtk-ok");
+	_finishButton.signal_clicked().connect(
+		sigc::mem_fun(*this, &StrategyWizardWindow::onFinishClicked));
+	_buttonBox.pack_end(_finishButton, true, false);
+	_finishButton.set_sensitive(false);
+	_mainBox.pack_end(_buttonBox, false, false);
+	
+	add(_mainBox);
+	_buttonBox.show_all();
+	_mainBox.show();
+	
+	updateSensitivities();
+}
+
+void StrategyWizardWindow::initializeTelescopePage(class RFIGuiController& guiController)
 {
 	_telescopeSubBox.pack_start(_telescopeLabel);
 	_telescopeList = Gtk::ListStore::create(_telescopeListColumns);
@@ -61,31 +92,8 @@ StrategyWizardWindow::StrategyWizardWindow(class RFIGuiController& guiController
 	}
 	
 	_telescopeBox.pack_start(_telescopeSubBox, false, false);
-	_notebook.append_page(_telescopeBox, "Telescope");
-	_notebook.signal_switch_page().connect(
-		sigc::mem_fun(*this, &StrategyWizardWindow::onPageSwitched));
-	
-	initializeOptionPage();
-	
-	_mainBox.pack_start(_notebook, true, true);
-	
-	gtkmm_set_image_from_icon_name(_previousButton, "go-previous");
-	_previousButton.signal_clicked().connect(
-		sigc::mem_fun(*this, &StrategyWizardWindow::onPreviousClicked));
-	_buttonBox.pack_start(_previousButton, true, false);
-	gtkmm_set_image_from_icon_name(_nextButton, "go-next");
-	_nextButton.signal_clicked().connect(
-		sigc::mem_fun(*this, &StrategyWizardWindow::onNextClicked));
-	_buttonBox.pack_start(_nextButton, true, false);
-	gtkmm_set_image_from_icon_name(_finishButton, "gtk-ok");
-	_finishButton.signal_clicked().connect(
-		sigc::mem_fun(*this, &StrategyWizardWindow::onFinishClicked));
-	_buttonBox.pack_end(_finishButton, true, false);
-	_finishButton.set_sensitive(false);
-	_mainBox.pack_end(_buttonBox, false, false);
-	
-	add(_mainBox);
-	_mainBox.show_all();
+	_mainBox.pack_start(_telescopeBox);
+	_telescopeBox.show_all();
 }
 
 void StrategyWizardWindow::initializeOptionPage()
@@ -124,7 +132,9 @@ void StrategyWizardWindow::initializeOptionPage()
 	_optionsLeftBox.pack_start(_autoCorrelationButton, true, true);
 	_optionsBox.pack_start(_optionsLeftBox);
 	_optionsBox.pack_start(_optionsRightBox);
-	_notebook.append_page(_optionsBox, "Options");
+	
+	_optionsBox.show_all_children();
+	_mainBox.pack_start(_optionsBox);
 }
 
 void StrategyWizardWindow::addTelescope(const Glib::ustring& name, int val)
@@ -136,12 +146,20 @@ void StrategyWizardWindow::addTelescope(const Glib::ustring& name, int val)
 
 void StrategyWizardWindow::onPreviousClicked()
 {
-	_notebook.set_current_page(0);
+	if(_page > 0)
+	{
+		--_page;
+		updatePage();
+	}
 }
 
 void StrategyWizardWindow::onNextClicked()
 {
-	_notebook.set_current_page(1);
+	if(_page < 1)
+	{
+		++_page;
+		updatePage();
+	}
 }
 
 void StrategyWizardWindow::onFinishClicked()
@@ -178,18 +196,25 @@ void StrategyWizardWindow::onFinishClicked()
 	_strategyController.NotifyChange();
 	
 	hide();
-}
-
-void StrategyWizardWindow::onPageSwitched(Gtk::Widget* page, guint pageNumber)
-{
-	updateSensitivities();
+	_page = 0;
+	updatePage();
 }
 
 void StrategyWizardWindow::updateSensitivities()
 {
 	bool hasTelescope = (_telescopeCombo.get_active_row_number() != -1);
-	int page = _notebook.get_current_page();
-	_previousButton.set_sensitive(page!=0);
-	_nextButton.set_sensitive(page!=1 && hasTelescope);
-	_finishButton.set_sensitive(page==1 && hasTelescope);
+	_previousButton.set_sensitive(_page!=0);
+	_nextButton.set_sensitive(_page!=1 && hasTelescope);
+	_finishButton.set_sensitive(_page==1 && hasTelescope);
+}
+
+void StrategyWizardWindow::updatePage()
+{
+	_telescopeBox.hide();
+	_optionsBox.hide();
+	if(_page == 0)
+		_telescopeBox.show();
+	else
+		_optionsBox.show();
+	updateSensitivities();
 }

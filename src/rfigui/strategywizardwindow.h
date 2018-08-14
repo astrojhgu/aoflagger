@@ -19,7 +19,8 @@ public:
 private:
 	class StrategyController &_strategyController;
 	
-	Gtk::Notebook _notebook;
+	int _page;
+	
 	Gtk::VBox _mainBox, _telescopeBox, _optionsLeftBox, _optionsRightBox;
 	Gtk::HBox _telescopeSubBox, _optionsBox;
 	Gtk::Label _telescopeLabel;
@@ -34,12 +35,13 @@ private:
 	Gtk::RadioButton _insensitiveButton, _normalSensitivityButton, _sensitiveButton;
 	Gtk::CheckButton _useOriginalFlagsButton, _autoCorrelationButton;
 	
+	void initializeTelescopePage(class RFIGuiController& guiController);
 	void initializeOptionPage();
 	void onNextClicked();
 	void onPreviousClicked();
 	void onFinishClicked();
-	void onPageSwitched(Gtk::Widget *page, guint pageNumber);
 	void updateSensitivities();
+	void updatePage();
 	void addTelescope(const Glib::ustring &name, int val);
 
 	struct ModelColumns : public Gtk::TreeModelColumnRecord
