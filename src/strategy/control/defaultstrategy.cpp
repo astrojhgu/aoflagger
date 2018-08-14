@@ -156,10 +156,8 @@ namespace rfiStrategy {
 	{
 		ActionBlock *current, *scratch;
 
-		if(setup.useOriginalFlags)
-			block.Add(std::unique_ptr<Action>(new SetImageAction()));
-		
-		block.Add(std::unique_ptr<Action>(new SetFlaggingAction()));
+		if(!setup.useOriginalFlags)
+			block.Add(std::unique_ptr<Action>(new SetFlaggingAction()));
 		
 		current = &block;
 		
@@ -211,6 +209,7 @@ namespace rfiStrategy {
 		t1->SetFrequencyDirectionSensitivity(setup.sumThresholdSensitivity);
 		if(setup.keepTransients)
 			t1->SetFrequencyDirectionFlagging(false);
+		t1->SetExcludeOriginalFlags(setup.useOriginalFlags);
 		iterationRoot->Add(std::move(t1));
 
 		std::unique_ptr<CombineFlagResults> cfr1(new CombineFlagResults());
@@ -221,7 +220,12 @@ namespace rfiStrategy {
 		iterationRoot->Add(std::move(cfr1));
 	
 		iterationRoot->Add(std::unique_ptr<SetImageAction>(new SetImageAction()));
-		
+		if(setup.useOriginalFlags)
+		{
+			std::unique_ptr<SetFlaggingAction> orBeforeFilter(new SetFlaggingAction());
+			orBeforeFilter->SetNewFlagging(SetFlaggingAction::OrOriginal);
+			iterationRoot->Add(std::move(orBeforeFilter));
+		}
 		if(!setup.keepTransients || setup.changeResVertically)
 		{
 			std::unique_ptr<ChangeResolutionAction> changeResAction(new ChangeResolutionAction());
@@ -281,6 +285,7 @@ namespace rfiStrategy {
 		t2->SetFrequencyDirectionSensitivity(setup.sumThresholdSensitivity);
 		if(setup.keepTransients)
 			t2->SetFrequencyDirectionFlagging(false);
+		t2->SetExcludeOriginalFlags(setup.useOriginalFlags);
 		current->Add(std::move(t2));
 		
 		visAction.reset(new VisualizeAction());
@@ -298,7 +303,9 @@ namespace rfiStrategy {
 		setFlagsInAllPolarizations->SetNewFlagging(SetFlaggingAction::PolarisationsEqual);
 		block.Add(std::move(setFlagsInAllPolarizations));
 		
-		block.Add(std::unique_ptr<MorphologicalFlagAction>(new MorphologicalFlagAction()));
+		std::unique_ptr<MorphologicalFlagAction> morphAction(new MorphologicalFlagAction());
+		morphAction->SetExcludeOriginalFlags(setup.useOriginalFlags);
+		block.Add(std::move(morphAction));
 
 		bool pedantic = false;
 		if(pedantic)
