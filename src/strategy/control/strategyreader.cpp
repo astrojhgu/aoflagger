@@ -566,7 +566,7 @@ class Action *StrategyReader::parseMorphologicalFlagAction(xmlNode *node)
 	newAction->SetMinAvailableTFRatio(getDoubleOr(node, "min-available-tf-ratio", 0.0));
 	newAction->SetMinimumGoodFrequencyRatio(getDouble(node, "minimum-good-frequency-ratio"));
 	newAction->SetMinimumGoodTimeRatio(getDouble(node, "minimum-good-time-ratio"));
-	getBoolOr(node, "exclude-original-flags", false);
+	newAction->SetExcludeOriginalFlags(getBoolOr(node, "exclude-original-flags", false));
 	return newAction;
 }
 
@@ -591,6 +591,7 @@ class Action *StrategyReader::parseSumThresholdAction(xmlNode *node)
 	newAction->SetFrequencyDirectionSensitivity(freqSensitivity);
 	newAction->SetTimeDirectionFlagging(getBool(node, "time-direction-flagging"));
 	newAction->SetFrequencyDirectionFlagging(getBool(node, "frequency-direction-flagging"));
+	newAction->SetExcludeOriginalFlags(getBoolOr(node, "exclude-original-flags", false));
 	return newAction;
 }
 

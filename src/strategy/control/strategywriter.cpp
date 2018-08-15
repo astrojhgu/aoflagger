@@ -392,6 +392,7 @@ namespace rfiStrategy {
 		Write<num_t>("frequency-direction-sensitivity", action.FrequencyDirectionSensitivity());
 		Write<bool>("time-direction-flagging", action.TimeDirectionFlagging());
 		Write<bool>("frequency-direction-flagging", action.FrequencyDirectionFlagging());
+		Write<bool>("exclude-original-flags", action.ExcludeOriginalFlags());
 	}
 
 	void StrategyWriter::writeTimeConvolutionAction(const TimeConvolutionAction &action)
