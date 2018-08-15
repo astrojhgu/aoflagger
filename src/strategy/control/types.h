@@ -75,6 +75,6 @@ class Observatorium;
 #define STRATEGY_FILE_FORMAT_VERSION_REQUIRED 3.4
 
 // The earliest software version which is required to read the written files
-#define STRATEGY_FILE_READER_VERSION_REQUIRED 3.92
+#define STRATEGY_FILE_READER_VERSION_REQUIRED 3.91
 
 #endif // RFI_STRATEGY_TYPES
