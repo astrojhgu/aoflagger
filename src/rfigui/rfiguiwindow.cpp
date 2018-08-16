@@ -64,6 +64,7 @@ RFIGuiWindow::RFIGuiWindow(RFIGuiController* controller) :
 	_mainVBox(Gtk::ORIENTATION_VERTICAL),
 	_timeFrequencyWidget(&_controller->TFController().Plot()),
 	_plotWindow(new PlotWindow(_controller->PlotManager())),
+	_strategy(new rfiStrategy::Strategy()),
 	_gaussianTestSets(true)
 {
 	_controller->AttachWindow(this);
@@ -91,9 +92,9 @@ RFIGuiWindow::RFIGuiWindow(RFIGuiController* controller) :
 	set_default_size(800,600);
 	set_default_icon_name("aoflagger");
 
-	_strategy = rfiStrategy::DefaultStrategy::CreateStrategy(
-		rfiStrategy::DefaultStrategy::GENERIC_TELESCOPE,
-		rfiStrategy::DefaultStrategy::FLAG_NONE);
+	rfiStrategy::DefaultStrategy::StrategySetup setup =
+		rfiStrategy::DefaultStrategy::DetermineSetup(rfiStrategy::DefaultStrategy::GENERIC_TELESCOPE, rfiStrategy::DefaultStrategy::FLAG_NONE, 0.0, 0.0, 0.0);
+	rfiStrategy::DefaultStrategy::LoadSingleStrategy(*_strategy, setup);
 	_imagePlaneWindow.reset(new ImagePlaneWindow());
 	
 	onTFZoomChanged();

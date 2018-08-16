@@ -74,15 +74,9 @@ void ForEachMSAction::Perform(ArtifactSet &artifacts, ProgressListener &progress
 				unsigned flags;
 				double frequency, timeResolution, frequencyResolution;
 				rfiStrategy::DefaultStrategy::DetermineSettings(*imageSet, telescopeId, flags, frequency, timeResolution, frequencyResolution);
+				rfiStrategy::DefaultStrategy::StrategySetup setup = rfiStrategy::DefaultStrategy::DetermineSetup(telescopeId, flags, frequency, timeResolution, frequencyResolution);
 				RemoveAll();
-				rfiStrategy::DefaultStrategy::LoadFullStrategy(
-					*this,
-					telescopeId,
-					flags,
-					frequency,
-					timeResolution,
-					frequencyResolution
-				);
+				rfiStrategy::DefaultStrategy::LoadFullStrategy(*this, setup);
 			}
 			
 			if(_threadCount != 0)

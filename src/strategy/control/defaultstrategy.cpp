@@ -88,14 +88,7 @@ namespace rfiStrategy {
 			return GENERIC_TELESCOPE;
 	}
 	
-	std::unique_ptr<Strategy> DefaultStrategy::CreateStrategy(enum TelescopeId telescopeId, unsigned flags, double frequency, double timeRes, double frequencyRes)
-	{
-		std::unique_ptr<Strategy> strategy(new Strategy());
-		LoadStrategy(*strategy, telescopeId, flags, frequency, timeRes, frequencyRes);
-		return strategy;
-	}
-	
-	void DefaultStrategy::LoadStrategy(ActionBlock &strategy, enum TelescopeId telescopeId, unsigned flags, double frequency, double timeRes, double frequencyRes)
+	DefaultStrategy::StrategySetup DefaultStrategy::DetermineSetup(enum TelescopeId telescopeId, unsigned flags, double frequency, double timeRes, double frequencyRes)
 	{
 		StrategySetup setup;
 		setup.calPassband =
@@ -140,7 +133,7 @@ namespace rfiStrategy {
 		if((flags&FLAG_INSENSITIVE) != 0)
 			setup.sumThresholdSensitivity *= 1.2;
 		setup.onStokesIQ = ((flags&FLAG_FAST) != 0);
-		setup.includePolStatistics =
+		setup.includeStatistics =
 			!(telescopeId==MWA_TELESCOPE || telescopeId==AARTFAAC_TELESCOPE);
 		
 		setup.verticalSmoothing = 5.0;
@@ -148,8 +141,7 @@ namespace rfiStrategy {
 			setup.verticalSmoothing = 1.0;
 		
 		setup.hasBaselines = telescopeId!=PARKES_TELESCOPE && telescopeId!=ARECIBO_TELESCOPE && telescopeId!=BIGHORNS_TELESCOPE && telescopeId!=GENERIC_TELESCOPE;
-		
-		LoadSingleStrategy(strategy, setup);
+		return setup;
 	}
 	
 	void DefaultStrategy::LoadSingleStrategy(ActionBlock &block, const StrategySetup& setup)
@@ -292,7 +284,7 @@ namespace rfiStrategy {
 		visAction->SetLabel("Iteration residual");
 		current->Add(std::move(visAction));
 		
-		if(setup.includePolStatistics)
+		if(setup.includeStatistics)
 		{
 			std::unique_ptr<PlotAction> plotPolarizationStatistics(new PlotAction());
 			plotPolarizationStatistics->SetPlotKind(PlotAction::PolarizationStatisticsPlot);
@@ -326,7 +318,7 @@ namespace rfiStrategy {
 			}
 		}
 
-		if(setup.includePolStatistics && setup.hasBaselines)
+		if(setup.includeStatistics && setup.hasBaselines)
 		{
 			std::unique_ptr<BaselineSelectionAction> baselineSelection(new BaselineSelectionAction());
 			baselineSelection->SetPreparationStep(true);
@@ -341,18 +333,18 @@ namespace rfiStrategy {
 		}
 	}
 
-	void DefaultStrategy::LoadFullStrategy(ActionBlock &destination, enum TelescopeId telescopeId, unsigned flags, double frequency, double timeRes, double frequencyRes)
+	void DefaultStrategy::LoadFullStrategy(ActionBlock &destination, const StrategySetup& setup)
 	{
 		std::unique_ptr<ForEachBaselineAction> feBaseBlock(new ForEachBaselineAction());
 		ForEachBaselineAction* feBaseBlockPtr = feBaseBlock.get();
 		destination.Add(std::move(feBaseBlock));
 		
-		LoadStrategy(*feBaseBlockPtr, telescopeId, flags, frequency, timeRes, frequencyRes);
+		LoadSingleStrategy(*feBaseBlockPtr, setup);
 
-		encapsulatePostOperations(destination, feBaseBlockPtr, telescopeId);
+		encapsulatePostOperations(destination, feBaseBlockPtr, setup);
 	}
 	
-	void DefaultStrategy::EncapsulateSingleStrategy(ActionBlock& destination, std::unique_ptr<ActionBlock> singleStrategy, enum TelescopeId telescopeId)
+	void DefaultStrategy::EncapsulateSingleStrategy(ActionBlock& destination, std::unique_ptr<ActionBlock> singleStrategy, const StrategySetup& setup)
 	{
 		std::unique_ptr<ForEachBaselineAction> feBaseBlock(new ForEachBaselineAction());
 		ForEachBaselineAction* feBaseBlockPtr = feBaseBlock.get();
@@ -360,25 +352,28 @@ namespace rfiStrategy {
 
 		feBaseBlockPtr->Add(std::move(singleStrategy));
 		
-		encapsulatePostOperations(destination, feBaseBlockPtr, telescopeId);
+		encapsulatePostOperations(destination, feBaseBlockPtr, setup);
 	}
 
-	void DefaultStrategy::encapsulatePostOperations(ActionBlock& destination, ForEachBaselineAction* feBaseBlock, enum TelescopeId telescopeId)
+	void DefaultStrategy::encapsulatePostOperations(ActionBlock& destination, ForEachBaselineAction* feBaseBlock, const StrategySetup& setup)
 	{
 		feBaseBlock->Add(std::unique_ptr<WriteFlagsAction>(new WriteFlagsAction()));
 
-		if(telescopeId != ARECIBO_TELESCOPE && telescopeId != PARKES_TELESCOPE)
+		if(setup.includeStatistics && setup.hasBaselines)
 		{
 			std::unique_ptr<PlotAction> antennaPlotAction(new PlotAction());
 			antennaPlotAction->SetPlotKind(PlotAction::AntennaFlagCountPlot);
 			feBaseBlock->Add(std::move(antennaPlotAction));
 		}
 
-		std::unique_ptr<PlotAction> frequencyPlotAction(new PlotAction());
-		frequencyPlotAction->SetPlotKind(PlotAction::FrequencyFlagCountPlot);
-		feBaseBlock->Add(std::move(frequencyPlotAction));
+		if(setup.includeStatistics)
+		{
+			std::unique_ptr<PlotAction> frequencyPlotAction(new PlotAction());
+			frequencyPlotAction->SetPlotKind(PlotAction::FrequencyFlagCountPlot);
+			feBaseBlock->Add(std::move(frequencyPlotAction));
+		}
 
-		if(telescopeId != ARECIBO_TELESCOPE && telescopeId != PARKES_TELESCOPE && telescopeId != GENERIC_TELESCOPE)
+		if(setup.includeStatistics && setup.hasBaselines)
 		{
 			std::unique_ptr<BaselineSelectionAction> baselineSelection(new BaselineSelectionAction());
 			baselineSelection->SetPreparationStep(false);

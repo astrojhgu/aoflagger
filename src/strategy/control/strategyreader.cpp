@@ -200,7 +200,7 @@ std::string StrategyReader::getString(xmlNode *node, const char *name) const
 
 Action *StrategyReader::parseAction(xmlNode *node)
 {
-	Action *newAction = 0;
+	Action *newAction = nullptr;
 	xmlChar *typeCh = xmlGetProp(node, BAD_CAST "type");
 	if(typeCh == 0)
 		throw StrategyReaderError("Action tag did not have 'type' parameter");
@@ -270,7 +270,7 @@ Action *StrategyReader::parseAction(xmlNode *node)
 	else if(typeStr == "WriteFlagsAction")
 		newAction = parseWriteFlagsAction(node);
 	xmlFree(typeCh);
-	if(newAction == 0)
+	if(newAction == nullptr)
 	{
 		std::stringstream s;
 		s << "Unknown action type '" << typeStr << "' in xml file";

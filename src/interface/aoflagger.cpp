@@ -277,14 +277,17 @@ namespace aoflagger {
 			std::shared_ptr<rfiStrategy::Strategy> strategyPtr;
 	};
 	
-	Strategy::Strategy(enum TelescopeId telescopeId, unsigned strategyFlags, double frequency, double timeRes, double frequencyRes) :
-		_data(new StrategyData(rfiStrategy::DefaultStrategy::CreateStrategy(
+	Strategy::Strategy(enum TelescopeId telescopeId, unsigned strategyFlags, double frequency, double timeRes, double frequencyRes)
+	{
+		std::unique_ptr<rfiStrategy::Strategy> s(new rfiStrategy::Strategy());
+		rfiStrategy::DefaultStrategy::StrategySetup setup = rfiStrategy::DefaultStrategy::DetermineSetup(
 			(rfiStrategy::DefaultStrategy::TelescopeId) telescopeId,
 			strategyFlags,
+			frequency,
 			timeRes,
-			frequencyRes
-		)))
-	{
+			frequencyRes);
+		rfiStrategy::DefaultStrategy::LoadSingleStrategy(*s, setup);
+		_data = new StrategyData(std::move(s));
 	}
 
 	Strategy::Strategy(const std::string& filename)

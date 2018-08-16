@@ -285,7 +285,9 @@ int main(int argc, char **argv)
 			if(!rfiStrategy::DefaultStrategy::StrategyContainsAction(*subStrategy, rfiStrategy::ForEachBaselineActionType) &&
 				!rfiStrategy::DefaultStrategy::StrategyContainsAction(*subStrategy, rfiStrategy::WriteFlagsActionType))
 			{
-				rfiStrategy::DefaultStrategy::EncapsulateSingleStrategy(*fomAction, std::move(subStrategy), rfiStrategy::DefaultStrategy::GENERIC_TELESCOPE);
+				rfiStrategy::DefaultStrategy::StrategySetup setup =
+					rfiStrategy::DefaultStrategy::DetermineSetup(rfiStrategy::DefaultStrategy::GENERIC_TELESCOPE, 0, 0.0, 0.0, 0.0);
+				rfiStrategy::DefaultStrategy::EncapsulateSingleStrategy(*fomAction, std::move(subStrategy), setup);
 				Logger::Info << "Modified single-baseline strategy so it will execute strategy on all baselines and write flags.\n";
 			}
 			else {

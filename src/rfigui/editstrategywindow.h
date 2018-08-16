@@ -41,7 +41,6 @@ class EditStrategyWindow : public Gtk::Window
 		void onOpenClicked();
 
 		void onLoadEmptyClicked();
-		void onLoadDefaultClicked();
 		void onWizardClicked();
 		
 		void onStrategyChanged();
@@ -78,7 +77,7 @@ class EditStrategyWindow : public Gtk::Window
 		Gtk::ButtonBox _strategyEditButtonBox, _strategyFileButtonBox, _strategyLoadDefaultsButtonBox;
 		Gtk::MenuToolButton _addActionButton;
 		Gtk::Button _removeActionButton, _moveUpButton, _moveDownButton;
-		Gtk::Button _loadEmptyButton, _loadDefaultButton, _wizardButton, _saveButton, _openButton;
+		Gtk::Button _loadEmptyButton, _wizardButton, _saveButton, _openButton;
 		ModelColumns _columns;
 		Gtk::ScrolledWindow _viewScrollWindow;
 		Gtk::TreeView _view;

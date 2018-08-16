@@ -362,14 +362,13 @@ void RFIGuiController::Open(const std::vector<std::string>& filenames, BaselineI
 			double frequency, timeResolution, frequencyResolution;
 			rfiStrategy::DefaultStrategy::DetermineSettings(*imageSet, telescopeId, flags, frequency, timeResolution, frequencyResolution);
 			_strategyController->Strategy().RemoveAll();
-			rfiStrategy::DefaultStrategy::LoadStrategy(
-				_strategyController->Strategy(),
+			rfiStrategy::DefaultStrategy::LoadSingleStrategy(_strategyController->Strategy(), rfiStrategy::DefaultStrategy::DetermineSetup(
 				telescopeId,
 				flags,
 				frequency,
 				timeResolution,
 				frequencyResolution
-			);
+			));
 			_strategyController->NotifyChange();
 		}
 	
@@ -495,14 +494,13 @@ void RFIGuiController::LoadPaths(const std::vector<std::string>& filenames)
 	double frequency, timeResolution, frequencyResolution;
 	rfiStrategy::DefaultStrategy::DetermineSettings(*imageSet, telescopeId, flags, frequency, timeResolution, frequencyResolution);
 	_strategyController->Strategy().RemoveAll();
-	rfiStrategy::DefaultStrategy::LoadStrategy(
-		_strategyController->Strategy(),
+	rfiStrategy::DefaultStrategy::LoadSingleStrategy(_strategyController->Strategy(), rfiStrategy::DefaultStrategy::DetermineSetup(
 		telescopeId,
 		flags,
 		frequency,
 		timeResolution,
 		frequencyResolution
-	);
+	));
 	_strategyController->NotifyChange();
 	
 	SetImageSet(std::move(imageSet));

@@ -51,7 +51,6 @@ EditStrategyWindow::EditStrategyWindow(RFIGuiController& guiController, Strategy
 	_moveUpButton("_Up", true),
 	_moveDownButton("_Down", true),
 	_loadEmptyButton("_New", true),
-	_loadDefaultButton("Default"),
 	_wizardButton("_Wizard...", true),
 	_saveButton("_Save As...", true),
 	_openButton("_Open", true),
@@ -130,9 +129,6 @@ void EditStrategyWindow::initLoadDefaultsButtons()
 	_strategyLoadDefaultsButtonBox.pack_start(_loadEmptyButton);
 	_loadEmptyButton.signal_clicked().connect(sigc::mem_fun(*this, &EditStrategyWindow::onLoadEmptyClicked));
 
-	_strategyLoadDefaultsButtonBox.pack_start(_loadDefaultButton);
-	_loadDefaultButton.signal_clicked().connect(sigc::mem_fun(*this, &EditStrategyWindow::onLoadDefaultClicked));
-	
 	_strategyLoadDefaultsButtonBox.pack_start(_wizardButton);
 	_wizardButton.signal_clicked().connect(sigc::mem_fun(*this, &EditStrategyWindow::onWizardClicked));
 
@@ -428,14 +424,6 @@ void EditStrategyWindow::onLoadEmptyClicked()
 {
 	_store->clear();
 	_strategy->RemoveAll();
-	fillStore();
-}
-
-void EditStrategyWindow::onLoadDefaultClicked()
-{
-	_store->clear();
-	_strategy->RemoveAll();
-	DefaultStrategy::LoadStrategy(*_strategy, rfiStrategy::DefaultStrategy::GENERIC_TELESCOPE, rfiStrategy::DefaultStrategy::FLAG_NONE);
 	fillStore();
 }
 

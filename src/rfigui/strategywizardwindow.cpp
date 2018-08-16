@@ -189,8 +189,8 @@ void StrategyWizardWindow::onFinishClicked()
 	if(_autoCorrelationButton.get_active())
 		flags |= rfiStrategy::DefaultStrategy::FLAG_AUTO_CORRELATION;
 	
-	std::unique_ptr<rfiStrategy::Strategy> strategy(
-		rfiStrategy::DefaultStrategy::CreateStrategy(telescopeId, flags));
+	std::unique_ptr<rfiStrategy::Strategy> strategy(new rfiStrategy::Strategy());
+	rfiStrategy::DefaultStrategy::LoadSingleStrategy(*strategy, rfiStrategy::DefaultStrategy::DetermineSetup(telescopeId, flags, 0.0, 0.0, 0.0));
 		
 	_strategyController.SetStrategy(std::move(strategy));
 	_strategyController.NotifyChange();
