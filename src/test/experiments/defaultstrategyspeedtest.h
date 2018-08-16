@@ -130,8 +130,9 @@ inline void DefaultStrategySpeedTest::TimeStrategy::operator()()
 	rfiStrategy::ArtifactSet artifacts(0);
 	artifacts.SetPolarizationStatistics(std::unique_ptr<PolarizationStatistics>(
 		new PolarizationStatistics() ));
-	std::unique_ptr<rfiStrategy::Strategy> strategy = rfiStrategy::DefaultStrategy::CreateStrategy(
-		rfiStrategy::DefaultStrategy::GENERIC_TELESCOPE, rfiStrategy::DefaultStrategy::FLAG_NONE
+	std::unique_ptr<rfiStrategy::Strategy> strategy(new rfiStrategy::Strategy());
+	rfiStrategy::DefaultStrategy::LoadSingleStrategy(*strategy, rfiStrategy::DefaultStrategy::DetermineSetup(
+		rfiStrategy::DefaultStrategy::GENERIC_TELESCOPE, rfiStrategy::DefaultStrategy::FLAG_NONE, 0.0, 0.0, 0.0)
 	);
 	prepareStrategy(artifacts);
 	DummyProgressListener progressListener;
@@ -444,8 +445,9 @@ inline void DefaultStrategySpeedTest::TimeRankOperator::operator()()
 	artifacts.SetPolarizationStatistics(std::unique_ptr<PolarizationStatistics>(
 		new PolarizationStatistics() ));
 
-	std::unique_ptr<rfiStrategy::Strategy> strategy = rfiStrategy::DefaultStrategy::CreateStrategy(
-		rfiStrategy::DefaultStrategy::GENERIC_TELESCOPE, rfiStrategy::DefaultStrategy::FLAG_NONE
+	std::unique_ptr<rfiStrategy::Strategy> strategy(new rfiStrategy::Strategy());
+	rfiStrategy::DefaultStrategy::LoadSingleStrategy(*strategy, rfiStrategy::DefaultStrategy::DetermineSetup(
+		rfiStrategy::DefaultStrategy::GENERIC_TELESCOPE, rfiStrategy::DefaultStrategy::FLAG_NONE, 0.0, 0.0, 0.0)
 	);
 	prepareStrategy(artifacts);
 	DummyProgressListener progressListener;
