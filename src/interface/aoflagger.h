@@ -687,6 +687,20 @@ namespace aoflagger {
 			 */
 			FlagMask Run(Strategy& strategy, const ImageSet& input);
 			
+			/** @brief Run the flagging strategy on the given data with correlator flags.
+			 * 
+			 * This method is similar to @ref Run(Strategy& strategy, const ImageSet&), except
+			 * that it will pass the correlator flags to the flagging strategy, which in the
+			 * case of bad data can do a better job of finding RFI in the good data.
+			 * @p input parameter. The @p strategy parameter can be the
+			 * same for different threads.
+			 * @param strategy The flagging strategy that will be used.
+			 * @param input The data to run the flagger on.
+			 * @param correlatorFlags Flags that indicate what data are bad.
+			 * @return The flags identifying bad (RFI contaminated) data.
+			 */
+			FlagMask Run(Strategy& strategy, const ImageSet& input, const FlagMask& correlatorFlags);
+			
 			/** @brief Create a new object for collecting statistics.
 			 * 
 			 * See the QualityStatistics class description for info on multithreading and/or combining statistics

@@ -491,6 +491,11 @@ namespace aoflagger {
 		return flagMask;
 	}
 	
+	FlagMask AOFlagger::Run(Strategy& strategy, const ImageSet& input, const FlagMask& correlatorFlags)
+	{
+		return Run(strategy, input);
+	}
+	
 	QualityStatistics AOFlagger::MakeQualityStatistics(const double *scanTimes, size_t nScans, const double *channelFrequencies, size_t nChannels, size_t nPolarizations)
 	{
 		return QualityStatistics(scanTimes, nScans, channelFrequencies, nChannels, nPolarizations, false);
