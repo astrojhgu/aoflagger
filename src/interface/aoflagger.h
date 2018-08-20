@@ -642,8 +642,8 @@ namespace aoflagger {
 			 * 
 			 * All parameters are hints to optimize the strategy, but need not actual alter the
 			 * strategy (or even have correct effects), but the returned strategy should for most
-			 * common cases be fine. Some properties conflict, e.g., specifying @ref StrategyFlags::LOW_FREQUENCY
-			 * as flag and giving a high @a frequency value. In these cases it is not defined which
+			 * common cases be fine. Some properties conflict, e.g., specifying @ref StrategyFlags::HIGH_TIME_RESOLUTION
+			 * as flag and giving a low @a timeRes value. In these cases it is not defined which
 			 * parameter takes precedence, thus it should obviously be avoided.
 			 * 
 			 * If frequency value, time resolution or frequency resolution or not known, they can be left at
