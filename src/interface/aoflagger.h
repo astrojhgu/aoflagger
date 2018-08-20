@@ -173,23 +173,23 @@ namespace aoflagger {
 			~ImageSet();
 			
 			/** @brief Assign to this image set. Only references to images are copied. */
-			ImageSet &operator=(const ImageSet& sourceImageSet);
+			ImageSet& operator=(const ImageSet& sourceImageSet);
 			
 			/** @brief Move assign to this image set.
 			 * @since Version 2.10
 			 */
-			ImageSet &operator=(ImageSet&& sourceImageSet);
+			ImageSet& operator=(ImageSet&& sourceImageSet);
 			
 			/** @brief Get access to the data buffer of an image.
 			 * @param imageIndex Index of image. See class description for ordering.
 			 * \note Rows are padded, see @ref HorizontalStride().
 			 */
-			float *ImageBuffer(size_t imageIndex);
+			float* ImageBuffer(size_t imageIndex);
 			
 			/** @brief Get constant access to the data buffer of an image.
 			 * @param imageIndex Index of image. See class description for ordering.
 			 */
-			const float *ImageBuffer(size_t imageIndex) const;
+			const float* ImageBuffer(size_t imageIndex) const;
 			
 			/** @brief Get width (number of time steps) of images. */
 			size_t Width() const;
@@ -217,7 +217,7 @@ namespace aoflagger {
 			
 			/** @brief Set all samples to the specified value.
 			 * @param newValue The new value for all values of all images in the set.
-			 * @since 2.5.0
+			 * @since 2.5
 			 */
 			void Set(float newValue);
 
@@ -230,7 +230,7 @@ namespace aoflagger {
 			 * to freeing and then allocating new images. It was added after rather
 			 * severe memory fragmentation problems in the Cotter MWA pipeline.
 			 * @param newWidth The new width of the images. Should satisfy newWidth <= HorizontalStride().
-			 * @since 2.5.0
+			 * @since 2.5
 			 */
 			void ResizeWithoutReallocation(size_t newWidth) const;
 			
@@ -245,7 +245,7 @@ namespace aoflagger {
 			
 			static void assertValidCount(size_t count);
 			
-			class ImageSetData *_data;
+			class ImageSetData* _data;
 	};
 
 	/** @brief A two-dimensional flag mask.
@@ -322,16 +322,16 @@ namespace aoflagger {
 			size_t HorizontalStride() const;
 			
 			/** @brief Get access to the data buffer. */
-			bool *Buffer();
+			bool* Buffer();
 			
 			/** @brief Get constant access to the data buffer. */
-			const bool *Buffer() const;
+			const bool* Buffer() const;
 			
 		private:
 			FlagMask(size_t width, size_t height);
 			FlagMask(size_t width, size_t height, bool initialValue);
 			
-			class FlagMaskData *_data;
+			class FlagMaskData* _data;
 	};
 
 	/** @brief Holds a flagging strategy.
@@ -359,19 +359,19 @@ namespace aoflagger {
 			~Strategy();
 			
 			/** @brief Assign to strategy. */
-			Strategy &operator=(const Strategy& sourceStrategy);
+			Strategy& operator=(const Strategy& sourceStrategy);
 			
 			/** @brief Move assign to strategy.
 			 * @since Version 2.10
 			 */
-			Strategy &operator=(Strategy&& sourceStrategy);
+			Strategy& operator=(Strategy&& sourceStrategy);
 			
 		private:
 			Strategy(enum TelescopeId telescopeId, unsigned strategyFlags, double frequency=0.0, double timeRes=0.0, double frequencyRes=0.0);
 			
 			explicit Strategy(const std::string& filename);
 			
-			class StrategyData *_data;
+			class StrategyData* _data;
 	};
 
 	/** @brief Statistics that can be collected online and saved to a measurement set.
@@ -411,7 +411,7 @@ namespace aoflagger {
 			~QualityStatistics();
 			
 			/** @brief Assign to this object. This is fast; only references are copied. */
-			QualityStatistics& operator=(const QualityStatistics &sourceQS);
+			QualityStatistics& operator=(const QualityStatistics& sourceQS);
 			
 			/** @brief Assign to this object. This is fast; only references are copied.
 			 * @since Version 2.10
@@ -427,12 +427,12 @@ namespace aoflagger {
 			 * count, etc.). When using this object again during collecting (see @ref AOFlagger::CollectStatistics()),
 			 * after combining it with another object, it will still use the meta data it was initialized with.
 			 */
-			QualityStatistics &operator+=(const QualityStatistics &rhs);
+			QualityStatistics& operator+=(const QualityStatistics& rhs);
 			
 		private:
-			QualityStatistics(const double *scanTimes, size_t nScans, const double *channelFrequencies, size_t nChannels, size_t nPolarizations, bool computeHistograms);
+			QualityStatistics(const double* scanTimes, size_t nScans, const double* channelFrequencies, size_t nChannels, size_t nPolarizations, bool computeHistograms);
 			
-			class QualityStatisticsData *_data;
+			class QualityStatisticsData* _data;
 	};
 	
 	/**
@@ -457,7 +457,7 @@ namespace aoflagger {
 			 * @param taskCount Total number of (sub) tasks.
 			 * @param description Description of the task, e.g. "SumThreshold".
 			 */
-			virtual void OnStartTask(size_t taskNo, size_t taskCount, const std::string &description)
+			virtual void OnStartTask(size_t taskNo, size_t taskCount, const std::string& description)
 			{ }
 			/**
 			* @brief Called when at the end of the current task.
@@ -482,7 +482,7 @@ namespace aoflagger {
 			 * This can occur when for example the strategy is malformed. 
 			 * @param thrownException The exception that was thrown.
 			 */
-			virtual void OnException(std::exception &thrownException) = 0;
+			virtual void OnException(std::exception& thrownException) = 0;
 	};
 	
 	/** @brief Main class for access to the flagger functionality.
@@ -582,7 +582,7 @@ namespace aoflagger {
 			 * of @ref ImageSet for image order).
 			 * @param widthCapacity Allow for enlarging image to this size, @sa ImageSet::ResizeWithoutReallocation()
 			 * @return A new ImageSet.
-			 * @since 2.6.0
+			 * @since 2.6
 			 */
 			ImageSet MakeImageSet(size_t width, size_t height, size_t count, size_t widthCapacity)
 			{
@@ -610,7 +610,7 @@ namespace aoflagger {
 			 * @param initialValue Initialize all pixels with this value.
 			 * @param widthCapacity Allow for enlarging image to this size, @sa ImageSet::ResizeWithoutReallocation()
 			 * @return A new ImageSet.
-			 * @since 2.6.0
+			 * @since 2.6
 			 */
 			ImageSet MakeImageSet(size_t width, size_t height, size_t count, float initialValue, size_t widthCapacity)
 			{
@@ -698,6 +698,7 @@ namespace aoflagger {
 			 * @param input The data to run the flagger on.
 			 * @param correlatorFlags Flags that indicate what data are bad.
 			 * @return The flags identifying bad (RFI contaminated) data.
+			 * @since 2.12
 			 */
 			FlagMask Run(Strategy& strategy, const ImageSet& input, const FlagMask& correlatorFlags);
 			
@@ -707,7 +708,7 @@ namespace aoflagger {
 			 * with different meta data. The meta data that is passed to this method will be used for all
 			 * calls to CollectStatistics() if this class is specified. No histograms will be computed.
 			 */
-			QualityStatistics MakeQualityStatistics(const double *scanTimes, size_t nScans, const double *channelFrequencies, size_t nChannels, size_t nPolarizations);
+			QualityStatistics MakeQualityStatistics(const double* scanTimes, size_t nScans, const double* channelFrequencies, size_t nChannels, size_t nPolarizations);
 			
 			/** @brief Create a new object for collecting statistics, possibly with histograms.
 			 * 
@@ -716,7 +717,7 @@ namespace aoflagger {
 			 * calls to CollectStatistics() if this class is specified.
 			 * @since Version 2.6
 			 */
-			QualityStatistics MakeQualityStatistics(const double *scanTimes, size_t nScans, const double *channelFrequencies, size_t nChannels, size_t nPolarizations, bool computeHistograms);
+			QualityStatistics MakeQualityStatistics(const double* scanTimes, size_t nScans, const double* channelFrequencies, size_t nChannels, size_t nPolarizations, bool computeHistograms);
 			
 			/** @brief Collect statistics from time-frequency images and masks.
 			 * 
@@ -777,7 +778,7 @@ namespace aoflagger {
 			 * events and call this method to enable receiving the events.
 			 * This method is not thread safe.
 			 * @param statusListener The handler that will receive the status updates.
-			 * @since Version 2.6.2
+			 * @since Version 2.7
 			 */
 			void SetStatusListener(StatusListener* statusListener)
 			{
