@@ -3,7 +3,6 @@
 
 #include "controllers/rfiguicontroller.h"
 
-#include "../strategy/control/defaultstrategy.h"
 #include "../strategy/actions/strategy.h"
 
 #include "../gtkmm-compat.h"
@@ -24,13 +23,26 @@ StrategyWizardWindow::StrategyWizardWindow(class RFIGuiController& guiController
 	_insensitiveButton("Insensitive"),
 	_normalSensitivityButton("Normal sensitivity"), _sensitiveButton("Sensitive"),
 	_useOriginalFlagsButton("Use existing flags"),
-	_autoCorrelationButton("Auto-correlation")
+	_autoCorrelationButton("Auto-correlation"),
+	
+	_setupGrid(),
+	_iterationCountLabel("Iterations"),
+	_sumThresholdLevelLabel("SumThreshold level"),
+	_verticalSmoothingLabel("Vertical smoothing"),
+	_changeResVerticallyCB("Change frequency resolution"),
+	_calPassbandCB("Normalize passband"),
+	_channelSelectionCB("Channel selection"),
+	_onStokesIQCB("On Stokes I and Q only"),
+	_includeStatisticsCB("Collect statistics"),
+	_hasBaselinesCB("Observation has multiple baselines")
 {
 	set_default_size(500, 250);
 	
 	initializeTelescopePage(guiController);
 	
 	initializeOptionPage();
+	
+	initializeSetupPage();
 	
 	gtkmm_set_image_from_icon_name(_previousButton, "go-previous");
 	_previousButton.signal_clicked().connect(
@@ -137,6 +149,80 @@ void StrategyWizardWindow::initializeOptionPage()
 	_mainBox.pack_start(_optionsBox);
 }
 
+void StrategyWizardWindow::initializeSetupPage()
+{
+	_setupGrid.attach(_iterationCountLabel, 0, 0, 1, 1);
+	_iterationCountLabel.set_hexpand(true);
+	_setupGrid.attach(_iterationCountEntry, 1, 0, 1, 1);
+	_iterationCountEntry.set_hexpand(true);
+	
+	_setupGrid.attach(_sumThresholdLevelLabel, 0, 1, 1, 1);
+	_sumThresholdLevelLabel.set_hexpand(true);
+	_setupGrid.attach(_sumThresholdLevelEntry, 1, 1, 1, 1);
+	_sumThresholdLevelEntry.set_hexpand(true);
+	
+	_setupGrid.attach(_verticalSmoothingLabel, 0, 2, 1, 1);
+	_verticalSmoothingLabel.set_hexpand(true);
+	_setupGrid.attach(_verticalSmoothingEntry, 1, 2, 1, 1);
+	_verticalSmoothingEntry.set_hexpand(true);
+	
+	_setupGrid.attach(_changeResVerticallyCB, 0, 3, 2, 1);
+	_changeResVerticallyCB.set_hexpand(true);
+	
+	_setupGrid.attach(_calPassbandCB, 0, 4, 2, 1);
+	_calPassbandCB.set_hexpand(true);
+
+	_setupGrid.attach(_channelSelectionCB, 0, 5, 2, 1);
+	_channelSelectionCB.set_hexpand(true);
+
+	_setupGrid.attach(_onStokesIQCB, 0, 6, 2, 1);
+	_onStokesIQCB.set_hexpand(true);
+
+	_setupGrid.attach(_includeStatisticsCB, 0, 7, 2, 1);
+	_includeStatisticsCB.set_hexpand(true);
+
+	_setupGrid.attach(_hasBaselinesCB, 0, 8, 2, 1);
+	_hasBaselinesCB.set_hexpand(true);
+	
+	_strategySetupBox.pack_start(_setupGrid, true, true);
+	
+	_strategySetupBox.show_all_children();
+	_mainBox.pack_start(_strategySetupBox);
+}
+
+void StrategyWizardWindow::updateSetupPageSelection(const rfiStrategy::DefaultStrategy::StrategySetup& setup)
+{
+	_iterationCountEntry.set_text(std::to_string(setup.iterationCount));
+	_sumThresholdLevelEntry.set_text(std::to_string(setup.sumThresholdSensitivity));
+	_verticalSmoothingEntry.set_text(std::to_string(setup.verticalSmoothing));
+	
+	_changeResVerticallyCB.set_active(setup.changeResVertically);
+	_calPassbandCB.set_active(setup.calPassband);
+	_channelSelectionCB.set_active(setup.channelSelection);
+
+	_onStokesIQCB.set_active(setup.onStokesIQ);
+	_includeStatisticsCB.set_active(setup.includeStatistics);
+	_hasBaselinesCB.set_active(setup.hasBaselines);
+}
+
+rfiStrategy::DefaultStrategy::StrategySetup StrategyWizardWindow::getSetupPageSelection() const
+{
+	rfiStrategy::DefaultStrategy::StrategySetup setup = getSetupFromOptions();
+	
+	setup.iterationCount = std::stoi(_iterationCountEntry.get_text());
+	setup.sumThresholdSensitivity = std::stod(_sumThresholdLevelEntry.get_text());
+	setup.verticalSmoothing = std::stod(_verticalSmoothingEntry.get_text());
+	
+	setup.changeResVertically = _changeResVerticallyCB.get_active();
+	setup.calPassband = _calPassbandCB.get_active();
+	setup.channelSelection = _channelSelectionCB.get_active();
+	setup.onStokesIQ = _onStokesIQCB.get_active();
+	setup.includeStatistics = _includeStatisticsCB.get_active();
+	setup.hasBaselines = _hasBaselinesCB.get_active();
+	
+	return setup;
+}
+
 void StrategyWizardWindow::addTelescope(const Glib::ustring& name, int val)
 {
 	Gtk::TreeModel::iterator row = _telescopeList->append();
@@ -155,14 +241,14 @@ void StrategyWizardWindow::onPreviousClicked()
 
 void StrategyWizardWindow::onNextClicked()
 {
-	if(_page < 1)
+	if(_page < 2)
 	{
 		++_page;
 		updatePage();
 	}
 }
 
-void StrategyWizardWindow::onFinishClicked()
+rfiStrategy::DefaultStrategy::StrategySetup StrategyWizardWindow::getSetupFromOptions() const
 {
 	const enum rfiStrategy::DefaultStrategy::TelescopeId telescopeId =
 		(enum rfiStrategy::DefaultStrategy::TelescopeId) (int) ((*_telescopeCombo.get_active())[_telescopeListColumns.val]);
@@ -188,9 +274,13 @@ void StrategyWizardWindow::onFinishClicked()
 		flags |= rfiStrategy::DefaultStrategy::FLAG_USE_ORIGINAL_FLAGS;
 	if(_autoCorrelationButton.get_active())
 		flags |= rfiStrategy::DefaultStrategy::FLAG_AUTO_CORRELATION;
-	
+	return rfiStrategy::DefaultStrategy::DetermineSetup(telescopeId, flags, 0.0, 0.0, 0.0);
+}
+
+void StrategyWizardWindow::onFinishClicked()
+{
 	std::unique_ptr<rfiStrategy::Strategy> strategy(new rfiStrategy::Strategy());
-	rfiStrategy::DefaultStrategy::LoadSingleStrategy(*strategy, rfiStrategy::DefaultStrategy::DetermineSetup(telescopeId, flags, 0.0, 0.0, 0.0));
+	rfiStrategy::DefaultStrategy::LoadSingleStrategy(*strategy, getSetupPageSelection());
 		
 	_strategyController.SetStrategy(std::move(strategy));
 	_strategyController.NotifyChange();
@@ -204,17 +294,26 @@ void StrategyWizardWindow::updateSensitivities()
 {
 	bool hasTelescope = (_telescopeCombo.get_active_row_number() != -1);
 	_previousButton.set_sensitive(_page!=0);
-	_nextButton.set_sensitive(_page!=1 && hasTelescope);
-	_finishButton.set_sensitive(_page==1 && hasTelescope);
+	_nextButton.set_sensitive(_page!=2 && hasTelescope);
+	_finishButton.set_sensitive(_page==2);
 }
 
 void StrategyWizardWindow::updatePage()
 {
 	_telescopeBox.hide();
 	_optionsBox.hide();
-	if(_page == 0)
+	_strategySetupBox.hide();
+	switch(_page) {
+	case 0:
 		_telescopeBox.show();
-	else
+		break;
+	case 1:
 		_optionsBox.show();
+		break;
+	case 2:
+		updateSetupPageSelection(getSetupFromOptions());
+		_strategySetupBox.show();
+		break;
+	}
 	updateSensitivities();
 }

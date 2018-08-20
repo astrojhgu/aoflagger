@@ -54,15 +54,15 @@ namespace rfiStrategy {
 				
 		struct StrategySetup {
 			int iterationCount;
+			double sumThresholdSensitivity;
+			double verticalSmoothing;
 			bool keepTransients;
 			bool changeResVertically;
 			bool calPassband;
 			bool channelSelection;
 			bool useOriginalFlags;
-			double sumThresholdSensitivity;
 			bool onStokesIQ;
 			bool includeStatistics;
-			double verticalSmoothing;
 			bool hasBaselines;
 			bool highTimeResolution;
 		};
