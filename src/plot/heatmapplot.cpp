@@ -783,11 +783,15 @@ TimeFrequencyMetaDataCPtr HeatMapPlot::GetSelectedMetaData() const
 
 bool HeatMapPlot::ConvertToUnits(double mouseX, double mouseY, int &posX, int &posY) const
 {
-	const unsigned int
+	unsigned int
 		startX = (unsigned int) round(_startHorizontal * _image->Width()),
 		startY = (unsigned int) round(_startVertical * _image->Height()),
 		endX = (unsigned int) round(_endHorizontal * _image->Width()),
 		endY = (unsigned int) round(_endVertical * _image->Height());
+	if(endX <= startX)
+		endX = startX+1;
+	if(endY <= startY)
+		endY = startY+1;
 	const unsigned
 		width = endX - startX,
 		height = endY - startY;
@@ -801,11 +805,15 @@ bool HeatMapPlot::ConvertToUnits(double mouseX, double mouseY, int &posX, int &p
 
 bool HeatMapPlot::ConvertToScreen(int posX, int posY, double& mouseX, double& mouseY) const
 {
-	const unsigned int
+	unsigned int
 		startX = (unsigned int) round(_startHorizontal * _image->Width()),
 		startY = (unsigned int) round(_startVertical * _image->Height()),
 		endX = (unsigned int) round(_endHorizontal * _image->Width()),
 		endY = (unsigned int) round(_endVertical * _image->Height());
+	if(endX <= startX)
+		endX = startX+1;
+	if(endY <= startY)
+		endY = startY+1;
 	const unsigned
 		width = endX - startX,
 		height = endY - startY;

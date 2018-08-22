@@ -76,6 +76,7 @@ RFIGuiWindow::RFIGuiWindow(RFIGuiController* controller) :
 	_timeFrequencyWidget.OnMouseMovedEvent().connect(sigc::mem_fun(*this, &RFIGuiWindow::onTFWidgetMouseMoved));
 	_timeFrequencyWidget.OnMouseLeaveEvent().connect(sigc::mem_fun(*this, &RFIGuiWindow::setSetNameInStatusBar));
 	_timeFrequencyWidget.OnButtonReleasedEvent().connect(sigc::mem_fun(*this, &RFIGuiWindow::onTFWidgetButtonReleased));
+	_timeFrequencyWidget.OnScrollEvent().connect(sigc::mem_fun(*this, &RFIGuiWindow::onTFScroll));
 	_timeFrequencyWidget.Plot().OnZoomChanged().connect(sigc::mem_fun(*this, &RFIGuiWindow::onTFZoomChanged));
 	_timeFrequencyWidget.Plot().SetShowXAxisDescription(false);
 	_timeFrequencyWidget.Plot().SetShowYAxisDescription(false);
@@ -1614,6 +1615,19 @@ void RFIGuiWindow::onTFWidgetButtonReleased(size_t x, size_t y)
 		
 			_plotFrame.Update();
 		}
+	}
+}
+
+void RFIGuiWindow::onTFScroll(size_t x, size_t y, int direction)
+{
+	if(direction < 0)
+	{
+		_timeFrequencyWidget.Plot().ZoomInOn(x, y);
+		_timeFrequencyWidget.Update();
+	}
+	else if(direction > 0) {
+		_timeFrequencyWidget.Plot().ZoomOut();
+		_timeFrequencyWidget.Update();
 	}
 }
 

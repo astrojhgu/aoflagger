@@ -166,6 +166,7 @@ class RFIGuiWindow : public Gtk::Window, private StrategyController {
 		void onLoadShortestBaselinePressed();
 		void onTFWidgetMouseMoved(size_t x, size_t y);
 		void onTFWidgetButtonReleased(size_t x, size_t y);
+		void onTFScroll(size_t x, size_t y, int direction);
 		void onMultiplyData();
 		void onSegment();
 		void onCluster();

@@ -14,6 +14,7 @@ public:
 	sigc::signal<void, size_t, size_t> &OnMouseMovedEvent() { return _onMouseMoved; }
 	sigc::signal<void> &OnMouseLeaveEvent() { return _onMouseLeft; }
 	sigc::signal<void, size_t, size_t> &OnButtonReleasedEvent() { return _onButtonReleased; }
+	sigc::signal<void, size_t, size_t, int> &OnScrollEvent() { return _onScroll; }
 	
 	bool IsMouseInImage() const { return _mouseIsIn; }
 	size_t MouseX() { return _mouseX; }
@@ -38,10 +39,11 @@ public:
 private:
 	void update(bool invalidated);
 	bool onDraw(const Cairo::RefPtr<Cairo::Context>& cr);
-	bool onMotion(GdkEventMotion *event);
-	bool onLeave(GdkEventCrossing *event);
-	bool onButtonPress(GdkEventButton *event);
-	bool onButtonRelease(GdkEventButton *event);
+	bool onMotion(GdkEventMotion* event);
+	bool onLeave(GdkEventCrossing* event);
+	bool onButtonPress(GdkEventButton* event);
+	bool onButtonRelease(GdkEventButton* event);
+	bool onScroll(GdkEventScroll* event);
 
 	bool _invalidated;
 	bool _mouseIsIn;
@@ -52,6 +54,7 @@ private:
 	sigc::signal<void, size_t, size_t> _onMouseMoved;
 	sigc::signal<void> _onMouseLeft;
 	sigc::signal<void, size_t, size_t> _onButtonReleased;
+	sigc::signal<void, size_t, size_t, int> _onScroll;
 	HeatMapPlot* _plot;
 };
 
