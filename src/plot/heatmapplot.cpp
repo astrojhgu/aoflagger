@@ -5,6 +5,7 @@
 #include "verticalplotscale.h"
 #include "title.h"
 
+#include <cmath>
 #include <iostream>
 #include <fstream>
 
@@ -16,6 +17,10 @@
 #include "../util/logger.h"
 
 #include <boost/algorithm/string.hpp>
+
+#ifndef HAVE_EXP10
+#define exp10(x) exp( (2.3025850929940456840179914546844) * (x) )
+#endif
 
 HeatMapPlot::HeatMapPlot() :
 	_isInitialized(false),
