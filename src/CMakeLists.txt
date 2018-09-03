@@ -320,7 +320,7 @@ add_test(aotest aotest)
 add_custom_target(check COMMAND aotest DEPENDS aotest)
 
 if(GTKMM_FOUND)
-	install (TARGETS rfigui aoqplot DESTINATION bin)
+	install (TARGETS rfigui aoqplot aoflagger-bin DESTINATION bin)
 endif(GTKMM_FOUND)
 
 if(BOOST_ASIO_H_FOUND AND SIGCXX_FOUND AND GTKMM_FOUND)
