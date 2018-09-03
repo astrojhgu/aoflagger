@@ -5,6 +5,7 @@
 #include "verticalplotscale.h"
 #include "title.h"
 
+#include <cmath>
 #include <iostream>
 #include <fstream>
 
