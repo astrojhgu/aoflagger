@@ -18,6 +18,7 @@
 #include "controllers/rfiguicontroller.h"
 
 #include "strategyframes/absthresholdframe.h"
+#include "strategyframes/applypassbandframe.h"
 #include "strategyframes/baselineselectionframe.h"
 #include "strategyframes/changeresolutionframe.h"
 #include "strategyframes/cutareaframe.h"
@@ -245,6 +246,9 @@ void EditStrategyWindow::onSelectionChanged()
 			{
 				case AbsThresholdActionType:
 					showRight(new AbsThresholdFrame(*static_cast<rfiStrategy::AbsThresholdAction*>(selectedAction), *this));
+					break;
+				case ApplyPassbandType:
+					showRight(new ApplyPassbandFrame(*static_cast<rfiStrategy::ApplyPassbandAction*>(selectedAction), *this));
 					break;
 				case BaselineSelectionActionType:
 					showRight(new BaselineSelectionFrame(*static_cast<rfiStrategy::BaselineSelectionAction*>(selectedAction), *this));

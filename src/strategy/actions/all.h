@@ -1,5 +1,6 @@
 
 #include "absthresholdaction.h"
+#include "applypassbandaction.h"
 #include "baselineselectionaction.h"
 #include "calibratepassbandaction.h"
 #include "changeresolutionaction.h"

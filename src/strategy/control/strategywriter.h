@@ -51,6 +51,7 @@ namespace rfiStrategy {
 
 			void writeAbsThresholdAction(const class AbsThresholdAction &action);
 			void writeAddStatisticsAction(const class AddStatisticsAction &action);
+			void writeApplyPassbandAction(const class ApplyPassbandAction& action);
 			void writeBaselineSelectionAction(const class BaselineSelectionAction &action);
 			void writeCalibratePassbandAction(const class CalibratePassbandAction &action);
 			void writeChangeResolutionAction(const class ChangeResolutionAction &action);
