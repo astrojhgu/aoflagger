@@ -34,7 +34,7 @@ public:
 	virtual ActionType Type() const final override { return ApplyPassbandType; }
 
 	const std::string& Filename() const { return _filename; }
-	void SetFilename(const std::string& filename) { _filename = filename; }
+	void SetFilename(const std::string& filename) { _filename = filename; _file.reset(); }
 	
 private:
 	struct PassbandIndex
@@ -46,10 +46,14 @@ private:
 		bool operator<(const PassbandIndex& rhs) const {
 			if(channel < rhs.channel)
 				return true;
-			else if(polarization < rhs.polarization)
-				return true;
-			else
-				return antenna < rhs.antenna;
+			else if(channel == rhs.channel)
+			{
+				if(polarization < rhs.polarization)
+					return true;
+				else if(polarization == rhs.polarization && antenna < rhs.antenna)
+					return true;
+			}
+			return false;
 		}
 	};
 	
@@ -69,6 +73,7 @@ private:
 				{
 					char polChar = pol[0];
 					_values.emplace(PassbandIndex{antenna, polChar, channel}, value);
+					//Logger::Info << antenna << " , " << polChar << " , " << channel << '\n';
 				}
 			}
 			Logger::Info << "Read " << _values.size() << " passband values from file " << filename << ".\n";
