@@ -132,7 +132,7 @@ private:
 		Image2DPtr corrected = Image2D::MakePtr(uncorrected->Width(), uncorrected->Height());
 		for(size_t ch=0; ch!=uncorrected->Height(); ++ch)
 		{
-			float val = file.GetValue(antenna1, pol1, ch) * file.GetValue(antenna2, pol2, ch);
+			float val = 1.0/(file.GetValue(antenna1, pol1, ch) * file.GetValue(antenna2, pol2, ch));
 			const num_t* ptrUncor = uncorrected->ValuePtr(0, ch);
 			num_t* ptrCor = corrected->ValuePtr(0, ch);
 			for(size_t x=0; x!=uncorrected->Width(); ++x)
