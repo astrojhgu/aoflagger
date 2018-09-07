@@ -123,16 +123,17 @@ private:
 				default: throw std::runtime_error("Can't apply a bandpass for polarization " + Polarization::TypeToShortString(polData.GetPolarization(0)));
 			}
 			
-			for(size_t imageIndex=0; imageIndex!=data.ImageCount(); ++imageIndex)
+			for(size_t imageIndex=0; imageIndex!=polData.ImageCount(); ++imageIndex)
 			{
-				Image2DCPtr uncorrected = data.GetImage(imageIndex);
+				Image2DCPtr uncorrected = polData.GetImage(imageIndex);
 				Image2DPtr newImage = apply(uncorrected, file, antenna1, antenna2, pol1, pol2);
-				data.SetImage(imageIndex, std::move(newImage));
+				polData.SetImage(imageIndex, std::move(newImage));
 			}
+			data.SetPolarizationData(i, std::move(polData));
 		}
 	}
 	
-	Image2DPtr apply(Image2DCPtr uncorrected, PassbandFile& file, const std::string& antenna1, const std::string& antenna2, char pol1, char pol2) const
+	Image2DPtr apply(Image2DCPtr& uncorrected, PassbandFile& file, const std::string& antenna1, const std::string& antenna2, char pol1, char pol2) const
 	{
 		Image2DPtr corrected = Image2D::MakePtr(uncorrected->Width(), uncorrected->Height());
 		for(size_t ch=0; ch!=uncorrected->Height(); ++ch)
