@@ -1,5 +1,5 @@
-#ifndef RFISTRATEGY_APPLY_PASSBAND_ACTION_H
-#define RFISTRATEGY_APPLY_PASSBAND_ACTION_H
+#ifndef RFISTRATEGY_APPLY_BANDPASS_ACTION_H
+#define RFISTRATEGY_APPLY_BANDPASS_ACTION_H
 
 #include <fstream>
 #include <map>
@@ -13,37 +13,37 @@
 
 namespace rfiStrategy {
 
-class ApplyPassbandAction : public Action {
+class ApplyBandpassAction : public Action {
 public:
-	ApplyPassbandAction()
+	ApplyBandpassAction()
 	{ }
 	
 	virtual std::string Description() final override
 	{
-		return "Apply passband";
+		return "Apply bandpass";
 	}
 	
 	virtual void Perform(ArtifactSet& artifacts, ProgressListener& progress) final override
 	{
 		if(!artifacts.HasMetaData() || !artifacts.MetaData()->HasAntenna1() || !artifacts.MetaData()->HasAntenna2())
-			throw std::runtime_error("No meta data available for passband correction");
+			throw std::runtime_error("No meta data available for bandpass correction");
 		
 		apply(artifacts.ContaminatedData(), artifacts.MetaData()->Antenna1().name, artifacts.MetaData()->Antenna2().name);
 	}
 
-	virtual ActionType Type() const final override { return ApplyPassbandType; }
+	virtual ActionType Type() const final override { return ApplyBandpassType; }
 
 	const std::string& Filename() const { return _filename; }
 	void SetFilename(const std::string& filename) { _filename = filename; _file.reset(); }
 	
 private:
-	struct PassbandIndex
+	struct BandpassIndex
 	{
 		std::string antenna;
 		char polarization;
 		size_t channel;
 		
-		bool operator<(const PassbandIndex& rhs) const {
+		bool operator<(const BandpassIndex& rhs) const {
 			if(channel < rhs.channel)
 				return true;
 			else if(channel == rhs.channel)
@@ -57,10 +57,10 @@ private:
 		}
 	};
 	
-	class PassbandFile
+	class BandpassFile
 	{
 	public:
-		PassbandFile(const std::string& filename)
+		BandpassFile(const std::string& filename)
 		{
 			std::ifstream file(filename);
 			std::string antenna, pol;
@@ -72,7 +72,7 @@ private:
 				if(file.good())
 				{
 					char polChar = pol[0];
-					_values.emplace(PassbandIndex{antenna, polChar, channel}, value);
+					_values.emplace(BandpassIndex{antenna, polChar, channel}, value);
 					//Logger::Info << antenna << " , " << polChar << " , " << channel << '\n';
 				}
 			}
@@ -81,31 +81,31 @@ private:
 		
 		double GetValue(const std::string& antenna, char polarization, size_t channel) const
 		{
-			auto iter = _values.find(PassbandIndex{antenna, polarization, channel});
+			auto iter = _values.find(BandpassIndex{antenna, polarization, channel});
 			if(iter == _values.end())
 			{
-				throw std::runtime_error("Passband file is missing values for " + antenna + " " + polarization + " " + std::to_string(channel));
+				throw std::runtime_error("Passband file is missing values for " + antenna + " pol " + polarization + " ch " + std::to_string(channel));
 			}
 			return iter->second;
 		}
 		
 		/** antenna, polarization, */
-		std::map<PassbandIndex, double> _values;
+		std::map<BandpassIndex, double> _values;
 	};
 	
-	PassbandFile& getFile() const
+	BandpassFile& getFile() const
 	{
 		std::lock_guard<std::mutex> lock(_mutex);
 		if(_file == nullptr)
 		{
-			_file.reset(new PassbandFile(_filename));
+			_file.reset(new BandpassFile(_filename));
 		}
 		return *_file.get();
 	}
 	
 	void apply(TimeFrequencyData& data, const std::string& antenna1, const std::string& antenna2) const
 	{
-		PassbandFile& file = getFile();
+		BandpassFile& file = getFile();
 		for(size_t i=0; i!=data.PolarizationCount(); ++i)
 		{
 			TimeFrequencyData polData = data.MakeFromPolarizationIndex(i);
@@ -133,7 +133,7 @@ private:
 		}
 	}
 	
-	Image2DPtr apply(Image2DCPtr& uncorrected, PassbandFile& file, const std::string& antenna1, const std::string& antenna2, char pol1, char pol2) const
+	Image2DPtr apply(Image2DCPtr& uncorrected, BandpassFile& file, const std::string& antenna1, const std::string& antenna2, char pol1, char pol2) const
 	{
 		Image2DPtr corrected = Image2D::MakePtr(uncorrected->Width(), uncorrected->Height());
 		for(size_t ch=0; ch!=uncorrected->Height(); ++ch)
@@ -151,7 +151,7 @@ private:
 	
 	std::string _filename;
 	mutable std::mutex _mutex;
-	mutable std::unique_ptr<PassbandFile> _file;
+	mutable std::unique_ptr<BandpassFile> _file;
 };
 }
 

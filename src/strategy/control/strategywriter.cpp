@@ -50,8 +50,8 @@ namespace rfiStrategy {
 				break;
 			case ActionBlockType:
 				throw std::runtime_error("Can not store action blocks");
-			case ApplyPassbandType:
-				writeApplyPassbandAction(static_cast<const ApplyPassbandAction&>(action));
+			case ApplyBandpassType:
+				writeApplyBandpassAction(static_cast<const ApplyBandpassAction&>(action));
 				break;
 			case BaselineSelectionActionType:
 				writeBaselineSelectionAction(static_cast<const BaselineSelectionAction&>(action));
@@ -165,9 +165,9 @@ namespace rfiStrategy {
 		End();
 	}
 	
-	void StrategyWriter::writeApplyPassbandAction(const class ApplyPassbandAction& action)
+	void StrategyWriter::writeApplyBandpassAction(const class ApplyBandpassAction& action)
 	{
-		Attribute("type", "ApplyPassbandAction");
+		Attribute("type", "ApplyBandpassAction");
 		Write("filename", action.Filename());
 	}
 	
