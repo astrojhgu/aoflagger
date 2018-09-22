@@ -288,14 +288,14 @@ std::unique_ptr<Action> StrategyReader::parseAbsThresholdAction(xmlNode* node)
 {
 	std::unique_ptr<AbsThresholdAction> newAction(new AbsThresholdAction());
 	newAction->SetThreshold(getDouble(node, "threshold"));
-	return newAction;
+	return std::move(newAction);
 }
 
 std::unique_ptr<Action> StrategyReader::parseApplyBandpassAction(xmlNode* node)
 {
 	std::unique_ptr<ApplyBandpassAction> newAction(new ApplyBandpassAction());
 	newAction->SetFilename(getString(node, "filename"));
-	return newAction;
+	return std::move(newAction);
 }
 
 std::unique_ptr<Action> StrategyReader::parseBaselineSelectionAction(xmlNode* node)
@@ -307,14 +307,14 @@ std::unique_ptr<Action> StrategyReader::parseBaselineSelectionAction(xmlNode* no
 	newAction->SetAbsThreshold(getDouble(node, "abs-threshold"));
 	newAction->SetSmoothingSigma(getDouble(node, "smoothing-sigma"));
 	newAction->SetMakePlot(getBool(node, "make-plot"));
-	return newAction;
+	return std::move(newAction);
 }
 
 std::unique_ptr<Action> StrategyReader::parseCalibratePassbandAction(xmlNode* node)
 {
 	std::unique_ptr<CalibratePassbandAction> newAction(new CalibratePassbandAction());
 	newAction->SetSteps(getInt(node, "steps"));
-	return newAction;
+	return std::move(newAction);
 }
 
 std::unique_ptr<Action> StrategyReader::parseChangeResolutionAction(xmlNode* node)
@@ -325,14 +325,14 @@ std::unique_ptr<Action> StrategyReader::parseChangeResolutionAction(xmlNode* nod
 	newAction->SetRestoreRevised(getBool(node, "restore-revised"));
 	newAction->SetRestoreMasks(getBool(node, "restore-masks"));
 	parseChildren(node, *newAction);
-	return newAction;
+	return std::move(newAction);
 }
 
 std::unique_ptr<Action> StrategyReader::parseCombineFlagResults(xmlNode* node)
 {
 	std::unique_ptr<CombineFlagResults> newAction(new CombineFlagResults());
 	parseChildren(node, *newAction);
-	return newAction;
+	return std::move(newAction);
 }
 
 std::unique_ptr<Action> StrategyReader::parseCutAreaAction(xmlNode* node)
@@ -343,13 +343,13 @@ std::unique_ptr<Action> StrategyReader::parseCutAreaAction(xmlNode* node)
 	newAction->SetTopChannels(getInt(node, "top-channels"));
 	newAction->SetBottomChannels(getInt(node, "bottom-channels"));
 	parseChildren(node, *newAction);
-	return newAction;
+	return std::move(newAction);
 }
 
 std::unique_ptr<Action> StrategyReader::parseEigenValueVerticalAction(xmlNode* )
 {
   std::unique_ptr<EigenValueVerticalAction> newAction(new EigenValueVerticalAction());
-  return newAction;
+  return std::move(newAction);
 }
 
 std::unique_ptr<Action> StrategyReader::parseForEachBaselineAction(xmlNode* node)
@@ -400,7 +400,7 @@ std::unique_ptr<Action> StrategyReader::parseForEachBaselineAction(xmlNode* node
 	}
 	
 	parseChildren(node, *newAction);
-	return newAction;
+	return std::move(newAction);
 }
 
 std::unique_ptr<Action> StrategyReader::parseForEachComplexComponentAction(xmlNode* node)
@@ -412,7 +412,7 @@ std::unique_ptr<Action> StrategyReader::parseForEachComplexComponentAction(xmlNo
 	newAction->SetOnImaginary(getBool(node, "on-imaginary"));
 	newAction->SetRestoreFromAmplitude(getBool(node, "restore-from-amplitude"));
 	parseChildren(node, *newAction);
-	return newAction;
+	return std::move(newAction);
 }
 
 std::unique_ptr<Action> StrategyReader::parseForEachMSAction(xmlNode* node)
@@ -440,7 +440,7 @@ std::unique_ptr<Action> StrategyReader::parseForEachMSAction(xmlNode* node)
 	}
 	
 	parseChildren(node, *newAction);
-	return newAction;
+	return std::move(newAction);
 }
 
 std::unique_ptr<Action> StrategyReader::parseForEachPolarisationBlock(xmlNode* node)
@@ -455,7 +455,7 @@ std::unique_ptr<Action> StrategyReader::parseForEachPolarisationBlock(xmlNode* n
 	newAction->SetOnStokesU(getBool(node, "on-stokes-u"));
 	newAction->SetOnStokesV(getBool(node, "on-stokes-v"));
 	parseChildren(node, *newAction);
-	return newAction;
+	return std::move(newAction);
 }
 
 std::unique_ptr<Action> StrategyReader::parseFrequencyConvolutionAction(xmlNode* node)
@@ -463,14 +463,14 @@ std::unique_ptr<Action> StrategyReader::parseFrequencyConvolutionAction(xmlNode*
 	std::unique_ptr<FrequencyConvolutionAction> newAction(new FrequencyConvolutionAction());
 	newAction->SetConvolutionSize(getInt(node, "convolution-size"));
 	newAction->SetKernelKind((enum FrequencyConvolutionAction::KernelKind) getInt(node, "kernel-kind"));
-	return newAction;
+	return std::move(newAction);
 }
 
 std::unique_ptr<Action> StrategyReader::parseFrequencySelectionAction(xmlNode* node)
 {
 	std::unique_ptr<FrequencySelectionAction> newAction(new FrequencySelectionAction());
 	newAction->SetThreshold(getDouble(node, "threshold"));
-	return newAction;
+	return std::move(newAction);
 }
 
 std::unique_ptr<Action> StrategyReader::parseFringeStopAction(xmlNode* node)
@@ -481,7 +481,7 @@ std::unique_ptr<Action> StrategyReader::parseFringeStopAction(xmlNode* node)
 	newAction->SetOnlyFringeStop(getBool(node, "only-fringe-stop"));
 	newAction->SetMinWindowSize(getInt(node, "min-window-size"));
 	newAction->SetMaxWindowSize(getInt(node, "max-window-size"));
-	return newAction;
+	return std::move(newAction);
 }
 
 std::unique_ptr<Action> StrategyReader::parseHighPassFilterAction(xmlNode* node)
@@ -492,13 +492,13 @@ std::unique_ptr<Action> StrategyReader::parseHighPassFilterAction(xmlNode* node)
 	newAction->SetWindowWidth(getInt(node, "window-width"));
 	newAction->SetWindowHeight(getInt(node, "window-height"));
 	newAction->SetMode((enum HighPassFilterAction::Mode) getInt(node, "mode"));
-	return newAction;
+	return std::move(newAction);
 }
 
 std::unique_ptr<Action> StrategyReader::parseImagerAction(xmlNode* )
 {
 	std::unique_ptr<ImagerAction> newAction(new ImagerAction());
-	return newAction;
+	return std::move(newAction);
 }
 
 std::unique_ptr<Action> StrategyReader::parseIterationBlock(xmlNode* node)
@@ -507,21 +507,21 @@ std::unique_ptr<Action> StrategyReader::parseIterationBlock(xmlNode* node)
 	newAction->SetIterationCount(getInt(node, "iteration-count"));
 	newAction->SetSensitivityStart(getDouble(node, "sensitivity-start"));
 	parseChildren(node, *newAction);
-	return newAction;
+	return std::move(newAction);
 }
 
 std::unique_ptr<Action> StrategyReader::parseNormalizeVarianceAction(xmlNode* node)
 {
 	std::unique_ptr<NormalizeVarianceAction> newAction(new NormalizeVarianceAction());
 	newAction->SetMedianFilterSizeInS(getDouble(node, "median-filter-size-in-s"));
-	return newAction;
+	return std::move(newAction);
 }
 
 std::unique_ptr<Action> StrategyReader::parseSetFlaggingAction(xmlNode* node)
 {
 	std::unique_ptr<SetFlaggingAction> newAction(new SetFlaggingAction());
 	newAction->SetNewFlagging((enum SetFlaggingAction::NewFlagging) getInt(node, "new-flagging"));
-	return newAction;
+	return std::move(newAction);
 }
 
 std::unique_ptr<Action> StrategyReader::parsePlotAction(xmlNode* node)
@@ -529,20 +529,20 @@ std::unique_ptr<Action> StrategyReader::parsePlotAction(xmlNode* node)
 	std::unique_ptr<PlotAction> newAction(new PlotAction());
 	newAction->SetPlotKind((enum PlotAction::PlotKind) getInt(node, "plot-kind"));
 	newAction->SetLogarithmicYAxis(getBool(node, "logarithmic-y-axis"));
-	return newAction;
+	return std::move(newAction);
 }
 
 std::unique_ptr<Action> StrategyReader::parseQuickCalibrateAction(xmlNode* )
 {
 	std::unique_ptr<QuickCalibrateAction> newAction(new QuickCalibrateAction());
-	return newAction;
+	return std::move(newAction);
 }
 
 std::unique_ptr<Action> StrategyReader::parseSetImageAction(xmlNode* node)
 {
 	std::unique_ptr<SetImageAction> newAction(new SetImageAction());
 	newAction->SetNewImage((enum SetImageAction::NewImage) getInt(node, "new-image"));
-	return newAction;
+	return std::move(newAction);
 }
 
 std::unique_ptr<Action> StrategyReader::parseSlidingWindowFitAction(xmlNode* node)
@@ -553,7 +553,7 @@ std::unique_ptr<Action> StrategyReader::parseSlidingWindowFitAction(xmlNode* nod
 	newAction->Parameters().method = (enum SlidingWindowFitParameters::Method) getInt(node, "method");
 	newAction->Parameters().timeDirectionKernelSize = getDouble(node, "time-direction-kernel-size");
 	newAction->Parameters().timeDirectionWindowSize = getInt(node, "time-direction-window-size");
-	return newAction;
+	return std::move(newAction);
 }
 
 std::unique_ptr<Action> StrategyReader::parseMorphologicalFlagAction(xmlNode* node)
@@ -567,14 +567,14 @@ std::unique_ptr<Action> StrategyReader::parseMorphologicalFlagAction(xmlNode* no
 	newAction->SetMinimumGoodFrequencyRatio(getDouble(node, "minimum-good-frequency-ratio"));
 	newAction->SetMinimumGoodTimeRatio(getDouble(node, "minimum-good-time-ratio"));
 	newAction->SetExcludeOriginalFlags(getBoolOr(node, "exclude-original-flags", false));
-	return newAction;
+	return std::move(newAction);
 }
 
 std::unique_ptr<Action> StrategyReader::parseSVDAction(xmlNode* node)
 {
 	std::unique_ptr<SVDAction> newAction(new SVDAction());
 	newAction->SetSingularValueCount(getInt(node, "singular-value-count"));
-	return newAction;
+	return std::move(newAction);
 }
 
 std::unique_ptr<Action> StrategyReader::parseSumThresholdAction(xmlNode* node)
@@ -592,7 +592,7 @@ std::unique_ptr<Action> StrategyReader::parseSumThresholdAction(xmlNode* node)
 	newAction->SetTimeDirectionFlagging(getBool(node, "time-direction-flagging"));
 	newAction->SetFrequencyDirectionFlagging(getBool(node, "frequency-direction-flagging"));
 	newAction->SetExcludeOriginalFlags(getBoolOr(node, "exclude-original-flags", false));
-	return newAction;
+	return std::move(newAction);
 }
 
 std::unique_ptr<Action> StrategyReader::parseTimeConvolutionAction(xmlNode* node)
@@ -605,14 +605,14 @@ std::unique_ptr<Action> StrategyReader::parseTimeConvolutionAction(xmlNode* node
 	newAction->SetEtaParameter(getDouble(node, "eta-parameter"));
 	newAction->SetAutoAngle(getBool(node, "auto-angle"));
 	newAction->SetIterations(getInt(node, "iterations"));
-	return newAction;
+	return std::move(newAction);
 }
 
 std::unique_ptr<Action> StrategyReader::parseTimeSelectionAction(xmlNode* node)
 {
 	std::unique_ptr<TimeSelectionAction> newAction(new TimeSelectionAction());
 	newAction->SetThreshold(getDouble(node, "threshold"));
-	return newAction;
+	return std::move(newAction);
 }
 
 std::unique_ptr<Action> StrategyReader::parseVisualizeAction(xmlNode* node)
@@ -629,19 +629,19 @@ std::unique_ptr<Action> StrategyReader::parseVisualizeAction(xmlNode* node)
 	else
 		throw StrategyReaderError("Incorrect 'source' given in visualize action");
 	newAction->SetSortingIndex(getInt(node, "sorting-index"));
-	return newAction;
+	return std::move(newAction);
 }
 
 std::unique_ptr<Action> StrategyReader::parseWriteDataAction(xmlNode* )
 {
 	std::unique_ptr<WriteDataAction> newAction(new WriteDataAction());
-	return newAction;
+	return std::move(newAction);
 }
 
 std::unique_ptr<Action> StrategyReader::parseWriteFlagsAction(xmlNode* )
 {
 	std::unique_ptr<WriteFlagsAction> newAction(new WriteFlagsAction());
-	return newAction;
+	return std::move(newAction);
 }
 
 } // end of namespace
