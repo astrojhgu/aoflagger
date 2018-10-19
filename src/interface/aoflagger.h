@@ -399,6 +399,13 @@ namespace aoflagger {
 		public:
 			friend class AOFlagger;
 			
+			/** Construct a QualityStatistics with null state.
+			 * 
+			 * An object created by this constructor can only be assigned to.
+			 * @since Version 2.13
+			 */
+			QualityStatistics();
+			
 			/** @brief Copy the object. This is fast; only references are copied. */
 			QualityStatistics(const QualityStatistics& sourceQS);
 			
