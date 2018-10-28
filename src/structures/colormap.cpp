@@ -11,6 +11,8 @@ std::unique_ptr<ColorMap> ColorMap::CreateColorMap(const std::string& type)
 		return UC(new ColdHotMap());
 	else if(type == "redblue")
 		return UC(new RedBlueMap());
+	else if(type == "blackred")
+		return UC(new BlackRedMap());
 	else if(type == "redwhiteblue")
 		return UC(new RedWhiteBlueMap());
 	else if(type=="redyellowblue")
