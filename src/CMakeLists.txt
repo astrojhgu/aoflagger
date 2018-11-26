@@ -112,6 +112,7 @@ set(MSIO_FILES
   msio/memorybaselinereader.cpp
   msio/pngfile.cpp
   msio/rspreader.cpp
+  msio/singlebaselinefile.cpp
   msio/spatialtimeloader.cpp)
   
 set(STRUCTURES_FILES
@@ -197,7 +198,8 @@ set(STRATEGY_IMAGESETS_FILES
   strategy/imagesets/imageset.cpp
   strategy/imagesets/msimageset.cpp
   strategy/imagesets/parmimageset.cpp
-  strategy/imagesets/pngreader.cpp)
+  strategy/imagesets/pngreader.cpp
+  strategy/imagesets/rfibaselineset.cpp)
 
 set(STRATEGY_FILES
   ${STRATEGY_ACTION_FILES}

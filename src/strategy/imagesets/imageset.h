@@ -138,10 +138,10 @@ namespace rfiStrategy {
 			static bool IsTimeFrequencyStatFile(const std::string &file);
 			static bool IsMSFile(const std::string &file);
 			static bool IsNoiseStatFile(const std::string &file);
-			static bool IsHarishFile(const std::string &file);
 			static bool IsPngFile(const std::string &file);
 			static bool IsFilterBankFile(const std::string& file);
 			static bool IsQualityStatSet(const std::string& file);
+			static bool IsRFIBaselineSet(const std::string& file);
 
 			void AddWriteFlagsTask(const ImageSetIndex &index, const TimeFrequencyData &data)
 			{

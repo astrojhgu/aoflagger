@@ -16,13 +16,15 @@
 #include "../../strategy/imagesets/spatialmsimageset.h"
 #include "../../strategy/imagesets/spatialtimeimageset.h"
 
-#include "../../quality/histogramcollection.h"
-
-#include "../../util/multiplot.h"
+#include "../../msio/singlebaselinefile.h"
 
 #include "../../plot/plotmanager.h"
 
+#include "../../quality/histogramcollection.h"
+
 #include "../../structures/spatialmatrixmetadata.h"
+
+#include "../../util/multiplot.h"
 
 #include "../rfiguiwindow.h"
 
@@ -570,4 +572,13 @@ void RFIGuiController::InterpolateFlagged()
 		_tfController.SetNewData(activeData, SelectedMetaData());
 		_rfiGuiWindow->GetTimeFrequencyWidget().Update();
 	}
+}
+
+void RFIGuiController::SaveBaseline(const std::string& filename)
+{
+	SingleBaselineFile file;
+	file.data = _tfController.OriginalData();
+	file.metaData = *_tfController.Plot().GetFullMetaData();
+	std::ofstream stream(filename);
+	file.Write(stream);
 }
