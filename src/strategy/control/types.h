@@ -69,12 +69,13 @@ class Observatorium;
 // 3.9 : Split SumThreshold's base-sensitivity into time-direction-sensitivity and frequency-direction-sensitivity.
 // 3.91 : Added the 'visualize in UI' action, added the 'exclude-original-flags' parameter
 //        to statistical flagging action.
-#define STRATEGY_FILE_FORMAT_VERSION 3.91
+// 3.92 : Add method to CalibrateBandpassAction
+#define STRATEGY_FILE_FORMAT_VERSION 3.92
 
 // The earliest format version which can be read by this version of the software
 #define STRATEGY_FILE_FORMAT_VERSION_REQUIRED 3.4
 
 // The earliest software version which is required to read the written files
-#define STRATEGY_FILE_READER_VERSION_REQUIRED 3.91
+#define STRATEGY_FILE_READER_VERSION_REQUIRED 3.92
 
 #endif // RFI_STRATEGY_TYPES

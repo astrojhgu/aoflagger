@@ -211,10 +211,17 @@ class TimeFrequencyData
 			if(_complexRepresentation != ComplexParts)
 				throw BadUsageException("Trying to create single complex image, but no complex data available");
 			if(_data.size() != 1)
-				throw BadUsageException("Not implemented");
-			if(_data[0]._images[0] == nullptr || _data[0]._images[1] == nullptr)
-				throw BadUsageException("Requesting non-existing image");
-			return std::array<Image2DCPtr,2>{{ _data[0]._images[0], _data[0]._images[1] }};
+			{
+				return std::array<Image2DCPtr,2>{{
+					Make(TimeFrequencyData::RealPart).GetSingleImage(),
+					Make(TimeFrequencyData::ImaginaryPart).GetSingleImage()
+				}};
+			}
+			else {
+				if(_data[0]._images[0] == nullptr || _data[0]._images[1] == nullptr)
+					throw BadUsageException("Requesting non-existing image");
+				return std::array<Image2DCPtr,2>{{ _data[0]._images[0], _data[0]._images[1] }};
+			}
 		}
 		
 		void Set(PolarizationEnum polarizationType,

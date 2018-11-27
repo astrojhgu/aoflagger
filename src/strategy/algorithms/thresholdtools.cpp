@@ -311,6 +311,44 @@ void ThresholdTools::WinsorizedMeanAndStdDev(const Image2D* image, const Mask2D*
 		stddev = 0.0;
 }
 
+template<typename T>
+double ThresholdTools::WinsorizedRMS(const std::vector<std::complex<T>> &input)
+{
+	if(input.empty())
+	{
+		return 0.0;
+	} else {
+		std::vector<std::complex<T>> data(input);
+		std::sort(data.begin(), data.end(), complexLessThanOperator<T>);
+		size_t lowIndex = (size_t) floor(0.1 * data.size());
+		size_t highIndex = (size_t) ceil(0.9 * data.size())-1;
+		std::complex<T> lowValue = data[lowIndex];
+		std::complex<T> highValue = data[highIndex];
+
+		// Calculate RMS
+		double rms = 0.0;
+		size_t count = 0;
+		for(const std::complex<T>& val : data) {
+			if(std::isfinite(val.real()) && std::isfinite(val.imag())) {
+				if(complexLessThanOperator<T>(val, lowValue))
+					rms += (lowValue*std::conj(lowValue)).real();
+				else if(complexLessThanOperator<T>(highValue, val))
+					rms += (highValue*std::conj(highValue)).real();
+				else
+					rms += (val * std::conj(val)).real();
+				count++;
+			}
+		}
+		if(count > 0)
+			return sqrt(1.54 * rms / (T) count);
+		else
+			return 0.0;
+	}
+}
+
+template double ThresholdTools::WinsorizedRMS(const std::vector<std::complex<float>> &input);
+template double ThresholdTools::WinsorizedRMS(const std::vector<std::complex<double>> &input);
+
 num_t ThresholdTools::MinValue(const Image2D* image, const Mask2D* mask)
 {
 	num_t minValue = std::numeric_limits<num_t>::max();

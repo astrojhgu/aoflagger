@@ -2,7 +2,7 @@
 #include "strategyiterator.h"
 
 #include "../actions/baselineselectionaction.h"
-#include "../actions/calibratepassbandaction.h"
+#include "../actions/calibratebandpassaction.h"
 #include "../actions/changeresolutionaction.h"
 #include "../actions/combineflagresultsaction.h"
 #include "../actions/foreachbaselineaction.h"
@@ -270,7 +270,7 @@ namespace rfiStrategy {
 		current = focActionPtr;
 		
 		if(setup.calPassband)
-			current->Add(std::unique_ptr<CalibratePassbandAction>(new CalibratePassbandAction()));
+			current->Add(std::unique_ptr<CalibrateBandpassAction>(new CalibrateBandpassAction()));
 		
 		std::unique_ptr<SumThresholdAction> t2(new SumThresholdAction());
 		t2->SetTimeDirectionSensitivity(setup.sumThresholdSensitivity);
