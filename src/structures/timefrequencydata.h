@@ -332,7 +332,7 @@ class TimeFrequencyData
 				}
 				else // _complexRepresentation != ComplexParts
 				{
-					// TODO should be done on real or imaginary
+					// TODO should be done on only real or imaginary
 					switch(polarization)
 					{
 						case Polarization::StokesI:
@@ -340,6 +340,10 @@ class TimeFrequencyData
 							break;
 						case Polarization::StokesQ:
 							newData = TimeFrequencyData(_complexRepresentation, Polarization::StokesQ, getFirstDiff(xxPol, yyPol));
+							break;
+						// this is not correct, but it is useful for visualization
+						case Polarization::StokesU:
+							newData = TimeFrequencyData(_complexRepresentation, Polarization::StokesU, getFirstSum(xyPol, yxPol));
 							break;
 						default:
 							throw BadUsageException("Requested polarization type not available in time frequency data");
