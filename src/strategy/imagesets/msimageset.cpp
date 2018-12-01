@@ -221,7 +221,7 @@ namespace rfiStrategy {
 		{
 			if(flags.size() == 1)
 				for(size_t i=0;i<_reader->Polarizations().size();++i)
-					allFlags.push_back(flags[0]);
+					allFlags.emplace_back(flags[0]);
 			else
 				throw std::runtime_error("Incorrect number of polarizations in write action");
 		}
