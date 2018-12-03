@@ -162,7 +162,7 @@ namespace rfiStrategy {
 		}
   }
 
-	void ChangeResolutionAction::IncreaseTime(TimeFrequencyData &originalData, TimeFrequencyData &changedData, bool restoreImage, bool restoreMask)
+	void ChangeResolutionAction::IncreaseTime(TimeFrequencyData &originalData, const TimeFrequencyData &changedData, bool restoreImage, bool restoreMask)
 	{
 		if(restoreImage)
 		{
@@ -190,7 +190,7 @@ namespace rfiStrategy {
 		}
 	}
 
-	void ChangeResolutionAction::IncreaseFrequency(TimeFrequencyData &originalData, TimeFrequencyData &changedData, bool restoreImage, bool restoreMask)
+	void ChangeResolutionAction::IncreaseFrequency(TimeFrequencyData &originalData, const TimeFrequencyData &changedData, bool restoreImage, bool restoreMask)
 	{
 		if(restoreImage)
 		{

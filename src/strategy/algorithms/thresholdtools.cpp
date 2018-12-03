@@ -717,10 +717,10 @@ Image2DPtr ThresholdTools::ShrinkHorizontally(size_t factor, const Image2D* inpu
 		size_t avgSize = factor;
 		if(avgSize + x*factor > oldWidth)
 			avgSize = oldWidth - x*factor;
-		size_t count = 0;
 
 		for(size_t y=0;y<input->Height();++y)
 		{
+			size_t count = 0;
 			num_t sum = 0.0;
 			for(size_t binX=0;binX<avgSize;++binX)
 			{
@@ -754,17 +754,17 @@ Image2DPtr ThresholdTools::ShrinkVertically(size_t factor, const Image2D* input,
 
 	Image2DPtr newImage = Image2D::CreateUnsetImagePtr(input->Width(), newHeight);
 
-	for(size_t y=0;y<newHeight;++y)
+	for(size_t y=0; y!=newHeight; ++y)
 	{
 		size_t avgSize = factor;
 		if(avgSize + y*factor > oldHeight)
 			avgSize = oldHeight - y*factor;
-		size_t count = 0;
 
-		for(size_t x=0;x<input->Width();++x)
+		for(size_t x=0; x!=input->Width(); ++x)
 		{
+			size_t count = 0;
 			num_t sum = 0.0;
-			for(size_t binY=0;binY<avgSize;++binY)
+			for(size_t binY=0; binY!=avgSize; ++binY)
 			{
 				size_t curY = y*factor + binY;
 				if(!mask->Value(x, curY))
@@ -776,7 +776,7 @@ Image2DPtr ThresholdTools::ShrinkVertically(size_t factor, const Image2D* input,
 			if(count == 0)
 			{
 				sum = 0.0;
-				for(size_t binY=0;binY<avgSize;++binY)
+				for(size_t binY=0; binY!=avgSize; ++binY)
 				{
 					size_t curY = y*factor + binY;
 					sum += input->Value(x, curY);

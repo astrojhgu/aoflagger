@@ -197,16 +197,16 @@ Mask2D Mask2D::ShrinkVerticallyForAveraging(int factor) const
 
 	Mask2D newMask(_width, newHeight);
 
-	for(size_t y=0;y<newHeight;++y)
+	for(size_t y=0; y!=newHeight; ++y)
 	{
 		size_t binSize = factor;
 		if(binSize + y*factor > _height)
 			binSize = _height - y*factor;
 
-		for(size_t x=0;x<_width;++x)
+		for(size_t x=0; x!=_width; ++x)
 		{
 			bool value = true;
-			for(size_t binY=0;binY<binSize;++binY)
+			for(size_t binY=0; binY!=binSize; ++binY)
 			{
 				size_t curY = y*factor + binY;
 				value = value & Value(x, curY);

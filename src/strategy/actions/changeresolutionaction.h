@@ -51,10 +51,10 @@ namespace rfiStrategy {
 			int _frequencyDecreaseFactor;
 
 			void DecreaseTime(TimeFrequencyData& data);
-			void IncreaseTime(TimeFrequencyData& originalData, TimeFrequencyData& changedData, bool restoreImage, bool restoreMask);
+			void IncreaseTime(TimeFrequencyData& originalData, const TimeFrequencyData& changedData, bool restoreImage, bool restoreMask);
 
 			void DecreaseFrequency(TimeFrequencyData& data);
-			void IncreaseFrequency(TimeFrequencyData &originalData, TimeFrequencyData& changedData, bool restoreImage, bool restoreMask);
+			void IncreaseFrequency(TimeFrequencyData &originalData, const TimeFrequencyData& changedData, bool restoreImage, bool restoreMask);
 			
 			void DecreaseTimeWithMask(TimeFrequencyData& data);
 			void DecreaseFrequencyWithMask(TimeFrequencyData& data);
