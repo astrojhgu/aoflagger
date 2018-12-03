@@ -325,6 +325,7 @@ std::unique_ptr<Action> StrategyReader::parseChangeResolutionAction(xmlNode* nod
 	newAction->SetFrequencyDecreaseFactor(getInt(node, "frequency-decrease-factor"));
 	newAction->SetRestoreRevised(getBool(node, "restore-revised"));
 	newAction->SetRestoreMasks(getBool(node, "restore-masks"));
+	newAction->SetUseMaskInAveraging(getBoolOr(node, "use-mask-in-averaging", false));
 	parseChildren(node, *newAction);
 	return std::move(newAction);
 }

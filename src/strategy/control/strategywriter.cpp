@@ -204,6 +204,7 @@ namespace rfiStrategy {
 		Write<int>("frequency-decrease-factor", action.FrequencyDecreaseFactor());
 		Write<bool>("restore-revised", action.RestoreRevised());
 		Write<bool>("restore-masks", action.RestoreMasks());
+		Write<bool>("use-mask-in-averaging", action.UseMaskInAveraging());
 		writeContainerItems(action);
 	}
 
