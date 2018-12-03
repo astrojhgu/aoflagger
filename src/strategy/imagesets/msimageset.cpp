@@ -234,5 +234,4 @@ namespace rfiStrategy {
 	{
 		_reader->PerformFlagWriteRequests();
 	}
-
 }

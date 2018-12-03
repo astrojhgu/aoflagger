@@ -110,6 +110,7 @@ namespace rfiStrategy {
 			virtual void Initialize() = 0;
 			virtual std::string Name() = 0;
 			virtual std::string File() = 0;
+			virtual std::string TelescopeName() = 0;
 			
 			virtual void AddReadRequest(const ImageSetIndex &index) = 0;
 			virtual void PerformReadRequests() = 0;

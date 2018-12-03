@@ -25,6 +25,7 @@ public:
 	
 	TimeFrequencyData data;
 	TimeFrequencyMetaData metaData;
+	std::string telescopeName;
 };
 
 #endif

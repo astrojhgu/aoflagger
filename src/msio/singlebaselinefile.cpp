@@ -23,6 +23,8 @@ void SingleBaselineFile::Read(std::istream& stream)
 	
 	data = UnserializeTFData(stream);
 	metaData = UnserializeMetaData(stream);
+	
+	telescopeName = Serializable::UnserializeString(stream);
 }
 
 void SingleBaselineFile::Write(std::ostream& stream)
@@ -36,6 +38,8 @@ void SingleBaselineFile::Write(std::ostream& stream)
 	
 	Serialize(stream, data);
 	Serialize(stream, metaData);
+	
+	Serializable::SerializeToString(stream, telescopeName);
 }
 
 TimeFrequencyData SingleBaselineFile::UnserializeTFData(std::istream& stream)

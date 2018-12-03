@@ -568,6 +568,7 @@ void RFIGuiController::SaveBaseline(const std::string& filename)
 	SingleBaselineFile file;
 	file.data = _tfController.OriginalData();
 	file.metaData = *_tfController.Plot().GetFullMetaData();
+	file.telescopeName = _imageSet->TelescopeName();
 	std::ofstream stream(filename);
 	file.Write(stream);
 }
