@@ -37,6 +37,7 @@ class ThresholdTools {
 		static void FilterConnectedSample(Mask2D* mask, size_t x, size_t y, size_t minConnectedSampleArea, bool eightConnected=true);
 		static void UnrollPhase(Image2D* image);
 		static Image2DPtr ShrinkHorizontally(size_t factor, const Image2D* input, const Mask2D* mask);
+		static Image2DPtr ShrinkVertically(size_t factor, const Image2D* input, const Mask2D* mask);
 
 		static Image2DPtr FrequencyRectangularConvolution(const Image2D* source, size_t convolutionSize)
 		{
