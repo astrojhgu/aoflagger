@@ -17,7 +17,7 @@ namespace rfiStrategy {
 	void MSImageSet::Initialize()
 	{
 		Logger::Debug << "Initializing image set...\n";
-		Logger::Debug << "Antenna's: " << _set.AntennaCount() << '\n';
+		Logger::Debug << "Antennas: " << _set.AntennaCount() << '\n';
 		_sequences = _set.GetSequences();
 		Logger::Debug << "Unique sequences: " << _sequences.size() << '\n';
 		if(_sequences.empty())
