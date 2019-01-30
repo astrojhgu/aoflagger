@@ -73,41 +73,29 @@ void GrayScalePlotPage::initStatisticKinds(Gtk::Toolbar& toolbar)
 {
 	toolbar.append(_separator1);
 	
-	_countButton.set_group(_statisticGroup);
 	_countButton.signal_clicked().connect(sigc::mem_fun(*this, &GrayScalePlotPage::onSelectCount));
 	_countButton.set_tooltip_text("Visibility count");
 	toolbar.append(_countButton);
-	_statisticGroup = _countButton.get_group();
 	
-	_meanButton.set_group(_statisticGroup);
 	_meanButton.signal_clicked().connect(sigc::mem_fun(*this, &GrayScalePlotPage::onSelectMean));
 	_meanButton.set_tooltip_text("Mean value");
 	toolbar.append(_meanButton);
-	_statisticGroup = _meanButton.get_group();
 	
-	_stdDevButton.set_group(_statisticGroup);
 	_stdDevButton.signal_clicked().connect(sigc::mem_fun(*this, &GrayScalePlotPage::onSelectStdDev));
 	_stdDevButton.set_tooltip_text("Standard deviation");
 	toolbar.append(_stdDevButton);
-	_statisticGroup = _stdDevButton.get_group();
 	
-	_dMeanButton.set_group(_statisticGroup);
 	_dMeanButton.signal_clicked().connect(sigc::mem_fun(*this, &GrayScalePlotPage::onSelectDMean));
 	_dMeanButton.set_tooltip_text("Frequency-differential (difference between channels) mean value");
 	toolbar.append(_dMeanButton);
-	_statisticGroup = _dMeanButton.get_group();
 	
-	_dStdDevButton.set_group(_statisticGroup);
 	_dStdDevButton.signal_clicked().connect(sigc::mem_fun(*this, &GrayScalePlotPage::onSelectDStdDev));
 	_dStdDevButton.set_tooltip_text("Frequency-differential (difference between channels) standard deviation");
 	toolbar.append(_dStdDevButton);
-	_statisticGroup = _dStdDevButton.get_group();
 	
-	_rfiPercentageButton.set_group(_statisticGroup);
 	_rfiPercentageButton.signal_clicked().connect(sigc::mem_fun(*this, &GrayScalePlotPage::onSelectRFIPercentage));
 	_rfiPercentageButton.set_tooltip_text("Flagged percentage");
 	toolbar.append(_rfiPercentageButton);
-	_statisticGroup = _rfiPercentageButton.get_group();
 	
 	_stdDevButton.set_active();
 }
@@ -118,31 +106,26 @@ void GrayScalePlotPage::initPolarizations(Gtk::Toolbar& toolbar)
 	
 	Gtk::RadioToolButton::Group group;
 	
-	_polPPButton.set_group(group);
 	_polPPButton.signal_clicked().connect(sigc::mem_fun(*this, &GrayScalePlotPage::updateImage));
 	_polPPButton.set_icon_name("showpp");
 	_polPPButton.set_tooltip_text("Display statistics for the PP polarization. Depending on the polarization configuration of the measurement set, this will show XX or RR.");
 	toolbar.append(_polPPButton);
 	
-	_polPQButton.set_group(group);
 	_polPQButton.signal_clicked().connect(sigc::mem_fun(*this, &GrayScalePlotPage::updateImage));
 	_polPQButton.set_icon_name("showpq");
 	_polPQButton.set_tooltip_text("Display statistics for the PQ polarization. Depending on the polarization configuration of the measurement set, this will show XY or RL.");
 	toolbar.append(_polPQButton);
 
-	_polQPButton.set_group(group);
 	_polQPButton.signal_clicked().connect(sigc::mem_fun(*this, &GrayScalePlotPage::updateImage));
 	_polQPButton.set_icon_name("showqp");
 	_polQPButton.set_tooltip_text("Display statistics for the QP polarization. Depending on the polarization configuration of the measurement set, this will show YX or LR.");
 	toolbar.append(_polQPButton);
 
-	_polQQButton.set_group(group);
 	_polQQButton.signal_clicked().connect(sigc::mem_fun(*this, &GrayScalePlotPage::updateImage));
 	_polQQButton.set_icon_name("showqq");
 	_polQQButton.set_tooltip_text("Display statistics for the QQ polarization. Depending on the polarization configuration of the measurement set, this will show YY or LL.");
 	toolbar.append(_polQQButton);
 
-	_polIButton.set_group(group);
 	_polIButton.signal_clicked().connect(sigc::mem_fun(*this, &GrayScalePlotPage::updateImage));
 	_polIButton.set_tooltip_text("Stokes I polarization");
 	toolbar.append(_polIButton);
