@@ -13,7 +13,6 @@ GrayScalePlotPage::GrayScalePlotPage(HeatMapPageController* controller) :
 	_countButton(_statisticGroup, "#"),
 	_meanButton(_statisticGroup, "μ"),
 	_stdDevButton(_statisticGroup, "σ"),
-	_dCountButton(_statisticGroup, "Δ#"),
 	_dMeanButton(_statisticGroup, "Δμ"),
 	_dStdDevButton(_statisticGroup, "Δσ"),
 	_rfiPercentageButton(_statisticGroup, "%"),
@@ -74,30 +73,34 @@ void GrayScalePlotPage::initStatisticKinds(Gtk::Toolbar& toolbar)
 {
 	toolbar.append(_separator1);
 	
+	Gtk::RadioToolButton::Group group;
+	
+	_countButton.set_group(group);
 	_countButton.signal_clicked().connect(sigc::mem_fun(*this, &GrayScalePlotPage::onSelectCount));
 	_countButton.set_tooltip_text("Visibility count");
 	toolbar.append(_countButton);
 	
+	_meanButton.set_group(group);
 	_meanButton.signal_clicked().connect(sigc::mem_fun(*this, &GrayScalePlotPage::onSelectMean));
 	_meanButton.set_tooltip_text("Mean value");
 	toolbar.append(_meanButton);
 	
+	_stdDevButton.set_group(group);
 	_stdDevButton.signal_clicked().connect(sigc::mem_fun(*this, &GrayScalePlotPage::onSelectStdDev));
 	_stdDevButton.set_tooltip_text("Standard deviation");
 	toolbar.append(_stdDevButton);
 	
-	//_dCountButton.signal_clicked().connect(sigc::mem_fun(*this, &GrayScalePlotPage::onSelectDCount));
-	//_dCountButton.set_tooltip_text("Visibility count in differential statistics");
-	//toolbar.append(_dCountButton);
-	
+	_dMeanButton.set_group(group);
 	_dMeanButton.signal_clicked().connect(sigc::mem_fun(*this, &GrayScalePlotPage::onSelectDMean));
 	_dMeanButton.set_tooltip_text("Frequency-differential (difference between channels) mean value");
 	toolbar.append(_dMeanButton);
 	
+	_dStdDevButton.set_group(group);
 	_dStdDevButton.signal_clicked().connect(sigc::mem_fun(*this, &GrayScalePlotPage::onSelectDStdDev));
 	_dStdDevButton.set_tooltip_text("Frequency-differential (difference between channels) standard deviation");
 	toolbar.append(_dStdDevButton);
 	
+	_rfiPercentageButton.set_group(group);
 	_rfiPercentageButton.signal_clicked().connect(sigc::mem_fun(*this, &GrayScalePlotPage::onSelectRFIPercentage));
 	_rfiPercentageButton.set_tooltip_text("Flagged percentage");
 	toolbar.append(_rfiPercentageButton);
@@ -109,26 +112,33 @@ void GrayScalePlotPage::initPolarizations(Gtk::Toolbar& toolbar)
 {
 	toolbar.append(_separator2);
 	
+	Gtk::RadioToolButton::Group group;
+	
+	_polPPButton.set_group(group);
 	_polPPButton.signal_clicked().connect(sigc::mem_fun(*this, &GrayScalePlotPage::updateImage));
 	_polPPButton.set_icon_name("showpp");
 	_polPPButton.set_tooltip_text("Display statistics for the PP polarization. Depending on the polarization configuration of the measurement set, this will show XX or RR.");
 	toolbar.append(_polPPButton);
 	
+	_polPQButton.set_group(group);
 	_polPQButton.signal_clicked().connect(sigc::mem_fun(*this, &GrayScalePlotPage::updateImage));
 	_polPQButton.set_icon_name("showpq");
 	_polPQButton.set_tooltip_text("Display statistics for the PQ polarization. Depending on the polarization configuration of the measurement set, this will show XY or RL.");
 	toolbar.append(_polPQButton);
 
+	_polQPButton.set_group(group);
 	_polQPButton.signal_clicked().connect(sigc::mem_fun(*this, &GrayScalePlotPage::updateImage));
 	_polQPButton.set_icon_name("showqp");
 	_polQPButton.set_tooltip_text("Display statistics for the QP polarization. Depending on the polarization configuration of the measurement set, this will show YX or LR.");
 	toolbar.append(_polQPButton);
 
+	_polQQButton.set_group(group);
 	_polQQButton.signal_clicked().connect(sigc::mem_fun(*this, &GrayScalePlotPage::updateImage));
 	_polQQButton.set_icon_name("showqq");
 	_polQQButton.set_tooltip_text("Display statistics for the QQ polarization. Depending on the polarization configuration of the measurement set, this will show YY or LL.");
 	toolbar.append(_polQQButton);
 
+	_polIButton.set_group(group);
 	_polIButton.signal_clicked().connect(sigc::mem_fun(*this, &GrayScalePlotPage::updateImage));
 	_polIButton.set_tooltip_text("Stokes I polarization");
 	toolbar.append(_polIButton);
@@ -140,18 +150,24 @@ void GrayScalePlotPage::initPhaseButtons(Gtk::Toolbar& toolbar)
 {
 	toolbar.append(_separator3);
 	
+	Gtk::RadioToolButton::Group group;
+	
+	_amplitudePhaseButton.set_group(group);
 	_amplitudePhaseButton.signal_clicked().connect(sigc::mem_fun(*this, &GrayScalePlotPage::updateImage));
 	_amplitudePhaseButton.set_tooltip_text("Amplitude");
 	toolbar.append(_amplitudePhaseButton);
 	
+	_phasePhaseButton.set_group(group);
 	_phasePhaseButton.signal_clicked().connect(sigc::mem_fun(*this, &GrayScalePlotPage::updateImage));
 	_phasePhaseButton.set_tooltip_text("Phase");
 	toolbar.append(_phasePhaseButton);
 	
+	_realPhaseButton.set_group(group);
 	_realPhaseButton.signal_clicked().connect(sigc::mem_fun(*this, &GrayScalePlotPage::updateImage));
 	_realPhaseButton.set_tooltip_text("Real value");
 	toolbar.append(_realPhaseButton);
 	
+	_imaginaryPhaseButton.set_group(group);
 	_imaginaryPhaseButton.signal_clicked().connect(sigc::mem_fun(*this, &GrayScalePlotPage::updateImage));
 	_imaginaryPhaseButton.set_tooltip_text("Imaginary value");
 	toolbar.append(_imaginaryPhaseButton);
@@ -163,12 +179,17 @@ void GrayScalePlotPage::initPlotOptions(Gtk::Toolbar& toolbar)
 {
 	toolbar.append(_separator4);
 	
+	Gtk::RadioToolButton::Group group;
+	
+	_rangeMinMaxButton.set_group(group);
 	_rangeMinMaxButton.signal_clicked().connect(sigc::mem_fun(*this, &GrayScalePlotPage::onSelectMinMaxRange));
 	toolbar.append(_rangeMinMaxButton);
 
+	_rangeWinsorizedButton.set_group(group);
 	_rangeWinsorizedButton.signal_clicked().connect(sigc::mem_fun(*this, &GrayScalePlotPage::onSelectWinsorizedRange));
 	toolbar.append(_rangeWinsorizedButton);
 
+	_rangeSpecified.set_group(group);
 	_rangeSpecified.signal_clicked().connect(sigc::mem_fun(*this, &GrayScalePlotPage::onSelectSpecifiedRange));
 	toolbar.append(_rangeSpecified);
 	
@@ -186,12 +207,17 @@ void GrayScalePlotPage::initPlotOptions(Gtk::Toolbar& toolbar)
 	
 	toolbar.append(_separator6);
 	
+	Gtk::RadioToolButton::Group normGroup;
+	
+	_meanNormButton.set_group(normGroup);
 	_meanNormButton.signal_clicked().connect(sigc::mem_fun(*this, &GrayScalePlotPage::onChangeNormMethod));
 	toolbar.append(_meanNormButton);
 	
+	_winsorNormButton.set_group(normGroup);
 	_winsorNormButton.signal_clicked().connect(sigc::mem_fun(*this, &GrayScalePlotPage::onChangeNormMethod));
 	toolbar.append(_winsorNormButton);
 	
+	_medianNormButton.set_group(normGroup);
 	_medianNormButton.signal_clicked().connect(sigc::mem_fun(*this, &GrayScalePlotPage::onChangeNormMethod));
 	toolbar.append(_medianNormButton);
 	
