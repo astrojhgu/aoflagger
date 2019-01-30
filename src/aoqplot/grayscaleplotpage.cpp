@@ -10,12 +10,12 @@
 
 GrayScalePlotPage::GrayScalePlotPage(HeatMapPageController* controller) :
 	_controller(controller),
-	_countButton(_statisticGroup, "#"),
-	_meanButton(_statisticGroup, "μ"),
-	_stdDevButton(_statisticGroup, "σ"),
-	_dMeanButton(_statisticGroup, "Δμ"),
-	_dStdDevButton(_statisticGroup, "Δσ"),
-	_rfiPercentageButton(_statisticGroup, "%"),
+	_countButton("#"),
+	_meanButton("μ"),
+	_stdDevButton("σ"),
+	_dMeanButton("Δμ"),
+	_dStdDevButton("Δσ"),
+	_rfiPercentageButton("%"),
 	_polPPButton(_polGroup, "pp"),
 	_polPQButton(_polGroup, "pq"),
 	_polQPButton(_polGroup, "qp"),
@@ -73,37 +73,41 @@ void GrayScalePlotPage::initStatisticKinds(Gtk::Toolbar& toolbar)
 {
 	toolbar.append(_separator1);
 	
-	Gtk::RadioToolButton::Group group;
-	
-	_countButton.set_group(group);
+	_countButton.set_group(_statisticGroup);
 	_countButton.signal_clicked().connect(sigc::mem_fun(*this, &GrayScalePlotPage::onSelectCount));
 	_countButton.set_tooltip_text("Visibility count");
 	toolbar.append(_countButton);
+	_statisticGroup = _countButton.get_group();
 	
-	_meanButton.set_group(group);
+	_meanButton.set_group(_statisticGroup);
 	_meanButton.signal_clicked().connect(sigc::mem_fun(*this, &GrayScalePlotPage::onSelectMean));
 	_meanButton.set_tooltip_text("Mean value");
 	toolbar.append(_meanButton);
+	_statisticGroup = _meanButton.get_group();
 	
-	_stdDevButton.set_group(group);
+	_stdDevButton.set_group(_statisticGroup);
 	_stdDevButton.signal_clicked().connect(sigc::mem_fun(*this, &GrayScalePlotPage::onSelectStdDev));
 	_stdDevButton.set_tooltip_text("Standard deviation");
 	toolbar.append(_stdDevButton);
+	_statisticGroup = _stdDevButton.get_group();
 	
-	_dMeanButton.set_group(group);
+	_dMeanButton.set_group(_statisticGroup);
 	_dMeanButton.signal_clicked().connect(sigc::mem_fun(*this, &GrayScalePlotPage::onSelectDMean));
 	_dMeanButton.set_tooltip_text("Frequency-differential (difference between channels) mean value");
 	toolbar.append(_dMeanButton);
+	_statisticGroup = _dMeanButton.get_group();
 	
-	_dStdDevButton.set_group(group);
+	_dStdDevButton.set_group(_statisticGroup);
 	_dStdDevButton.signal_clicked().connect(sigc::mem_fun(*this, &GrayScalePlotPage::onSelectDStdDev));
 	_dStdDevButton.set_tooltip_text("Frequency-differential (difference between channels) standard deviation");
 	toolbar.append(_dStdDevButton);
+	_statisticGroup = _dStdDevButton.get_group();
 	
-	_rfiPercentageButton.set_group(group);
+	_rfiPercentageButton.set_group(_statisticGroup);
 	_rfiPercentageButton.signal_clicked().connect(sigc::mem_fun(*this, &GrayScalePlotPage::onSelectRFIPercentage));
 	_rfiPercentageButton.set_tooltip_text("Flagged percentage");
 	toolbar.append(_rfiPercentageButton);
+	_statisticGroup = _rfiPercentageButton.get_group();
 	
 	_stdDevButton.set_active();
 }
