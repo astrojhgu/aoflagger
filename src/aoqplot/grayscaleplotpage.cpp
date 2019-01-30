@@ -10,12 +10,12 @@
 
 GrayScalePlotPage::GrayScalePlotPage(HeatMapPageController* controller) :
 	_controller(controller),
-	_countButton("#"),
-	_meanButton("μ"),
-	_stdDevButton("σ"),
-	_dMeanButton("Δμ"),
-	_dStdDevButton("Δσ"),
-	_rfiPercentageButton("%"),
+	_countButton(_statisticGroup, "#"),
+	_meanButton(_statisticGroup, "μ"),
+	_stdDevButton(_statisticGroup, "σ"),
+	_dMeanButton(_statisticGroup, "Δμ"),
+	_dStdDevButton(_statisticGroup, "Δσ"),
+	_rfiPercentageButton(_statisticGroup, "%"),
 	_polPPButton(_polGroup, "pp"),
 	_polPQButton(_polGroup, "pq"),
 	_polQPButton(_polGroup, "qp"),
