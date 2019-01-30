@@ -104,8 +104,6 @@ void GrayScalePlotPage::initPolarizations(Gtk::Toolbar& toolbar)
 {
 	toolbar.append(_separator2);
 	
-	Gtk::RadioToolButton::Group group;
-	
 	_polPPButton.signal_clicked().connect(sigc::mem_fun(*this, &GrayScalePlotPage::updateImage));
 	_polPPButton.set_icon_name("showpp");
 	_polPPButton.set_tooltip_text("Display statistics for the PP polarization. Depending on the polarization configuration of the measurement set, this will show XX or RR.");
@@ -137,24 +135,18 @@ void GrayScalePlotPage::initPhaseButtons(Gtk::Toolbar& toolbar)
 {
 	toolbar.append(_separator3);
 	
-	Gtk::RadioToolButton::Group group;
-	
-	_amplitudePhaseButton.set_group(group);
 	_amplitudePhaseButton.signal_clicked().connect(sigc::mem_fun(*this, &GrayScalePlotPage::updateImage));
 	_amplitudePhaseButton.set_tooltip_text("Amplitude");
 	toolbar.append(_amplitudePhaseButton);
 	
-	_phasePhaseButton.set_group(group);
 	_phasePhaseButton.signal_clicked().connect(sigc::mem_fun(*this, &GrayScalePlotPage::updateImage));
 	_phasePhaseButton.set_tooltip_text("Phase");
 	toolbar.append(_phasePhaseButton);
 	
-	_realPhaseButton.set_group(group);
 	_realPhaseButton.signal_clicked().connect(sigc::mem_fun(*this, &GrayScalePlotPage::updateImage));
 	_realPhaseButton.set_tooltip_text("Real value");
 	toolbar.append(_realPhaseButton);
 	
-	_imaginaryPhaseButton.set_group(group);
 	_imaginaryPhaseButton.signal_clicked().connect(sigc::mem_fun(*this, &GrayScalePlotPage::updateImage));
 	_imaginaryPhaseButton.set_tooltip_text("Imaginary value");
 	toolbar.append(_imaginaryPhaseButton);
@@ -166,17 +158,12 @@ void GrayScalePlotPage::initPlotOptions(Gtk::Toolbar& toolbar)
 {
 	toolbar.append(_separator4);
 	
-	Gtk::RadioToolButton::Group group;
-	
-	_rangeMinMaxButton.set_group(group);
 	_rangeMinMaxButton.signal_clicked().connect(sigc::mem_fun(*this, &GrayScalePlotPage::onSelectMinMaxRange));
 	toolbar.append(_rangeMinMaxButton);
 
-	_rangeWinsorizedButton.set_group(group);
 	_rangeWinsorizedButton.signal_clicked().connect(sigc::mem_fun(*this, &GrayScalePlotPage::onSelectWinsorizedRange));
 	toolbar.append(_rangeWinsorizedButton);
 
-	_rangeSpecified.set_group(group);
 	_rangeSpecified.signal_clicked().connect(sigc::mem_fun(*this, &GrayScalePlotPage::onSelectSpecifiedRange));
 	toolbar.append(_rangeSpecified);
 	
@@ -194,17 +181,12 @@ void GrayScalePlotPage::initPlotOptions(Gtk::Toolbar& toolbar)
 	
 	toolbar.append(_separator6);
 	
-	Gtk::RadioToolButton::Group normGroup;
-	
-	_meanNormButton.set_group(normGroup);
 	_meanNormButton.signal_clicked().connect(sigc::mem_fun(*this, &GrayScalePlotPage::onChangeNormMethod));
 	toolbar.append(_meanNormButton);
 	
-	_winsorNormButton.set_group(normGroup);
 	_winsorNormButton.signal_clicked().connect(sigc::mem_fun(*this, &GrayScalePlotPage::onChangeNormMethod));
 	toolbar.append(_winsorNormButton);
 	
-	_medianNormButton.set_group(normGroup);
 	_medianNormButton.signal_clicked().connect(sigc::mem_fun(*this, &GrayScalePlotPage::onChangeNormMethod));
 	toolbar.append(_medianNormButton);
 	
