@@ -324,7 +324,7 @@ void RFIGuiWindow::onExecuteStrategyPressed()
 		artifacts.SetRevisedData(zero);
 	}
 	if(_timeFrequencyWidget.Plot().GetFullMetaData() != nullptr)
-			artifacts.SetMetaData(_timeFrequencyWidget.Plot().GetFullMetaData());
+		artifacts.SetMetaData(_timeFrequencyWidget.Plot().GetFullMetaData());
 	if(_controller->HasImageSet())
 	{
 		artifacts.SetImageSet(_controller->GetImageSet().Clone());

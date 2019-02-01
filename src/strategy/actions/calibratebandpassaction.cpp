@@ -54,7 +54,7 @@ namespace rfiStrategy {
 		for(size_t i=0; i!=data.ImageCount(); ++i)
 		{
 			const Image2D &image = *data.GetImage(i);
-			Image2D *destImage = Image2D::CreateUnsetImage(image.Width(), image.Height());
+			Image2DPtr destImage = Image2D::CreateUnsetImagePtr(image.Width(), image.Height());
 			for(size_t step=0; step!=_steps; ++step)
 			{
 				const size_t startY = step*height/_steps, endY = (step+1)*height/_steps;
@@ -89,7 +89,7 @@ namespace rfiStrategy {
 #endif
 				}
 			}
-			data.SetImage(i, Image2DPtr(destImage));
+			data.SetImage(i, std::move(destImage));
 		}
 	}
 
