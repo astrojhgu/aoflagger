@@ -121,15 +121,18 @@ namespace rfiStrategy {
 			_baselines.push_back(std::pair<size_t,size_t>(0, 0));
       AntennaInfo antenna;
       antenna.id = 0;
-			//size_t width = _file->GetCurrentImageSize(1);
+			antenna.name = "";
 			size_t height = _file->GetCurrentImageSize(2);
-			_antennaInfos.push_back(antenna);
+			_antennaInfos.emplace_back(antenna);
 			_bandCount = 1;
 			_bandInfos.emplace(0, BandInfo());
 			_bandInfos[0].channels.resize(height);
+			double freq0 = _file->GetDoubleKeywordValue("CRVAL2");
+			double freqDelta = _file->GetDoubleKeywordValue("CDELT2");
+			_sourceName = _file->GetKeywordValue("SOURCE");
 			for(size_t i=0; i!=_bandInfos[0].channels.size(); ++i)
 			{
-				_bandInfos[0].channels[i].frequencyHz = i;
+				_bandInfos[0].channels[i].frequencyHz = freq0 + i*freqDelta;
 				_bandInfos[0].channels[i].frequencyIndex = i;
 			}
 			_file->MoveToHDU(1);
@@ -408,10 +411,20 @@ namespace rfiStrategy {
 				}
 			}
 		}
-		data = TimeFrequencyData::FromLinear(TimeFrequencyData::RealPart, imgs[0], imgs[1], imgs[2], imgs[3]);
+		data = TimeFrequencyData::MakeFromPolarizationCombination(
+			TimeFrequencyData(TimeFrequencyData::RealPart, Polarization::StokesI, imgs[0]),
+			TimeFrequencyData(TimeFrequencyData::RealPart, Polarization::StokesQ, imgs[1]),
+			TimeFrequencyData(TimeFrequencyData::RealPart, Polarization::StokesU, imgs[2]),
+			TimeFrequencyData(TimeFrequencyData::RealPart, Polarization::StokesV, imgs[3])
+		);
 		metaData.SetBand(_bandInfos[0]);
 		metaData.SetAntenna1(_antennaInfos[0]);
 		metaData.SetAntenna2(_antennaInfos[0]);
+		std::vector<double> times(width);
+		double timeDelta = _file->GetDoubleKeywordValue("CDELT1");
+		for(size_t i=0; i!=width; ++i)
+			times[i] = timeDelta * i;
+		metaData.SetObservationTimes(times);
 	}
 	
 	void FitsImageSet::ReadSingleDishTable(TimeFrequencyData &data, TimeFrequencyMetaData &metaData, size_t ifIndex)
@@ -689,13 +702,19 @@ namespace rfiStrategy {
 
 	std::string FitsImageSetIndex::Description() const {
 		FitsImageSet &set = static_cast<class FitsImageSet&>(imageSet());
-		int a1 = set.Baselines()[_baselineIndex].first;
-		int a2 = set.Baselines()[_baselineIndex].second;
-		AntennaInfo info1 = set.GetAntennaInfo(a1);
-		AntennaInfo info2 = set.GetAntennaInfo(a2);
-		std::stringstream s;
-		s << "Correlation " << info1.name << " x " << info2.name << ", band " << _band;
-		return s.str();
+		if(set.IsDynSpectrumType())
+		{
+			return set.SourceName();
+		}
+		else {
+			int a1 = set.Baselines()[_baselineIndex].first;
+			int a2 = set.Baselines()[_baselineIndex].second;
+			AntennaInfo info1 = set.GetAntennaInfo(a1);
+			AntennaInfo info2 = set.GetAntennaInfo(a2);
+			std::stringstream s;
+			s << "Correlation " << info1.name << " x " << info2.name << ", band " << _band;
+			return s.str();
+		}
 	}
 
 	std::string FitsImageSet::File()
@@ -705,13 +724,19 @@ namespace rfiStrategy {
 	
 	std::string FitsImageSet::TelescopeName()
 	{
-		for(int hduIndex=2; hduIndex <= _file->GetHDUCount(); hduIndex++)
+		if(_fitsType == SDFitsType)
 		{
-			_file->MoveToHDU(hduIndex);
-			std::string extName = _file->GetKeywordValue("EXTNAME");
-			if(extName == "SINGLE DISH")
-				return _file->GetKeywordValue("TELESCOP");
+			for(int hduIndex=2; hduIndex <= _file->GetHDUCount(); hduIndex++)
+			{
+				_file->MoveToHDU(hduIndex);
+				std::string extName = _file->GetKeywordValue("EXTNAME");
+				if(extName == "SINGLE DISH")
+					return _file->GetKeywordValue("TELESCOP");
+			}
+			return "";
 		}
-		return "";
+		else {
+			return "DynSpectrum";
+		}
 	}
 }

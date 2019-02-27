@@ -91,6 +91,8 @@ public:
 	{
 		return _antennaInfos[antennaIndex];
 	}
+	const std::string& SourceName() const { return _sourceName; }
+	bool IsDynSpectrumType() const { return _fitsType == DynSpectrumType; }
 	
 private:
 	FitsImageSet(const FitsImageSet &source);
@@ -116,6 +118,7 @@ private:
 	std::vector<int> _bandIndexToNumber;
 	size_t _currentBaselineIndex, _currentBandIndex;
 	double _frequencyOffset;
+	std::string _sourceName;
 	
 	std::stack<BaselineData> _baselineData;
 	enum { UVFitsType, SDFitsType, DynSpectrumType } _fitsType;
