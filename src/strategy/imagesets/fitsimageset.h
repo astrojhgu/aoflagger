@@ -108,7 +108,8 @@ private:
 	
 	TimeFrequencyData ReadPrimaryGroupTable(size_t baselineIndex, int band, int stokes, TimeFrequencyMetaData &metaData);
 	
-	void saveSingleDishFlags(std::vector<Mask2DCPtr> &flags, size_t ifIndex);
+	void saveSingleDishFlags(const std::vector<Mask2DCPtr>& flags, size_t ifIndex);
+	void saveDynSpectrumFlags(const std::vector<Mask2DCPtr>& flags);
 	
 	std::shared_ptr<class FitsFile> _file;
 	std::vector<std::pair<size_t,size_t> > _baselines;

@@ -146,7 +146,13 @@ void RFIGuiController::PlotPowerSpectrum()
 		plot.SetLogarithmicYAxis(true);
 
 		TimeFrequencyData data = ActiveData();
-		std::array<Image2DCPtr, 2> images = data.GetSingleComplexImage();
+		std::array<Image2DCPtr, 2> images;
+		if(data.ComplexRepresentation() == TimeFrequencyData::ComplexParts)
+			images = data.GetSingleComplexImage();
+		else {
+			images[0] = data.GetSingleImage();
+			images[1] = images[0];
+		}
 		Mask2DPtr mask =
 			Mask2D::CreateSetMaskPtr<false>(images[0]->Width(), images[0]->Height());
 		Plot2DPointSet &beforeSet = plot.StartLine("Flags not applied");

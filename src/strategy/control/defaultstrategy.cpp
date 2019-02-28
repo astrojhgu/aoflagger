@@ -65,7 +65,7 @@ namespace rfiStrategy {
 		}
 	}
 		
-	DefaultStrategy::TelescopeId DefaultStrategy::TelescopeIdFromName(const std::string &name)
+	DefaultStrategy::TelescopeId DefaultStrategy::TelescopeIdFromName(const std::string& name)
 	{
 		const std::string nameUpper = boost::algorithm::to_upper_copy(name);
 		if(nameUpper == "AARTFAAC")

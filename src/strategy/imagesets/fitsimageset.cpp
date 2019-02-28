@@ -157,7 +157,7 @@ namespace rfiStrategy {
 			break;
 		case DynSpectrumType:
 			ReadDynSpectrum(data, *metaData);
-			return BaselineData(data, metaData);
+			return BaselineData(data, metaData, index);
 		}
 		
 		for(int hduIndex=2;hduIndex <= _file->GetHDUCount();hduIndex++)
@@ -399,6 +399,7 @@ namespace rfiStrategy {
 		Image2DPtr imgs[4];
 		for(size_t i=0; i!=4; ++i)
 			imgs[i] = Image2D::CreateUnsetImagePtr(width, height);
+		Mask2DPtr flags = Mask2D::CreateSetMask<false>(width, height);
 		std::vector<num_t>::const_iterator bufferIter = buffer.begin();
 		for(size_t j=0; j!=npol; ++j)
 		{
@@ -407,6 +408,8 @@ namespace rfiStrategy {
 				for(size_t x=0; x!=width; ++x)
 				{
 					imgs[j]->SetValue(x, y, *bufferIter);
+					if(!std::isfinite(*bufferIter))
+						flags->SetValue(x, y, true);
 					++bufferIter;
 				}
 			}
@@ -417,6 +420,7 @@ namespace rfiStrategy {
 			TimeFrequencyData(TimeFrequencyData::RealPart, Polarization::StokesU, imgs[2]),
 			TimeFrequencyData(TimeFrequencyData::RealPart, Polarization::StokesV, imgs[3])
 		);
+		data.SetGlobalMask(flags);
 		metaData.SetBand(_bandInfos[0]);
 		metaData.SetAntenna1(_antennaInfos[0]);
 		metaData.SetAntenna2(_antennaInfos[0]);
@@ -581,22 +585,33 @@ namespace rfiStrategy {
 	
 	void FitsImageSet::AddWriteFlagsTask(const ImageSetIndex &index, std::vector<Mask2DCPtr> &flags)
 	{
-		if(_file->HasGroups())
-			throw BadUsageException("Not implemented for grouped fits files");
-		else
+		switch(_fitsType)
+		{
+		case UVFitsType:
+			throw BadUsageException("Not implemented for UV fits files");
+		case SDFitsType:
 			saveSingleDishFlags(flags, static_cast<const FitsImageSetIndex&>(index)._band);
+			break;
+		case DynSpectrumType:
+			saveDynSpectrumFlags(flags);
+			break;
+		}
 	}
 
 	void FitsImageSet::PerformWriteFlagsTask()
 	{
-		if(_file->HasGroups())
-			throw BadUsageException("Not implemented for grouped fits files");
-		else {
+		switch(_fitsType)
+		{
+		case UVFitsType:
+			throw BadUsageException("Writing flags not implemented for UV fits files");
+		case SDFitsType:
+		case DynSpectrumType:
 			// Nothing to be done; Add..Task already wrote the flags.
+			break;
 		}
 	}
 	
-	void FitsImageSet::saveSingleDishFlags(std::vector<Mask2DCPtr> &flags, size_t ifIndex)
+	void FitsImageSet::saveSingleDishFlags(const std::vector<Mask2DCPtr>& flags, size_t ifIndex)
 	{
 		_file->Close();
 		_file->Open(FitsFile::ReadWriteMode);
@@ -668,6 +683,37 @@ namespace rfiStrategy {
 				++timeIndex;
 			}
 		}
+	}
+	
+	void FitsImageSet::saveDynSpectrumFlags(const std::vector<Mask2DCPtr>& flags)
+	{
+		Logger::Debug << "Writing dynspectrum flags.\n";
+		_file->Close();
+		_file->Open(FitsFile::ReadWriteMode);
+		_file->MoveToHDU(1);
+			
+		size_t width = _file->GetCurrentImageSize(1);
+		size_t height = _file->GetCurrentImageSize(2);
+		size_t npol = _file->GetCurrentImageSize(3);
+		size_t n = width * height * npol;
+		std::vector<num_t> buffer(n);
+		_file->ReadCurrentImageData(0, buffer.data(), buffer.size());
+		
+		std::vector<num_t>::iterator bufferIter = buffer.begin();
+		for(size_t j=0; j!=npol; ++j)
+		{
+			for(size_t y=0; y!=height; ++y)
+			{
+				for(size_t x=0; x!=width; ++x)
+				{
+					if(flags[j]->Value(x, y))
+						*bufferIter = std::numeric_limits<num_t>::quiet_NaN();
+					++bufferIter;
+				}
+			}
+		}
+		
+		_file->WriteImage(0, buffer.data(), buffer.size(), std::numeric_limits<num_t>::quiet_NaN());
 	}
 	
 	void FitsImageSetIndex::Previous()
