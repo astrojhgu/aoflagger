@@ -242,18 +242,18 @@ void RFIGuiController::PlotPowerTime()
 		Image2DCPtr image = activeData.GetSingleImage();
 		Mask2DPtr mask =
 			Mask2D::CreateSetMaskPtr<false>(image->Width(), image->Height());
-		Plot2DPointSet &totalPlot = plot.StartLine("Total");
+		Plot2DPointSet &totalPlot = plot.StartLine("Without flagging");
 		RFIPlots::MakePowerTimePlot(totalPlot, image, mask, SelectedMetaData());
 
 		mask = Mask2D::MakePtr(*activeData.GetSingleMask());
 		if(!mask->AllFalse())
 		{
-			Plot2DPointSet &uncontaminatedPlot = plot.StartLine("Uncontaminated");
+			Plot2DPointSet &uncontaminatedPlot = plot.StartLine("With flagging");
 			RFIPlots::MakePowerTimePlot(uncontaminatedPlot, image, mask, SelectedMetaData());
 	
-			mask->Invert();
-			Plot2DPointSet &rfiPlot = plot.StartLine("RFI");
-			RFIPlots::MakePowerTimePlot(rfiPlot, image, mask, SelectedMetaData());
+			//mask->Invert();
+			//Plot2DPointSet &rfiPlot = plot.StartLine("RFI");
+			//RFIPlots::MakePowerTimePlot(rfiPlot, image, mask, SelectedMetaData());
 		}
 
 		_plotManager->Update();
