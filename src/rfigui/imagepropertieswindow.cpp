@@ -23,6 +23,7 @@ ImagePropertiesWindow::ImagePropertiesWindow(HeatMapWidget &imageWidget, const s
 	_blackRedScaleButton("Black/red"),
 	_redBlueYellowScaleButton("Red/Yellow/Blue"),
 	_fireScaleButton("Fire"),
+	_coolScaleButton("Cool"),
 	_cubeHelixScaleButton("Cubehelix"),
 	_cubeHelixColourfulScaleButton("Cubehelix+"),
 	_viridisScaleButton("Viridis"),
@@ -114,6 +115,9 @@ void ImagePropertiesWindow::initColorMapButtons()
 	_fireScaleButton.set_group(group);
 	_colorMapBox.pack_start(_fireScaleButton);
 	
+	_coolScaleButton.set_group(group);
+	_colorMapBox.pack_start(_coolScaleButton);
+	
 	_cubeHelixScaleButton.set_group(group);
 	_colorMapBox.pack_start(_cubeHelixScaleButton);
 	
@@ -133,6 +137,7 @@ void ImagePropertiesWindow::initColorMapButtons()
 		case HeatMapPlot::BlackRedMap: _blackRedScaleButton.set_active(true); break;
 		case HeatMapPlot::RedYellowBlueMap: _redBlueYellowScaleButton.set_active(true); break;
 		case HeatMapPlot::FireMap: _fireScaleButton.set_active(true); break;
+		case HeatMapPlot::CoolMap: _coolScaleButton.set_active(true); break;
 		case HeatMapPlot::CubeHelixMap: _cubeHelixScaleButton.set_active(true); break;
 		case HeatMapPlot::CubeHelixColourfulMap: _cubeHelixColourfulScaleButton.set_active(true); break;
 		case HeatMapPlot::ViridisMap: _viridisScaleButton.set_active(true); break;
@@ -314,6 +319,8 @@ void ImagePropertiesWindow::onApplyClicked()
 		_imageWidget.Plot().SetColorMap(HeatMapPlot::RedYellowBlueMap);
 	else if(_fireScaleButton.get_active())
 		_imageWidget.Plot().SetColorMap(HeatMapPlot::FireMap);
+	else if(_coolScaleButton.get_active())
+		_imageWidget.Plot().SetColorMap(HeatMapPlot::CoolMap);
 	else if(_cubeHelixScaleButton.get_active())
 		_imageWidget.Plot().SetColorMap(HeatMapPlot::CubeHelixMap);
 	else if(_cubeHelixColourfulScaleButton.get_active())
