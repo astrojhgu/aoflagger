@@ -282,6 +282,7 @@ void DirectBaselineReader::PerformFlagWriteRequests()
 		addRequestRows(_writeRequests[i], i, rows);
 	std::sort(rows.begin(), rows.end());
 
+	Table()->reopenRW();
 	casacore::ROScalarColumn<double> timeColumn(*Table(), "TIME");
 	casacore::ArrayColumn<bool> flagColumn(*Table(), "FLAG");
 

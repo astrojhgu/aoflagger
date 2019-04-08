@@ -26,15 +26,13 @@ class IndirectBaselineReader : public BaselineReader {
 		
 		void SetReadUVW(bool readUVW) { _readUVW = readUVW; }
 	private:
-		class ReorderInfo
+		struct ReorderInfo
 		{
-		public:
 			std::unique_ptr<std::ofstream> dataFile;
 			std::unique_ptr<std::ofstream> flagFile;
 		};
-		class UpdateInfo
+		struct UpdateInfo
 		{
-		public:
 			std::unique_ptr<std::ifstream> dataFile;
 			std::unique_ptr<std::ifstream> flagFile;
 		};

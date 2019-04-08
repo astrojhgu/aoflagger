@@ -15,28 +15,31 @@
 
 #include "../util/logger.h"
 
-BaselineReader::BaselineReader(const std::string &msFile)
-	: _measurementSet(msFile), _table(0), _dataColumnName("DATA"), _subtractModel(false), _readData(true), _readFlags(true),
+BaselineReader::BaselineReader(const std::string &msFile) :
+	_measurementSet(msFile),
+	_table(),
+	_dataColumnName("DATA"),
+	_subtractModel(false),
+	_readData(true),
+	_readFlags(true),
 	_polarizations()
 {
-	try {
-		_table = new casacore::MeasurementSet(_measurementSet.Path(), casacore::MeasurementSet::Update);
-	} catch(std::exception &e)
-	{
-		Logger::Warn << "Read-write opening of file " << msFile << " failed, trying read-only...\n";
-		_table = new casacore::MeasurementSet(_measurementSet.Path());
-		Logger::Warn << "Table opened in read-only: writing not possible.\n";
-	}
+	//try {
+	//	_table.reset(new casacore::MeasurementSet(_measurementSet.Path(), casacore::MeasurementSet::Update));
+	//} catch(std::exception &e)
+	//{
+	//	Logger::Warn << "Read-write opening of file " << msFile << " failed, trying read-only...\n";
+		_table.reset(new casacore::MeasurementSet(_measurementSet.Path()));
+	//	Logger::Warn << "Table opened in read-only: writing not possible.\n";
+	//}
 }
 
 BaselineReader::~BaselineReader()
-{
-	delete _table;
-}
+{ }
 
 void BaselineReader::initObservationTimes()
 {
-	if(_observationTimes.size() == 0)
+	if(_observationTimes.empty())
 	{
 		Logger::Debug << "Initializing observation times...\n";
 		size_t sequenceCount = _measurementSet.SequenceCount();

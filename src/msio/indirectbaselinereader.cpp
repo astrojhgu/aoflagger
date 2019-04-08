@@ -70,7 +70,7 @@ void IndirectBaselineReader::PerformReadRequests()
 		else {
 			_results[i]._uvw.clear();
 			for(unsigned j=0;j<width;++j)
-			_results[i]._uvw.push_back(UVW(0.0, 0.0, 0.0));
+			_results[i]._uvw.emplace_back(0.0, 0.0, 0.0);
 		}
 
 		std::ifstream dataFile(DataFilename(), std::ifstream::binary);
@@ -430,6 +430,10 @@ template<bool UpdateData, bool UpdateFlags>
 void IndirectBaselineReader::updateOriginalMS()
 {
 	casacore::Table &table = *Table();
+	if(UpdateData || UpdateFlags)
+	{
+		table.reopenRW();
+	}
 
 	casacore::ROScalarColumn<double> timeColumn(*Table(), "TIME");
 	casacore::ROScalarColumn<int> antenna1Column(table, "ANTENNA1"); 

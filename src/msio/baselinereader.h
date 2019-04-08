@@ -38,7 +38,7 @@ class BaselineReader {
 			return _polarizations;
 		}
 
-		class casacore::MeasurementSet *Table() const { return _table; }
+		class casacore::MeasurementSet* Table() const { return _table.get(); }
 
 		MeasurementSet &Set() { return _measurementSet; }
 
@@ -90,6 +90,7 @@ class BaselineReader {
 		virtual size_t GetMaxRecommendedBufferSize(size_t threadCount) { return 2*threadCount; }
 		
 		static uint64_t MeasurementSetDataSize(const std::string &filename);
+		
 	protected:
 		struct ReadRequest {
 			int antenna1;
@@ -163,7 +164,7 @@ class BaselineReader {
 		}
 
 		MeasurementSet _measurementSet;
-		class casacore::MeasurementSet *_table;
+		std::unique_ptr<class casacore::MeasurementSet> _table;
 		
 		std::string _dataColumnName;
 		bool _subtractModel;

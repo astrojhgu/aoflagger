@@ -256,6 +256,7 @@ void MemoryBaselineReader::PerformFlagWriteRequests()
 void MemoryBaselineReader::writeFlags()
 {
 	casacore::Table &table = *Table();
+	table.reopenRW();
 	
 	ROScalarColumn<int>
 		ant1Column(table, casacore::MeasurementSet::columnName(MSMainEnums::ANTENNA1)),
