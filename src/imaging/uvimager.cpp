@@ -135,7 +135,7 @@ void UVImager::Image(const IntegerDomain &frequencies, const IntegerDomain &ante
 	casacore::ArrayColumn<bool> flagCol(ms,
 		casacore::MeasurementSet::columnName(casacore::MeasurementSet::FLAG));
 
-	size_t rows = _measurementSet->RowCount();
+	size_t rows = ms.nrow();
 	for(unsigned row=0; row!=rows; ++row)
 	{
 		unsigned a1 = antenna1Col(row);

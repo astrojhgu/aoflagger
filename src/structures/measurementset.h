@@ -64,11 +64,6 @@ public:
 		return _fields.size();
 	}
 	
-	size_t RowCount() const
-	{
-		return _rowCount;
-	}
-	
 	static size_t BandCount(const std::string &filename);
 	
 	/**
@@ -120,19 +115,11 @@ public:
 		initializeMainTableData();
 		return _observationTimes;
 	}
+	
 	const std::set<double> &GetObservationTimesSet(size_t sequenceId)
 	{
 		initializeMainTableData();
 		return _observationTimesPerSequence[sequenceId];
-	}
-	
-	std::vector<double> *CreateObservationTimesVector()
-	{
-		initializeMainTableData();
-		std::vector<double> *times = new std::vector<double>();
-		for(std::set<double>::const_iterator i=_observationTimes.begin();i!=_observationTimes.end();++i)
-			times->push_back(*i);
-		return times;
 	}
 	
 	bool HasAOFlaggerHistory();
@@ -154,7 +141,7 @@ public:
 				antenna1(_antenna1), antenna2(_antenna2),
 				spw(_spw), sequenceId(_sequenceId),
 				fieldId(_fieldId)
-				{ }
+			{ }
 			unsigned antenna1, antenna2;
 			unsigned spw;
 			unsigned sequenceId;
@@ -194,8 +181,6 @@ private:
 	void initializeObservation(casacore::MeasurementSet& ms);
 
 	const std::string _path;
-	
-	size_t _rowCount;
 	
 	bool _isMainTableDataInitialized;
 	
