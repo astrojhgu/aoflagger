@@ -79,8 +79,6 @@ class ColorMap {
  */
 class MonochromeMap : public ColorMap {
 	public:
-		MonochromeMap() { }
-		~MonochromeMap() { }
 		unsigned char ValueToColorR(long double value) const noexcept override { return (unsigned char) (value*127.5+127.5); }
 		unsigned char ValueToColorG(long double value) const noexcept override { return (unsigned char) (value*127.5+127.5); }
 		unsigned char ValueToColorB(long double value) const noexcept override { return (unsigned char) (value*127.5+127.5); }
@@ -92,8 +90,6 @@ class MonochromeMap : public ColorMap {
  */
 class InvertedMap : public ColorMap {
 	public:
-		InvertedMap() { }
-		~InvertedMap() { }
 		unsigned char ValueToColorR(long double value) const noexcept override { return (unsigned char) (127.5-value*127.5); }
 		unsigned char ValueToColorG(long double value) const noexcept override { return (unsigned char) (127.5-value*127.5); }
 		unsigned char ValueToColorB(long double value) const noexcept override { return (unsigned char) (127.5-value*127.5); }
@@ -105,8 +101,6 @@ class InvertedMap : public ColorMap {
  */
 class RedBlueMap : public ColorMap {
 	public:
-		RedBlueMap() { }
-		~RedBlueMap() { }
 		unsigned char ValueToColorR(long double value) const noexcept override {
 			if(value>0.0)
 				return (unsigned char) (value*255.0);
@@ -128,8 +122,6 @@ class RedBlueMap : public ColorMap {
  */
 class BlackRedMap : public ColorMap {
 	public:
-		BlackRedMap() { }
-		~BlackRedMap() { }
 		unsigned char ValueToColorR(long double value) const noexcept override {
 			if(value>0.0)
 				return (unsigned char) (255-value*255.0);
@@ -157,8 +149,6 @@ class BlackRedMap : public ColorMap {
  */
 class RedWhiteBlueMap : public ColorMap {
 	public:
-		RedWhiteBlueMap() { }
-		~RedWhiteBlueMap() { }
 		unsigned char ValueToColorR(long double value) const noexcept override {
 			if(value<0.0)
 				return (unsigned char) (255.0 + (value*255.0));
@@ -185,8 +175,6 @@ class RedWhiteBlueMap : public ColorMap {
  */
 class ColdHotMap : public ColorMap {
 	public:
-		ColdHotMap() { }
-		~ColdHotMap() { }
 		unsigned char ValueToColorR(long double value) const noexcept override {
 			if(value >= 0.5)
 				return (unsigned char) ((1.5 - value) * 255.0);
@@ -243,7 +231,6 @@ class PosLogMap : public ColorMap {
 	public:
 		explicit PosLogMap(const ColorMap &map) :
 			_map(map) { }
-		~PosLogMap() { }
 		unsigned char ValueToColorR(long double value) const noexcept override { return value >= 0.0  ? _map.ValueToColorR((log10(value*0.9999+0.0001)+2.0)/2.0) : _map.ValueToColorR(-1.0); }
 		unsigned char ValueToColorG(long double value) const noexcept override { return value >= 0.0  ? _map.ValueToColorG((log10(value*0.9999+0.0001)+2.0)/2.0) : _map.ValueToColorG(-1.0);  }
 		unsigned char ValueToColorB(long double value) const noexcept override { return value >= 0.0  ? _map.ValueToColorB((log10(value*0.9999+0.0001)+2.0)/2.0) : _map.ValueToColorB(-1.0);  }
@@ -279,8 +266,6 @@ class FullLogMap : public ColorMap {
  */
 class RedYellowBlueMap : public ColorMap {
 	public:
-		RedYellowBlueMap() { }
-		~RedYellowBlueMap() { }
 		unsigned char ValueToColorR(long double value) const noexcept override {
 			if(value >= 1.0/3.0)
 				return 255;
@@ -312,8 +297,6 @@ class RedYellowBlueMap : public ColorMap {
 
 class FireMap : public ColorMap {
 	public:
-		FireMap() { }
-		~FireMap() { }
 		unsigned char ValueToColorR(long double value) const noexcept override {
 			if(value < -1.0)
 				return 0;
@@ -339,6 +322,31 @@ class FireMap : public ColorMap {
 				return 255;
 		}
 		unsigned char ValueToColorA(long double) const noexcept override { return 255; }
+};
+
+class CoolMap : public ColorMap {
+	public:
+		unsigned char ValueToColorR(long double value) const noexcept final override {
+			if(value < 0.0)
+				return 0;
+			else
+				return (unsigned char) (value * 255.0);
+		}
+		unsigned char ValueToColorG(long double value) const noexcept final override {
+			if(value < -0.5)
+				return 0;
+			else if(value > 0.5)
+				return 255;
+			else
+				return (unsigned char) ((value + 0.5) * 255.0);
+		}
+		unsigned char ValueToColorB(long double value) const noexcept final override {
+			if(value < 0)
+				return (value + 1.0) * 255.0;
+			else
+				return 255;
+		}
+		unsigned char ValueToColorA(long double) const noexcept final override { return 255; }
 };
 
 /**

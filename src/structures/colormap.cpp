@@ -19,6 +19,8 @@ std::unique_ptr<ColorMap> ColorMap::CreateColorMap(const std::string& type)
 		return UC(new RedYellowBlueMap());
 	else if(type=="fire")
 		return UC(new FireMap());
+	else if(type=="cool")
+		return UC(new CoolMap());
 	else if(type == "positive")
 		return UC(new PositiveMap());
 	else if(type == "invpositive")
@@ -45,7 +47,7 @@ std::unique_ptr<ColorMap> ColorMap::CreateColorMap(const std::string& type)
 		return UC(new MonochromeMap());
 }
 
-const std::string ColorMap::_colorMapsString("monochrome, coldhot, redblue, redyellowblue, fire, contrast, coldhotcontrast, redbluecontrast, redyellowbluecontrast, positive, invpositive, positivecontrast, invpositivecontrast, cubehelix, cubehelixcolourful, viridis");
+const std::string ColorMap::_colorMapsString("monochrome, coldhot, redblue, redyellowblue, fire, cool, contrast, coldhotcontrast, redbluecontrast, redyellowbluecontrast, positive, invpositive, positivecontrast, invpositivecontrast, cubehelix, cubehelixcolourful, viridis");
 
 const std::string &ColorMap::GetColorMapsString() throw()
 {
