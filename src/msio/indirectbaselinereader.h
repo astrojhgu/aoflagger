@@ -89,7 +89,7 @@ class IndirectBaselineReader : public BaselineReader {
 		}
 
 		DirectBaselineReader _directReader;
-		SeqIndexLookupTable *_seqIndexTable;
+		std::unique_ptr<SeqIndexLookupTable> _seqIndexTable;
 		std::vector<size_t> _filePositions;
 		bool _msIsReordered;
 		bool _removeReorderedFiles;

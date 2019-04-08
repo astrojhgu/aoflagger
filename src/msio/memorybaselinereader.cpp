@@ -5,22 +5,12 @@
 #include "../util/stopwatch.h"
 
 #include <casacore/ms/MeasurementSets/MeasurementSet.h>
+#include <casacore/tables/Tables/ArrayColumn.h>
+#include <casacore/tables/Tables/ScalarColumn.h>
 
 #include <vector>
 
 using namespace casacore;
-
-void MemoryBaselineReader::clear()
-{
-	for(std::map<BaselineID, Result*>::iterator i=_baselines.begin(); i!=_baselines.end(); ++i)
-	{
-		// They don't all have to contain objects, but will be zero otherwise so safe to delete right away
-		delete i->second;
-	}
-	_baselines.clear();
-	_areFlagsChanged = false;
-	_isRead = false;
-}
 
 void MemoryBaselineReader::PerformReadRequests()
 {
@@ -30,7 +20,8 @@ void MemoryBaselineReader::PerformReadRequests()
 	{
 		const ReadRequest &request = _readRequests[i];
 		BaselineID id(request.antenna1, request.antenna2, request.spectralWindow, request.sequenceId);
-		std::map<BaselineID, Result*>::const_iterator requestedBaselineIter = _baselines.find(id);
+		std::map<BaselineID, std::unique_ptr<Result>>::const_iterator
+			requestedBaselineIter = _baselines.find(id);
 		if(requestedBaselineIter == _baselines.end())
 		{
 			std::ostringstream errorStr;
@@ -57,26 +48,25 @@ void MemoryBaselineReader::readSet()
 	
 		casacore::Table &table = *Table();
 		
-		ROScalarColumn<int>
+		ScalarColumn<int>
 			ant1Column(table, casacore::MeasurementSet::columnName(MSMainEnums::ANTENNA1)),
 			ant2Column(table, casacore::MeasurementSet::columnName(MSMainEnums::ANTENNA2)),
 			dataDescIdColumn(table, casacore::MeasurementSet::columnName(MSMainEnums::DATA_DESC_ID)),
 			fieldIdColumn(table, casacore::MeasurementSet::columnName(MSMainEnums::FIELD_ID));
-		ROScalarColumn<double>
+		ScalarColumn<double>
 			timeColumn(table, casacore::MeasurementSet::columnName(MSMainEnums::TIME));
-		ROArrayColumn<casacore::Complex>
+		ArrayColumn<casacore::Complex>
 			dataColumn(table, DataColumnName());
-		ROArrayColumn<bool>
+		ArrayColumn<bool>
 			flagColumn(table, casacore::MeasurementSet::columnName(MSMainEnums::FLAG));
-		ROArrayColumn<double>
+		ArrayColumn<double>
 			uvwColumn(table, casacore::MeasurementSet::columnName(MSMainEnums::UVW));
 		
 		size_t
 			antennaCount = Set().AntennaCount(),
-			polarizationCount = Polarizations().size();
-			
-		size_t bandCount = Set().BandCount();
-		size_t sequenceCount = Set().SequenceCount();
+			polarizationCount = Polarizations().size(),
+			bandCount = Set().BandCount(),
+			sequenceCount = Set().SequenceCount();
 		
 		std::vector<size_t> dataIdToSpw;
 		Set().GetDataDescToBandVector(dataIdToSpw);
@@ -242,7 +232,7 @@ void MemoryBaselineReader::PerformFlagWriteRequests()
 	{
 		const FlagWriteRequest &request = _writeRequests[i];
 		BaselineID id(request.antenna1, request.antenna2, request.spectralWindow, request.sequenceId);
-		Result *result = _baselines[id];
+		std::unique_ptr<Result>& result = _baselines[id];
 		if(result->_flags.size() != request.flags.size())
 			throw std::runtime_error("Polarizations do not match");
 		for(size_t p=0;p!=result->_flags.size();++p)
@@ -258,12 +248,12 @@ void MemoryBaselineReader::writeFlags()
 	casacore::Table &table = *Table();
 	table.reopenRW();
 	
-	ROScalarColumn<int>
+	ScalarColumn<int>
 		ant1Column(table, casacore::MeasurementSet::columnName(MSMainEnums::ANTENNA1)),
 		ant2Column(table, casacore::MeasurementSet::columnName(MSMainEnums::ANTENNA2)),
 		dataDescIdColumn(table, casacore::MeasurementSet::columnName(MSMainEnums::DATA_DESC_ID)),
 		fieldIdColumn(table, casacore::MeasurementSet::columnName(MSMainEnums::FIELD_ID));
-	ROScalarColumn<double>
+	ScalarColumn<double>
 		timeColumn(table, casacore::MeasurementSet::columnName(MSMainEnums::TIME));
 	ArrayColumn<bool>
 		flagColumn(table, casacore::MeasurementSet::columnName(MSMainEnums::FLAG));
@@ -306,14 +296,15 @@ void MemoryBaselineReader::writeFlags()
 		casacore::Array<bool> flagArray(flagShape);
 		
 		BaselineID baselineID(ant1, ant2, spw, sequenceId);
-		std::map<BaselineID, Result*>::iterator resultIter = _baselines.find(baselineID);
-		Result *result = resultIter->second;
+		std::map<BaselineID, std::unique_ptr<Result>>::iterator
+			resultIter = _baselines.find(baselineID);
+		std::unique_ptr<Result>& result = resultIter->second;
 		
 		Array<bool>::contiter flagPtr = flagArray.cbegin();
 		
 		std::vector<Mask2D*> masks(polarizationCount);
 		for(size_t p=0;p!=polarizationCount;++p)
-			masks[p] = &*result->_flags[p];
+			masks[p] = result->_flags[p].get();
 		
 		for(size_t ch=0;ch!=frequencyCount;++ch)
 		{

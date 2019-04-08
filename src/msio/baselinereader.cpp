@@ -9,6 +9,8 @@
 #include <casacore/tables/DataMan/StandardStManAccessor.h>
 #include <casacore/tables/DataMan/TiledStManAccessor.h>
 #include <casacore/tables/Tables/TableIter.h>
+#include <casacore/tables/Tables/ArrayColumn.h>
+#include <casacore/tables/Tables/ScalarColumn.h>
 #include <casacore/tables/TaQL/ExprNode.h>
 
 #include "../structures/timefrequencydata.h"
@@ -91,7 +93,7 @@ void BaselineReader::initializePolarizations()
 		casacore::MSDataDescription ddTable = ms.dataDescription();
 		if(ddTable.nrow() == 0)
 			throw std::runtime_error("DataDescription table is empty");
-		casacore::ROScalarColumn<int> polIdColumn(ddTable, casacore::MSDataDescription::columnName(casacore::MSDataDescription::POLARIZATION_ID));
+		casacore::ScalarColumn<int> polIdColumn(ddTable, casacore::MSDataDescription::columnName(casacore::MSDataDescription::POLARIZATION_ID));
 		int polarizationId = polIdColumn(0);
 		for(size_t row=0; row!=ddTable.nrow(); ++row)
 		{
@@ -100,7 +102,7 @@ void BaselineReader::initializePolarizations()
 		}
 		
 		casacore::Table polTable = ms.polarization();
-		casacore::ROArrayColumn<int> corTypeColumn(polTable, "CORR_TYPE"); 
+		casacore::ArrayColumn<int> corTypeColumn(polTable, "CORR_TYPE"); 
 		casacore::Array<int> corType = corTypeColumn(polarizationId);
 		casacore::Array<int>::iterator iterend(corType.end());
 		for (casacore::Array<int>::iterator iter=corType.begin(); iter!=iterend; ++iter)
@@ -117,16 +119,16 @@ uint64_t BaselineReader::MeasurementSetDataSize(const string& filename)
 	
 	casacore::MSSpectralWindow spwTable = ms.spectralWindow();
 	
-	casacore::ROScalarColumn<int> numChanCol(spwTable, casacore::MSSpectralWindow::columnName(casacore::MSSpectralWindowEnums::NUM_CHAN));
+	casacore::ScalarColumn<int> numChanCol(spwTable, casacore::MSSpectralWindow::columnName(casacore::MSSpectralWindowEnums::NUM_CHAN));
 	size_t channelCount = numChanCol.get(0);
 	if(channelCount == 0) throw std::runtime_error("No channels in set");
 	if(ms.nrow() == 0) throw std::runtime_error("Table has no rows (no data)");
 	
 	typedef float num_t;
 	typedef std::complex<num_t> complex_t;
-	casacore::ROScalarColumn<int> ant1Column(ms, ms.columnName(casacore::MSMainEnums::ANTENNA1));
-	casacore::ROScalarColumn<int> ant2Column(ms, ms.columnName(casacore::MSMainEnums::ANTENNA2));
-	casacore::ROArrayColumn<complex_t> dataColumn(ms, ms.columnName(casacore::MSMainEnums::DATA));
+	casacore::ScalarColumn<int> ant1Column(ms, ms.columnName(casacore::MSMainEnums::ANTENNA1));
+	casacore::ScalarColumn<int> ant2Column(ms, ms.columnName(casacore::MSMainEnums::ANTENNA2));
+	casacore::ArrayColumn<complex_t> dataColumn(ms, ms.columnName(casacore::MSMainEnums::DATA));
 	
 	casacore::IPosition dataShape = dataColumn.shape(0);
 	unsigned polarizationCount = dataShape[0];

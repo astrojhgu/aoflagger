@@ -21,9 +21,15 @@
 
 #include "reorderedfilebuffer.h"
 
-IndirectBaselineReader::IndirectBaselineReader(const std::string &msFile) : BaselineReader(msFile), _directReader(msFile),
-_seqIndexTable(0),
-_msIsReordered(false), _removeReorderedFiles(false), _reorderedDataFilesHaveChanged(false), _reorderedFlagFilesHaveChanged(false), _readUVW(false)
+IndirectBaselineReader::IndirectBaselineReader(const std::string &msFile) :
+	BaselineReader(msFile),
+	_directReader(msFile),
+	_seqIndexTable(),
+	_msIsReordered(false),
+	_removeReorderedFiles(false),
+	_reorderedDataFilesHaveChanged(false),
+	_reorderedFlagFilesHaveChanged(false),
+	_readUVW(false)
 {
 }
 
@@ -35,7 +41,7 @@ IndirectBaselineReader::~IndirectBaselineReader()
 		updateOriginalMSFlags();
 	removeTemporaryFiles();
 	
-	delete _seqIndexTable;
+	_seqIndexTable.reset();
 	_filePositions.clear();
 }
 
@@ -157,7 +163,7 @@ void IndirectBaselineReader::makeLookupTables(size_t &fileSize)
 		bandCount = Set().BandCount(),
 		sequencesPerBaselineCount = Set().SequenceCount();
 
-	_seqIndexTable = new SeqIndexLookupTable(antennaCount, bandCount, sequencesPerBaselineCount);
+	_seqIndexTable.reset(new SeqIndexLookupTable(antennaCount, bandCount, sequencesPerBaselineCount));
 	fileSize = 0;
 	for(size_t i=0;i<sequences.size();++i)
 	{
@@ -202,7 +208,7 @@ void IndirectBaselineReader::reorderFull()
 {
 	Stopwatch watch(true);
 	
-	casacore::Table &table = *Table();
+	casacore::Table& table = *Table();
 
 	casacore::ROScalarColumn<double> timeColumn(*Table(), "TIME");
 	casacore::ROArrayColumn<bool> flagColumn(table, "FLAG");
@@ -271,15 +277,16 @@ void IndirectBaselineReader::reorderFull()
 			prevTime = time;
 		}
 		
-		size_t polarizationCount = Polarizations().size();
-		size_t antenna1 = antenna1Column(rowIndex);
-		size_t antenna2 = antenna2Column(rowIndex);
-		size_t spw = dataIdToSpw[dataDescIdColumn(rowIndex)];
-		size_t channelCount = Set().FrequencyCount(spw);
-		size_t arrayIndex = _seqIndexTable->Value(antenna1, antenna2, spw, sequenceId);
-		size_t &filePos = writeFilePositions[arrayIndex];
-		size_t &timePos = timePositions[arrayIndex];
-		size_t sampleCount = channelCount * polarizationCount;
+		size_t 
+			polarizationCount = Polarizations().size(),
+			antenna1 = antenna1Column(rowIndex),
+			antenna2 = antenna2Column(rowIndex),
+			spw = dataIdToSpw[dataDescIdColumn(rowIndex)],
+			channelCount = Set().FrequencyCount(spw),
+			arrayIndex = _seqIndexTable->Value(antenna1, antenna2, spw, sequenceId),
+			sampleCount = channelCount * polarizationCount;
+		size_t& filePos = writeFilePositions[arrayIndex];
+		size_t& timePos = timePositions[arrayIndex];
 		
 		casacore::Array<casacore::Complex> data = (*dataColumn)(rowIndex);
 		casacore::Array<bool> flag = flagColumn(rowIndex);

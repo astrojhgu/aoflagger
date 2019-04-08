@@ -2,12 +2,17 @@
 
 #include "../structures/image2d.h"
 #include "../structures/mask2d.h"
-#include "../structures/timefrequencydata.h"
+#include "../structures/measurementset.h"
 #include "../structures/spatialmatrixmetadata.h"
+#include "../structures/timefrequencydata.h"
 
 #include "../util/integerdomain.h"
 #include "../util/stopwatch.h"
 #include "../util/ffttools.h"
+
+#include <casacore/ms/MeasurementSets/MeasurementSet.h>
+#include <casacore/tables/Tables/ArrayColumn.h>
+#include <casacore/tables/Tables/ScalarColumn.h>
 
 UVImager::UVImager(unsigned long xRes, unsigned long yRes, ImageKind imageKind) : _xRes(xRes), _yRes(yRes), _xResFT(xRes), _yResFT(yRes), _uvReal(), _uvImaginary(), _uvWeights(), _uvFTReal(), _uvFTImaginary(), _antennas(0), _fields(0), _imageKind(imageKind), _invertFlagging(false), _directFT(false), _ignoreBoundWarnings(false)
 {
@@ -111,20 +116,48 @@ void UVImager::Image(const IntegerDomain &frequencies, const IntegerDomain &ante
 
 	std::cout << "Reading all data for " << frequencies.ValueCount() << " frequencies..." << std::flush;
 	Stopwatch stopwatch(true);
-	MSIterator iterator(*_measurementSet);
+	
+	casacore::MeasurementSet ms(_measurementSet->Path());
+	casacore::ScalarColumn<int> antenna1Col(ms,
+		casacore::MeasurementSet::columnName(casacore::MeasurementSet::ANTENNA1));
+	casacore::ScalarColumn<int> antenna2Col(ms,
+		casacore::MeasurementSet::columnName(casacore::MeasurementSet::ANTENNA2));
+	casacore::ScalarColumn<int> fieldIdCol(ms,
+		casacore::MeasurementSet::columnName(casacore::MeasurementSet::FIELD_ID));
+	casacore::ScalarColumn<int> dataDescIdCol(ms,
+		casacore::MeasurementSet::columnName(casacore::MeasurementSet::DATA_DESC_ID));
+	casacore::ScalarColumn<double> timeCol(ms,
+		casacore::MeasurementSet::columnName(casacore::MeasurementSet::TIME));
+	casacore::ScalarColumn<double> scanNumberCol(ms,
+		casacore::MeasurementSet::columnName(casacore::MeasurementSet::SCAN_NUMBER));
+	casacore::ArrayColumn<casacore::Complex> correctedDataCol(ms,
+		casacore::MeasurementSet::columnName(casacore::MeasurementSet::CORRECTED_DATA));
+	casacore::ArrayColumn<bool> flagCol(ms,
+		casacore::MeasurementSet::columnName(casacore::MeasurementSet::FLAG));
+
 	size_t rows = _measurementSet->RowCount();
-	for(unsigned i=0;i<rows;++i,++iterator) {
-		unsigned a1 = iterator.Antenna1();
-		unsigned a2 = iterator.Antenna2();
-		if(antenna1Domain.IsIn(a1) && antenna2Domain.IsIn(a2)) {
-			unsigned scan = iterator.ScanNumber();
+	for(unsigned row=0; row!=rows; ++row)
+	{
+		unsigned a1 = antenna1Col(row);
+		unsigned a2 = antenna2Col(row);
+		if(antenna1Domain.IsIn(a1) && antenna2Domain.IsIn(a2))
+		{
+			unsigned scan = scanNumberCol(row);
 			unsigned index1 = antenna1Domain.Index(a1);
 			unsigned index2 = antenna1Domain.Index(a2);
-			int field = iterator.Field();
-			double time = iterator.Time();
-			casacore::Array<casacore::Complex>::const_iterator cdI = iterator.CorrectedDataIterator();
-			casacore::Array<bool>::const_iterator fI = iterator.FlagIterator();
-			for(int f=0;f<frequencies.GetValue(0);++f) { ++fI; ++fI; ++fI; ++fI; ++cdI; ++cdI; ++cdI; ++cdI; }
+			int field = fieldIdCol(row);
+			double time = timeCol(row);
+			casacore::Array<casacore::Complex> dataArr = correctedDataCol(row);
+			casacore::Array<bool> flagArr = flagCol(row);
+			casacore::Array<casacore::Complex>::const_iterator
+				cdI = dataArr.begin();
+			casacore::Array<bool>::const_iterator
+				fI = flagArr.begin();
+			for(int f=0;f<frequencies.GetValue(0);++f)
+			{
+				++fI; ++fI; ++fI; ++fI;
+				++cdI; ++cdI; ++cdI; ++cdI;
+			}
 			for(unsigned f=0;f<frequencies.ValueCount();++f) {
 				SingleFrequencySingleBaselineData &curData = data[f][index1][index2][scan];
 				casacore::Complex xxData = *cdI;

@@ -15,7 +15,6 @@ class BaselineMatrixLoader
 {
 	public:
 		explicit BaselineMatrixLoader(MeasurementSet &measurementSet);
-		~BaselineMatrixLoader();
 
 		TimeFrequencyData Load(size_t timeIndex)
 		{
@@ -29,15 +28,16 @@ class BaselineMatrixLoader
 			return *_metaData;
 		}
 		size_t FrequencyCount() const { return _frequencyCount; }
+		
 	private:
 		TimeFrequencyData LoadSummed(size_t timeIndex);
 
-		casacore::Table *_sortedTable;
-		casacore::TableIterator *_tableIter;
+		std::unique_ptr<casacore::Table> _sortedTable;
+		std::unique_ptr<casacore::TableIterator> _tableIter;
 		size_t _currentIterIndex;
 		MeasurementSet _measurementSet;
 		size_t _timeIndexCount;
-		class SpatialMatrixMetaData *_metaData;
+		std::unique_ptr<class SpatialMatrixMetaData> _metaData;
 		size_t _frequencyCount;
 };
 

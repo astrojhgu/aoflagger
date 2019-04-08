@@ -120,6 +120,7 @@ set(STRUCTURES_FILES
   structures/image2d.cpp
   structures/mask2d.cpp
   structures/measurementset.cpp
+  structures/msiterator.cpp
   structures/samplerow.cpp
   structures/stokesimager.cpp
   structures/timefrequencydata.cpp)

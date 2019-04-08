@@ -2,13 +2,11 @@
 #define UVIMAGER_H
 
 #include "../structures/timefrequencymetadata.h"
-#include "../structures/measurementset.h"
 #include "../structures/date.h"
-
 #include "../structures/timefrequencydata.h"
 
 struct SingleFrequencySingleBaselineData {
-	casacore::Complex data;
+	std::complex<float> data;
 	bool flag;
 	bool available;
 	double time;
