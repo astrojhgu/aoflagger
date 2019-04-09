@@ -119,7 +119,7 @@ namespace rfiStrategy {
 	std::string MSImageSetIndex::Description() const
 	{
 		std::stringstream sstream;
-		const MeasurementSet::Sequence &sequence = static_cast<class MSImageSet&>(imageSet())._sequences[_sequenceIndex];
+		const MSMetaData::Sequence &sequence = static_cast<class MSImageSet&>(imageSet())._sequences[_sequenceIndex];
 		size_t
 			antenna1 = sequence.antenna1,
 			antenna2 = sequence.antenna2,
@@ -149,7 +149,7 @@ namespace rfiStrategy {
 	size_t MSImageSet::FindBaselineIndex(size_t antenna1, size_t antenna2, size_t band, size_t sequenceId)
 	{
 		size_t index = 0;
-		for(std::vector<MeasurementSet::Sequence>::const_iterator i=_sequences.begin();
+		for(std::vector<MSMetaData::Sequence>::const_iterator i=_sequences.begin();
 			i != _sequences.end() ; ++i)
 		{
 			bool antennaMatch = (i->antenna1 == antenna1 && i->antenna2 == antenna2) || (i->antenna1 == antenna2 && i->antenna2 == antenna1);

@@ -3,7 +3,7 @@
 #include "strategy/algorithms/antennaselector.h"
 #include "strategy/algorithms/baselineselector.h"
 
-#include "structures/measurementset.h"
+#include "structures/msmetadata.h"
 
 #include "quality/defaultstatistics.h"
 #include "quality/histogramcollection.h"
@@ -37,7 +37,7 @@ StatisticsCollection load(const std::string& filename, std::vector<AntennaInfo>&
 		antennae = commander.Antennas();
 	}
 	else {
-		MeasurementSet ms(filename);
+		MSMetaData ms(filename);
 		const unsigned polarizationCount = ms.PolarizationCount();
 		
 		statisticsCollection.SetPolarizationCount(polarizationCount);

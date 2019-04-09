@@ -1,5 +1,5 @@
-#ifndef MEASUREMENTSET_H
-#define MEASUREMENTSET_H
+#ifndef MS_META_DATA_H
+#define MS_META_DATA_H
 
 #include <string>
 #include <vector>
@@ -12,18 +12,18 @@
 
 #include "antennainfo.h"
 
-class MeasurementSet
+class MSMetaData
 {
 public:
 	class Sequence;
 	
-	explicit MeasurementSet(const std::string &path)
+	explicit MSMetaData(const std::string &path)
 		: _path(path), _isMainTableDataInitialized(false)
 	{
 		initializeOtherData();
 	}
 	
-	~MeasurementSet();
+	~MSMetaData();
 	
 	size_t FrequencyCount(size_t bandIndex)
 	{
@@ -136,39 +136,41 @@ public:
 	
 	class Sequence
 	{
-		public:
-			Sequence(unsigned _antenna1, unsigned _antenna2, unsigned _spw, unsigned _sequenceId, unsigned _fieldId) :
-				antenna1(_antenna1), antenna2(_antenna2),
-				spw(_spw), sequenceId(_sequenceId),
-				fieldId(_fieldId)
-			{ }
-			unsigned antenna1, antenna2;
-			unsigned spw;
-			unsigned sequenceId;
-			unsigned fieldId;
-			
-			bool operator<(const Sequence &rhs) const
+	public:
+		Sequence(unsigned _antenna1, unsigned _antenna2, unsigned _spw, unsigned _sequenceId, unsigned _fieldId) :
+			antenna1(_antenna1), antenna2(_antenna2),
+			spw(_spw), sequenceId(_sequenceId),
+			fieldId(_fieldId)
+		{ }
+		
+		unsigned antenna1, antenna2;
+		unsigned spw;
+		unsigned sequenceId;
+		unsigned fieldId;
+		
+		bool operator<(const Sequence &rhs) const
+		{
+			if(antenna1 < rhs.antenna1) return true;
+			else if(antenna1 == rhs.antenna1)
 			{
-				if(antenna1 < rhs.antenna1) return true;
-				else if(antenna1 == rhs.antenna1)
+				if(antenna2 < rhs.antenna2) return true;
+				else if(antenna2 == rhs.antenna2)
 				{
-					if(antenna2 < rhs.antenna2) return true;
-					else if(antenna2 == rhs.antenna2)
+					if(spw < rhs.spw) return true;
+					else if(spw == rhs.spw)
 					{
-						if(spw < rhs.spw) return true;
-						else if(spw == rhs.spw)
-						{
-							return sequenceId < rhs.sequenceId;
-						}
+						return sequenceId < rhs.sequenceId;
 					}
 				}
-				return false;
 			}
-			bool operator==(const Sequence &rhs) const
-			{
-				return antenna1==rhs.antenna1 && antenna2==rhs.antenna2 &&
-					spw==rhs.spw && sequenceId==rhs.sequenceId;
-			}
+			return false;
+		}
+		
+		bool operator==(const Sequence &rhs) const
+		{
+			return antenna1==rhs.antenna1 && antenna2==rhs.antenna2 &&
+				spw==rhs.spw && sequenceId==rhs.sequenceId;
+		}
 	};
 private:
 	void initializeMainTableData();

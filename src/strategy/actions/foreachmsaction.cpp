@@ -2,7 +2,7 @@
 
 #include <boost/filesystem.hpp>
 
-#include "../../structures/measurementset.h"
+#include "../../structures/msmetadata.h"
 
 #include "strategy.h"
 
@@ -39,7 +39,7 @@ void ForEachMSAction::Perform(ArtifactSet &artifacts, ProgressListener &progress
 		bool skip = false;
 		if(_skipIfAlreadyProcessed)
 		{
-			MeasurementSet set(filename);
+			MSMetaData set(filename);
 			if(set.HasAOFlaggerHistory())
 			{
 				skip = true;
@@ -137,7 +137,7 @@ void ForEachMSAction::writeHistory(const std::string &filename)
 {
 	if(GetChildCount() != 0)
 	{
-		MeasurementSet ms(filename);
+		MSMetaData ms(filename);
 		const Strategy *strategy = 0;
 		if(GetChildCount() == 1 && dynamic_cast<const Strategy*>(&GetChild(0)) != 0)
 		{

@@ -6,7 +6,7 @@
 #include <casacore/tables/Tables/TableIter.h>
 
 #include "../structures/timefrequencydata.h"
-#include "../structures/measurementset.h"
+#include "../structures/msmetadata.h"
 
 /**
  * Loader for time x baseline matrices. These are mainly used for SVD experiments.
@@ -15,7 +15,7 @@
 class SpatialTimeLoader
 {
 	public:
-		explicit SpatialTimeLoader(MeasurementSet &measurementSet);
+		explicit SpatialTimeLoader(MSMetaData &measurementSet);
 		~SpatialTimeLoader();
 
 		TimeFrequencyData Load(unsigned channelIndex, bool fringeStop = true);
@@ -23,8 +23,9 @@ class SpatialTimeLoader
 		unsigned ChannelCount() const { return _channelCount; }
 		
 		unsigned TimestepsCount() const { return _timestepsCount; }
+		
 	private:
-		MeasurementSet &_measurementSet;
+		MSMetaData &_msMetaData;
 		casacore::Table *_sortedTable;
 		casacore::TableIterator *_tableIter;
 		unsigned _channelCount;

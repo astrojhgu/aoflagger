@@ -8,7 +8,7 @@
 #include "../../structures/antennainfo.h"
 #include "../../structures/timefrequencydata.h"
 #include "../../structures/timefrequencymetadata.h"
-#include "../../structures/measurementset.h"
+#include "../../structures/msmetadata.h"
 
 #include "../../msio/baselinereader.h"
 
@@ -200,7 +200,7 @@ namespace rfiStrategy {
 			{
 				_readUVW = readUVW;
 			}
-			const std::vector<MeasurementSet::Sequence>& Sequences() const {
+			const std::vector<MSMetaData::Sequence>& Sequences() const {
 				return _sequences;
 			}
 			
@@ -224,12 +224,12 @@ namespace rfiStrategy {
 			TimeFrequencyMetaDataCPtr createMetaData(const ImageSetIndex &index, std::vector<UVW> &uvw);
 
 			const std::string _msFile;
-			MeasurementSet _set;
+			MSMetaData _set;
 			BaselineReaderPtr _reader;
 			std::string _dataColumnName;
 			bool _subtractModel;
 			bool _readDipoleAutoPolarisations, _readDipoleCrossPolarisations, _readStokesI;
-			std::vector<MeasurementSet::Sequence> _sequences;
+			std::vector<MSMetaData::Sequence> _sequences;
 			size_t _bandCount, _fieldCount, _sequencesPerBaselineCount;
 			size_t _scanCountPartOverlap;
 			bool _readFlags, _readUVW;

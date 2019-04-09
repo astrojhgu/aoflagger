@@ -119,8 +119,8 @@ set(STRUCTURES_FILES
   structures/colormap.cpp
   structures/image2d.cpp
   structures/mask2d.cpp
-  structures/measurementset.cpp
   structures/msiterator.cpp
+  structures/msmetadata.cpp
   structures/samplerow.cpp
   structures/stokesimager.cpp
   structures/timefrequencydata.cpp)

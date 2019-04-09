@@ -9,7 +9,7 @@
 #include "../structures/antennainfo.h"
 #include "../structures/image2d.h"
 #include "../structures/mask2d.h"
-#include "../structures/measurementset.h"
+#include "../structures/msmetadata.h"
 #include "../structures/polarization.h"
 
 typedef std::shared_ptr<class BaselineReader> BaselineReaderPtr;
@@ -40,7 +40,7 @@ class BaselineReader {
 
 		class casacore::MeasurementSet* Table() const { return _table.get(); }
 
-		MeasurementSet &Set() { return _measurementSet; }
+		MSMetaData& Set() { return _measurementSet; }
 
 		const std::map<double,size_t> &ObservationTimes(size_t sequenceId) const
 		{ 
@@ -163,7 +163,7 @@ class BaselineReader {
 			_readRequests.push_back(request);
 		}
 
-		MeasurementSet _measurementSet;
+		MSMetaData _measurementSet;
 		std::unique_ptr<class casacore::MeasurementSet> _table;
 		
 		std::string _dataColumnName;

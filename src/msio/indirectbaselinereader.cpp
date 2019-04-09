@@ -156,7 +156,7 @@ void IndirectBaselineReader::reorderedMS()
 
 void IndirectBaselineReader::makeLookupTables(size_t &fileSize)
 {
-	std::vector<MeasurementSet::Sequence> sequences = Set().GetSequences();
+	std::vector<MSMetaData::Sequence> sequences = Set().GetSequences();
 	const size_t
 		antennaCount = Set().AntennaCount(),
 		polarizationCount = Polarizations().size(),
@@ -168,7 +168,7 @@ void IndirectBaselineReader::makeLookupTables(size_t &fileSize)
 	for(size_t i=0;i<sequences.size();++i)
 	{
 		// Initialize look-up table to get index into Sequence-array quickly
-		const MeasurementSet::Sequence &s = sequences[i];
+		const MSMetaData::Sequence &s = sequences[i];
 		_seqIndexTable->Value(s.antenna1, s.antenna2, s.spw, s.sequenceId) = i;
 		
 		// Initialize look-up table to go from sequence array to file position. Is in samples, so
@@ -452,7 +452,7 @@ void IndirectBaselineReader::updateOriginalMS()
 
 	int rowCount = table.nrow();
 
-	std::vector<MeasurementSet::Sequence> sequences = Set().GetSequences();
+	std::vector<MSMetaData::Sequence> sequences = Set().GetSequences();
 	std::vector<size_t> dataIdToSpw;
 	Set().GetDataDescToBandVector(dataIdToSpw);
 	

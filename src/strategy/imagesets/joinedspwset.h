@@ -5,7 +5,7 @@
 #include "imageset.h"
 #include "msimageset.h"
 
-#include "../../structures/measurementset.h"
+#include "../../structures/msmetadata.h"
 
 #include <vector>
 #include <list>
@@ -13,7 +13,7 @@
 
 namespace rfiStrategy {
 	
-	using Sequence = MeasurementSet::Sequence;
+	using Sequence = MSMetaData::Sequence;
 	
 	class JoinedSPWSetIndex : public ImageSetIndex {
 		public:
@@ -47,14 +47,14 @@ namespace rfiStrategy {
 		explicit JoinedSPWSet(std::unique_ptr<MSImageSet> msImageSet) :
 			_msImageSet(std::move(msImageSet))
 		{
-			const std::vector<MeasurementSet::Sequence>& sequences = _msImageSet->Sequences();
+			const std::vector<MSMetaData::Sequence>& sequences = _msImageSet->Sequences();
 			size_t nBands = _msImageSet->BandCount();
 			_nChannels.resize(nBands);
 			for(size_t b=0; b!=nBands; ++b)
 				_nChannels[b] = _msImageSet->GetBandInfo(b).channels.size();
 			for(size_t sequenceIndex = 0; sequenceIndex!=sequences.size(); ++sequenceIndex)
 			{
-				const MeasurementSet::Sequence& s = sequences[sequenceIndex];
+				const MSMetaData::Sequence& s = sequences[sequenceIndex];
 				Sequence js(s.antenna1, s.antenna2, 0, s.sequenceId, s.fieldId);
 				// TODO Central frequency instead of spw id is a better idea
 				_joinedSequences[js].push_back(std::make_pair(s.spw, sequenceIndex));

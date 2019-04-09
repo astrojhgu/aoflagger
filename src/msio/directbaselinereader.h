@@ -10,7 +10,7 @@
 #include "../structures/antennainfo.h"
 #include "../structures/image2d.h"
 #include "../structures/mask2d.h"
-#include "../structures/measurementset.h"
+#include "../structures/msmetadata.h"
 
 class DirectBaselineReader : public BaselineReader {
 public:

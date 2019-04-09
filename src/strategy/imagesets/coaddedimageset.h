@@ -4,7 +4,7 @@
 #include "imageset.h"
 #include "msimageset.h"
 
-#include "../../structures/measurementset.h"
+#include "../../structures/msmetadata.h"
 #include "../../util/logger.h"
 
 #include <vector>
@@ -13,7 +13,7 @@
 
 namespace rfiStrategy {
 	
-	using Sequence = MeasurementSet::Sequence;
+	using Sequence = MSMetaData::Sequence;
 	
 	class CoaddedImageSetIndex : public ImageSetIndex {
 		public:

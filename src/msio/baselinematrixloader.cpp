@@ -8,10 +8,10 @@
 #include "../structures/scalarcolumniterator.h"
 #include "../structures/spatialmatrixmetadata.h"
 
-BaselineMatrixLoader::BaselineMatrixLoader(MeasurementSet &measurementSet)
-	: _sortedTable(), _tableIter(), _currentIterIndex(0), _measurementSet(measurementSet), _timeIndexCount(0), _metaData()
+BaselineMatrixLoader::BaselineMatrixLoader(MSMetaData& msMetaData)
+	: _sortedTable(), _tableIter(), _currentIterIndex(0), _msMetaData(msMetaData), _timeIndexCount(0), _metaData()
 {
-	casacore::Table rawTable(_measurementSet.Path());
+	casacore::Table rawTable(_msMetaData.Path());
 	casacore::Block<casacore::String> names(4);
 	names[0] = "DATA_DESC_ID";
 	names[1] = "TIME";
@@ -28,7 +28,7 @@ BaselineMatrixLoader::BaselineMatrixLoader(MeasurementSet &measurementSet)
 		iter.next();
 		++_timeIndexCount;
 	}
-	_frequencyCount = _measurementSet.FrequencyCount(0);
+	_frequencyCount = _msMetaData.FrequencyCount(0);
 
 	_tableIter.reset(new casacore::TableIterator(*_sortedTable, selectionNames, casacore::TableIterator::Ascending, casacore::TableIterator::NoSort));
 }
@@ -220,7 +220,7 @@ TimeFrequencyData BaselineMatrixLoader::LoadSummed(size_t timeIndex)
 		++flagIter;
 	}
 	casacore::ROScalarColumn<int> bandColumn(table, "DATA_DESC_ID");
-	BandInfo band = _measurementSet.GetBandInfo(bandColumn(0));
+	BandInfo band = _msMetaData.GetBandInfo(bandColumn(0));
 	_metaData->SetFrequency(band.CenterFrequencyHz());
 
 	TimeFrequencyData data = TimeFrequencyData::FromLinear(xxRImage, xxIImage, xyRImage, xyIImage, yxRImage, yxIImage, yyRImage, yyIImage);
@@ -382,7 +382,7 @@ void BaselineMatrixLoader::LoadPerChannel(size_t timeIndex, std::vector<TimeFreq
 		}
 	}
 	casacore::ScalarColumn<int> bandColumn(table, "DATA_DESC_ID");
-	BandInfo band = _measurementSet.GetBandInfo(bandColumn(0));
+	BandInfo band = _msMetaData.GetBandInfo(bandColumn(0));
 	_metaData->SetFrequency(band.CenterFrequencyHz());
 
 	data.clear();
