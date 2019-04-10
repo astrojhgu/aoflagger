@@ -1,4 +1,5 @@
 #include "memorybaselinereader.h"
+
 #include "../structures/system.h"
 
 #include "../util/logger.h"
@@ -14,7 +15,11 @@ using namespace casacore;
 
 void MemoryBaselineReader::PerformReadRequests()
 {
-	readSet();
+	if(!_isRead)
+	{
+		readSet();
+		_isRead = true;
+	}
 	
 	for(size_t i=0;i!=_readRequests.size();++i)
 	{
@@ -40,114 +45,125 @@ void MemoryBaselineReader::PerformReadRequests()
 
 void MemoryBaselineReader::readSet()
 {
-	if(!_isRead)
-	{
-		Stopwatch watch(true);
-		
-		initializeMeta();
+	Stopwatch watch(true);
 	
-		casacore::Table &table = *Table();
-		
-		ScalarColumn<int>
-			ant1Column(table, casacore::MeasurementSet::columnName(MSMainEnums::ANTENNA1)),
-			ant2Column(table, casacore::MeasurementSet::columnName(MSMainEnums::ANTENNA2)),
-			dataDescIdColumn(table, casacore::MeasurementSet::columnName(MSMainEnums::DATA_DESC_ID)),
-			fieldIdColumn(table, casacore::MeasurementSet::columnName(MSMainEnums::FIELD_ID));
-		ScalarColumn<double>
-			timeColumn(table, casacore::MeasurementSet::columnName(MSMainEnums::TIME));
-		ArrayColumn<casacore::Complex>
-			dataColumn(table, DataColumnName());
-		ArrayColumn<bool>
-			flagColumn(table, casacore::MeasurementSet::columnName(MSMainEnums::FLAG));
-		ArrayColumn<double>
-			uvwColumn(table, casacore::MeasurementSet::columnName(MSMainEnums::UVW));
-		
-		size_t
-			antennaCount = Set().AntennaCount(),
-			polarizationCount = Polarizations().size(),
-			bandCount = Set().BandCount(),
-			sequenceCount = Set().SequenceCount();
-		
-		std::vector<size_t> dataIdToSpw;
-		Set().GetDataDescToBandVector(dataIdToSpw);
-		
-		std::vector<BandInfo> bandInfos(bandCount);
+	initializeMeta();
+
+	casacore::Table& table = *Table();
+	
+	ScalarColumn<int>
+		ant1Column(table, casacore::MeasurementSet::columnName(MSMainEnums::ANTENNA1)),
+		ant2Column(table, casacore::MeasurementSet::columnName(MSMainEnums::ANTENNA2)),
+		dataDescIdColumn(table, casacore::MeasurementSet::columnName(MSMainEnums::DATA_DESC_ID)),
+		fieldIdColumn(table, casacore::MeasurementSet::columnName(MSMainEnums::FIELD_ID));
+	ScalarColumn<double>
+		timeColumn(table, casacore::MeasurementSet::columnName(MSMainEnums::TIME));
+	ArrayColumn<casacore::Complex>
+		dataColumn(table, DataColumnName());
+	ArrayColumn<bool>
+		flagColumn(table, casacore::MeasurementSet::columnName(MSMainEnums::FLAG));
+	ArrayColumn<double>
+		uvwColumn(table, casacore::MeasurementSet::columnName(MSMainEnums::UVW));
+	
+	size_t
+		antennaCount = MetaData().AntennaCount(),
+		polarizationCount = Polarizations().size(),
+		bandCount = MetaData().BandCount(),
+		sequenceCount = MetaData().SequenceCount(),
+		intStart = IntervalStart(),
+		intEnd = IntervalEnd();
+	
+	std::vector<size_t> dataIdToSpw;
+	MetaData().GetDataDescToBandVector(dataIdToSpw);
+	
+	std::vector<BandInfo> bandInfos(bandCount);
+	for(size_t b=0; b!=bandCount; ++b)
+		bandInfos[b] = MetaData().GetBandInfo(b);
+	
+	// Initialize the look-up matrix
+	// to quickly access the elements (without the map-lookup)
+	typedef std::unique_ptr<Result> MatrixElement;
+	typedef std::vector<MatrixElement> MatrixRow;
+	typedef std::vector<MatrixRow> BaselineMatrix;
+	typedef std::vector<BaselineMatrix> BaselineCube;
+	
+	BaselineCube baselineCube(sequenceCount * bandCount);
+	
+	for(size_t s=0; s!=sequenceCount; ++s)
+	{
 		for(size_t b=0; b!=bandCount; ++b)
-			bandInfos[b] = Set().GetBandInfo(b);
-		
-		// Initialize the look-up matrix
-		// to quickly access the elements (without the map-lookup)
-		typedef Result* MatrixElement;
-		typedef std::vector<MatrixElement> MatrixRow;
-		typedef std::vector<MatrixRow> BaselineMatrix;
-		typedef std::vector<BaselineMatrix> BaselineCube;
-		
-		BaselineCube baselineCube(sequenceCount * bandCount);
-		
-		for(size_t s=0; s!=sequenceCount; ++s)
 		{
-			for(size_t b=0; b!=bandCount; ++b)
+			BaselineMatrix& matrix = baselineCube[s*bandCount + b];
+			matrix.resize(antennaCount);
+			
+			BandInfo band = MetaData().GetBandInfo(0);
+			for(size_t a1=0;a1!=antennaCount;++a1)
 			{
-				BaselineMatrix &matrix = baselineCube[s*bandCount + b];
-				matrix.resize(antennaCount);
-				
-				BandInfo band = Set().GetBandInfo(0);
-				for(size_t a1=0;a1!=antennaCount;++a1)
-				{
-					matrix[a1].resize(antennaCount);
-					for(size_t a2=0;a2!=antennaCount;++a2)
-						matrix[a1][a2] = 0;
-				}
+				matrix[a1].resize(antennaCount);
+				for(size_t a2=0;a2!=antennaCount;++a2)
+					matrix[a1][a2] = 0;
 			}
 		}
-		
-		// The actual reading of the data
-		Logger::Debug << "Reading the data...\n";
-		
-		double prevTime = -1.0;
-		size_t curTimeIndex = size_t(0);
-		unsigned rowCount = table.nrow();
-		
-		casacore::Array<casacore::Complex> dataArray;
-		casacore::Array<bool> flagArray;
-		size_t prevFieldId = size_t(-1), sequenceId = size_t(-1);
-		for(unsigned rowIndex = 0;rowIndex < rowCount;++rowIndex)
+	}
+	
+	// The actual reading of the data
+	Logger::Debug << "Reading the data (interval={" << intStart << "..." << intEnd << "})...\n";
+	
+	double prevTime = -1.0;
+	size_t timeIndexInSequence = size_t(0);
+	size_t rowCount = table.nrow();
+	
+	casacore::Array<casacore::Complex> dataArray;
+	casacore::Array<bool> flagArray;
+	size_t
+		prevFieldId = size_t(-1),
+		sequenceId = size_t(-1),
+		timeIndex = size_t(-1);
+	for(size_t rowIndex = 0; rowIndex != rowCount; ++rowIndex)
+	{
+		double time = timeColumn(rowIndex);
+		bool newTime = time != prevTime;
+		if(newTime)
+		{
+			prevTime = time;
+			++timeIndex;
+		}
+		if(timeIndex >= intEnd)
+			break;
+		if(timeIndex >= intStart)
 		{
 			size_t fieldId = fieldIdColumn(rowIndex);
 			if(fieldId != prevFieldId)
 			{
 				prevFieldId = fieldId;
 				sequenceId++;
-				prevTime = -1.0;
+				newTime = true;
 			}
 			const std::map<double, size_t>
 				&observationTimes = ObservationTimes(sequenceId);
-			double time = timeColumn(rowIndex);
-			if(time != prevTime)
+			if(newTime)
 			{
-				curTimeIndex = observationTimes.find(time)->second;
-				prevTime = time;
+				timeIndexInSequence = observationTimes.find(time)->second;
 			}
-			
 			size_t ant1 = ant1Column(rowIndex);
 			size_t ant2 = ant2Column(rowIndex);
 			size_t spw = dataIdToSpw[dataDescIdColumn(rowIndex)];
 			size_t spwFieldIndex = spw + sequenceId * bandCount;
 			if(ant1 > ant2) std::swap(ant1, ant2);
 			
-			Result *result = baselineCube[spwFieldIndex][ant1][ant2];
-			if(result == 0)
+			std::unique_ptr<Result>& result = baselineCube[spwFieldIndex][ant1][ant2];
+			if(result == nullptr)
 			{
 				const size_t timeStepCount = observationTimes.size();
-				result = new Result();
+				const size_t nFreq = MetaData().FrequencyCount(spw);
+				result.reset(new Result());
 				for(size_t p=0;p!=polarizationCount;++p) {
-					result->_realImages.push_back(Image2D::CreateZeroImagePtr(timeStepCount, Set().FrequencyCount(spw)));
-					result->_imaginaryImages.push_back(Image2D::CreateZeroImagePtr(timeStepCount, Set().FrequencyCount(spw)));
-					result->_flags.push_back(Mask2D::CreateSetMaskPtr<true>(timeStepCount, Set().FrequencyCount(spw)));
+					result->_realImages.emplace_back(Image2D::CreateZeroImagePtr(timeStepCount, nFreq));
+					result->_imaginaryImages.emplace_back(Image2D::CreateZeroImagePtr(timeStepCount, nFreq));
+					result->_flags.emplace_back(Mask2D::CreateSetMaskPtr<true>(timeStepCount, nFreq));
 				}
 				result->_bandInfo = bandInfos[spw];
 				result->_uvw.resize(timeStepCount);
-				baselineCube[spwFieldIndex][ant1][ant2] = result;
 			}
 			
 			dataArray = dataColumn.get(rowIndex);
@@ -159,23 +175,24 @@ void MemoryBaselineReader::readSet()
 			uvw.u = *uvwPtr; ++uvwPtr;
 			uvw.v = *uvwPtr; ++uvwPtr;
 			uvw.w = *uvwPtr;
-			result->_uvw[curTimeIndex] = uvw;
+			result->_uvw[timeIndexInSequence] = uvw;
 			
-			for(size_t p=0;p!=polarizationCount;++p)
+			for(size_t p=0; p!=polarizationCount; ++p)
 			{
 				Array<Complex>::const_contiter dataPtr = dataArray.cbegin();
 				Array<bool>::const_contiter flagPtr = flagArray.cbegin();
 			
-				Image2D *real = &*result->_realImages[p];
-				Image2D *imag = &*result->_imaginaryImages[p];
-				Mask2D *mask = &*result->_flags[p];
-				const size_t imgStride = real->Stride();
-				const size_t mskStride = mask->Stride();
-				num_t *realOutPtr = real->ValuePtr(curTimeIndex, 0);
-				num_t *imagOutPtr = imag->ValuePtr(curTimeIndex, 0);
-				bool *flagOutPtr = mask->ValuePtr(curTimeIndex, 0);
+				Image2D& real = *result->_realImages[p];
+				Image2D& imag = *result->_imaginaryImages[p];
+				Mask2D& mask = *result->_flags[p];
+				const size_t imgStride = real.Stride();
+				const size_t mskStride = mask.Stride();
+				num_t* realOutPtr = real.ValuePtr(timeIndexInSequence, 0);
+				num_t* imagOutPtr = imag.ValuePtr(timeIndexInSequence, 0);
+				bool* flagOutPtr = mask.ValuePtr(timeIndexInSequence, 0);
 				
-				for(size_t i=0;i!=p;++i) {
+				for(size_t i=0;i!=p;++i)
+				{
 					++dataPtr;
 					++flagPtr;
 				}
@@ -197,38 +214,41 @@ void MemoryBaselineReader::readSet()
 				}
 			}
 		}
-		
-		// Store elements in matrix to the baseline map.
-		for(size_t s=0; s!=sequenceCount; ++s)
+	}
+	
+	// Store elements in matrix in the baseline map.
+	for(size_t s=0; s!=sequenceCount; ++s)
+	{
+		for(size_t b=0; b!=bandCount; ++b)
 		{
-			for(size_t b=0; b!=bandCount; ++b)
+			size_t fbIndex = s*bandCount + b;
+			for(size_t a1=0; a1!=antennaCount; ++a1)
 			{
-				size_t fbIndex = s*bandCount + b;
-				for(size_t a1=0;a1!=antennaCount;++a1)
+				for(size_t a2=a1; a2!=antennaCount; ++a2)
 				{
-					for(size_t a2=a1;a2!=antennaCount;++a2)
+					std::unique_ptr<Result>& result = baselineCube[fbIndex][a1][a2];
+					if(result)
 					{
-						if(baselineCube[fbIndex][a1][a2] != 0)
-						{
-							BaselineID id(a1, a2, b, s);
-							_baselines.insert(std::pair<BaselineID, Result*>(id, baselineCube[fbIndex][a1][a2]));
-						}
+						_baselines.emplace(BaselineID(a1, a2, b, s), std::move(result));
 					}
 				}
 			}
 		}
-		_areFlagsChanged = false;
-		_isRead = true;
-		
-		Logger::Debug << "Reading toke " << watch.ToString() << ".\n";
 	}
+	_areFlagsChanged = false;
+	
+	Logger::Debug << "Reading toke " << watch.ToString() << ".\n";
 }
 
 void MemoryBaselineReader::PerformFlagWriteRequests()
 {
-	readSet();
+	if(!_isRead)
+	{
+		readSet();
+		_isRead = true;
+	}
 	
-	for(size_t i=0;i!=_writeRequests.size();++i)
+	for(size_t i=0; i!=_writeRequests.size(); ++i)
 	{
 		const FlagWriteRequest &request = _writeRequests[i];
 		BaselineID id(request.antenna1, request.antenna2, request.spectralWindow, request.sequenceId);
@@ -258,7 +278,7 @@ void MemoryBaselineReader::writeFlags()
 	ArrayColumn<bool>
 		flagColumn(table, casacore::MeasurementSet::columnName(MSMainEnums::FLAG));
 	std::vector<size_t> dataIdToSpw;
-	Set().GetDataDescToBandVector(dataIdToSpw);
+	MetaData().GetDataDescToBandVector(dataIdToSpw);
 	
 	const size_t polarizationCount = Polarizations().size();
 		
@@ -266,56 +286,73 @@ void MemoryBaselineReader::writeFlags()
 	
 	double prevTime = -1.0;
 	unsigned rowCount = table.nrow();
-	size_t timeIndex = 0;
-	size_t prevFieldId = size_t(-1), sequenceId = size_t(-1);
-	for(unsigned rowIndex = 0;rowIndex < rowCount;++rowIndex)
+	size_t
+		timeIndex = size_t(-1),
+		prevFieldId = size_t(-1),
+		sequenceId = size_t(-1),
+		intStart = IntervalStart(),
+		intEnd = IntervalEnd(),
+		timeIndexInSequence = 0;
+	for(unsigned rowIndex = 0; rowIndex != rowCount; ++rowIndex)
 	{
-		size_t fieldId = fieldIdColumn(rowIndex);
-		if(fieldId != prevFieldId)
-		{
-			prevFieldId = fieldId;
-			sequenceId++;
-			prevTime = -1.0;
-		}
 		double time = timeColumn(rowIndex);
-		if(time != prevTime)
+		bool newTime = time != prevTime;
+		if(newTime)
 		{
-			timeIndex = ObservationTimes(sequenceId).find(time)->second;
 			prevTime = time;
+			++timeIndex;
 		}
-		
-		size_t ant1 = ant1Column(rowIndex);
-		size_t ant2 = ant2Column(rowIndex);
-		size_t spw = dataIdToSpw[dataDescIdColumn(rowIndex)];
-		if(ant1 > ant2) std::swap(ant1, ant2);
-		
-		size_t frequencyCount = Set().FrequencyCount(spw);
-		IPosition flagShape = IPosition(2);
-		flagShape[0] = polarizationCount;
-		flagShape[1] = frequencyCount;
-		casacore::Array<bool> flagArray(flagShape);
-		
-		BaselineID baselineID(ant1, ant2, spw, sequenceId);
-		std::map<BaselineID, std::unique_ptr<Result>>::iterator
-			resultIter = _baselines.find(baselineID);
-		std::unique_ptr<Result>& result = resultIter->second;
-		
-		Array<bool>::contiter flagPtr = flagArray.cbegin();
-		
-		std::vector<Mask2D*> masks(polarizationCount);
-		for(size_t p=0;p!=polarizationCount;++p)
-			masks[p] = result->_flags[p].get();
-		
-		for(size_t ch=0;ch!=frequencyCount;++ch)
+		if(timeIndex >= intEnd)
+			break;
+		if(timeIndex >= intStart)
 		{
-			for(size_t p=0;p!=polarizationCount;++p)
+			size_t fieldId = fieldIdColumn(rowIndex);
+			if(fieldId != prevFieldId)
 			{
-				*flagPtr = masks[p]->Value(timeIndex, ch);
-				++flagPtr;
+				prevFieldId = fieldId;
+				sequenceId++;
+				newTime = true;
 			}
+			const std::map<double, size_t>
+				&observationTimes = ObservationTimes(sequenceId);
+			if(newTime)
+			{
+				timeIndexInSequence = observationTimes.find(time)->second;
+			}
+			
+			size_t ant1 = ant1Column(rowIndex);
+			size_t ant2 = ant2Column(rowIndex);
+			size_t spw = dataIdToSpw[dataDescIdColumn(rowIndex)];
+			if(ant1 > ant2) std::swap(ant1, ant2);
+			
+			size_t frequencyCount = MetaData().FrequencyCount(spw);
+			IPosition flagShape = IPosition(2);
+			flagShape[0] = polarizationCount;
+			flagShape[1] = frequencyCount;
+			casacore::Array<bool> flagArray(flagShape);
+			
+			BaselineID baselineID(ant1, ant2, spw, sequenceId);
+			std::map<BaselineID, std::unique_ptr<Result>>::iterator
+				resultIter = _baselines.find(baselineID);
+			std::unique_ptr<Result>& result = resultIter->second;
+			
+			Array<bool>::contiter flagPtr = flagArray.cbegin();
+			
+			std::vector<Mask2D*> masks(polarizationCount);
+			for(size_t p=0;p!=polarizationCount;++p)
+				masks[p] = result->_flags[p].get();
+			
+			for(size_t ch=0;ch!=frequencyCount;++ch)
+			{
+				for(size_t p=0;p!=polarizationCount;++p)
+				{
+					*flagPtr = masks[p]->Value(timeIndexInSequence, ch);
+					++flagPtr;
+				}
+			}
+			
+			flagColumn.put(rowIndex, flagArray);
 		}
-		
-		flagColumn.put(rowIndex, flagArray);
 	}
 	
 	_areFlagsChanged = false;

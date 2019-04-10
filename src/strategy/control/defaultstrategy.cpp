@@ -457,7 +457,7 @@ namespace rfiStrategy {
 		if(indexableSet != nullptr)
 		{
 			DetermineSettings(
-				indexableSet->Reader()->Set(),
+				indexableSet->Reader()->MetaData(),
 				telescopeId,
 				flags,
 				frequency,

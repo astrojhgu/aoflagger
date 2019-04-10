@@ -1,16 +1,18 @@
 #ifndef MS_META_DATA_H
 #define MS_META_DATA_H
 
+#include "../strategy/control/types.h"
+
+#include "antennainfo.h"
+
+#include <casacore/ms/MeasurementSets/MeasurementSet.h>
+
+#include <boost/optional/optional.hpp>
+
 #include <string>
 #include <vector>
 #include <utility>
 #include <set>
-
-#include <casacore/ms/MeasurementSets/MeasurementSet.h>
-
-#include "../strategy/control/types.h"
-
-#include "antennainfo.h"
 
 class MSMetaData
 {
@@ -24,6 +26,9 @@ public:
 	}
 	
 	~MSMetaData();
+	
+	void SetIntervalStart(size_t index) { _intervalStart = index;}
+	void SetIntervalEnd(size_t index) { _intervalEnd = index; }
 	
 	size_t FrequencyCount(size_t bandIndex)
 	{
@@ -172,6 +177,7 @@ public:
 				spw==rhs.spw && sequenceId==rhs.sequenceId;
 		}
 	};
+
 private:
 	void initializeMainTableData();
 	
@@ -201,6 +207,8 @@ private:
 	std::vector<Sequence> _sequences;
 	
 	std::string _telescopeName;
+	
+	boost::optional<size_t> _intervalStart, _intervalEnd;
 };
 
 #endif

@@ -70,7 +70,7 @@ namespace rfiStrategy {
 		virtual std::unique_ptr<ImageSet> Clone() override final
 		{
 			std::unique_ptr<JoinedSPWSet> newSet(new JoinedSPWSet());
-			newSet->_msImageSet = _msImageSet->CloneMSImageSet();
+			newSet->_msImageSet.reset(new MSImageSet(*_msImageSet));
 			newSet->_joinedSequences = _joinedSequences;
 			newSet->_nChannels = _nChannels;
 			return std::move(newSet);

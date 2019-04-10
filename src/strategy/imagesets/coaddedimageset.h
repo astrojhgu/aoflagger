@@ -62,7 +62,7 @@ namespace rfiStrategy {
 			std::unique_ptr<CoaddedImageSet> newSet(new CoaddedImageSet());
 			for(const std::unique_ptr<MSImageSet>& imageSet : _msImageSets)
 			{
-				newSet->_msImageSets.emplace_back(imageSet->CloneMSImageSet());
+				newSet->_msImageSets.emplace_back(std::unique_ptr<MSImageSet>(new MSImageSet(*imageSet)));
 			}
 			return std::move(newSet);
 		}

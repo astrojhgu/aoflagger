@@ -6,13 +6,15 @@
 #include <stdexcept>
 
 #include "../structures/antennainfo.h"
+
 #include "baselinereader.h"
+
 #include "../structures/image2d.h"
 #include "../structures/mask2d.h"
 
 class MemoryBaselineReader : public BaselineReader {
 public:
-	explicit MemoryBaselineReader(const std::string &msFile)
+	explicit MemoryBaselineReader(const std::string& msFile)
 		: BaselineReader(msFile), _isRead(false), _areFlagsChanged(false)
 	{ }
 	

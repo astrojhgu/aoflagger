@@ -61,14 +61,14 @@ void IndirectBaselineReader::PerformReadRequests()
 		for(size_t p=0;p<Polarizations().size();++p)
 		{
 			if(ReadData()) {
-				_results[i]._realImages.push_back(Image2D::CreateZeroImagePtr(width, Set().FrequencyCount(request.spectralWindow)));
-				_results[i]._imaginaryImages.push_back(Image2D::CreateZeroImagePtr(width, Set().FrequencyCount(request.spectralWindow)));
+				_results[i]._realImages.push_back(Image2D::CreateZeroImagePtr(width, MetaData().FrequencyCount(request.spectralWindow)));
+				_results[i]._imaginaryImages.push_back(Image2D::CreateZeroImagePtr(width, MetaData().FrequencyCount(request.spectralWindow)));
 			}
 			if(ReadFlags()) {
 				// The flags should be initialized to true, as a baseline might
 				// miss some time scans that other baselines do have, and these
 				// should be flagged.
-				_results[i]._flags.push_back(Mask2D::CreateSetMaskPtr<true>(width, Set().FrequencyCount(request.spectralWindow)));
+				_results[i]._flags.push_back(Mask2D::CreateSetMaskPtr<true>(width, MetaData().FrequencyCount(request.spectralWindow)));
 			}
 		}
 		if(_readUVW)
@@ -86,7 +86,7 @@ void IndirectBaselineReader::PerformReadRequests()
 		dataFile.seekg(filePos * (sizeof(float)*2), std::ios_base::beg);
 		flagFile.seekg(filePos * sizeof(bool), std::ios_base::beg);
 
-		const size_t bufferSize = Set().FrequencyCount(request.spectralWindow) * Polarizations().size();
+		const size_t bufferSize = MetaData().FrequencyCount(request.spectralWindow) * Polarizations().size();
 		for(size_t x=0;x<width;++x)
 		{
 			std::vector<float> dataBuffer(bufferSize*2);
@@ -95,7 +95,7 @@ void IndirectBaselineReader::PerformReadRequests()
 			size_t dataBufferPtr = 0;
 			flagFile.read((char *) &flagBuffer[0], bufferSize * sizeof(bool));
 			size_t flagBufferPtr = 0;
-			for(size_t f=0;f<Set().FrequencyCount(request.spectralWindow);++f) {
+			for(size_t f=0;f<MetaData().FrequencyCount(request.spectralWindow);++f) {
 				for(size_t p=0;p<Polarizations().size();++p)
 				{
 					_results[i]._realImages[p]->SetValue(x, f, dataBuffer[dataBufferPtr]);
@@ -133,7 +133,7 @@ void IndirectBaselineReader::reorderedMS()
 		std::ifstream str(path.string().c_str());
 		std::string name;
 		std::getline(str, name);
-		if(boost::filesystem::equivalent(boost::filesystem::path(name), Set().Path()))
+		if(boost::filesystem::equivalent(boost::filesystem::path(name), MetaData().Path()))
 		{
 			Logger::Debug << "Measurement set has already been reordered; using old temporary files.\n";
 			reorderRequired = false;
@@ -147,7 +147,7 @@ void IndirectBaselineReader::reorderedMS()
 	{
 		reorderFull();
 		std::ofstream str(path.string().c_str());
-		str << Set().Path() << '\n';
+		str << MetaData().Path() << '\n';
 	} else {
 		size_t fileSize;
 		makeLookupTables(fileSize);
@@ -156,12 +156,12 @@ void IndirectBaselineReader::reorderedMS()
 
 void IndirectBaselineReader::makeLookupTables(size_t &fileSize)
 {
-	std::vector<MSMetaData::Sequence> sequences = Set().GetSequences();
+	std::vector<MSMetaData::Sequence> sequences = MetaData().GetSequences();
 	const size_t
-		antennaCount = Set().AntennaCount(),
+		antennaCount = MetaData().AntennaCount(),
 		polarizationCount = Polarizations().size(),
-		bandCount = Set().BandCount(),
-		sequencesPerBaselineCount = Set().SequenceCount();
+		bandCount = MetaData().BandCount(),
+		sequencesPerBaselineCount = MetaData().SequenceCount();
 
 	_seqIndexTable.reset(new SeqIndexLookupTable(antennaCount, bandCount, sequencesPerBaselineCount));
 	fileSize = 0;
@@ -174,7 +174,7 @@ void IndirectBaselineReader::makeLookupTables(size_t &fileSize)
 		// Initialize look-up table to go from sequence array to file position. Is in samples, so
 		// multiple times sizeof(bool) or ..(float)) for exact position.
 		_filePositions.push_back(fileSize);
-		fileSize += ObservationTimes(s.sequenceId).size() * Set().FrequencyCount(s.spw) * polarizationCount;
+		fileSize += ObservationTimes(s.sequenceId).size() * MetaData().FrequencyCount(s.spw) * polarizationCount;
 	}
 }
 
@@ -224,7 +224,7 @@ void IndirectBaselineReader::reorderFull()
 	std::unique_ptr<casacore::ROArrayColumn<casacore::Complex>> dataColumn( new casacore::ROArrayColumn<casacore::Complex>(table, DataColumnName()) );
 
 	std::vector<size_t> dataIdToSpw;
-	Set().GetDataDescToBandVector(dataIdToSpw);
+	MetaData().GetDataDescToBandVector(dataIdToSpw);
 	
 	size_t fileSize;
 	makeLookupTables(fileSize);
@@ -282,7 +282,7 @@ void IndirectBaselineReader::reorderFull()
 			antenna1 = antenna1Column(rowIndex),
 			antenna2 = antenna2Column(rowIndex),
 			spw = dataIdToSpw[dataDescIdColumn(rowIndex)],
-			channelCount = Set().FrequencyCount(spw),
+			channelCount = MetaData().FrequencyCount(spw),
 			arrayIndex = _seqIndexTable->Value(antenna1, antenna2, spw, sequenceId),
 			sampleCount = channelCount * polarizationCount;
 		size_t& filePos = writeFilePositions[arrayIndex];
@@ -357,7 +357,7 @@ void IndirectBaselineReader::PerformDataWriteTask(std::vector<Image2DCPtr> _real
 	if(!_msIsReordered) reorderedMS();
 	
 	const size_t width = _realImages[0]->Width();
-	const size_t bufferSize = Set().FrequencyCount(spectralWindow) * Polarizations().size();
+	const size_t bufferSize = MetaData().FrequencyCount(spectralWindow) * Polarizations().size();
 	
 	std::ofstream dataFile(DataFilename(), std::ofstream::binary | std::ios_base::in | std::ios_base::out);
 	size_t index = _seqIndexTable->Value(antenna1, antenna2, spectralWindow, sequenceId);
@@ -368,7 +368,7 @@ void IndirectBaselineReader::PerformDataWriteTask(std::vector<Image2DCPtr> _real
 	for(size_t x=0;x<width;++x)
 	{
 		size_t dataBufferPtr = 0;
-		for(size_t f=0;f<Set().FrequencyCount(spectralWindow);++f) {
+		for(size_t f=0;f<MetaData().FrequencyCount(spectralWindow);++f) {
 			for(size_t p=0; p<Polarizations().size(); ++p)
 			{
 				dataBuffer[dataBufferPtr] = _realImages[p]->Value(x, f);
@@ -406,7 +406,7 @@ void IndirectBaselineReader::performFlagWriteTask(std::vector<Mask2DCPtr> flags,
 	if(!_msIsReordered) reorderedMS();
 	
 	const size_t width = flags[0]->Width();
-	const size_t bufferSize = Set().FrequencyCount(spw) * Polarizations().size();
+	const size_t bufferSize = MetaData().FrequencyCount(spw) * Polarizations().size();
 	
 	std::ofstream flagFile(FlagFilename(), std::ofstream::binary | std::ios_base::in | std::ios_base::out);
 	size_t index = _seqIndexTable->Value(antenna1, antenna2, spw, sequenceId);
@@ -417,7 +417,7 @@ void IndirectBaselineReader::performFlagWriteTask(std::vector<Mask2DCPtr> flags,
 	for(size_t x=0;x<width;++x)
 	{
 		size_t flagBufferPtr = 0;
-		for(size_t f=0;f<Set().FrequencyCount(spw);++f) {
+		for(size_t f=0;f<MetaData().FrequencyCount(spw);++f) {
 			for(size_t p=0; p<polarizationCount; ++p)
 			{
 				flagBuffer[flagBufferPtr] = flags[p]->Value(x, f);
@@ -452,9 +452,9 @@ void IndirectBaselineReader::updateOriginalMS()
 
 	int rowCount = table.nrow();
 
-	std::vector<MSMetaData::Sequence> sequences = Set().GetSequences();
+	std::vector<MSMetaData::Sequence> sequences = MetaData().GetSequences();
 	std::vector<size_t> dataIdToSpw;
-	Set().GetDataDescToBandVector(dataIdToSpw);
+	MetaData().GetDataDescToBandVector(dataIdToSpw);
 	
 	size_t polarizationCount = Polarizations().size();
 
@@ -497,7 +497,7 @@ void IndirectBaselineReader::updateOriginalMS()
 		size_t antenna1 = antenna1Column(rowIndex);
 		size_t antenna2 = antenna2Column(rowIndex);
 		size_t spw = dataIdToSpw[dataDescIdColumn(rowIndex)];
-		size_t channelCount = Set().FrequencyCount(spw);
+		size_t channelCount = MetaData().FrequencyCount(spw);
 		size_t arrayIndex = _seqIndexTable->Value(antenna1, antenna2, spw, sequenceId);
 		size_t sampleCount = channelCount * polarizationCount;
 		size_t &filePos = updatedFilePos[arrayIndex];

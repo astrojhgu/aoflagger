@@ -13,6 +13,8 @@
 
 #include <mutex>
 
+#include <boost/optional/optional.hpp>
+
 class RFIGuiController
 {
 	public:
@@ -133,7 +135,7 @@ class RFIGuiController
 		void PlotTimeScatterComparison();
 		void PlotSingularValues();
 		
-		void Open(const std::vector<std::string>& filenames, BaselineIOMode ioMode, bool readUVW, const std::string& dataColumn, bool subtractModel, size_t polCountToRead, bool loadStrategy, bool combineSPW);
+		void Open(const std::vector<std::string>& filenames, BaselineIOMode ioMode, bool readUVW, const std::string& dataColumn, bool subtractModel, size_t polCountToRead, bool loadStrategy, bool combineSPW, std::pair<boost::optional<size_t>,boost::optional<size_t>> interval);
 		
 		void OpenTestSet(unsigned index, bool gaussianTestSets);
 		

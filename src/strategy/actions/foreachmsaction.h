@@ -5,6 +5,8 @@
 
 #include "../../structures/types.h"
 
+#include <boost/optional/optional.hpp>
+
 #include <set>
 
 namespace rfiStrategy {
@@ -48,6 +50,14 @@ namespace rfiStrategy {
 			const std::string &DataColumnName() const { return _dataColumnName; }
 			void SetDataColumnName(const std::string &name) { _dataColumnName = name; }
 			
+			void SetInterval(boost::optional<size_t> intervalStart, boost::optional<size_t> intervalEnd)
+			{
+				_intervalStart = intervalStart;
+				_intervalEnd = intervalEnd;
+			}
+			boost::optional<size_t> IntervalStart() const { return _intervalStart; }
+			boost::optional<size_t> IntervalEnd() const { return _intervalEnd; }
+			
 			bool CombineSPWs() const { return _combineSPWs; }
 			void SetCombineSPWs(bool combineSPWs) { _combineSPWs = combineSPWs; }
 			
@@ -78,6 +88,7 @@ namespace rfiStrategy {
 			std::vector<std::string> _filenames;
 			bool _readUVW;
 			std::string _dataColumnName;
+			boost::optional<size_t> _intervalStart, _intervalEnd;
 			bool _subtractModel;
 			std::string _commandLineForHistory;
 			bool _combineSPWs;

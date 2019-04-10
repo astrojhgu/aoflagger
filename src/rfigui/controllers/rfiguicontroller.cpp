@@ -317,7 +317,7 @@ void RFIGuiController::PlotSingularValues()
 	}
 }
 
-void RFIGuiController::Open(const std::vector<std::string>& filenames, BaselineIOMode ioMode, bool readUVW, const std::string& dataColumn, bool subtractModel, size_t polCountToRead, bool loadStrategy, bool combineSPW)
+void RFIGuiController::Open(const std::vector<std::string>& filenames, BaselineIOMode ioMode, bool readUVW, const std::string& dataColumn, bool subtractModel, size_t polCountToRead, bool loadStrategy, bool combineSPW, std::pair<boost::optional<size_t>,boost::optional<size_t>> interval)
 {
 	if(filenames.size() == 1)
 		Logger::Info << "Opening " << filenames[0] << '\n';
@@ -332,6 +332,7 @@ void RFIGuiController::Open(const std::vector<std::string>& filenames, BaselineI
 		{
 			msImageSet->SetSubtractModel(subtractModel);
 			msImageSet->SetDataColumnName(dataColumn);
+			msImageSet->SetInterval(interval.first, interval.second);
 	
 			if(polCountToRead == 1)
 				msImageSet->SetReadStokesI();

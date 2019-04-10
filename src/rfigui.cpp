@@ -41,6 +41,7 @@ static void run(int argc, char *argv[])
 	std::set<SavedBaseline> savedBaselines;
 	bool interactive = true;
 	std::string dataColumnName = "DATA";
+	boost::optional<size_t> intervalStart, intervalEnd;
 	
 	while(argi < argc)
 	{
@@ -131,7 +132,7 @@ static void run(int argc, char *argv[])
 			if(interactive)
 				window->OpenPaths(filenames);
 			else
-				controller.Open(filenames, DirectReadMode, true, dataColumnName, false, 4, true, false);
+				controller.Open(filenames, DirectReadMode, true, dataColumnName, false, 4, true, false, std::make_pair(intervalStart, intervalEnd));
 		}
 		
 		if(!savedBaselines.empty())

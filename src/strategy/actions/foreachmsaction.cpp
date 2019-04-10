@@ -21,19 +21,16 @@
 namespace rfiStrategy {
 
 void ForEachMSAction::Initialize()
-{
-}
+{ }
 
-void ForEachMSAction::Perform(ArtifactSet &artifacts, ProgressListener &progress)
+void ForEachMSAction::Perform(ArtifactSet& artifacts, ProgressListener& progress)
 {
 	unsigned taskIndex = 0;
 	
 	FinishAll();
 
-	for(std::vector<std::string>::const_iterator i=_filenames.begin();i!=_filenames.end();++i)
+	for(const std::string& filename : _filenames)
 	{
-		std::string filename = *i;
-		
 		progress.OnStartTask(*this, taskIndex, _filenames.size(), std::string("Processing measurement set ") + filename);
 		
 		bool skip = false;
@@ -51,13 +48,14 @@ void ForEachMSAction::Perform(ArtifactSet &artifacts, ProgressListener &progress
 		if(!skip)
 		{
 			std::unique_ptr<ImageSet> imageSet(ImageSet::Create(std::vector<std::string>{filename}, _baselineIOMode));
-			bool isMS = dynamic_cast<MSImageSet*>(&*imageSet) != 0;
+			bool isMS = dynamic_cast<MSImageSet*>(&*imageSet) != nullptr;
 			if(isMS)
 			{ 
 				MSImageSet* msImageSet = static_cast<MSImageSet*>(imageSet.get());
 				msImageSet->SetDataColumnName(_dataColumnName);
 				msImageSet->SetSubtractModel(_subtractModel);
 				msImageSet->SetReadUVW(_readUVW);
+				msImageSet->SetInterval(_intervalStart, _intervalEnd);
 				if(_combineSPWs)
 				{
 					msImageSet->Initialize();
@@ -108,7 +106,7 @@ void ForEachMSAction::Perform(ArtifactSet &artifacts, ProgressListener &progress
 			artifacts.SetNoImageSet();
 
 			if(isMS)
-				writeHistory(*i);
+				writeHistory(filename);
 		}
 	
 		progress.OnEndTask(*this);
@@ -138,17 +136,17 @@ void ForEachMSAction::writeHistory(const std::string &filename)
 	if(GetChildCount() != 0)
 	{
 		MSMetaData ms(filename);
-		const Strategy *strategy = 0;
+		const Strategy *strategy = nullptr;
 		if(GetChildCount() == 1 && dynamic_cast<const Strategy*>(&GetChild(0)) != 0)
 		{
 			strategy = static_cast<const Strategy*>(&GetChild(0));
 		} else {
 			const ActionContainer *root = GetRoot();
-			if(dynamic_cast<const Strategy*>(root) != 0)
+			if(dynamic_cast<const Strategy*>(root))
 				strategy = static_cast<const Strategy*>(root);
 		}
 		Logger::Debug << "Adding strategy to history table of MS...\n";
-		if(strategy != 0) {
+		if(strategy != nullptr) {
 			try {
 				ms.AddAOFlaggerHistory(*strategy, _commandLineForHistory);
 			} catch(std::exception &e)

@@ -51,7 +51,7 @@ namespace rfiStrategy {
 	
 	void MSImageSet::initReader()
 	{
-		if(_reader == 0 )
+		if(_reader == nullptr )
 		{
 			switch(_ioMode)
 			{
@@ -75,6 +75,7 @@ namespace rfiStrategy {
 			}
 		}
 		_reader->SetDataColumnName(_dataColumnName);
+		_reader->SetInterval(_intervalStart, _intervalEnd);
 		_reader->SetSubtractModel(_subtractModel);
 		_reader->SetReadFlags(_readFlags);
 		_reader->SetReadData(true);
@@ -87,7 +88,7 @@ namespace rfiStrategy {
 
 	size_t MSImageSet::EndIndex(const MSImageSetIndex &index)
 	{
-		return _reader->Set().GetObservationTimesSet(GetSequenceId(index)).size();
+		return _reader->MetaData().GetObservationTimesSet(GetSequenceId(index)).size();
 	}
 
 	std::vector<double> MSImageSet::ObservationTimesVector(const ImageSetIndex &index)
@@ -95,21 +96,21 @@ namespace rfiStrategy {
 		const MSImageSetIndex &msIndex = static_cast<const MSImageSetIndex &>(index);
 		// StartIndex(msIndex), EndIndex(msIndex)
 		unsigned sequenceId = _sequences[msIndex._sequenceIndex].sequenceId;
-		const std::set<double> &obsTimesSet = _reader->Set().GetObservationTimesSet(sequenceId);
+		const std::set<double>& obsTimesSet = _reader->MetaData().GetObservationTimesSet(sequenceId);
 		std::vector<double> obs(obsTimesSet.begin(), obsTimesSet.end());
 		return obs;
 	}
-			
+	
 	TimeFrequencyMetaDataCPtr MSImageSet::createMetaData(const ImageSetIndex &index, std::vector<UVW> &uvw)
 	{
-		const MSImageSetIndex &msIndex = static_cast<const MSImageSetIndex&>(index);
-		TimeFrequencyMetaData *metaData = new TimeFrequencyMetaData();
+		const MSImageSetIndex& msIndex = static_cast<const MSImageSetIndex&>(index);
+		TimeFrequencyMetaData* metaData = new TimeFrequencyMetaData();
 		metaData->SetAntenna1(_set.GetAntennaInfo(GetAntenna1(msIndex)));
 		metaData->SetAntenna2(_set.GetAntennaInfo(GetAntenna2(msIndex)));
 		metaData->SetBand(_set.GetBandInfo(GetBand(msIndex)));
 		metaData->SetField(_set.GetFieldInfo(GetField(msIndex)));
 		metaData->SetObservationTimes(ObservationTimesVector(msIndex));
-		if(_reader != 0)
+		if(_reader != nullptr)
 		{
 			metaData->SetUVW(uvw);
 		}

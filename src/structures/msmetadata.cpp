@@ -148,7 +148,7 @@ void MSMetaData::initializeMainTableData()
 {
 	if(!_isMainTableDataInitialized)
 	{
-		Logger::Debug << "Initializing ms cache data...\n"; 
+		Logger::Debug << "Initializing ms metadata cache data...\n"; 
 		
 		casacore::MeasurementSet ms(_path);
 		casacore::ScalarColumn<int> antenna1Col(ms,
@@ -165,31 +165,52 @@ void MSMetaData::initializeMainTableData()
 		double time = -1.0;
 		std::set<std::pair<size_t, size_t> > baselineSet;
 		std::set<Sequence> sequenceSet;
-		size_t prevFieldId = size_t(-1), sequenceId = size_t(-1);
+		size_t
+			prevFieldId = size_t(-1),
+			sequenceId = size_t(-1),
+			timeIndex = size_t(-1);
 		for(size_t row=0; row!=ms.nrow(); ++row)
 		{
-			size_t a1 = antenna1Col(row);
-			size_t a2 = antenna2Col(row);
-			size_t fieldId = fieldIdCol(row);
-			size_t spw = dataDescIdCol(row);
+			size_t
+				a1 = antenna1Col(row),
+				a2 = antenna2Col(row),
+				fieldId = fieldIdCol(row),
+				spw = dataDescIdCol(row);
 			double cur_time = timeCol(row);
 			
-			if(fieldId != prevFieldId)
+			bool isNewTime = cur_time != time;
+			if(isNewTime)
 			{
-				prevFieldId = fieldId;
-				sequenceId++;
-				_observationTimesPerSequence.emplace_back();
-			}
-			if(cur_time != time)
-			{
-				_observationTimes.insert(_observationTimes.end(), cur_time);
-				_observationTimesPerSequence[sequenceId].insert(cur_time);
+				++timeIndex;
 				time = cur_time;
 			}
-			
-			baselineSet.insert(std::pair<size_t,size_t>(a1, a2));
-			sequenceSet.insert(Sequence(a1, a2, spw, sequenceId, fieldId));
+			bool selected = true;
+			if(_intervalStart)
+				selected = timeIndex >= _intervalStart.value();
+			if(_intervalEnd)
+			{
+				if(timeIndex >= _intervalEnd.value())
+					break;
+			}
+			if(selected)
+			{
+				if(fieldId != prevFieldId)
+				{
+					prevFieldId = fieldId;
+					sequenceId++;
+					_observationTimesPerSequence.emplace_back();
+				}
+				if(isNewTime)
+				{
+					_observationTimesPerSequence[sequenceId].insert(cur_time);
+					_observationTimes.insert(_observationTimes.end(), cur_time);
+				}
+				
+				baselineSet.insert(std::pair<size_t, size_t>(a1, a2));
+				sequenceSet.insert(Sequence(a1, a2, spw, sequenceId, fieldId));
+			}
 		}
+		
 		_baselines.assign(baselineSet.begin(), baselineSet.end());
 		_sequences.assign(sequenceSet.begin(), sequenceSet.end());
 		_isMainTableDataInitialized = true;

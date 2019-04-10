@@ -24,7 +24,7 @@ GoToWindow::GoToWindow(RFIGuiWindow &rfiGuiWindow) : Gtk::Window(),
 	_sequenceStore = Gtk::ListStore::create(_sequenceModelColumns);
 
 	const std::vector<MSMetaData::Sequence> &_sequences =
-		_imageSet->Reader()->Set().GetSequences();
+		_imageSet->Reader()->MetaData().GetSequences();
 
 	const rfiStrategy::ImageSetIndex &setIndex =
 		static_cast<rfiStrategy::ImageSetIndex&>(_rfiGuiWindow.Controller().GetImageSetIndex());

@@ -18,7 +18,7 @@
 #include "../util/logger.h"
 
 BaselineReader::BaselineReader(const std::string &msFile) :
-	_measurementSet(msFile),
+	_msMetaData(msFile),
 	_table(),
 	_dataColumnName("DATA"),
 	_subtractModel(false),
@@ -26,14 +26,7 @@ BaselineReader::BaselineReader(const std::string &msFile) :
 	_readFlags(true),
 	_polarizations()
 {
-	//try {
-	//	_table.reset(new casacore::MeasurementSet(_measurementSet.Path(), casacore::MeasurementSet::Update));
-	//} catch(std::exception &e)
-	//{
-	//	Logger::Warn << "Read-write opening of file " << msFile << " failed, trying read-only...\n";
-		_table.reset(new casacore::MeasurementSet(_measurementSet.Path()));
-	//	Logger::Warn << "Table opened in read-only: writing not possible.\n";
-	//}
+	_table.reset(new casacore::MeasurementSet(_msMetaData.Path()));
 }
 
 BaselineReader::~BaselineReader()
@@ -44,16 +37,16 @@ void BaselineReader::initObservationTimes()
 	if(_observationTimes.empty())
 	{
 		Logger::Debug << "Initializing observation times...\n";
-		size_t sequenceCount = _measurementSet.SequenceCount();
+		size_t sequenceCount = _msMetaData.SequenceCount();
 		_observationTimes.resize(sequenceCount);
 		for(size_t sequenceId=0; sequenceId!=sequenceCount; ++sequenceId)
 		{
-			const std::set<double> &times = _measurementSet.GetObservationTimesSet(sequenceId);
+			const std::set<double> &times = _msMetaData.GetObservationTimesSet(sequenceId);
 			unsigned index = 0;
-			for(std::set<double>::const_iterator i=times.begin();i!=times.end();++i)
+			for(double t : times)
 			{
-				_observationTimes[sequenceId].insert(std::pair<double,size_t>(*i, index));
-				_observationTimesVector.push_back(*i);
+				_observationTimes[sequenceId].insert(std::pair<double,size_t>(t, index));
+				_observationTimesVector.push_back(t);
 				++index;
 			}
 		}
@@ -88,7 +81,7 @@ void BaselineReader::initializePolarizations()
 {
 	if(_polarizations.empty())
 	{
-		casacore::MeasurementSet ms(_measurementSet.Path());
+		casacore::MeasurementSet ms(_msMetaData.Path());
 		
 		casacore::MSDataDescription ddTable = ms.dataDescription();
 		if(ddTable.nrow() == 0)

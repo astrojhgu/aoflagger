@@ -31,12 +31,12 @@ void DirectBaselineReader::initBaselineCache()
 	{
 		Logger::Debug << "Determining sequence positions within file for direct baseline reader...\n";
 		std::vector<size_t> dataIdToSpw;
-		Set().GetDataDescToBandVector(dataIdToSpw);
+		MetaData().GetDataDescToBandVector(dataIdToSpw);
 		
-		casacore::ROScalarColumn<int> antenna1Column(*Table(), "ANTENNA1"); 
-		casacore::ROScalarColumn<int> antenna2Column(*Table(), "ANTENNA2");
-		casacore::ROScalarColumn<int> dataDescIdColumn(*Table(), "DATA_DESC_ID");
-		casacore::ROScalarColumn<int> fieldIdColumn(*Table(), "FIELD_ID");
+		casacore::ScalarColumn<int> antenna1Column(*Table(), "ANTENNA1"); 
+		casacore::ScalarColumn<int> antenna2Column(*Table(), "ANTENNA2");
+		casacore::ScalarColumn<int> dataDescIdColumn(*Table(), "DATA_DESC_ID");
+		casacore::ScalarColumn<int> fieldIdColumn(*Table(), "FIELD_ID");
 		
 		int prevFieldId = -1, sequenceId = -1;
 		for(size_t i=0;i<Table()->nrow();++i) {
@@ -130,7 +130,7 @@ void DirectBaselineReader::PerformReadRequests()
 			startIndex = _readRequests[i].startIndex,
 			endIndex = _readRequests[i].endIndex,
 			band = _readRequests[i].spectralWindow,
-			channelCount = Set().FrequencyCount(band),
+			channelCount = MetaData().FrequencyCount(band),
 			sequenceId = _readRequests[i].sequenceId,
 			timeCount = ObservationTimes(sequenceId).size();
 			
@@ -189,16 +189,16 @@ void DirectBaselineReader::PerformReadRequests()
 		bool timeIsSelected = timeIndex>=startIndex && timeIndex<endIndex;
 		if(ReadData() && timeIsSelected) {
 			if(DataKind() == WeightData)
-				readWeights(requestIndex, timeIndex-startIndex, Set().FrequencyCount(band), weightColumn(rowIndex));
+				readWeights(requestIndex, timeIndex-startIndex, MetaData().FrequencyCount(band), weightColumn(rowIndex));
 			else if(modelColumn == 0)
-				readTimeData(requestIndex, timeIndex-startIndex, Set().FrequencyCount(band), (*dataColumn)(rowIndex), 0);
+				readTimeData(requestIndex, timeIndex-startIndex, MetaData().FrequencyCount(band), (*dataColumn)(rowIndex), 0);
 			else {
 				const casacore::Array<casacore::Complex> model = (*modelColumn)(rowIndex); 
-				readTimeData(requestIndex, timeIndex-startIndex, Set().FrequencyCount(band), (*dataColumn)(rowIndex), &model);
+				readTimeData(requestIndex, timeIndex-startIndex, MetaData().FrequencyCount(band), (*dataColumn)(rowIndex), &model);
 			}
 		}
 		if(ReadFlags() && timeIsSelected) {
-			readTimeFlags(requestIndex, timeIndex-startIndex, Set().FrequencyCount(band), flagColumn(rowIndex));
+			readTimeFlags(requestIndex, timeIndex-startIndex, MetaData().FrequencyCount(band), flagColumn(rowIndex));
 		}
 		if(timeIsSelected) {
 			casacore::Array<double> arr = uvwColumn(rowIndex);
@@ -289,9 +289,9 @@ void DirectBaselineReader::PerformFlagWriteRequests()
 	for(std::vector<FlagWriteRequest>::iterator i=_writeRequests.begin();i!=_writeRequests.end();++i)
 	{
 		size_t band = i->spectralWindow;
-		if(Set().FrequencyCount(band) != i->flags[0]->Height())
+		if(MetaData().FrequencyCount(band) != i->flags[0]->Height())
 		{
-			std::cerr << "The frequency count in the measurement set (" << Set().FrequencyCount(band) << ") does not match the image!" << std::endl;
+			std::cerr << "The frequency count in the measurement set (" << MetaData().FrequencyCount(band) << ") does not match the image!" << std::endl;
 		}
 		if(i->endIndex - i->startIndex != i->flags[0]->Width())
 		{
@@ -311,7 +311,7 @@ void DirectBaselineReader::PerformFlagWriteRequests()
 		{
 			casacore::Array<bool> flag = flagColumn(rowIndex);
 			casacore::Array<bool>::iterator j = flag.begin();
-			for(size_t f=0;f<(size_t) Set().FrequencyCount(request.spectralWindow);++f) {
+			for(size_t f=0;f<(size_t) MetaData().FrequencyCount(request.spectralWindow);++f) {
 				for(size_t p=0;p<Polarizations().size();++p)
 				{
 					*j = request.flags[p]->Value(timeIndex - request.startIndex, f);
