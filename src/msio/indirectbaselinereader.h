@@ -62,7 +62,7 @@ class IndirectBaselineReader : public BaselineReader {
 			size_t _antennaCount;
 			std::vector<std::vector<std::vector<size_t> > > _table;
 		};
-		void reorderedMS();
+		void reorderMS();
 		void reorderFull();
 		void makeLookupTables(size_t &fileSize);
 		void updateOriginalMSData();

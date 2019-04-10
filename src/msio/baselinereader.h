@@ -176,6 +176,11 @@ protected:
 		initObservationTimes();
 		initializePolarizations();
 	}
+	
+	const std::vector<std::map<double,size_t>>& ObservationTimesPerSequence() const
+	{
+		return _observationTimes;
+	}
 
 	std::vector<ReadRequest> _readRequests;
 	std::vector<FlagWriteRequest> _writeRequests;
@@ -207,7 +212,7 @@ private:
 	bool _subtractModel;
 	bool _readData, _readFlags;
 	
-	std::vector<std::map<double,size_t> > _observationTimes;
+	std::vector<std::map<double,size_t>> _observationTimes;
 	std::vector<double> _observationTimesVector;
 	std::vector<PolarizationEnum> _polarizations;
 	boost::optional<size_t> _intervalStart, _intervalEnd;

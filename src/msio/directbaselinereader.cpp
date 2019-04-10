@@ -1,11 +1,6 @@
 #include "directbaselinereader.h"
 
-#include <vector>
-#include <set>
-#include <stdexcept>
-
-#include <casacore/tables/DataMan/TiledStManAccessor.h>
-#include <casacore/ms/MeasurementSets/MeasurementSet.h>
+#include "msselection.h"
 
 #include "../structures/arraycolumniterator.h"
 #include "../structures/scalarcolumniterator.h"
@@ -13,6 +8,13 @@
 
 #include "../util/logger.h"
 #include "../util/stopwatch.h"
+
+#include <casacore/tables/DataMan/TiledStManAccessor.h>
+#include <casacore/ms/MeasurementSets/MeasurementSet.h>
+
+#include <vector>
+#include <set>
+#include <stdexcept>
 
 DirectBaselineReader::DirectBaselineReader(const std::string &msFile) : BaselineReader(msFile)
 {
@@ -27,33 +29,29 @@ void DirectBaselineReader::initBaselineCache()
 {
 	// Pass one time through the entire measurement set and store the rownumbers of
 	// the baselines.
-	if(_baselineCache.empty())
+	Logger::Debug << "Determining sequence positions within file for direct baseline reader...\n";
+	std::vector<size_t> dataIdToSpw;
+	MetaData().GetDataDescToBandVector(dataIdToSpw);
+	
+	size_t
+		intStart = IntervalStart(),
+		intEnd = IntervalEnd();
+		
+	casacore::ScalarColumn<int> antenna1Column(*Table(), "ANTENNA1"); 
+	casacore::ScalarColumn<int> antenna2Column(*Table(), "ANTENNA2");
+	casacore::ScalarColumn<int> dataDescIdColumn(*Table(), "DATA_DESC_ID");
+	
+	MSSelection msSelection(*Table(), intStart, intEnd, ObservationTimesPerSequence());
+	msSelection.Process(
+		[&](size_t rowIndex, size_t sequenceId, size_t /*timeIndex*/, size_t /*timeIndexInSequence*/)
 	{
-		Logger::Debug << "Determining sequence positions within file for direct baseline reader...\n";
-		std::vector<size_t> dataIdToSpw;
-		MetaData().GetDataDescToBandVector(dataIdToSpw);
-		
-		casacore::ScalarColumn<int> antenna1Column(*Table(), "ANTENNA1"); 
-		casacore::ScalarColumn<int> antenna2Column(*Table(), "ANTENNA2");
-		casacore::ScalarColumn<int> dataDescIdColumn(*Table(), "DATA_DESC_ID");
-		casacore::ScalarColumn<int> fieldIdColumn(*Table(), "FIELD_ID");
-		
-		int prevFieldId = -1, sequenceId = -1;
-		for(size_t i=0;i<Table()->nrow();++i) {
-			int
-				antenna1 = antenna1Column(i),
-				antenna2 = antenna2Column(i),
-				dataDescId = dataDescIdColumn(i),
-				fieldId = fieldIdColumn(i);
-			if(fieldId != prevFieldId)
-			{
-				prevFieldId = fieldId;
-				sequenceId++;
-			}
-			int spectralWindow = dataIdToSpw[dataDescId];
-			addRowToBaselineCache(antenna1, antenna2, spectralWindow, sequenceId, i);
-		}
-	}
+		int
+			antenna1 = antenna1Column(rowIndex),
+			antenna2 = antenna2Column(rowIndex),
+			dataDescId = dataDescIdColumn(rowIndex);
+		int spectralWindow = dataIdToSpw[dataDescId];
+		addRowToBaselineCache(antenna1, antenna2, spectralWindow, sequenceId, rowIndex);
+	});
 }
 
 void DirectBaselineReader::addRowToBaselineCache(int antenna1, int antenna2, int spectralWindow, int sequenceId, size_t row)
@@ -111,7 +109,8 @@ void DirectBaselineReader::PerformReadRequests()
   Stopwatch stopwatch(true);
 	
 	initializeMeta();
-	initBaselineCache();
+	if(_baselineCache.empty())
+		initBaselineCache();
 
 	// Each element contains (row number, corresponding request index)
 	std::vector<std::pair<size_t, size_t> > rows;
@@ -122,62 +121,52 @@ void DirectBaselineReader::PerformReadRequests()
 	
 	Logger::Debug << "Reading " << _readRequests.size() << " requests with " << rows.size() << " rows total, flags=" << ReadFlags() << ", " << Polarizations().size() << " polarizations.\n";
 	
-	_results.clear();
-	for(size_t i=0;i<_readRequests.size();++i)
+	_results.resize(_readRequests.size());
+	for(size_t reqIndex=0; reqIndex!=_readRequests.size(); ++reqIndex)
 	{
-		_results.push_back(Result());
+		const ReadRequest& request = _readRequests[reqIndex];
+		Result& result = _results[reqIndex];
 		size_t
-			startIndex = _readRequests[i].startIndex,
-			endIndex = _readRequests[i].endIndex,
-			band = _readRequests[i].spectralWindow,
-			channelCount = MetaData().FrequencyCount(band),
-			sequenceId = _readRequests[i].sequenceId,
-			timeCount = ObservationTimes(sequenceId).size();
+			startIndex = request.startIndex,
+			endIndex = request.endIndex,
+			band = request.spectralWindow,
+			channelCount = MetaData().FrequencyCount(band);
 			
-		if(startIndex > timeCount)
-		{
-			Logger::Warn << "startIndex > timeCount\n";
-		}
-		if(endIndex > timeCount)
-		{
-			endIndex = timeCount;
-			Logger::Warn << "endIndex (" << endIndex << ") > timeCount (" << timeCount << ")\n";
-		}
-
 		size_t width = endIndex-startIndex;
 		for(size_t p=0;p<Polarizations().size();++p)
 		{
 			if(ReadData()) {
-				_results[i]._realImages.push_back(Image2D::CreateZeroImagePtr(width, channelCount));
-				_results[i]._imaginaryImages.push_back(Image2D::CreateZeroImagePtr(width, channelCount));
+				result._realImages.emplace_back(Image2D::CreateZeroImagePtr(width, channelCount));
+				result._imaginaryImages.emplace_back(Image2D::CreateZeroImagePtr(width, channelCount));
 			}
 			if(ReadFlags()) {
 				// The flags should be initialized to true, as a baseline might
 				// miss some time scans that other baselines do have, and these
 				// should be flagged.
-				_results[i]._flags.push_back(Mask2D::CreateSetMaskPtr<true>(width, channelCount));
+				result._flags.emplace_back(Mask2D::CreateSetMaskPtr<true>(width, channelCount));
 			}
 		}
-		_results[i]._uvw.resize(width);
+		result._uvw.resize(width);
 	}
 
 	casacore::Table &table = *Table();
 
-	casacore::ROScalarColumn<double> timeColumn(table, "TIME");
-	casacore::ROArrayColumn<float> weightColumn(table, "WEIGHT");
-	casacore::ROArrayColumn<double> uvwColumn(table, "UVW");
-	casacore::ROArrayColumn<bool> flagColumn(table, "FLAG");
-	std::unique_ptr<casacore::ROArrayColumn<casacore::Complex>> modelColumn, dataColumn;
+	casacore::ScalarColumn<double> timeColumn(table, "TIME");
+	casacore::ArrayColumn<float> weightColumn(table, "WEIGHT");
+	casacore::ArrayColumn<double> uvwColumn(table, "UVW");
+	casacore::ArrayColumn<bool> flagColumn(table, "FLAG");
+	std::unique_ptr<casacore::ArrayColumn<casacore::Complex>> modelColumn, dataColumn;
 	
 	if(ReadData())
-		dataColumn.reset( new casacore::ROArrayColumn<casacore::Complex>(table, DataColumnName()) );
+		dataColumn.reset( new casacore::ArrayColumn<casacore::Complex>(table, DataColumnName()) );
 
 	if(SubtractModel())
-		modelColumn.reset( new casacore::ROArrayColumn<casacore::Complex>(table, "MODEL_DATA") );
+		modelColumn.reset( new casacore::ArrayColumn<casacore::Complex>(table, "MODEL_DATA") );
 
-	for(std::vector<std::pair<size_t, size_t> >::const_iterator i=rows.begin();i!=rows.end();++i) {
-		size_t rowIndex = i->first;
-		size_t requestIndex = i->second;
+	for(std::pair<size_t, size_t> p : rows)
+	{
+		size_t rowIndex = p.first;
+		size_t requestIndex = p.second;
 		
 		double time = timeColumn(rowIndex);
 		const ReadRequest &request = _readRequests[requestIndex];
@@ -187,10 +176,12 @@ void DirectBaselineReader::PerformReadRequests()
 			endIndex = request.endIndex,
 			band = request.spectralWindow;
 		bool timeIsSelected = timeIndex>=startIndex && timeIndex<endIndex;
-		if(ReadData() && timeIsSelected) {
-			if(DataKind() == WeightData)
-				readWeights(requestIndex, timeIndex-startIndex, MetaData().FrequencyCount(band), weightColumn(rowIndex));
-			else if(modelColumn == 0)
+		if(ReadData() && timeIsSelected)
+		{
+			//if(BaselineReader::DataKind() == WeightData)
+			//	readWeights(requestIndex, timeIndex-startIndex, MetaData().FrequencyCount(band), weightColumn(rowIndex));
+			//else
+			if(modelColumn == nullptr)
 				readTimeData(requestIndex, timeIndex-startIndex, MetaData().FrequencyCount(band), (*dataColumn)(rowIndex), 0);
 			else {
 				const casacore::Array<casacore::Complex> model = (*modelColumn)(rowIndex); 
@@ -221,7 +212,8 @@ std::vector<UVW> DirectBaselineReader::ReadUVW(unsigned antenna1, unsigned anten
   Stopwatch stopwatch(true);
 	
 	initializeMeta();
-	initBaselineCache();
+	if(_baselineCache.empty())
+		initBaselineCache();
 
 	const std::map<double, size_t> &observationTimes = ObservationTimes(sequenceId);
 
@@ -273,7 +265,8 @@ void DirectBaselineReader::PerformFlagWriteRequests()
 
 	initializeMeta();
 
-	initBaselineCache();
+	if(_baselineCache.empty())
+		initBaselineCache();
 
 	// Each element contains (row number, corresponding request index)
 	std::vector<std::pair<size_t, size_t> > rows;
