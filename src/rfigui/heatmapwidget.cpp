@@ -139,7 +139,8 @@ bool HeatMapWidget::onButtonRelease(GdkEventButton *event)
 		if(_isZooming)
 		{
 			_isZooming = false;
-			_plot->ZoomTo(_bpressStartX, _bpressStartY, _mouseX, _mouseY);
+			if(_bpressStartX != _mouseX || _bpressStartY != _mouseY)
+				_plot->ZoomTo(_bpressStartX, _bpressStartY, _mouseX, _mouseY);
 		}
 		if(_isPanning)
 		{
