@@ -34,7 +34,7 @@ void enlarge(const Data& input, Data& destination, size_t horizontalFactor, size
 		newHeight = destination.TFData().ImageHeight();
 	if(destination.TFData().ImageCount() != imageCount)
 		throw std::runtime_error("Error in enlarge() call: source and image have different number of images");
-	std::cout << "Enlarging " << horizontalFactor << " x " << verticalFactor << " to " << newWidth << " x " << newHeight << '\n';
+	//std::cout << "Enlarging " << horizontalFactor << " x " << verticalFactor << " to " << newWidth << " x " << newHeight << '\n';
 	
 	if(horizontalFactor > 1)
 	{

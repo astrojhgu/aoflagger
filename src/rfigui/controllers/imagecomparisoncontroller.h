@@ -27,6 +27,10 @@ class ImageComparisonController {
 		{
 			_dataList.emplace_back(label, data);
 			size_t v = _dataList.size() - 1;
+			// If the first image is visualized, adding a new last visualization
+			// affects the visualized flags on top of the first image.
+			if(_visualizedImage == 0)
+				updateVisualizedImageAndMask();
 			_visualizationListChange.emit();
 			return v;
 		}
