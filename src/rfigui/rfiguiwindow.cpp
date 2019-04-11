@@ -1977,7 +1977,12 @@ void RFIGuiWindow::onHelpAbout()
 
 void RFIGuiWindow::onExecutePythonStrategy()
 {
-	_controller->ExecutePythonStrategy();
+	try {
+		_controller->ExecutePythonStrategy();
+	}
+	catch(std::exception& e) {
+		showError(e.what());
+	}
 }
 
 void RFIGuiWindow::SetBaselineInfo(bool multipleBaselines, const std::string& name, const std::string& description)
