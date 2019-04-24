@@ -111,9 +111,9 @@ void MemoryBaselineReader::readSet()
 	casacore::Array<casacore::Complex> dataArray;
 	casacore::Array<bool> flagArray;
 	
-	MSSelection msSelection(*Table(), intStart, intEnd, ObservationTimesPerSequence());
+	MSSelection msSelection(*Table(), ObservationTimesPerSequence());
 	msSelection.Process(
-		[&](size_t rowIndex, size_t sequenceId, size_t timeIndex, size_t timeIndexInSequence)
+		[&](size_t rowIndex, size_t sequenceId, size_t timeIndexInSequence)
 	{
 		size_t ant1 = ant1Column(rowIndex);
 		size_t ant2 = ant2Column(rowIndex);
@@ -253,9 +253,9 @@ void MemoryBaselineReader::writeFlags()
 		intStart = IntervalStart(),
 		intEnd = IntervalEnd();
 		
-	MSSelection msSelection(*Table(), intStart, intEnd, ObservationTimesPerSequence());
+	MSSelection msSelection(*Table(), ObservationTimesPerSequence());
 	msSelection.Process(
-		[&](size_t rowIndex, size_t sequenceId, size_t timeIndex, size_t timeIndexInSequence)
+		[&](size_t rowIndex, size_t sequenceId, size_t timeIndexInSequence)
 	{
 		size_t ant1 = ant1Column(rowIndex);
 		size_t ant2 = ant2Column(rowIndex);

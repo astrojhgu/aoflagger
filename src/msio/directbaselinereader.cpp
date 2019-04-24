@@ -33,17 +33,13 @@ void DirectBaselineReader::initBaselineCache()
 	std::vector<size_t> dataIdToSpw;
 	MetaData().GetDataDescToBandVector(dataIdToSpw);
 	
-	size_t
-		intStart = IntervalStart(),
-		intEnd = IntervalEnd();
-		
 	casacore::ScalarColumn<int> antenna1Column(*Table(), "ANTENNA1"); 
 	casacore::ScalarColumn<int> antenna2Column(*Table(), "ANTENNA2");
 	casacore::ScalarColumn<int> dataDescIdColumn(*Table(), "DATA_DESC_ID");
 	
-	MSSelection msSelection(*Table(), intStart, intEnd, ObservationTimesPerSequence());
+	MSSelection msSelection(*Table(), ObservationTimesPerSequence());
 	msSelection.Process(
-		[&](size_t rowIndex, size_t sequenceId, size_t /*timeIndex*/, size_t /*timeIndexInSequence*/)
+		[&](size_t rowIndex, size_t sequenceId, size_t /*timeIndexInSequence*/)
 	{
 		int
 			antenna1 = antenna1Column(rowIndex),

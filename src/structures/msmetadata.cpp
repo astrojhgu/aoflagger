@@ -167,8 +167,7 @@ void MSMetaData::initializeMainTableData()
 		std::set<Sequence> sequenceSet;
 		size_t
 			prevFieldId = size_t(-1),
-			sequenceId = size_t(-1),
-			timeIndex = size_t(-1);
+			sequenceId = size_t(-1);
 		for(size_t row=0; row!=ms.nrow(); ++row)
 		{
 			size_t
@@ -179,40 +178,43 @@ void MSMetaData::initializeMainTableData()
 			double cur_time = timeCol(row);
 			
 			bool isNewTime = cur_time != time;
+			if(fieldId != prevFieldId)
+			{
+				prevFieldId = fieldId;
+				sequenceId++;
+				_observationTimesPerSequence.emplace_back();
+			}
 			if(isNewTime)
 			{
-				++timeIndex;
 				time = cur_time;
+				_observationTimesPerSequence[sequenceId].insert(cur_time);
 			}
-			bool selected = true;
-			if(_intervalStart)
-				selected = timeIndex >= _intervalStart.value();
-			if(_intervalEnd)
-			{
-				if(timeIndex >= _intervalEnd.value())
-					break;
-			}
-			if(selected)
-			{
-				if(fieldId != prevFieldId)
-				{
-					prevFieldId = fieldId;
-					sequenceId++;
-					_observationTimesPerSequence.emplace_back();
-				}
-				if(isNewTime)
-				{
-					_observationTimesPerSequence[sequenceId].insert(cur_time);
-					_observationTimes.insert(_observationTimes.end(), cur_time);
-				}
-				
-				baselineSet.insert(std::pair<size_t, size_t>(a1, a2));
-				sequenceSet.insert(Sequence(a1, a2, spw, sequenceId, fieldId));
-			}
+			
+			baselineSet.insert(std::pair<size_t, size_t>(a1, a2));
+			sequenceSet.insert(Sequence(a1, a2, spw, sequenceId, fieldId));
 		}
 		
 		_baselines.assign(baselineSet.begin(), baselineSet.end());
 		_sequences.assign(sequenceSet.begin(), sequenceSet.end());
+		
+		if(_intervalEnd)
+		{
+			for(std::set<double>& seq : _observationTimesPerSequence)
+			{
+				if(seq.size() > _intervalEnd.get())
+					seq.erase(std::next(seq.begin(), _intervalEnd.get()), seq.end());
+			}
+		}
+		if(_intervalStart)
+		{
+			for(std::set<double>& seq : _observationTimesPerSequence)
+			{
+				if(seq.size() > _intervalStart.get())
+					seq.erase(seq.begin(), std::next(seq.begin(), _intervalStart.get()));
+				else
+					seq.clear();
+			}
+		}
 		_isMainTableDataInitialized = true;
 	}
 }

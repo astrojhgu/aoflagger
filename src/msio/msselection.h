@@ -6,6 +6,7 @@
 
 #include <casacore/ms/MeasurementSets/MeasurementSet.h>
 
+#include <limits>
 #include <map>
 #include <vector>
 
@@ -13,15 +14,12 @@ class MSSelection
 {
 public:
 	MSSelection(casacore::MeasurementSet& ms,
-		size_t intervalStart,
-		size_t intervalEnd,
 		const std::vector<std::map<double, size_t>>& observationTimes
 	) :
-		_intervalStart(intervalStart),
-		_intervalEnd(intervalEnd),
 		_observationTimes(observationTimes),
 		_ms(ms)
-	{ }
+	{ 
+	}
 	
 	template<typename Function>
 	void Process(Function function)
@@ -33,8 +31,7 @@ public:
 		size_t
 			prevFieldId = size_t(-1),
 			sequenceId = size_t(-1),
-			timeIndexInSequence = size_t(-1),
-			timeIndex = size_t(-1);
+			timeIndexInSequence = size_t(-1);
 	
 		for(size_t rowIndex = 0; rowIndex != _ms.nrow(); ++rowIndex)
 		{
@@ -51,19 +48,21 @@ public:
 			{
 				const std::map<double, size_t>
 					&observationTimes = _observationTimes[sequenceId];
-				prevTime = newTime;
-				timeIndexInSequence = observationTimes.find(time)->second;
+				prevTime = time;
+				auto elem = observationTimes.find(time);
+				if(elem == observationTimes.end())
+					timeIndexInSequence = std::numeric_limits<size_t>::max();
+				else
+					timeIndexInSequence = elem->second;
 			}
-			if(timeIndexInSequence >= _intervalStart && timeIndexInSequence < _intervalEnd)
+			if(timeIndexInSequence != std::numeric_limits<size_t>::max())
 			{
-				function(rowIndex, sequenceId, timeIndex, timeIndexInSequence);
+				function(rowIndex, sequenceId, timeIndexInSequence);
 			}
 		}
 	}
 	
 private:
-	size_t _intervalStart, _intervalEnd;
-	
 	std::vector<std::map<double, size_t>> _observationTimes;
 	
 	casacore::MeasurementSet& _ms;

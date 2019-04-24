@@ -45,7 +45,7 @@ void BaselineReader::initObservationTimes()
 			unsigned index = 0;
 			for(double t : times)
 			{
-				_observationTimes[sequenceId].insert(std::pair<double,size_t>(t, index));
+				_observationTimes[sequenceId].emplace(t, index);
 				_observationTimesVector.push_back(t);
 				++index;
 			}

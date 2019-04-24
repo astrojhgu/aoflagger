@@ -254,13 +254,13 @@ void IndirectBaselineReader::reorderFull()
 		intEnd = IntervalEnd();
 	unsigned progress = 0, prevProgress = unsigned(-1);
 	
-	MSSelection msSelection(*Table(), intStart, intEnd, ObservationTimesPerSequence());
+	MSSelection msSelection(*Table(), ObservationTimesPerSequence());
 	
 	msSelection.Process(
-		[&](size_t rowIndex, size_t sequenceId, size_t timeIndex, size_t timeIndexInSequence)
+		[&](size_t rowIndex, size_t sequenceId, size_t timeIndexInSequence)
 	{
-		progress = (timeIndex - intStart)*100/(intEnd - intStart);
-		if(progress != prevProgress)
+		progress = timeIndexInSequence*100/(intEnd - intStart);
+		if(progress > prevProgress)
 		{
 			if(progress/10 != prevProgress/10)
 				Logger::Debug << "\nReorder progress: ";
@@ -465,13 +465,10 @@ void IndirectBaselineReader::updateOriginalMS()
 
 	std::vector<size_t> updatedFilePos = _filePositions;
 	std::vector<size_t> timePositions(updatedFilePos.size(), size_t(-1));
-	size_t
-		intStart = IntervalStart(),
-		intEnd = IntervalEnd();
 		
-	MSSelection msSelection(*Table(), intStart, intEnd, ObservationTimesPerSequence());
+	MSSelection msSelection(*Table(), ObservationTimesPerSequence());
 	msSelection.Process(
-		[&](size_t rowIndex, size_t sequenceId, size_t timeIndex, size_t timeIndexInSequence)
+		[&](size_t rowIndex, size_t sequenceId, size_t timeIndexInSequence)
 	{
 		size_t
 			antenna1 = antenna1Column(rowIndex),
