@@ -72,8 +72,8 @@ void MemoryBaselineReader::readSet()
 		intStart = IntervalStart(),
 		intEnd = IntervalEnd();
 	
-	std::vector<size_t> dataIdToSpw;
-	MetaData().GetDataDescToBandVector(dataIdToSpw);
+	std::vector<size_t> dataDescIdToSpw;
+	MetaData().GetDataDescToBandVector(dataDescIdToSpw);
 	
 	std::vector<BandInfo> bandInfos(bandCount);
 	for(size_t b=0; b!=bandCount; ++b)
@@ -117,10 +117,9 @@ void MemoryBaselineReader::readSet()
 	{
 		size_t ant1 = ant1Column(rowIndex);
 		size_t ant2 = ant2Column(rowIndex);
-		size_t spw = dataIdToSpw[dataDescIdColumn(rowIndex)];
+		size_t spw = dataDescIdToSpw[dataDescIdColumn(rowIndex)];
 		size_t spwFieldIndex = spw + sequenceId * bandCount;
 		if(ant1 > ant2) std::swap(ant1, ant2);
-		
 		std::unique_ptr<Result>& result = baselineCube[spwFieldIndex][ant1][ant2];
 		if(result == nullptr)
 		{
@@ -185,7 +184,7 @@ void MemoryBaselineReader::readSet()
 		}
 	});
 	
-	// Store elements in matrix in the baseline map.
+	// Move elements from matrix into the baseline map.
 	for(size_t s=0; s!=sequenceCount; ++s)
 	{
 		for(size_t b=0; b!=bandCount; ++b)

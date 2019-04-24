@@ -40,28 +40,22 @@ public:
 		{
 			double time = timeColumn(rowIndex);
 			bool newTime = time != prevTime;
+			size_t fieldId = fieldIdColumn(rowIndex);
+			if(fieldId != prevFieldId)
+			{
+				prevFieldId = fieldId;
+				sequenceId++;
+				newTime = true;
+			}
 			if(newTime)
 			{
-				prevTime = time;
-				++timeIndex;
-			}
-			if(timeIndex >= _intervalEnd)
-				break;
-			if(timeIndex >= _intervalStart)
-			{
-				size_t fieldId = fieldIdColumn(rowIndex);
-				if(fieldId != prevFieldId)
-				{
-					prevFieldId = fieldId;
-					sequenceId++;
-					newTime = true;
-				}
 				const std::map<double, size_t>
 					&observationTimes = _observationTimes[sequenceId];
-				if(newTime)
-				{
-					timeIndexInSequence = observationTimes.find(time)->second;
-				}
+				prevTime = newTime;
+				timeIndexInSequence = observationTimes.find(time)->second;
+			}
+			if(timeIndexInSequence >= _intervalStart && timeIndexInSequence < _intervalEnd)
+			{
 				function(rowIndex, sequenceId, timeIndex, timeIndexInSequence);
 			}
 		}

@@ -57,7 +57,7 @@ namespace rfiStrategy {
 				const MSMetaData::Sequence& s = sequences[sequenceIndex];
 				Sequence js(s.antenna1, s.antenna2, 0, s.sequenceId, s.fieldId);
 				// TODO Central frequency instead of spw id is a better idea
-				_joinedSequences[js].push_back(std::make_pair(s.spw, sequenceIndex));
+				_joinedSequences[js].emplace_back(s.spw, sequenceIndex);
 			}
 			for(auto& js : _joinedSequences)
 				std::sort(js.second.begin(), js.second.end());
