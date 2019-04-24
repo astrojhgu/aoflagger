@@ -249,10 +249,6 @@ void MemoryBaselineReader::writeFlags()
 		
 	Logger::Debug << "Flags have changed, writing them back to the set...\n";
 	
-	size_t
-		intStart = IntervalStart(),
-		intEnd = IntervalEnd();
-		
 	MSSelection msSelection(*Table(), ObservationTimesPerSequence());
 	msSelection.Process(
 		[&](size_t rowIndex, size_t sequenceId, size_t timeIndexInSequence)
