@@ -234,8 +234,7 @@ void MemoryBaselineReader::PerformFlagWriteRequests()
 
 void MemoryBaselineReader::writeFlags()
 {
-	casacore::MeasurementSet ms(OpenMS());
-	ms.reopenRW();
+	casacore::MeasurementSet ms(OpenMS(true));
 	
 	ScalarColumn<int>
 		ant1Column(ms, casacore::MeasurementSet::columnName(MSMainEnums::ANTENNA1)),

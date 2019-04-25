@@ -40,9 +40,12 @@ public:
 		return _polarizations;
 	}
 
-	class casacore::MeasurementSet OpenMS() const
+	class casacore::MeasurementSet OpenMS(bool writeAccess = false) const
 	{
-		return casacore::MeasurementSet(_msMetaData.Path());
+		if(writeAccess)
+			return casacore::MeasurementSet(_msMetaData.Path(), casacore::TableLock::PermanentLockingWait, casacore::Table::Update);
+		else
+			return casacore::MeasurementSet(_msMetaData.Path(), casacore::TableLock::PermanentLockingWait);
 	}
 
 	MSMetaData& MetaData() { return _msMetaData; }
