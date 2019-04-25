@@ -51,7 +51,7 @@ void MemoryBaselineReader::readSet()
 	
 	initializeMeta();
 
-	casacore::Table& table = *Table();
+	casacore::MeasurementSet table(OpenMS());
 	
 	ScalarColumn<int>
 		ant1Column(table, casacore::MeasurementSet::columnName(MSMainEnums::ANTENNA1)),
@@ -111,7 +111,8 @@ void MemoryBaselineReader::readSet()
 	casacore::Array<casacore::Complex> dataArray;
 	casacore::Array<bool> flagArray;
 	
-	MSSelection msSelection(*Table(), ObservationTimesPerSequence());
+	casacore::MeasurementSet ms(OpenMS());
+	MSSelection msSelection(ms, ObservationTimesPerSequence());
 	msSelection.Process(
 		[&](size_t rowIndex, size_t sequenceId, size_t timeIndexInSequence)
 	{
@@ -233,15 +234,15 @@ void MemoryBaselineReader::PerformFlagWriteRequests()
 
 void MemoryBaselineReader::writeFlags()
 {
-	casacore::Table &table = *Table();
-	table.reopenRW();
+	casacore::MeasurementSet ms(OpenMS());
+	ms.reopenRW();
 	
 	ScalarColumn<int>
-		ant1Column(table, casacore::MeasurementSet::columnName(MSMainEnums::ANTENNA1)),
-		ant2Column(table, casacore::MeasurementSet::columnName(MSMainEnums::ANTENNA2)),
-		dataDescIdColumn(table, casacore::MeasurementSet::columnName(MSMainEnums::DATA_DESC_ID));
+		ant1Column(ms, casacore::MeasurementSet::columnName(MSMainEnums::ANTENNA1)),
+		ant2Column(ms, casacore::MeasurementSet::columnName(MSMainEnums::ANTENNA2)),
+		dataDescIdColumn(ms, casacore::MeasurementSet::columnName(MSMainEnums::DATA_DESC_ID));
 	ArrayColumn<bool>
-		flagColumn(table, casacore::MeasurementSet::columnName(MSMainEnums::FLAG));
+		flagColumn(ms, casacore::MeasurementSet::columnName(MSMainEnums::FLAG));
 	std::vector<size_t> dataIdToSpw;
 	MetaData().GetDataDescToBandVector(dataIdToSpw);
 	
@@ -249,7 +250,7 @@ void MemoryBaselineReader::writeFlags()
 		
 	Logger::Debug << "Flags have changed, writing them back to the set...\n";
 	
-	MSSelection msSelection(*Table(), ObservationTimesPerSequence());
+	MSSelection msSelection(ms, ObservationTimesPerSequence());
 	msSelection.Process(
 		[&](size_t rowIndex, size_t sequenceId, size_t timeIndexInSequence)
 	{

@@ -19,14 +19,12 @@
 
 BaselineReader::BaselineReader(const std::string &msFile) :
 	_msMetaData(msFile),
-	_table(),
 	_dataColumnName("DATA"),
 	_subtractModel(false),
 	_readData(true),
 	_readFlags(true),
 	_polarizations()
 {
-	_table.reset(new casacore::MeasurementSet(_msMetaData.Path()));
 }
 
 BaselineReader::~BaselineReader()

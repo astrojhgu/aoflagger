@@ -210,15 +210,15 @@ void IndirectBaselineReader::reorderFull()
 {
 	Stopwatch watch(true);
 	
-	casacore::Table& table = *Table();
+	casacore::MeasurementSet ms = OpenMS();
 
-	casacore::ArrayColumn<bool> flagColumn(table, "FLAG");
-	casacore::ScalarColumn<int> dataDescIdColumn(table, "DATA_DESC_ID"); 
-	casacore::ScalarColumn<int> antenna1Column(table, "ANTENNA1"); 
-	casacore::ScalarColumn<int> antenna2Column(table, "ANTENNA2");
-	casacore::ArrayColumn<casacore::Complex> dataColumn(table, DataColumnName() );
+	casacore::ArrayColumn<bool> flagColumn(ms, "FLAG");
+	casacore::ScalarColumn<int> dataDescIdColumn(ms, "DATA_DESC_ID"); 
+	casacore::ScalarColumn<int> antenna1Column(ms, "ANTENNA1"); 
+	casacore::ScalarColumn<int> antenna2Column(ms, "ANTENNA2");
+	casacore::ArrayColumn<casacore::Complex> dataColumn(ms, DataColumnName() );
 
-	if(table.nrow() == 0)
+	if(ms.nrow() == 0)
 		throw std::runtime_error("Measurement set is empty (zero rows)");
 
 
@@ -254,7 +254,7 @@ void IndirectBaselineReader::reorderFull()
 		intEnd = IntervalEnd();
 	unsigned progress = 0, prevProgress = unsigned(-1);
 	
-	MSSelection msSelection(*Table(), ObservationTimesPerSequence());
+	MSSelection msSelection(ms, ObservationTimesPerSequence());
 	
 	msSelection.Process(
 		[&](size_t rowIndex, size_t sequenceId, size_t timeIndexInSequence)
@@ -427,19 +427,19 @@ void IndirectBaselineReader::performFlagWriteTask(std::vector<Mask2DCPtr> flags,
 template<bool UpdateData, bool UpdateFlags>
 void IndirectBaselineReader::updateOriginalMS()
 {
-	casacore::Table &table = *Table();
+	casacore::MeasurementSet ms = OpenMS();
 	if(UpdateData || UpdateFlags)
 	{
-		table.reopenRW();
+		ms.reopenRW();
 	}
 
-	casacore::ROScalarColumn<double> timeColumn(*Table(), "TIME");
-	casacore::ROScalarColumn<int> antenna1Column(table, "ANTENNA1"); 
-	casacore::ROScalarColumn<int> antenna2Column(table, "ANTENNA2");
-	casacore::ROScalarColumn<int> fieldIdColumn(table, "FIELD_ID");
-	casacore::ROScalarColumn<int> dataDescIdColumn(table, "DATA_DESC_ID");
-	casacore::ArrayColumn<bool> flagColumn(table, "FLAG");
-	casacore::ArrayColumn<casacore::Complex> dataColumn(table, DataColumnName());
+	casacore::ScalarColumn<double> timeColumn(ms, "TIME");
+	casacore::ScalarColumn<int> antenna1Column(ms, "ANTENNA1"); 
+	casacore::ScalarColumn<int> antenna2Column(ms, "ANTENNA2");
+	casacore::ScalarColumn<int> fieldIdColumn(ms, "FIELD_ID");
+	casacore::ScalarColumn<int> dataDescIdColumn(ms, "DATA_DESC_ID");
+	casacore::ArrayColumn<bool> flagColumn(ms, "FLAG");
+	casacore::ArrayColumn<casacore::Complex> dataColumn(ms, DataColumnName());
 
 	std::vector<MSMetaData::Sequence> sequences = MetaData().GetSequences();
 	std::vector<size_t> dataIdToSpw;
@@ -466,7 +466,7 @@ void IndirectBaselineReader::updateOriginalMS()
 	std::vector<size_t> updatedFilePos = _filePositions;
 	std::vector<size_t> timePositions(updatedFilePos.size(), size_t(-1));
 		
-	MSSelection msSelection(*Table(), ObservationTimesPerSequence());
+	MSSelection msSelection(ms, ObservationTimesPerSequence());
 	msSelection.Process(
 		[&](size_t rowIndex, size_t sequenceId, size_t timeIndexInSequence)
 	{

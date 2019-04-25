@@ -16,7 +16,9 @@
 #include <set>
 #include <stdexcept>
 
-DirectBaselineReader::DirectBaselineReader(const std::string &msFile) : BaselineReader(msFile)
+DirectBaselineReader::DirectBaselineReader(const std::string &msFile) :
+	BaselineReader(msFile),
+	_ms(OpenMS())
 {
 }
 
@@ -33,11 +35,11 @@ void DirectBaselineReader::initBaselineCache()
 	std::vector<size_t> dataIdToSpw;
 	MetaData().GetDataDescToBandVector(dataIdToSpw);
 	
-	casacore::ScalarColumn<int> antenna1Column(*Table(), "ANTENNA1"); 
-	casacore::ScalarColumn<int> antenna2Column(*Table(), "ANTENNA2");
-	casacore::ScalarColumn<int> dataDescIdColumn(*Table(), "DATA_DESC_ID");
+	casacore::ScalarColumn<int> antenna1Column(_ms, "ANTENNA1"); 
+	casacore::ScalarColumn<int> antenna2Column(_ms, "ANTENNA2");
+	casacore::ScalarColumn<int> dataDescIdColumn(_ms, "DATA_DESC_ID");
 	
-	MSSelection msSelection(*Table(), ObservationTimesPerSequence());
+	MSSelection msSelection(_ms, ObservationTimesPerSequence());
 	msSelection.Process(
 		[&](size_t rowIndex, size_t sequenceId, size_t /*timeIndexInSequence*/)
 	{
@@ -145,19 +147,17 @@ void DirectBaselineReader::PerformReadRequests()
 		result._uvw.resize(width);
 	}
 
-	casacore::Table &table = *Table();
-
-	casacore::ScalarColumn<double> timeColumn(table, "TIME");
-	casacore::ArrayColumn<float> weightColumn(table, "WEIGHT");
-	casacore::ArrayColumn<double> uvwColumn(table, "UVW");
-	casacore::ArrayColumn<bool> flagColumn(table, "FLAG");
+	casacore::ScalarColumn<double> timeColumn(_ms, "TIME");
+	casacore::ArrayColumn<float> weightColumn(_ms, "WEIGHT");
+	casacore::ArrayColumn<double> uvwColumn(_ms, "UVW");
+	casacore::ArrayColumn<bool> flagColumn(_ms, "FLAG");
 	std::unique_ptr<casacore::ArrayColumn<casacore::Complex>> modelColumn, dataColumn;
 	
 	if(ReadData())
-		dataColumn.reset( new casacore::ArrayColumn<casacore::Complex>(table, DataColumnName()) );
+		dataColumn.reset( new casacore::ArrayColumn<casacore::Complex>(_ms, DataColumnName()) );
 
 	if(SubtractModel())
-		modelColumn.reset( new casacore::ArrayColumn<casacore::Complex>(table, "MODEL_DATA") );
+		modelColumn.reset( new casacore::ArrayColumn<casacore::Complex>(_ms, "MODEL_DATA") );
 
 	for(std::pair<size_t, size_t> p : rows)
 	{
@@ -227,9 +227,8 @@ std::vector<UVW> DirectBaselineReader::ReadUVW(unsigned antenna1, unsigned anten
 	
 	size_t width = observationTimes.size();
 
-	casacore::Table &table = *Table();
-	casacore::ROScalarColumn<double> timeColumn(table, "TIME");
-	casacore::ROArrayColumn<double> uvwColumn(table, "UVW");
+	casacore::ScalarColumn<double> timeColumn(_ms, "TIME");
+	casacore::ArrayColumn<double> uvwColumn(_ms, "UVW");
 	
 	std::vector<UVW> uvws;
 	uvws.resize(width);
@@ -271,9 +270,9 @@ void DirectBaselineReader::PerformFlagWriteRequests()
 		addRequestRows(_writeRequests[i], i, rows);
 	std::sort(rows.begin(), rows.end());
 
-	Table()->reopenRW();
-	casacore::ROScalarColumn<double> timeColumn(*Table(), "TIME");
-	casacore::ArrayColumn<bool> flagColumn(*Table(), "FLAG");
+	_ms.reopenRW();
+	casacore::ScalarColumn<double> timeColumn(_ms, "TIME");
+	casacore::ArrayColumn<bool> flagColumn(_ms, "FLAG");
 
 	for(std::vector<FlagWriteRequest>::iterator i=_writeRequests.begin();i!=_writeRequests.end();++i)
 	{
@@ -388,7 +387,7 @@ void DirectBaselineReader::readWeights(size_t requestIndex, size_t xOffset, int 
 void DirectBaselineReader::ShowStatistics()
 {
 	try {
-		casacore::ROTiledStManAccessor accessor(*Table(), "LofarStMan");
+		casacore::ROTiledStManAccessor accessor(_ms, "LofarStMan");
 		std::stringstream s;
 		accessor.showCacheStatistics(s);
 		Logger::Debug << s.str();

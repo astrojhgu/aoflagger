@@ -40,7 +40,10 @@ public:
 		return _polarizations;
 	}
 
-	class casacore::MeasurementSet* Table() const { return _table.get(); }
+	class casacore::MeasurementSet OpenMS() const
+	{
+		return casacore::MeasurementSet(_msMetaData.Path());
+	}
 
 	MSMetaData& MetaData() { return _msMetaData; }
 
@@ -206,7 +209,6 @@ private:
 	}
 
 	MSMetaData _msMetaData;
-	std::unique_ptr<class casacore::MeasurementSet> _table;
 	
 	std::string _dataColumnName;
 	bool _subtractModel;

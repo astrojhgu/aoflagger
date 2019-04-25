@@ -81,6 +81,7 @@ private:
 	void readWeights(size_t requestIndex, size_t xOffset, int frequencyCount, const casacore::Array<float> weight);
 
 	std::map<BaselineCacheIndex, BaselineCacheValue> _baselineCache;
+	casacore::MeasurementSet _ms;
 };
 
 #endif // DIRECTBASELINEREADER_H
