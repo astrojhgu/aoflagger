@@ -26,8 +26,8 @@ class SpatialTimeLoader
 		
 	private:
 		MSMetaData &_msMetaData;
-		casacore::Table *_sortedTable;
-		casacore::TableIterator *_tableIter;
+		std::unique_ptr<casacore::Table> _sortedTable;
+		std::unique_ptr<casacore::TableIterator> _tableIter;
 		unsigned _channelCount;
 		unsigned _timestepsCount;
 		unsigned _antennaCount;
