@@ -72,7 +72,16 @@ RFIGuiWindow::RFIGuiWindow(RFIGuiController* controller) :
 	_menu->SetOriginalFlagsActive(_controller->AreOriginalFlagsShown());
 	_menu->SetAlternativeFlagsActive(_controller->AreAlternativeFlagsShown());
 	
+	// File
+	_menu->OnActionDirectoryOpen.connect([&]() { onActionDirectoryOpen(); });
+	_menu->OnActionFileOpen.connect([&]() { onActionFileOpen(); });
+	_menu->OnActionDirectoryOpenForSpatial.connect([&]() { onActionDirectoryOpenForSpatial(); });
+	_menu->OnActionDirectoryOpenForST.connect([&]() { onActionDirectoryOpenForST(); });
+	_menu->OnSaveBaseline.connect([&]() { onSaveBaseline(); });
 	_menu->OnQuit.connect([&]() { onQuit(); });
+	
+	// Other toolbar items
+	
 	
 	_mainVBox.pack_start(_menu->Menu(), Gtk::PACK_SHRINK);
 	_mainVBox.pack_start(_menu->Toolbar(), Gtk::PACK_SHRINK);

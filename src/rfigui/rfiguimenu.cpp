@@ -17,36 +17,19 @@ RFIGuiMenu::RFIGuiMenu() : _blockVisualizationSignals(false)
 	
 	makeFileMenu();
 	makeViewMenu();
-	/*
 	makePlotMenu();
+	/*
 	makeBrowseMenu();
 	makeSimulateMenu();
 	makeDataMenu();
 	makeActionsMenu();
 	makeHelpMenu();
-	makeToolbarActions();
 	*/
+	makeToolbarActions();
 		
 	Glib::ustring ui_info =
     "<ui>"
     "  <menubar name='MenuBar'>"
-	  "    <menu action='MenuView'>"
-    "      <menuitem action='ImageProperties'/>"
-    "      <menuitem action='TimeGraph'/>"
-    "      <separator/>"
-    "      <menuitem action='OriginalFlags'/>"
-    "      <menuitem action='AlternativeFlags'/>"
-    "      <menuitem action='Highlight'/>"
-    "      <separator/>"
-    "      <menuitem action='ZoomFit'/>"
-    "      <menuitem action='ZoomIn'/>"
-    "      <menuitem action='ZoomOut'/>"
-    "      <separator/>"
-    "      <menuitem action='ShowImagePlane'/>"
-    "      <menuitem action='SetAndShowImagePlane'/>"
-    "      <menuitem action='AddToImagePlane'/>"
-    "      <separator/>"
-    "      <menuitem action='ShowStats'/>"
 	  "    </menu>"
 	  "    <menu action='MenuPlot'>"
     "      <menu action='MenuPlotFlagComparison'>"
@@ -222,12 +205,11 @@ RFIGuiMenu::RFIGuiMenu() : _blockVisualizationSignals(false)
 
 void RFIGuiMenu::makeFileMenu()
 {
-	// Gtk::AccelKey("<control>O")
-	addItem(_menuFile, _miFileOpen, OnActionFileOpen, "Open _file", "document-open");
-	
 	// <control>D
 	addItem(_menuFile, _miFileOpenDir, OnActionDirectoryOpen, "Open _directory", "folder");
-	tooltip(_miFileOpenDir, "Open a directory. This action should be used to open a measurement set. For opening files (e.g. sdfits files), select 'Open file' instead.");
+	
+	// Gtk::AccelKey("<control>O")
+	addItem(_menuFile, _miFileOpen, OnActionFileOpen, "Open _file", "document-open");
 	
 	addItem(_menuFile, _miFileOpenSpatial, OnActionDirectoryOpenForSpatial, "Open _directory as spatial");
 	
@@ -272,97 +254,34 @@ void RFIGuiMenu::makeViewMenu()
 	addItem(_menuView, _miViewAddToImagePlane, OnAddToImagePlane, "Add to image");
 	addItem(_menuView, _miViewSep4);
 	
+	// F2
 	addItem(_menuView, _miViewStats, OnShowStats, "Statistics");
-}
-
-/*
-	_timeGraphButton = Gtk::ToggleAction::create("TimeGraph", "Time graph");
-	_timeGraphButton->set_active(false); 
-	_actionGroup->add(_timeGraphButton, RFIGuiMenu::OnTimeGraphButtonPressed);
-	
-  _originalFlagsButton = Gtk::ToggleAction::create("OriginalFlags", "Or flags");
-	_originalFlagsButton->set_icon_name("showoriginalflags");
-	_originalFlagsButton->set_tooltip("Display the first flag mask on top of the visibilities. These flags are displayed in purple and indicate the flags as they originally were stored in the measurement set.");
-	_toggleConnections.push_back(_originalFlagsButton->signal_activate().connect(RFIGuiMenu::OnToggleFlags)));
-	_actionGroup->add(_originalFlagsButton,
-			Gtk::AccelKey("F3"));
-	
-  _altFlagsButton = Gtk::ToggleAction::create("AlternativeFlags", "Alt flags");
-	_altFlagsButton->set_icon_name("showalternativeflags");
-	_altFlagsButton->set_tooltip("Display the second flag mask on top of the visibilities. These flags are displayed in yellow and indicate flags found by running the strategy.");
-	_toggleConnections.push_back(_altFlagsButton->signal_activate().connect(RFIGuiMenu::OnToggleFlags)));
-	_actionGroup->add(_altFlagsButton,
-			Gtk::AccelKey("F4"));
-	
-	_actionGroup->add( Gtk::Action::create("Highlight", "Highlight"),
-  RFIGuiMenu::OnHightlightPressed);
-	
-	_zoomToFitButton = Gtk::Action::create("ZoomFit", "Zoom _fit");
-	_zoomToFitButton->set_icon_name("zoom-fit-best");
-	_actionGroup->add(_zoomToFitButton, Gtk::AccelKey("<control>0"),
-		RFIGuiMenu::OnZoomFit);
-	_zoomInButton = Gtk::Action::create("ZoomIn", "Zoom in");
-	_zoomInButton->set_icon_name("zoom-in");
-	_actionGroup->add(_zoomInButton, Gtk::AccelKey("<control>equal"),
-		RFIGuiMenu::OnZoomIn);
-	_zoomOutButton = Gtk::Action::create("ZoomOut", "Zoom out");
-	_zoomOutButton->set_icon_name("zoom-out");
-	_actionGroup->add(_zoomOutButton, Gtk::AccelKey("<control>minus"),
-	RFIGuiMenu::OnZoomOut);
-	_actionGroup->add( Gtk::Action::create("ShowImagePlane", "_Show image plane"),
-		Gtk::AccelKey("<control>I"),
-  RFIGuiMenu::OnShowImagePlane);
-	_actionGroup->add( Gtk::Action::create("SetAndShowImagePlane", "S_et & show image plane"),
-		Gtk::AccelKey("<control><shift>I"),
-		RFIGuiMenu::OnSetAndShowImagePlane);
-	_actionGroup->add( Gtk::Action::create("AddToImagePlane", "Add to _image plane"),
-  RFIGuiMenu::OnAddToImagePlane);
-	
-	_actionGroup->add(Gtk::Action::create("ShowStats", "Show _stats"),
-		Gtk::AccelKey("F2"),
-		RFIGuiMenu::OnShowStats);
 }
 
 void RFIGuiMenu::makePlotMenu()
 {
-	_actionGroup->add( Gtk::Action::create("PlotPowerSpectrumComparison", "Power _spectrum"),
-		RFIGuiMenu::OnPlotPowerSpectrumComparisonPressed);
-	_actionGroup->add( Gtk::Action::create("PlotPowerTimeComparison", "Po_wer vs time"),
-  RFIGuiMenu::OnPlotPowerTimeComparisonPressed);
-	_actionGroup->add( Gtk::Action::create("PlotTimeScatterComparison", "Time _scatter"),
-  RFIGuiMenu::OnPlotTimeScatterComparisonPressed);
+	addItem(_menuFlagComparison, _miPlotComparisonPowerSpectrum, OnPlotPowerSpectrumComparisonPressed, "Power _spectrum");
+	addItem(_menuFlagComparison, _miPlotComparisonPowerTime, OnPlotPowerTimeComparisonPressed, "Po_wer vs time");
+	addItem(_menuFlagComparison, _miPlotComparisonTimeScatter, OnPlotTimeScatterComparisonPressed, "Time _scatter");
 	
-	_actionGroup->add( Gtk::Action::create("PlotDist", "Plot _distribution"), RFIGuiMenu::OnPlotDistPressed);
-	_actionGroup->add( Gtk::Action::create("PlotLogLogDist", "Plot _log-log dist"),
-  RFIGuiMenu::OnPlotLogLogDistPressed);
-	_actionGroup->add( Gtk::Action::create("PlotComplexPlane", "Plot _complex plane"),
-		Gtk::AccelKey("<alt>C"),
-		RFIGuiMenu::OnPlotComplexPlanePressed);
-	_actionGroup->add( Gtk::Action::create("PlotMeanSpectrum", "Plot _mean spectrum"),
-		Gtk::AccelKey("<alt>M"),
-		RFIGuiMenu::OnPlotMeanSpectrumPressed);
-	_actionGroup->add( Gtk::Action::create("PlotSumSpectrum", "Plot s_um spectrum"),
-		Gtk::AccelKey("<alt>U"),
-		RFIGuiMenu::OnPlotSumSpectrumPressed);
-	_actionGroup->add( Gtk::Action::create("PlotPowerSpectrum", "Plot _power spectrum"),
-		Gtk::AccelKey("<alt>W"),
-		RFIGuiMenu::OnPlotPowerSpectrumPressed);
-	_actionGroup->add( Gtk::Action::create("PlotFrequencyScatter", "Plot _frequency scatter"),
-		RFIGuiMenu::OnPlotFrequencyScatterPressed);
+	_miFlagComparison.set_submenu(_menuFlagComparison);
+	addItem(_menuPlot, _miFlagComparison, "Flag comparison");
 	
-	_actionGroup->add( Gtk::Action::create("PlotRMSSpectrum", "Plot _rms spectrum"),
-		Gtk::AccelKey("<alt>R"),
-		RFIGuiMenu::OnPlotPowerRMSPressed);
-	_actionGroup->add( Gtk::Action::create("PlotPowerTime", "Plot power vs _time"),
-		Gtk::AccelKey("<alt>T"),
-		RFIGuiMenu::OnPlotPowerTimePressed);
-	_actionGroup->add( Gtk::Action::create("PlotTimeScatter", "Plot t_ime scatter"),
- 		Gtk::AccelKey("<alt>I"),
-		RFIGuiMenu::OnPlotTimeScatterPressed);
-	_actionGroup->add( Gtk::Action::create("PlotSingularValues", "Plot _singular values"),
-  RFIGuiMenu::OnPlotSingularValuesPressed);
+	addItem(_menuPlot, _miPlotDistribution, OnPlotDistPressed, "Plot _distribution");
+	addItem(_menuPlot, _miPlotLogLogDistribution, OnPlotLogLogDistPressed, "Plot _log-log dist");
+	addItem(_menuPlot, _miPlotComplexPlane, OnPlotComplexPlanePressed, "Plot _complex plane");
+	addItem(_menuPlot, _miPlotMeanSpectrum, OnPlotMeanSpectrumPressed, "Plot _mean spectrum");
+	
+	addItem(_menuPlot, _miPlotSumSpectrum, OnPlotSumSpectrumPressed, "Plot s_um spectrum");
+	addItem(_menuPlot, _miPlotPowerSpectrum, OnPlotPowerSpectrumPressed, "Plot _power spectrum");
+	addItem(_menuPlot, _miPlotFrequencyScatter, OnPlotFrequencyScatterPressed, "Plot _frequency scatter");
+	addItem(_menuPlot, _miPlotRMSSpectrum, OnPlotPowerRMSPressed, "Plot _rms spectrum");
+	
+	addItem(_menuPlot, _miPlotPowerTime, OnPlotPowerTimePressed, "Plot power vs _time");
+	addItem(_menuPlot, _miPlotTimeScatter, OnPlotTimeScatterPressed, "Plot t_ime scatter");
+	addItem(_menuPlot, _miPlotSingularValues, OnPlotSingularValuesPressed, "Plot _singular values");
 }
-
+/*
 void RFIGuiMenu::makeBrowseMenu()
 {
 	_previousButton = Gtk::Action::create("Previous", "Previous");
@@ -620,43 +539,46 @@ void RFIGuiMenu::makeHelpMenu()
 	action->set_icon_name("aoflagger");
 	_actionGroup->add(action, RFIGuiMenu::OnHelpAbout));
 }
+*/
 
 void RFIGuiMenu::makeToolbarActions()
 {
-  _showPPButton = Gtk::ToggleAction::create("DisplayPP", "PP");
-	_showPPButton->set_active(_controller->IsPPShown());
-	_showPPButton->set_icon_name("showpp");
-	_showPPButton->set_tooltip("Display the PP polarization. Depending on the polarization configuration of the measurement set, this will show XX or RR");
-	_toggleConnections.push_back(_showPPButton->signal_activate().connect(RFIGuiMenu::OnTogglePolarizations)));
-	_actionGroup->add(_showPPButton);
+	addTool(_tbOpenDirectory, OnActionDirectoryOpen, "Open", "Open a directory. This action should be used to open a measurement set. For opening files (e.g. sdfits files), select 'Open file' instead.", "folder");
 	
-  _showPQButton = Gtk::ToggleAction::create("DisplayPQ", "PQ");
-	_showPQButton->set_active(_controller->IsPQShown());
-	_showPQButton->set_icon_name("showpq");
-	_showPQButton->set_tooltip("Display the PQ polarization. Depending on the polarization configuration of the measurement set, this will show XY or RL");
-	_toggleConnections.push_back(_showPQButton->signal_activate().connect(RFIGuiMenu::OnTogglePolarizations)));
-	_actionGroup->add(_showPQButton);
+	_toolbar.append(_tbSep1);
 	
-  _showQPButton = Gtk::ToggleAction::create("DisplayQP", "QP");
-	_showQPButton->set_active(_controller->IsQPShown());
-	_showQPButton->set_icon_name("showqp");
-	_showQPButton->set_tooltip("Display the QP polarization. Depending on the polarization configuration of the measurement set, this will show YX or LR");
-	_toggleConnections.push_back(_showQPButton->signal_activate().connect(RFIGuiMenu::OnTogglePolarizations)));
-	_actionGroup->add(_showQPButton);
+	// Gtk::AccelKey("F9")
+	addTool(_tbExecuteStrategy, OnExecuteStrategyPressed, "E_xecute strategy", "Run the currently loaded strategy. Normally this will not write back the results to the opened set. The flagging results are displayed in the plot as yellow ('alternative') flag mask.", "system-run");
+	// F3
+	addTool(_tbOriginalFlags, OnToggleFlags, "Ori flags", "Display the first flag mask on top of the visibilities. These flags are displayed in purple and indicate the flags as they originally were stored in the measurement set.", "showoriginalflags");
+	// F4
+	addTool(_tbAlternativeFlags, OnToggleFlags, "Alt flags", "Display the second flag mask on top of the visibilities. These flags are displayed in yellow and indicate flags found by running the strategy.", "showalternativeflags");
 	
-  _showQQButton = Gtk::ToggleAction::create("DisplayQQ", "QQ");
-	_showQQButton->set_active(_controller->IsQQShown());
-	_showQQButton->set_icon_name("showqq");
-	_showQQButton->set_tooltip("Display the QQ polarization. Depending on the polarization configuration of the measurement set, this will show YY or LL");
-	_toggleConnections.push_back(_showQQButton->signal_activate().connect(RFIGuiMenu::OnTogglePolarizations)));
-	_actionGroup->add(_showQQButton);
+	_toolbar.append(_tbSep2);
 	
-	_selectVisualizationButton.set_label("Change visualization");
-	_selectVisualizationButton.set_tooltip_text("Switch visualization");
-	_selectVisualizationButton.set_arrow_tooltip_text("Select visualization");
-	_selectVisualizationButton.set_icon_name("showoriginalvisibilities");
-	pToolbar->append(_selectVisualizationButton);
-	_selectVisualizationButton.set_menu(_tfVisualizationMenu);
-	_selectVisualizationButton.signal_clicked().connect(RFIGuiMenu::OnToggleImage));
+	// F6
+	addTool(_tbPrevious, OnLoadPrevious, "Previous", "Load and display the previous baseline. Normally, this steps from the baseline between antennas (i) and (j) to (i) and (j-1).", "go-previous");
+	_tbPrevious.set_sensitive(false);
+	// F5
+	addTool(_tbReload, OnReloadPressed, "Reload", "Reload the currently displayed baseline. This will reset the purple flags to the measurement set flags, and clear the yellow flags.", "view-refresh");
+	_tbReload.set_sensitive(false);
+	// F7
+	addTool(_tbNext, OnLoadNext, "Next", "Load and display the next baseline. Normally, this steps from the baseline between antennas (i) and (j) to (i) and (j+1).", "go-next");
+	_tbNext.set_sensitive(false);
+	
+	_toolbar.append(_tbSep3);
+	
+	// <control>0
+	addTool(_tbZoomFit, OnZoomFit, "Fit", "Zoom fit", "zoom-fit-best");
+	addTool(_tbZoomIn, OnZoomIn, "+", "Zoom in", "zoom-in");
+	addTool(_tbZoomOut, OnZoomOut, "-", "Zoom out", "zoom-out");
+	
+	auto sig = [&]() { if(!_blockVisualizationSignals) OnTogglePolarizations(); };
+	addTool(_tbDisplayPP, sig, "PP", "Display the PP polarization. Depending on the polarization configuration of the measurement set, this will show XX or RR", "showpp");
+	addTool(_tbDisplayPQ, sig, "PQ", "Display the PQ polarization. Depending on the polarization configuration of the measurement set, this will show XY or RL", "showpq");
+	addTool(_tbDisplayQP, sig, "QP", "Display the QP polarization. Depending on the polarization configuration of the measurement set, this will show YX or LR", "showqp");
+	addTool(_tbDisplayQQ, sig, "QQ", "Display the QQ polarization. Depending on the polarization configuration of the measurement set, this will show YY or LL", "showqq");
+	addTool(_tbSelectVisualization, OnToggleImage, "Change visualization", "Switch visualization", "showoriginalvisibilities");
+	_tbSelectVisualization.set_menu(_tfVisualizationMenu);
 }
-*/
+

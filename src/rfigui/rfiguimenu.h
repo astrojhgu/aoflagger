@@ -9,6 +9,8 @@
 #include <gtkmm/radiomenuitem.h>
 #include <gtkmm/radiotoolbutton.h>
 #include <gtkmm/separatormenuitem.h>
+#include <gtkmm/separatortoolitem.h>
+#include <gtkmm/checkmenuitem.h>
 #include <gtkmm/toggletoolbutton.h>
 #include <gtkmm/toolbar.h>
 #include <gtkmm/toolbutton.h>
@@ -23,22 +25,24 @@ public:
 	Gtk::MenuBar& Menu() { return _menuBar; }
 	Gtk::Toolbar& Toolbar() { return _toolbar; }
 	
+	// File
+	sigc::signal<void()> OnActionFileOpen;
+	sigc::signal<void()> OnActionDirectoryOpen;
+	sigc::signal<void()> OnActionDirectoryOpenForSpatial;
+	sigc::signal<void()> OnActionDirectoryOpenForST;
+	sigc::signal<void()> OnSaveBaseline;
+	sigc::signal<void()> OnQuit;
+	
+	// View
+	sigc::signal<void()> OnZoomFit;
+	sigc::signal<void()> OnZoomIn;
+	sigc::signal<void()> OnZoomOut;
 	sigc::signal<void()> OnLoadPrevious;
 	sigc::signal<void()> OnLoadNext;
 	sigc::signal<void()> OnToggleFlags;
 	sigc::signal<void()> OnTogglePolarizations;
 	sigc::signal<void()> OnToggleImage;
 	sigc::signal<void()> OnSelectImage;
-	sigc::signal<void()> OnQuit;
-	sigc::signal<void()> OnActionFileOpen;
-	sigc::signal<void()> OnActionDirectoryOpen;
-	sigc::signal<void()> OnActionDirectoryOpenForSpatial;
-	sigc::signal<void()> OnActionDirectoryOpenForST;
-	sigc::signal<void()> OnSaveBaseline;
-	sigc::signal<void()> OnTFZoomChanged;
-	sigc::signal<void()> OnZoomFit;
-	sigc::signal<void()> OnZoomIn;
-	sigc::signal<void()> OnZoomOut;
 	sigc::signal<void()> OnShowImagePlane;
 	sigc::signal<void()> OnSetAndShowImagePlane;
 	sigc::signal<void()> OnAddToImagePlane;
@@ -160,19 +164,24 @@ public:
 		_altFlagsButton.set_active(alternativeFlags);
 	}
 	
-	bool ShowPPActive() const { return _showPPButton.get_active(); }
-	bool ShowPQActive() const { return _showPQButton.get_active(); }
-	bool ShowQPActive() const { return _showQPButton.get_active(); }
-	bool ShowQQActive() const { return _showQQButton.get_active(); }
+	bool ShowPPActive() const { return _tbDisplayPP.get_active(); }
+	bool ShowPQActive() const { return _tbDisplayPQ.get_active(); }
+	bool ShowQPActive() const { return _tbDisplayQP.get_active(); }
+	bool ShowQQActive() const { return _tbDisplayQQ.get_active(); }
 	
-	void SetShowPPActive(bool active) { _showPPButton.set_active(active); }
-	void SetShowPQActive(bool active) { _showPQButton.set_active(active); }
-	void SetShowQPActive(bool active) { _showQPButton.set_active(active); }
-	void SetShowQQActive(bool active) { _showQQButton.set_active(active); }
+	void SetShowPPActive(bool active) { _tbDisplayPP.set_active(active); }
+	void SetShowPQActive(bool active) { _tbDisplayPQ.set_active(active); }
+	void SetShowQPActive(bool active) { _tbDisplayQP.set_active(active); }
+	void SetShowQQActive(bool active) { _tbDisplayQQ.set_active(active); }
+	
+	void SetShowPPSensitive(bool sensitive) { _tbDisplayPP.set_sensitive(sensitive); }
+	void SetShowPQSensitive(bool sensitive) { _tbDisplayPQ.set_sensitive(sensitive); }
+	void SetShowQPSensitive(bool sensitive) { _tbDisplayQP.set_sensitive(sensitive); }
+	void SetShowQQSensitive(bool sensitive) { _tbDisplayQQ.set_sensitive(sensitive); }
 	
 	bool CloseExecuteFrame() const { return _closeExecuteFrameButton.get_active(); }
 	
-	bool TimeGraphActive() const { return _timeGraphButton.get_active(); }
+	bool TimeGraphActive() const { return _miViewTimeGraph.get_active(); }
 	
 	bool SimulateNCPActive() const { return _ncpSetButton.get_active(); }
 	bool SimulateB1834Active() const { return _b1834SetButton.get_active(); }
@@ -181,20 +190,15 @@ public:
 	bool Simulate64ChActive() const { return _sim64ChannelsButton.get_active(); }
 	bool SimFixBandwidthActive() const { return _simFixBandwidthButton.get_active(); }
 	
-	void SetShowPPSensitive(bool sensitive) { _showPPButton.set_sensitive(sensitive); }
-	void SetShowPQSensitive(bool sensitive) { _showPQButton.set_sensitive(sensitive); }
-	void SetShowQPSensitive(bool sensitive) { _showQPButton.set_sensitive(sensitive); }
-	void SetShowQQSensitive(bool sensitive) { _showQQButton.set_sensitive(sensitive); }
+	void SetZoomToFitSensitive(bool sensitive) { _tbZoomFit.set_sensitive(sensitive); }
+	void SetZoomOutSensitive(bool sensitive) { _tbZoomOut.set_sensitive(sensitive); }
+	void SetZoomInSensitive(bool sensitive) { _tbZoomIn.set_sensitive(sensitive); }
 	
-	void SetZoomToFitSensitive(bool sensitive) { _zoomToFitButton.set_sensitive(sensitive); }
-	void SetZoomOutSensitive(bool sensitive) { _zoomOutButton.set_sensitive(sensitive); }
-	void SetZoomInSensitive(bool sensitive) { _zoomInButton.set_sensitive(sensitive); }
+	void SetPreviousSensitive(bool sensitive) { _tbPrevious.set_sensitive(sensitive); }
+	void SetNextSensitive(bool sensitive) { _tbNext.set_sensitive(sensitive); }
+	void SetReloadSensitive(bool sensitive) { _tbReload.set_sensitive(sensitive); }
 	
-	void SetPreviousSensitive(bool sensitive) { _previousButton.set_sensitive(sensitive); }
-	void SetNextSensitive(bool sensitive) { _nextButton.set_sensitive(sensitive); }
-	void SetReloadSensitive(bool sensitive) { _reloadButton.set_sensitive(sensitive); }
-	
-	void SetSelectVisualizationSensitive(bool sensitive) { _selectVisualizationButton.set_sensitive(sensitive); }
+	void SetSelectVisualizationSensitive(bool sensitive) { _tbSelectVisualization.set_sensitive(sensitive); }
 	
 	Gtk::Menu& VisualizationMenu() { return _tfVisualizationMenu; }
 	
@@ -222,10 +226,18 @@ private:
 		menu.append(sep);
 	}
 	
+	void addItem(Gtk::Menu& menu, Gtk::MenuItem& item, const char* label)
+	{
+		item.set_label(label);
+		item.set_use_underline(true);
+		menu.append(item);
+	}
+	
 	template<typename SigType>
 	void addItem(Gtk::Menu& menu, Gtk::MenuItem& item, const SigType& sig, const char* label)
 	{
 		item.set_label(label);
+		item.set_use_underline(true);
 		item.signal_activate().connect(sig);
 		menu.append(item);
 	}
@@ -245,6 +257,16 @@ private:
 		item.item.signal_activate().connect(sig);
 		//item.item.add(item.box);
 		menu.append(item.item);
+	}
+	
+	template<typename SigType>
+	void addTool(Gtk::ToolButton& tool, const SigType& sig, const char* label, const char* tooltip, const char* icon)
+	{
+		tool.set_label(label);
+		tool.set_tooltip_text(tooltip);
+		tool.set_icon_name(icon);
+		tool.signal_clicked().connect(sig);
+		_toolbar.append(tool);
 	}
 	
 	void tooltip(ImgMenuItem& item, const char* tooltipStr) { }
@@ -270,29 +292,40 @@ private:
 		_miSimulate, _miData, _miActions, _miHelp;
 		
 	// File menu
-	ImgMenuItem _miFileOpen, _miFileOpenDir, _miFileQuit;
+	ImgMenuItem _miFileOpenDir, _miFileOpen;
 	Gtk::MenuItem _miFileOpenSpatial, _miFileOpenST, _miFileSaveBaseline;
+	ImgMenuItem _miFileQuit;
 	
 	// View menu
-	Gtk::MenuItem _miViewProperties, _miViewTimeGraph;
+	Gtk::MenuItem _miViewProperties;
+	Gtk::CheckMenuItem _miViewTimeGraph;
 	ImgMenuItem _miViewOriginalFlags, _miViewAlternativeFlags;
 	Gtk::MenuItem _miViewHighlight;
 	Gtk::SeparatorMenuItem _miViewSep1, _miViewSep2, _miViewSep3, _miViewSep4;
 	ImgMenuItem _miViewZoomFit, _miViewZoomIn, _miViewZoomOut;
 	Gtk::MenuItem _miViewImagePlane, _miViewSetImagePlane, _miViewAddToImagePlane;
 	Gtk::MenuItem _miViewStats;
-
-	Glib::RefPtr<Gtk::ActionGroup> _actionGroup;
-	Gtk::ToolButton
-		_previousButton, _reloadButton, _nextButton,
-		_zoomToFitButton, _zoomInButton, _zoomOutButton;
-	Gtk::MenuToolButton _selectVisualizationButton;
+	
+	// Plot menu
+	Gtk::MenuItem _miFlagComparison;
+	Gtk::Menu _menuFlagComparison;
+	Gtk::MenuItem _miPlotComparisonPowerSpectrum, _miPlotComparisonPowerTime, _miPlotComparisonTimeScatter;
+	Gtk::MenuItem _miPlotDistribution, _miPlotLogLogDistribution, _miPlotComplexPlane, _miPlotMeanSpectrum;
+	Gtk::MenuItem _miPlotSumSpectrum, _miPlotPowerSpectrum, _miPlotFrequencyScatter, _miPlotRMSSpectrum, _miPlotPowerTime;
+	Gtk::MenuItem _miPlotTimeScatter, _miPlotSingularValues;
+	
+	// Toolbar
+	Gtk::SeparatorToolItem _tbSep1, _tbSep2, _tbSep3;
+	Gtk::ToolButton _tbOpenDirectory, _tbExecuteStrategy;
+	Gtk::ToggleToolButton _tbOriginalFlags, _tbAlternativeFlags;
+	Gtk::ToolButton _tbPrevious, _tbReload, _tbNext;
+	Gtk::ToolButton _tbZoomFit, _tbZoomIn, _tbZoomOut;
+	Gtk::ToggleToolButton _tbDisplayPP, _tbDisplayPQ, _tbDisplayQP, _tbDisplayQQ;
+	Gtk::MenuToolButton _tbSelectVisualization;
+	
 	Gtk::ToggleToolButton
 		_originalFlagsButton, _altFlagsButton,
-		_showPPButton, _showPQButton,
-		_showQPButton, _showQQButton,
-		_backgroundImageButton, _diffImageButton,
-		_timeGraphButton, _simFixBandwidthButton,
+		_simFixBandwidthButton,
 		_closeExecuteFrameButton;
 	bool _blockVisualizationSignals;
 	Gtk::RadioToolButton
