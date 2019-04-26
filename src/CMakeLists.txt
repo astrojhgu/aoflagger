@@ -90,6 +90,7 @@ set(GUI_FILES
   rfigui/plotframe.cpp
   rfigui/plotwindow.cpp
   rfigui/progresswindow.cpp
+  rfigui/rfiguimenu.cpp
   rfigui/rfiguiwindow.cpp
   rfigui/strategywizardwindow.cpp
   strategy/plots/rfiplots.cpp
