@@ -19,71 +19,9 @@ RFIGuiMenu::RFIGuiMenu() : _blockVisualizationSignals(false)
 	makeBrowseMenu();
 	makeSimulateMenu();
 	makeDataMenu();
-	/*
 	makeActionsMenu();
-	*/
 	makeHelpMenu();
 	makeToolbarActions();
-		
-	Glib::ustring ui_info =
-    "<ui>"
-    "  <menubar name='MenuBar'>"
-	  "    </menu>"
-	  "    <menu action='MenuData'>"
-    "      <menuitem action='VisToOriginal'/>"
-    "      <separator/>"
-    "      <menuitem action='KeepReal'/>"
-    "      <menuitem action='KeepImaginary'/>"
-    "      <menuitem action='KeepPhase'/>"
-    "      <menuitem action='UnrollPhase'/>"
-    "      <separator/>"
-    "      <menuitem action='KeepStokesI'/>"
-    "      <menuitem action='KeepStokesQ'/>"
-    "      <menuitem action='KeepStokesU'/>"
-    "      <menuitem action='KeepStokesV'/>"
-    "      <separator/>"
-    "      <menuitem action='KeepRR'/>"
-    "      <menuitem action='KeepRL'/>"
-    "      <menuitem action='KeepLR'/>"
-    "      <menuitem action='KeepLL'/>"
-    "      <separator/>"
-    "      <menuitem action='KeepXX'/>"
-    "      <menuitem action='KeepXY'/>"
-    "      <menuitem action='KeepYX'/>"
-    "      <menuitem action='KeepYY'/>"
-    "      <separator/>"
-    "      <menuitem action='StoreData'/>"
-    "      <menuitem action='RecallData'/>"
-    "      <menuitem action='SubtractDataFromMem'/>"
-    "      <menuitem action='ClearOriginalFlags'/>"
-    "      <menuitem action='ClearAltFlags'/>"
-	  "    </menu>"
-	  "    <menu action='MenuActions'>"
-    "      <menuitem action='EditStrategy'/>"
-    "      <menuitem action='ExecuteStrategy'/>"
-    "      <menuitem action='CloseExecuteFrame'/>"
-    "      <separator/>"
-    "      <menuitem action='ExecutePythonStrategy'/>"
-    "      <separator/>"
-    "      <menuitem action='Segment'/>"
-    "      <menuitem action='Cluster'/>"
-    "      <menuitem action='Classify'/>"
-    "      <menuitem action='RemoveSmallSegments'/>"
-    "      <menuitem action='InterpolateFlagged'/>"
-    "      <separator/>"
-    "      <menuitem action='VertEVD'/>"
-    "      <menuitem action='ApplyTimeProfile'/>"
-    "      <menuitem action='ApplyVertProfile'/>"
-    "      <menuitem action='RestoreTimeProfile'/>"
-    "      <menuitem action='RestoreVertProfile'/>"
-    "      <menuitem action='ReapplyTimeProfile'/>"
-    "      <menuitem action='ReapplyVertProfile'/>"
-	  "    </menu>"
-	  "    <menu action='MenuHelp'>"
-    "      <menuitem action='About'/>"
-	  "    </menu>"
-    "  </menubar>"
-    "</ui>";
 
 	if(Gtk::IconTheme::get_default()->has_icon("aoflagger"))
 	{
@@ -318,51 +256,34 @@ void RFIGuiMenu::makeDataMenu()
 	addItem(_menuData, _miDataClearAltFlags, OnClearAltFlagsPressed, "Clear alt flags");
 }
 
-/*
 void RFIGuiMenu::makeActionsMenu()
 {
-	_actionGroup->add( Gtk::Action::create("EditStrategy", "_Edit strategy"),
-		Gtk::AccelKey("F8"),
-  RFIGuiMenu::OnEditStrategyPressed);
-	action = Gtk::Action::create("ExecuteStrategy", "E_xecute strategy");
-	action->set_tooltip("Run the currently loaded strategy. Normally this will not write back the results to the opened set. The flagging results are displayed in the plot as yellow ('alternative') flag mask.");
-	action->set_icon_name("system-run");
-	_actionGroup->add(action, Gtk::AccelKey("F9"),
-			RFIGuiMenu::OnExecuteStrategyPressed));
-	_closeExecuteFrameButton = Gtk::ToggleAction::create("CloseExecuteFrame", "Close execute frame");
-	_actionGroup->add(_closeExecuteFrameButton);
-	_closeExecuteFrameButton->set_active(true); 
+	// F8
+	addItem(_menuActions, _miEditStrategy, OnEditStrategyPressed, "_Edit strategy");
+	// F9
+	addItem(_menuActions, _miActionsExecuteStrategy, OnExecuteStrategyPressed, "E_xecute strategy", "system-run");
+	addItem(_menuActions, _miActionsCloseExecuteFrame, "Close execute frame");
+	_miActionsCloseExecuteFrame.set_active(true); 
+	addItem(_menuActions, _miActionsSep1);
 	
-	_actionGroup->add( Gtk::Action::create("ExecutePythonStrategy", "_Execute script"),
-		RFIGuiMenu::OnExecutePythonStrategy);
+	addItem(_menuActions, _miActionsExecutePythonStrategy, OnExecutePythonStrategy, "Execute _script");
+	addItem(_menuActions, _miActionsSep2);
 	
-	_actionGroup->add( Gtk::Action::create("Segment", "Segment"),
-  RFIGuiMenu::OnSegment);
-	_actionGroup->add( Gtk::Action::create("Cluster", "Cluster"),
-  RFIGuiMenu::OnCluster);
-	_actionGroup->add( Gtk::Action::create("Classify", "Classify"),
-  RFIGuiMenu::OnClassify);
-	_actionGroup->add( Gtk::Action::create("RemoveSmallSegments", "Remove small segments"),
-  RFIGuiMenu::OnRemoveSmallSegments);
-	_actionGroup->add( Gtk::Action::create("InterpolateFlagged", "Interpolate flagged"),
-  sigc::mem_fun(_controller, &RFIGuiController::InterpolateFlagged);
-	
-	_actionGroup->add( Gtk::Action::create("VertEVD", "Vert EVD"),
-  RFIGuiMenu::OnVertEVD);
-	_actionGroup->add( Gtk::Action::create("ApplyTimeProfile", "Apply time profile"),
-  RFIGuiMenu::OnApplyTimeProfile);
-	_actionGroup->add( Gtk::Action::create("ApplyVertProfile", "Apply vert profile"),
-  RFIGuiMenu::OnApplyVertProfile);
-	_actionGroup->add( Gtk::Action::create("RestoreTimeProfile", "Restore time profile"),
-  RFIGuiMenu::OnRestoreTimeProfile);
-	_actionGroup->add( Gtk::Action::create("RestoreVertProfile", "Restore vert profile"),
-  RFIGuiMenu::OnRestoreVertProfile);
-	_actionGroup->add( Gtk::Action::create("ReapplyTimeProfile", "Reapply time profile"),
-  RFIGuiMenu::OnReapplyTimeProfile);
-	_actionGroup->add( Gtk::Action::create("ReapplyVertProfile", "Reapply vert profile"),
-  RFIGuiMenu::OnReapplyVertProfile);
+	addItem(_menuActions, _miActionsSegment, OnSegment, "Segment");
+	addItem(_menuActions, _miActionsCluster, OnCluster, "Cluster");
+	addItem(_menuActions, _miActionsClassify, OnClassify, "Classify");
+	addItem(_menuActions, _miActionsRemoveSmallSegments, OnRemoveSmallSegments, "Remove small segments");
+	addItem(_menuActions, _miActionsInterpolateFlagged, OnInterpolateFlagged, "Interpolate flagged");
+	addItem(_menuActions, _miActionsSep3);
+
+	addItem(_menuActions, _miActionsVertEVD, OnReapplyVertProfile, "Vert EVD");
+	addItem(_menuActions, _miActionsApplyTimeProfile, OnApplyTimeProfile, "Apply time profile");
+	addItem(_menuActions, _miActionsApplyVertProfile, OnApplyVertProfile, "Apply vert profile");
+	addItem(_menuActions, _miActionsRestoreTimeProfile, OnRestoreTimeProfile, "Restore time profile");
+	addItem(_menuActions, _miActionsRestoreVertProfile, OnRestoreVertProfile, "Restore vert profile");
+	addItem(_menuActions, _miActionsReapplyTimeProfile, OnReapplyTimeProfile, "Reapply time profile");
+	addItem(_menuActions, _miActionsReapplyVertProfile, OnReapplyVertProfile, "Reapply vert profile");
 }
-*/
 
 void RFIGuiMenu::makeHelpMenu()
 {

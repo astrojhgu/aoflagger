@@ -126,6 +126,7 @@ public:
 	sigc::signal<void()> OnRemoveSmallSegments;
 	sigc::signal<void()> OnTimeGraphButtonPressed;
 	sigc::signal<void()> OnUnrollPhaseButtonPressed;
+	sigc::signal<void()> OnInterpolateFlagged;
 	sigc::signal<void()> OnVertEVD;
 	sigc::signal<void()> OnApplyTimeProfile;
 	sigc::signal<void()> OnApplyVertProfile;
@@ -345,6 +346,7 @@ private:
 	Gtk::MenuItem _miSimSourceSetA, _miSimSourceSetB, _miSimSourceSetC, _miSimSourceSetD;
 	Gtk::MenuItem _miSimSourceOffAxis, _miSimSourceOnAxis;
 	
+	// Data menu
 	Gtk::MenuItem _miDataToOriginal;
 	Gtk::SeparatorMenuItem _miDataSep1, _miDataSep2, _miDataSep3, _miDataSep4, _miDataSep5;
 	Gtk::MenuItem _miDataReal, _miDataImaginary, _miDataPhase, _miDataUnrollPhase;
@@ -353,7 +355,17 @@ private:
 	Gtk::MenuItem _miDataXX, _miDataXY, _miDataYX, _miDataYY;
 	Gtk::MenuItem _miDataStore, _miDataRecall, _miDataSubtract;
 	Gtk::MenuItem _miDataClearOriginalFlags, _miDataClearAltFlags;
-		
+	
+	// Actions menu
+	Gtk::MenuItem _miEditStrategy;
+	Gtk::SeparatorMenuItem _miActionsSep1, _miActionsSep2, _miActionsSep3;
+	ImgMenuItem _miActionsExecuteStrategy;
+	Gtk::CheckMenuItem _miActionsCloseExecuteFrame;
+	Gtk::MenuItem _miActionsExecutePythonStrategy;
+	Gtk::MenuItem _miActionsSegment, _miActionsCluster, _miActionsClassify, _miActionsRemoveSmallSegments, _miActionsInterpolateFlagged;
+	Gtk::MenuItem _miActionsVertEVD, _miActionsApplyTimeProfile, _miActionsApplyVertProfile;
+	Gtk::MenuItem _miActionsRestoreTimeProfile, _miActionsRestoreVertProfile, _miActionsReapplyTimeProfile, _miActionsReapplyVertProfile;
+	
 	// Help menu
 	ImgMenuItem _miHelpAbout;
 	
