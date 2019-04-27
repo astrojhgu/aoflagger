@@ -314,6 +314,11 @@ private:
 	Gtk::MenuItem _miPlotSumSpectrum, _miPlotPowerSpectrum, _miPlotFrequencyScatter, _miPlotRMSSpectrum, _miPlotPowerTime;
 	Gtk::MenuItem _miPlotTimeScatter, _miPlotSingularValues;
 	
+	// Browse menu
+	Gtk::SeparatorMenuItem _miBrowseSep1, _miBrowseSep2;
+	ImgMenuItem _miBrowsePrevious, _miBrowseReload, _miBrowseNext;
+	Gtk::MenuItem _miBrowseGoto, _miBrowseLongestBaseline, _miBrowseShortestBaseline;
+	
 	// Toolbar
 	Gtk::SeparatorToolItem _tbSep1, _tbSep2, _tbSep3;
 	Gtk::ToolButton _tbOpenDirectory, _tbExecuteStrategy;

@@ -18,8 +18,8 @@ RFIGuiMenu::RFIGuiMenu() : _blockVisualizationSignals(false)
 	makeFileMenu();
 	makeViewMenu();
 	makePlotMenu();
-	/*
 	makeBrowseMenu();
+	/*
 	makeSimulateMenu();
 	makeDataMenu();
 	makeActionsMenu();
@@ -281,39 +281,27 @@ void RFIGuiMenu::makePlotMenu()
 	addItem(_menuPlot, _miPlotTimeScatter, OnPlotTimeScatterPressed, "Plot t_ime scatter");
 	addItem(_menuPlot, _miPlotSingularValues, OnPlotSingularValuesPressed, "Plot _singular values");
 }
-/*
+
 void RFIGuiMenu::makeBrowseMenu()
 {
-	_previousButton = Gtk::Action::create("Previous", "Previous");
-	_previousButton->set_icon_name("go-previous");
-	_previousButton->set_tooltip("Load and display the previous baseline. Normally, this steps from the baseline between antennas (i) and (j) to (i) and (j-1).");
-	_previousButton->set_sensitive(false);
-	
-	_actionGroup->add(_previousButton,
-		Gtk::AccelKey("F6"),
-		RFIGuiMenu::OnLoadPrevious);
-	_nextButton = Gtk::Action::create("Next", "Next");
-	_nextButton->set_icon_name("go-next");
-	_nextButton->set_tooltip("Load and display the next baseline. Normally, this steps from the baseline between antennas (i) and (j) to (i) and (j+1).");
-	_nextButton->set_sensitive(false);
-	_actionGroup->add(_nextButton,
-		Gtk::AccelKey("F7"),
-		RFIGuiMenu::OnLoadNext);
-	_reloadButton = Gtk::Action::create("Reload", "_Reload");
-	_reloadButton->set_icon_name("view-refresh");
-	_reloadButton->set_tooltip("Reload the currently displayed baseline. This will reset the purple flags to the measurement set flags, and clear the yellow flags.");
-	_reloadButton->set_sensitive(false);
-	_actionGroup->add(_reloadButton, Gtk::AccelKey("F5"),
-  RFIGuiMenu::OnReloadPressed);
-	_actionGroup->add( Gtk::Action::create("GoTo", "_Go to..."),
-		Gtk::AccelKey("<control>G"),
-  RFIGuiMenu::OnGoToPressed);
-	_actionGroup->add( Gtk::Action::create("LoadLongestBaseline", "Longest baseline"),
-		RFIGuiMenu::OnLoadLongestBaselinePressed);
-	_actionGroup->add( Gtk::Action::create("LoadShortestBaseline", "Shortest baseline"),
-		RFIGuiMenu::OnLoadShortestBaselinePressed);	
+	// F6
+	addItem(_menuBrowse, _miBrowsePrevious, OnLoadPrevious, "Previous", "go-previous");
+	_miBrowsePrevious.item.set_sensitive(false);
+	// F5
+	addItem(_menuBrowse, _miBrowseReload, OnReloadPressed, "_Reload", "view-refresh");
+	_miBrowseReload.item.set_sensitive(false);
+	// F7
+	addItem(_menuBrowse, _miBrowseNext, OnLoadPrevious, "Next", "go-next");
+	_miBrowseNext.item.set_sensitive(false);
+	addItem(_menuBrowse, _miBrowseSep1);
+	// "<control>G"
+	addItem(_menuBrowse, _miBrowseGoto, OnGoToPressed, "_Go to...");
+	addItem(_menuBrowse, _miBrowseSep2);
+	addItem(_menuBrowse, _miBrowseLongestBaseline, OnLoadLongestBaselinePressed, "Longest baseline");
+	addItem(_menuBrowse, _miBrowseShortestBaseline, OnLoadShortestBaselinePressed, "Shortest baseline");
 }
 
+/*
 void RFIGuiMenu::makeSimulateMenu()
 {
 	_actionGroup->add( Gtk::Action::create("OpenTestSet", "Open _testset");
