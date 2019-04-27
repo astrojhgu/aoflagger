@@ -13,18 +13,16 @@ RFIGuiMenu::RFIGuiMenu() : _blockVisualizationSignals(false)
 	topMenu(_menuActions, _miActions, "_Actions");
 	topMenu(_menuHelp, _miHelp, "_Help");
 	
-	//_actionGroup->add( Gtk::Action::create("MenuPlotFlagComparison", "_Compare flags") );
-	
 	makeFileMenu();
 	makeViewMenu();
 	makePlotMenu();
 	makeBrowseMenu();
 	makeSimulateMenu();
-	/*
 	makeDataMenu();
+	/*
 	makeActionsMenu();
-	makeHelpMenu();
 	*/
+	makeHelpMenu();
 	makeToolbarActions();
 		
 	Glib::ustring ui_info =
@@ -85,25 +83,6 @@ RFIGuiMenu::RFIGuiMenu() : _blockVisualizationSignals(false)
     "      <menuitem action='About'/>"
 	  "    </menu>"
     "  </menubar>"
-    "  <toolbar  name='ToolBar'>"
-    "    <toolitem action='OpenDirectory'/>"
-    "    <separator/>"
-    "    <toolitem action='ExecuteStrategy'/>"
-    "    <toolitem action='OriginalFlags'/>"
-    "    <toolitem action='AlternativeFlags'/>"
-    "    <separator/>"
-    "    <toolitem action='Previous'/>"
-    "    <toolitem action='Reload'/>"
-    "    <toolitem action='Next'/>"
-    "    <separator/>"
-    "    <toolitem action='ZoomFit'/>"
-    "    <toolitem action='ZoomIn'/>"
-    "    <toolitem action='ZoomOut'/>"
-    "    <toolitem action='DisplayPP'/>"
-    "    <toolitem action='DisplayPQ'/>"
-    "    <toolitem action='DisplayQP'/>"
-    "    <toolitem action='DisplayQQ'/>"
-    "  </toolbar>"
     "</ui>";
 
 	if(Gtk::IconTheme::get_default()->has_icon("aoflagger"))
@@ -179,7 +158,7 @@ void RFIGuiMenu::makePlotMenu()
 	addItem(_menuFlagComparison, _miPlotComparisonTimeScatter, OnPlotTimeScatterComparisonPressed, "Time _scatter");
 	
 	_miFlagComparison.set_submenu(_menuFlagComparison);
-	addItem(_menuPlot, _miFlagComparison, "Flag comparison");
+	addItem(_menuPlot, _miFlagComparison, "Compare flags");
 	
 	addItem(_menuPlot, _miPlotDistribution, OnPlotDistPressed, "Plot _distribution");
 	addItem(_menuPlot, _miPlotLogLogDistribution, OnPlotLogLogDistPressed, "Plot _log-log dist");
@@ -302,70 +281,44 @@ void RFIGuiMenu::makeSimulateMenu()
 	addItem(_menuSimulate, _miSimSourceOnAxis, OnSimulateOnAxisSource, "Simulate on-axis source");
 }
 
-/*
 void RFIGuiMenu::makeDataMenu()
 {
-	_actionGroup->add( Gtk::Action::create("VisToOriginal", "Current->Original"),
-  RFIGuiMenu::OnVisualizedToOriginalPressed);
-
-	_actionGroup->add( Gtk::Action::create("KeepReal", "Keep _real part"),
-		Gtk::AccelKey("<control>,"),
-		RFIGuiMenu::OnKeepRealPressed);
-	_actionGroup->add( Gtk::Action::create("KeepImaginary", "Keep _imaginary part"),
-		Gtk::AccelKey("<control>."),
-		RFIGuiMenu::OnKeepImaginaryPressed);
-	_actionGroup->add( Gtk::Action::create("KeepPhase", "Keep _phase part"),
-		Gtk::AccelKey("<control>1"),
-		RFIGuiMenu::OnKeepPhasePressed);
-	_actionGroup->add( Gtk::Action::create("KeepStokesI", "Keep _stokesI part"),
-  RFIGuiMenu::OnKeepStokesIPressed);
-	_actionGroup->add( Gtk::Action::create("KeepStokesQ", "Keep stokes_Q part"),
-  RFIGuiMenu::OnKeepStokesQPressed);
-	_actionGroup->add( Gtk::Action::create("KeepStokesU", "Keep stokes_U part"),
-  RFIGuiMenu::OnKeepStokesUPressed);
-	_actionGroup->add( Gtk::Action::create("KeepStokesV", "Keep stokes_V part"),
-  RFIGuiMenu::OnKeepStokesVPressed);
-	_actionGroup->add( Gtk::Action::create("KeepRR", "Keep _rr part"),
-		Gtk::AccelKey("<control>R"),
-		RFIGuiMenu::OnKeepRRPressed);
-	_actionGroup->add( Gtk::Action::create("KeepRL", "Keep rl part"),
-		RFIGuiMenu::OnKeepRLPressed);
-	_actionGroup->add( Gtk::Action::create("KeepLR", "Keep lr part"),
-		Gtk::AccelKey("<control><alt>L"),
-		RFIGuiMenu::OnKeepLRPressed);
-	_actionGroup->add( Gtk::Action::create("KeepLL", "Keep _ll part"),
-		Gtk::AccelKey("<control>L"),
-		RFIGuiMenu::OnKeepLLPressed);
-	_actionGroup->add( Gtk::Action::create("KeepXX", "Keep _xx part"),
-		Gtk::AccelKey("<control>X"),
-		RFIGuiMenu::OnKeepXXPressed);
-	_actionGroup->add( Gtk::Action::create("KeepXY", "Keep xy part"),
-		Gtk::AccelKey("<control><alt>X"),
-		RFIGuiMenu::OnKeepXYPressed);
-	_actionGroup->add( Gtk::Action::create("KeepYX", "Keep yx part"),
-		Gtk::AccelKey("<control><alt>Y"),
-		RFIGuiMenu::OnKeepYXPressed);
-	_actionGroup->add( Gtk::Action::create("KeepYY", "Keep _yy part"),
-		Gtk::AccelKey("<control>Y"),
-		RFIGuiMenu::OnKeepYYPressed);
-	_actionGroup->add( Gtk::Action::create("UnrollPhase", "_Unroll phase"),
-	RFIGuiMenu::OnUnrollPhaseButtonPressed);
-
-	_actionGroup->add( Gtk::Action::create("ClearOriginalFlags", "Clear ori flags"),
-  RFIGuiMenu::OnClearOriginalFlagsPressed);
-	_actionGroup->add( Gtk::Action::create("ClearAltFlags", "Clear alt flags"),
-  RFIGuiMenu::OnClearAltFlagsPressed);
+	addItem(_menuData, _miDataToOriginal, OnVisualizedToOriginalPressed, "Set original");
+	addItem(_menuData, _miDataSep1);
 	
-	_actionGroup->add( Gtk::Action::create("StoreData", "Store"),
-		Gtk::AccelKey("<control>M"),
-  RFIGuiMenu::OnStoreData);
-	_actionGroup->add( Gtk::Action::create("RecallData", "Recall"),
-		Gtk::AccelKey("<control><alt>R"),
-		RFIGuiMenu::OnRecallData);
-	_actionGroup->add( Gtk::Action::create("SubtractDataFromMem", "Subtract from mem"),
-  RFIGuiMenu::OnSubtractDataFromMem);
+	addItem(_menuData, _miDataReal, OnKeepRealPressed, "Keep _real part");
+	addItem(_menuData, _miDataImaginary, OnKeepImaginaryPressed, "Keep _imaginary part");
+	addItem(_menuData, _miDataPhase, OnKeepPhasePressed, "Keep _phase part");
+	addItem(_menuData, _miDataUnrollPhase, OnUnrollPhaseButtonPressed, "_Unroll phase");
+	addItem(_menuData, _miDataSep2);
+	
+	addItem(_menuData, _miDataStokesI, OnKeepStokesIPressed, "Keep _stokes I");
+	addItem(_menuData, _miDataStokesQ, OnKeepStokesQPressed, "Keep stokes _Q");
+	addItem(_menuData, _miDataStokesU, OnKeepStokesUPressed, "Keep stokes _U");
+	addItem(_menuData, _miDataStokesV, OnKeepStokesVPressed, "Keep stokes _V");
+	addItem(_menuData, _miDataSep3);
+	
+	addItem(_menuData, _miDataRR, OnKeepRRPressed, "Keep _rr");
+	addItem(_menuData, _miDataRL, OnKeepRLPressed, "Keep rl");
+	addItem(_menuData, _miDataLR, OnKeepLRPressed, "Keep lr");
+	addItem(_menuData, _miDataLL, OnKeepLLPressed, "Keep _ll");
+	addItem(_menuData, _miDataSep4);
+
+	addItem(_menuData, _miDataXX, OnKeepXXPressed, "Keep _xx");
+	addItem(_menuData, _miDataXY, OnKeepXYPressed, "Keep xy");
+	addItem(_menuData, _miDataYX, OnKeepYXPressed, "Keep yx");
+	addItem(_menuData, _miDataYY, OnKeepYYPressed, "Keep _yy");
+	addItem(_menuData, _miDataSep5);
+
+	addItem(_menuData, _miDataStore, OnStoreData, "Store");
+	addItem(_menuData, _miDataRecall, OnStoreData, "Recall");
+	addItem(_menuData, _miDataSubtract, OnStoreData, "Subtract from mem");
+	
+	addItem(_menuData, _miDataClearOriginalFlags, OnClearOriginalFlagsPressed, "Clear ori flags");
+	addItem(_menuData, _miDataClearAltFlags, OnClearAltFlagsPressed, "Clear alt flags");
 }
 
+/*
 void RFIGuiMenu::makeActionsMenu()
 {
 	_actionGroup->add( Gtk::Action::create("EditStrategy", "_Edit strategy"),
@@ -409,14 +362,12 @@ void RFIGuiMenu::makeActionsMenu()
 	_actionGroup->add( Gtk::Action::create("ReapplyVertProfile", "Reapply vert profile"),
   RFIGuiMenu::OnReapplyVertProfile);
 }
+*/
 
 void RFIGuiMenu::makeHelpMenu()
 {
-	Glib::RefPtr<Gtk::Action> action = Gtk::Action::create("About", "_About");
-	action->set_icon_name("aoflagger");
-	_actionGroup->add(action, RFIGuiMenu::OnHelpAbout));
+	addItem(_menuHelp, _miHelpAbout, OnHelpAbout, "_About", "aoflagger");
 }
-*/
 
 void RFIGuiMenu::makeToolbarActions()
 {

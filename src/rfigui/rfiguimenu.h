@@ -344,7 +344,19 @@ private:
 	Gtk::MenuItem _miSimCorrelation;
 	Gtk::MenuItem _miSimSourceSetA, _miSimSourceSetB, _miSimSourceSetC, _miSimSourceSetD;
 	Gtk::MenuItem _miSimSourceOffAxis, _miSimSourceOnAxis;
+	
+	Gtk::MenuItem _miDataToOriginal;
+	Gtk::SeparatorMenuItem _miDataSep1, _miDataSep2, _miDataSep3, _miDataSep4, _miDataSep5;
+	Gtk::MenuItem _miDataReal, _miDataImaginary, _miDataPhase, _miDataUnrollPhase;
+	Gtk::MenuItem _miDataStokesI, _miDataStokesQ, _miDataStokesU, _miDataStokesV;
+	Gtk::MenuItem _miDataRR, _miDataRL, _miDataLR, _miDataLL;
+	Gtk::MenuItem _miDataXX, _miDataXY, _miDataYX, _miDataYY;
+	Gtk::MenuItem _miDataStore, _miDataRecall, _miDataSubtract;
+	Gtk::MenuItem _miDataClearOriginalFlags, _miDataClearAltFlags;
 		
+	// Help menu
+	ImgMenuItem _miHelpAbout;
+	
 	// Toolbar
 	Gtk::SeparatorToolItem _tbSep1, _tbSep2, _tbSep3;
 	Gtk::ToolButton _tbOpenDirectory, _tbExecuteStrategy;
