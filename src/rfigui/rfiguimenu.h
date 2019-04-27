@@ -319,6 +319,32 @@ private:
 	ImgMenuItem _miBrowsePrevious, _miBrowseReload, _miBrowseNext;
 	Gtk::MenuItem _miBrowseGoto, _miBrowseLongestBaseline, _miBrowseShortestBaseline;
 	
+	// Simulate menu
+	Gtk::Menu _menuTestSets;
+	Gtk::SeparatorMenuItem _miTestSep1;
+	Gtk::MenuItem _miTestSets;
+	Gtk::RadioMenuItem _miTestGaussian, _miTestRayleigh, _miTestZero;
+	Gtk::MenuItem _miTestA, _miTestB, _miTestC, _miTestD, _miTestE;
+	Gtk::MenuItem _miTestF, _miTestG, _miTestH, _miTestNoise, _miTestModel3;
+	Gtk::MenuItem _miTestModel5, _miTestNoiseModel3, _miTestNoiseModel5, _miTestBStrong;
+	Gtk::MenuItem _miTestBWeak, _miTestBAligned, _miTestGaussianBroadband, _miTestSenusoidalBroadband;
+	Gtk::MenuItem _miTestSlewedGaussianBroadband, _miTestBurstBroadband;
+	Gtk::MenuItem _miTestRFIDistLow, _miTestRFIDistMid, _miTestRFIDistHigh;
+	
+	Gtk::Menu _menuModify;
+	Gtk::MenuItem _miSimulateModify;
+	Gtk::MenuItem _miModifyStaticFringe, _miModify1SigmaStaticFringe;
+	Gtk::MenuItem _miModifyToOne, _miModifyToI, _miModifyToOnePlusI;
+	Gtk::MenuItem _miModifyCorrelatorFault, _miModifyMultiply;
+	
+	Gtk::SeparatorMenuItem _miSimSep1, _miSimSep2;
+	Gtk::RadioMenuItem _miSimNCP, _miSimB1834, _miSimEmpty;
+	Gtk::RadioMenuItem _miSim16channels, _miSim64channels, _miSim256channels;
+	Gtk::CheckMenuItem _miSimFixBandwidth;
+	Gtk::MenuItem _miSimCorrelation;
+	Gtk::MenuItem _miSimSourceSetA, _miSimSourceSetB, _miSimSourceSetC, _miSimSourceSetD;
+	Gtk::MenuItem _miSimSourceOffAxis, _miSimSourceOnAxis;
+		
 	// Toolbar
 	Gtk::SeparatorToolItem _tbSep1, _tbSep2, _tbSep3;
 	Gtk::ToolButton _tbOpenDirectory, _tbExecuteStrategy;

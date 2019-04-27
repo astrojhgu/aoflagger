@@ -19,8 +19,8 @@ RFIGuiMenu::RFIGuiMenu() : _blockVisualizationSignals(false)
 	makeViewMenu();
 	makePlotMenu();
 	makeBrowseMenu();
-	/*
 	makeSimulateMenu();
+	/*
 	makeDataMenu();
 	makeActionsMenu();
 	makeHelpMenu();
@@ -30,92 +30,6 @@ RFIGuiMenu::RFIGuiMenu() : _blockVisualizationSignals(false)
 	Glib::ustring ui_info =
     "<ui>"
     "  <menubar name='MenuBar'>"
-	  "    </menu>"
-	  "    <menu action='MenuPlot'>"
-    "      <menu action='MenuPlotFlagComparison'>"
-    "        <menuitem action='PlotPowerSpectrumComparison'/>"
-    "        <menuitem action='PlotPowerTimeComparison'/>"
-    "        <menuitem action='PlotTimeScatterComparison'/>"
-		"      </menu>"
-    "      <separator/>"
-    "      <menuitem action='PlotDist'/>"
-    "      <menuitem action='PlotLogLogDist'/>"
-    "      <menuitem action='PlotComplexPlane'/>"
-    "      <menuitem action='PlotMeanSpectrum'/>"
-    "      <menuitem action='PlotSumSpectrum'/>"
-    "      <menuitem action='PlotPowerSpectrum'/>"
-    "      <menuitem action='PlotFrequencyScatter'/>"
-    "      <menuitem action='PlotRMSSpectrum'/>"
-    "      <menuitem action='PlotPowerTime'/>"
-    "      <menuitem action='PlotTimeScatter'/>"
-    "      <menuitem action='PlotSingularValues'/>"
-	  "    </menu>"
-    "    <menu action='MenuBrowse'>"
-    "      <menuitem action='Previous'/>"
-    "      <menuitem action='Reload'/>"
-    "      <menuitem action='Next'/>"
-    "      <separator/>"
-    "      <menuitem action='GoTo'/>"
-    "      <separator/>"
-    "      <menuitem action='LoadLongestBaseline'/>"
-    "      <menuitem action='LoadShortestBaseline'/>"
-    "    </menu>"
-	  "    <menu action='MenuSimulate'>"
-    "      <menu action='OpenTestSet'>"
-		"        <menuitem action='GaussianTestSets'/>"
-		"        <menuitem action='RayleighTestSets'/>"
-		"        <menuitem action='ZeroTestSets'/>"
-    "        <separator/>"
-		"        <menuitem action='OpenTestSetA'/>"
-		"        <menuitem action='OpenTestSetB'/>"
-		"        <menuitem action='OpenTestSetC'/>"
-		"        <menuitem action='OpenTestSetD'/>"
-		"        <menuitem action='OpenTestSetE'/>"
-		"        <menuitem action='OpenTestSetF'/>"
-		"        <menuitem action='OpenTestSetG'/>"
-		"        <menuitem action='OpenTestSetH'/>"
-		"        <menuitem action='OpenTestSetNoise'/>"
-		"        <menuitem action='OpenTestSetModel3'/>"
-		"        <menuitem action='OpenTestSetModel5'/>"
-		"        <menuitem action='OpenTestSetNoiseModel3'/>"
-		"        <menuitem action='OpenTestSetNoiseModel5'/>"
-		"        <menuitem action='OpenTestSetBStrong'/>"
-		"        <menuitem action='OpenTestSetBWeak'/>"
-		"        <menuitem action='OpenTestSetBAligned'/>"
-		"        <menuitem action='OpenTestSetGaussianBroadband'/>"
-		"        <menuitem action='OpenTestSetSinusoidalBroadband'/>"
-		"        <menuitem action='OpenTestSetSlewedGaussianBroadband'/>"
-		"        <menuitem action='OpenTestSetBurstBroadband'/>"
-		"        <menuitem action='OpenTestSetRFIDistributionLow'/>"
-		"        <menuitem action='OpenTestSetRFIDistributionMid'/>"
-		"        <menuitem action='OpenTestSetRFIDistributionHigh'/>"
-		"      </menu>"
-		"      <menu action='AddTestModification'>"
-		"        <menuitem action='AddStaticFringe'/>"
-		"        <menuitem action='Add1SigmaStaticFringe'/>"
-		"        <menuitem action='SetToOne'/>"
-		"        <menuitem action='SetToI'/>"
-		"        <menuitem action='SetToOnePlusI'/>"
-		"        <menuitem action='AddCorrelatorFault'/>"
-		"        <menuitem action='MultiplyData'/>"
-		"      </menu>"
-		"      <separator/>"
-    "      <menuitem action='NCPSet'/>"
-    "      <menuitem action='B1834Set'/>"
-    "      <menuitem action='EmptySet'/>"
-    "      <separator/>"
-    "      <menuitem action='Sim16Channels'/>"
-    "      <menuitem action='Sim64Channels'/>"
-    "      <menuitem action='Sim256Channels'/>"
-    "      <menuitem action='SimFixBandwidth'/>"
-    "      <separator/>"
-    "      <menuitem action='SimulateCorrelation'/>"
-    "      <menuitem action='SimulateSourceSetA'/>"
-    "      <menuitem action='SimulateSourceSetB'/>"
-    "      <menuitem action='SimulateSourceSetC'/>"
-    "      <menuitem action='SimulateSourceSetD'/>"
-    "      <menuitem action='SimulateOffAxisSource'/>"
-    "      <menuitem action='SimulateOnAxisSource'/>"
 	  "    </menu>"
 	  "    <menu action='MenuData'>"
     "      <menuitem action='VisToOriginal'/>"
@@ -301,119 +215,94 @@ void RFIGuiMenu::makeBrowseMenu()
 	addItem(_menuBrowse, _miBrowseShortestBaseline, OnLoadShortestBaselinePressed, "Shortest baseline");
 }
 
-/*
 void RFIGuiMenu::makeSimulateMenu()
 {
-	_actionGroup->add( Gtk::Action::create("OpenTestSet", "Open _testset");
-	Gtk::RadioButtonGroup testSetGroup;
-	_gaussianTestSetsButton = Gtk::RadioAction::create(testSetGroup, "GaussianTestSets", "Gaussian");
-	_gaussianTestSetsButton->set_active(true);
-	_rayleighTestSetsButton = Gtk::RadioAction::create(testSetGroup, "RayleighTestSets", "Rayleigh");
-	_zeroTestSetsButton = Gtk::RadioAction::create(testSetGroup, "ZeroTestSets", "Zero");
-	_actionGroup->add(_gaussianTestSetsButton, RFIGuiMenu::OnGaussianTestSets);
-	_actionGroup->add(_rayleighTestSetsButton, RFIGuiMenu::OnRayleighTestSets);
-	_actionGroup->add(_zeroTestSetsButton, RFIGuiMenu::OnZeroTestSets);
+	_miTestSets.set_submenu(_menuTestSets);
+	addItem(_menuSimulate, _miTestSets, "Open _testset");
 	
-	_actionGroup->add( Gtk::Action::create("OpenTestSetA", "A Full spikes"),
-	RFIGuiMenu::OnOpenTestSetA);
-	_actionGroup->add( Gtk::Action::create("OpenTestSetB", "B Half spikes"),
-	RFIGuiMenu::OnOpenTestSetB);
-	_actionGroup->add( Gtk::Action::create("OpenTestSetC", "C Varying spikes"),
-	RFIGuiMenu::OnOpenTestSetC);
-	_actionGroup->add( Gtk::Action::create("OpenTestSetD", "D 3 srcs + spikes"),
-	RFIGuiMenu::OnOpenTestSetD);
-	_actionGroup->add( Gtk::Action::create("OpenTestSetE", "E 5 srcs + spikes"),
-	RFIGuiMenu::OnOpenTestSetE);
-	_actionGroup->add( Gtk::Action::create("OpenTestSetF", "F 5 srcs + spikes"),
-	RFIGuiMenu::OnOpenTestSetF);
-	_actionGroup->add( Gtk::Action::create("OpenTestSetG", "G Test set G"),
-	RFIGuiMenu::OnOpenTestSetG);
-	_actionGroup->add( Gtk::Action::create("OpenTestSetH", "H filtered srcs + spikes"),
-	RFIGuiMenu::OnOpenTestSetH);
-	_actionGroup->add( Gtk::Action::create("OpenTestSetNoise", "Noise"),
-	RFIGuiMenu::OnOpenTestSetNoise));
-	_actionGroup->add( Gtk::Action::create("OpenTestSetModel3", "3-source model"),
-	RFIGuiMenu::OnOpenTestSet3Model));
-	_actionGroup->add( Gtk::Action::create("OpenTestSetModel5", "5-source model"),
-	RFIGuiMenu::OnOpenTestSet5Model));
-	_actionGroup->add( Gtk::Action::create("OpenTestSetNoiseModel3", "3-source model with noise"),
-	RFIGuiMenu::OnOpenTestSetNoise3Model));
-	_actionGroup->add( Gtk::Action::create("OpenTestSetNoiseModel5", "5-source model with noise"),
-	RFIGuiMenu::OnOpenTestSetNoise5Model));
-	_actionGroup->add( Gtk::Action::create("OpenTestSetBStrong", "Test set B (strong RFI)"),
-	RFIGuiMenu::OnOpenTestSetBStrong));
-	_actionGroup->add( Gtk::Action::create("OpenTestSetBWeak", "Test set B (weak RFI)"),
-	RFIGuiMenu::OnOpenTestSetBWeak));
-	_actionGroup->add( Gtk::Action::create("OpenTestSetBAligned", "Test set B (aligned)"),
-	RFIGuiMenu::OnOpenTestSetBAligned));
-	_actionGroup->add( Gtk::Action::create("OpenTestSetGaussianBroadband", "Gaussian broadband"),
-	RFIGuiMenu::OnOpenTestSetGaussianBroadband));
-	_actionGroup->add( Gtk::Action::create("OpenTestSetSinusoidalBroadband", "Sinusoidal broadband"),
-	RFIGuiMenu::OnOpenTestSetSinusoidalBroadband));
-	_actionGroup->add( Gtk::Action::create("OpenTestSetSlewedGaussianBroadband", "Slewed Gaussian"),
-	RFIGuiMenu::OnOpenTestSetSlewedGaussianBroadband));
-	_actionGroup->add( Gtk::Action::create("OpenTestSetBurstBroadband", "Burst"),
-	RFIGuiMenu::OnOpenTestSetBurstBroadband));
-	_actionGroup->add( Gtk::Action::create("OpenTestSetRFIDistributionLow", "Slope -2 dist low"),
-	RFIGuiMenu::OnOpenTestSetRFIDistributionLow));
-	_actionGroup->add( Gtk::Action::create("OpenTestSetRFIDistributionMid", "Slope -2 dist mid"),
-	RFIGuiMenu::OnOpenTestSetRFIDistributionMid));
-	_actionGroup->add( Gtk::Action::create("OpenTestSetRFIDistributionHigh", "Slope -2 dist high"),
-	RFIGuiMenu::OnOpenTestSetRFIDistributionHigh));
-	_actionGroup->add( Gtk::Action::create("AddTestModification", "Test modify");
-	_actionGroup->add( Gtk::Action::create("AddStaticFringe", "Static fringe"),
-	RFIGuiMenu::OnAddStaticFringe);
-	_actionGroup->add( Gtk::Action::create("Add1SigmaStaticFringe", "Static 1 sigma fringe"),
-	RFIGuiMenu::OnAdd1SigmaFringe);
-	_actionGroup->add( Gtk::Action::create("SetToOne", "Set to 1"),
-	RFIGuiMenu::OnSetToOne);
-	_actionGroup->add( Gtk::Action::create("SetToI", "Set to i"),
-	RFIGuiMenu::OnSetToI);
-	_actionGroup->add( Gtk::Action::create("SetToOnePlusI", "Set to 1+i"),
-	RFIGuiMenu::OnSetToOnePlusI);
-	_actionGroup->add( Gtk::Action::create("AddCorrelatorFault", "Add correlator fault"),
-	RFIGuiMenu::OnAddCorrelatorFault);
-	_actionGroup->add( Gtk::Action::create("MultiplyData", "Multiply data..."),
-	RFIGuiMenu::OnMultiplyData);
+	Gtk::RadioMenuItem::Group testSetGroup;
+	addItem(_menuTestSets, _miTestGaussian, OnGaussianTestSets, "Gaussian");
+	_miTestGaussian.set_group(testSetGroup);
+	_miTestGaussian.set_active(true);
+	addItem(_menuTestSets, _miTestRayleigh, OnRayleighTestSets, "Rayleigh");
+	_miTestRayleigh.set_group(testSetGroup);
+	addItem(_menuTestSets, _miTestZero, OnZeroTestSets, "Zero");
+	_miTestZero.set_group(testSetGroup);
+
+	addItem(_menuTestSets, _miTestSep1);
 	
-	Gtk::RadioButtonGroup setGroup;
-	_ncpSetButton = Gtk::RadioAction::create(setGroup, "NCPSet", "Use NCP set");
-	_b1834SetButton = Gtk::RadioAction::create(setGroup, "B1834Set", "Use B1834 set");
-	_emptySetButton = Gtk::RadioAction::create(setGroup, "EmptySet", "Use empty set");
-	_ncpSetButton->set_active(true); 
-	_actionGroup->add(_ncpSetButton);
-	_actionGroup->add(_b1834SetButton);
-	_actionGroup->add(_emptySetButton);
+	addItem(_menuTestSets, _miTestA, OnOpenTestSetA, "A Full spikes");
+	addItem(_menuTestSets, _miTestB, OnOpenTestSetB, "B Half spikes");
+	addItem(_menuTestSets, _miTestC, OnOpenTestSetC, "C Varying spikes");
+	addItem(_menuTestSets, _miTestD, OnOpenTestSetD, "D 3 srcs + spikes");
+	addItem(_menuTestSets, _miTestE, OnOpenTestSetE, "E 5 srcs + spikes");
+	addItem(_menuTestSets, _miTestF, OnOpenTestSetF, "F 5 srcs + spikes");
+	addItem(_menuTestSets, _miTestG, OnOpenTestSetG, "G Test set G");
+	addItem(_menuTestSets, _miTestH, OnOpenTestSetG, "H filtered srcs + spikes");
 	
-	Gtk::RadioButtonGroup chGroup;
-	_sim16ChannelsButton = Gtk::RadioAction::create(chGroup, "Sim16Channels", "16 channels");
-	_sim64ChannelsButton = Gtk::RadioAction::create(chGroup, "Sim64Channels", "64 channels");
-	_sim256ChannelsButton = Gtk::RadioAction::create(chGroup, "Sim256Channels", "256 channels");
-	_sim64ChannelsButton->set_active(true); 
-	_actionGroup->add(_sim16ChannelsButton);
-	_actionGroup->add(_sim64ChannelsButton);
-	_actionGroup->add(_sim256ChannelsButton);
+	addItem(_menuTestSets, _miTestNoise, OnOpenTestSetNoise, "Noise");
+	addItem(_menuTestSets, _miTestModel3, OnOpenTestSet3Model, "3-source model");
+	addItem(_menuTestSets, _miTestModel5, OnOpenTestSet5Model, "5-source model");
+	addItem(_menuTestSets, _miTestNoiseModel3, OnOpenTestSetNoise3Model, "3-source model with noise");
+	addItem(_menuTestSets, _miTestNoiseModel5, OnOpenTestSetNoise5Model, "5-source model with noise");
+	addItem(_menuTestSets, _miTestBStrong, OnOpenTestSetBStrong, "Test set B (strong RFI)");
+	addItem(_menuTestSets, _miTestBWeak, OnOpenTestSetBWeak, "Test set B (weak RFI)");
+	addItem(_menuTestSets, _miTestBAligned, OnOpenTestSetBAligned, "Test set B (aligned)");
 	
-	_simFixBandwidthButton = Gtk::ToggleAction::create("SimFixBandwidth", "Fix bandwidth");
-	_simFixBandwidthButton->set_active(false); 
-	_actionGroup->add(_simFixBandwidthButton);
+	addItem(_menuTestSets, _miTestGaussianBroadband, OnOpenTestSetGaussianBroadband, "Gaussian broadband");
+	addItem(_menuTestSets, _miTestSenusoidalBroadband, OnOpenTestSetSinusoidalBroadband, "Sinusoidal broadband");
+	addItem(_menuTestSets, _miTestSlewedGaussianBroadband, OnOpenTestSetSlewedGaussianBroadband, "Slewed Gaussian");
+	addItem(_menuTestSets, _miTestBurstBroadband, OnOpenTestSetBurstBroadband, "Burst");
+	addItem(_menuTestSets, _miTestRFIDistLow, OnOpenTestSetRFIDistributionLow, "Slope -2 dist low");
+	addItem(_menuTestSets, _miTestRFIDistMid, OnOpenTestSetRFIDistributionMid, "Slope -2 dist mid");
+	addItem(_menuTestSets, _miTestRFIDistHigh, OnOpenTestSetRFIDistributionHigh, "Slope -2 dist high");
 	
-	_actionGroup->add( Gtk::Action::create("SimulateCorrelation", "Simulate correlation"),
-  RFIGuiMenu::OnSimulateCorrelation);
-	_actionGroup->add( Gtk::Action::create("SimulateSourceSetA", "Simulate source set A"),
-  RFIGuiMenu::OnSimulateSourceSetA);
-	_actionGroup->add( Gtk::Action::create("SimulateSourceSetB", "Simulate source set B"),
-  RFIGuiMenu::OnSimulateSourceSetB);
-	_actionGroup->add( Gtk::Action::create("SimulateSourceSetC", "Simulate source set C"),
-  RFIGuiMenu::OnSimulateSourceSetC);
-	_actionGroup->add( Gtk::Action::create("SimulateSourceSetD", "Simulate source set D"),
-  RFIGuiMenu::OnSimulateSourceSetD);
-	_actionGroup->add( Gtk::Action::create("SimulateOffAxisSource", "Simulate off-axis source"),
-  RFIGuiMenu::OnSimulateOffAxisSource);
-	_actionGroup->add( Gtk::Action::create("SimulateOnAxisSource", "Simulate on-axis source"),
-  RFIGuiMenu::OnSimulateOnAxisSource);
+	_miSimulateModify.set_submenu(_menuModify);
+	addItem(_menuSimulate, _miSimulateModify, "Modify");
+	
+	addItem(_menuModify, _miModifyStaticFringe, OnAddStaticFringe, "Static fringe");
+	addItem(_menuModify, _miModify1SigmaStaticFringe, OnAdd1SigmaFringe, "Static 1 sigma fringe");
+	addItem(_menuModify, _miModifyToOne, OnSetToOne, "Set to 1");
+	addItem(_menuModify, _miModifyToI, OnSetToI, "Set to i");
+	addItem(_menuModify, _miModifyToOnePlusI, OnSetToOnePlusI, "Set to 1+i");
+	addItem(_menuModify, _miModifyCorrelatorFault, OnAddCorrelatorFault, "Add correlator fault");
+	addItem(_menuModify, _miModifyMultiply, OnMultiplyData, "Multiply data...");
+	
+	Gtk::RadioMenuItem::Group setGroup;
+	_miSimNCP.set_group(setGroup);
+	addItem(_menuSimulate, _miSimNCP, "Use NCP set");
+	_miSimB1834.set_group(setGroup);
+	addItem(_menuSimulate, _miSimB1834, "Use B1834 set");
+	_miSimEmpty.set_group(setGroup);
+	addItem(_menuSimulate, _miSimEmpty, "Use empty set");
+	_miSimNCP.set_active(true); 
+	
+	addItem(_menuSimulate, _miSimSep1);
+	
+	Gtk::RadioMenuItem::Group chGroup;
+	_miSim16channels.set_group(chGroup);
+	addItem(_menuSimulate, _miSim16channels, "16 channels");
+	_miSim64channels.set_group(chGroup);
+	addItem(_menuSimulate, _miSim64channels, "64 channels");
+	_miSim256channels.set_group(chGroup);
+	addItem(_menuSimulate, _miSim256channels, "256 channels");
+	_miSim64channels.set_active(true); 
+	
+	addItem(_menuSimulate, _miSimSep2);
+	
+	addItem(_menuSimulate, _miSimFixBandwidth, "Fix bandwidth");
+	_miSimFixBandwidth.set_active(false); 
+	
+	addItem(_menuSimulate, _miSimCorrelation, OnSimulateCorrelation, "Simulate correlation");
+	addItem(_menuSimulate, _miSimSourceSetA, OnSimulateSourceSetA, "Simulate source set A");
+	addItem(_menuSimulate, _miSimSourceSetB, OnSimulateSourceSetB, "Simulate source set B");
+	addItem(_menuSimulate, _miSimSourceSetC, OnSimulateSourceSetC, "Simulate source set C");
+	addItem(_menuSimulate, _miSimSourceSetD, OnSimulateSourceSetD, "Simulate source set D");
+	addItem(_menuSimulate, _miSimSourceOffAxis, OnSimulateOffAxisSource, "Simulate off-axis source");
+	addItem(_menuSimulate, _miSimSourceOnAxis, OnSimulateOnAxisSource, "Simulate on-axis source");
 }
 
+/*
 void RFIGuiMenu::makeDataMenu()
 {
 	_actionGroup->add( Gtk::Action::create("VisToOriginal", "Current->Original"),
