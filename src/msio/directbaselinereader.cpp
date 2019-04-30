@@ -2,8 +2,6 @@
 
 #include "msselection.h"
 
-#include "../structures/arraycolumniterator.h"
-#include "../structures/scalarcolumniterator.h"
 #include "../structures/timefrequencydata.h"
 
 #include "../util/logger.h"

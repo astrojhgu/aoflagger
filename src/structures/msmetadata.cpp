@@ -1,12 +1,11 @@
 #include <casacore/ms/MeasurementSets/MeasurementSet.h>
-#include <casacore/ms/MeasurementSets/MSTable.h>
-#include <casacore/tables/Tables/TableDesc.h>
-#include <casacore/tables/Tables/TableRow.h>
-#include <casacore/tables/TaQL/ExprNode.h>
+//#include <casacore/ms/MeasurementSets/MSTable.h>
+//#include <casacore/tables/Tables/TableDesc.h>
+//#include <casacore/tables/Tables/TableRow.h>
+#include <casacore/tables/Tables/ArrayColumn.h>
+#include <casacore/tables/Tables/ScalarColumn.h>
 
 #include "msmetadata.h"
-#include "arraycolumniterator.h"
-#include "scalarcolumniterator.h"
 #include "date.h"
 
 #include "../util/logger.h"
@@ -35,11 +34,11 @@ void MSMetaData::initializeAntennas(casacore::MeasurementSet &ms)
 {
 	casacore::MSAntenna antennaTable = ms.antenna();
 	size_t count = antennaTable.nrow();
-	casacore::ROArrayColumn<double> positionCol(antennaTable, "POSITION"); 
-	casacore::ROScalarColumn<casacore::String> nameCol(antennaTable, "NAME");
-	casacore::ROScalarColumn<double> diameterCol(antennaTable, "DISH_DIAMETER");
-	casacore::ROScalarColumn<casacore::String> mountCol(antennaTable, "MOUNT");
-	casacore::ROScalarColumn<casacore::String> stationCol(antennaTable, "STATION");
+	casacore::ArrayColumn<double> positionCol(antennaTable, "POSITION"); 
+	casacore::ScalarColumn<casacore::String> nameCol(antennaTable, "NAME");
+	casacore::ScalarColumn<double> diameterCol(antennaTable, "DISH_DIAMETER");
+	casacore::ScalarColumn<casacore::String> mountCol(antennaTable, "MOUNT");
+	casacore::ScalarColumn<casacore::String> stationCol(antennaTable, "STATION");
 
 	_antennas.resize(count);
 	for(size_t row=0; row!=count; ++row)
@@ -260,7 +259,7 @@ void MSMetaData::GetAOFlaggerHistory(std::ostream &stream)
 		if(application(i) == "AOFlagger")
 		{
 			stream << "====================\n"
-				"Command: " << cli(i)[0] << "\n"
+				"Command: " << *cli(i).begin() << "\n"
 				"Date: " << Date::AipsMJDToDateString(time(i)) << "\n"
 				"Time: " << Date::AipsMJDToTimeString(time(i)) << "\n"
 				"Strategy: \n     ----------     \n";
@@ -278,7 +277,7 @@ void MSMetaData::AddAOFlaggerHistory(const rfiStrategy::Strategy &strategy, cons
 {
 	// This has been copied from MSWriter.cc of NDPPP and altered (thanks, Ger!)
 	casacore::MeasurementSet ms(_path);
-	casacore::Table histtab(ms.keywordSet().asTable("HISTORY"));
+	casacore::Table histtab(ms.history());
 	histtab.reopenRW();
 	casacore::ScalarColumn<double>       time        (histtab, "TIME");
 	casacore::ScalarColumn<int>          obsId       (histtab, "OBSERVATION_ID");
@@ -342,7 +341,7 @@ std::string MSMetaData::GetStationName() const
 	casacore::Table antennaTable(ms.antenna());
 	if(antennaTable.nrow() == 0)
 		throw std::runtime_error("GetStationName() : no rows in Antenna table");
-	casacore::ROScalarColumn<casacore::String> stationColumn(antennaTable, "STATION");
+	casacore::ScalarColumn<casacore::String> stationColumn(antennaTable, "STATION");
 	return stationColumn(0);
 }
 

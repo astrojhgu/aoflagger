@@ -3,24 +3,21 @@
 #include <stdexcept>
 #include <vector>
 
-#include <casacore/tables/TaQL/ExprNode.h>
-
-#include "../structures/arraycolumniterator.h"
-#include "../structures/scalarcolumniterator.h"
+#include <casacore/tables/Tables/ArrayColumn.h>
+#include <casacore/tables/Tables/ScalarColumn.h>
 
 #include "../util/logger.h"
 
 SpatialTimeLoader::SpatialTimeLoader(MSMetaData& msMetaData)
-	:  _msMetaData(msMetaData), _sortedTable(0), _tableIter(0)
+	:  _msMetaData(msMetaData)
 {
-	casacore::Table *rawTable = new casacore::Table(_msMetaData.Path());
+	casacore::Table rawTable(_msMetaData.Path());
 	casacore::Block<casacore::String> names(4);
 	names[0] = "DATA_DESC_ID";
 	names[1] = "TIME";
 	names[2] = "ANTENNA1";
 	names[3] = "ANTENNA2";
-	_sortedTable = new casacore::Table(rawTable->sort(names));
-	delete rawTable;
+	_sortedTable.reset(new casacore::Table(rawTable.sort(names)));
 
 	_channelCount = _msMetaData.FrequencyCount(0);
 	_timestepsCount = _msMetaData.TimestepCount();
@@ -29,14 +26,11 @@ SpatialTimeLoader::SpatialTimeLoader(MSMetaData& msMetaData)
 
 	casacore::Block<casacore::String> selectionNames(1);
 	selectionNames[0] = "DATA_DESC_ID";
-	_tableIter = new casacore::TableIterator(*_sortedTable, selectionNames, casacore::TableIterator::Ascending, casacore::TableIterator::NoSort);
+	_tableIter.reset(new casacore::TableIterator(*_sortedTable, selectionNames, casacore::TableIterator::Ascending, casacore::TableIterator::NoSort));
 }
 
 SpatialTimeLoader::~SpatialTimeLoader()
 {
-	if(_sortedTable != 0)
-		delete _sortedTable;
-	delete _tableIter;
 }
 
 TimeFrequencyData SpatialTimeLoader::Load(unsigned channelIndex, bool fringeStop)

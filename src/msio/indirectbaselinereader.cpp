@@ -11,8 +11,6 @@
 
 #include <boost/filesystem.hpp>
 
-#include "../structures/arraycolumniterator.h"
-#include "../structures/scalarcolumniterator.h"
 #include "../structures/timefrequencydata.h"
 #include "../structures/system.h"
 

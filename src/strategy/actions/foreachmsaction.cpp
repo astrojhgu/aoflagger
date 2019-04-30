@@ -48,7 +48,7 @@ void ForEachMSAction::Perform(ArtifactSet& artifacts, ProgressListener& progress
 		if(!skip)
 		{
 			std::unique_ptr<ImageSet> imageSet(ImageSet::Create(std::vector<std::string>{filename}, _baselineIOMode));
-			bool isMS = dynamic_cast<MSImageSet*>(&*imageSet) != nullptr;
+			bool isMS = dynamic_cast<MSImageSet*>(imageSet.get()) != nullptr;
 			if(isMS)
 			{ 
 				MSImageSet* msImageSet = static_cast<MSImageSet*>(imageSet.get());
@@ -137,7 +137,7 @@ void ForEachMSAction::writeHistory(const std::string &filename)
 	{
 		MSMetaData ms(filename);
 		const Strategy *strategy = nullptr;
-		if(GetChildCount() == 1 && dynamic_cast<const Strategy*>(&GetChild(0)) != 0)
+		if(GetChildCount() == 1 && dynamic_cast<const Strategy*>(&GetChild(0)) != nullptr)
 		{
 			strategy = static_cast<const Strategy*>(&GetChild(0));
 		} else {
