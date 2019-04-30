@@ -26,33 +26,103 @@ public:
 	Gtk::Toolbar& Toolbar() { return _toolbar; }
 	
 	// File
-	sigc::signal<void()> OnActionFileOpen;
 	sigc::signal<void()> OnActionDirectoryOpen;
+	sigc::signal<void()> OnActionFileOpen;
 	sigc::signal<void()> OnActionDirectoryOpenForSpatial;
 	sigc::signal<void()> OnActionDirectoryOpenForST;
 	sigc::signal<void()> OnSaveBaseline;
 	sigc::signal<void()> OnQuit;
 	
 	// View
+	sigc::signal<void()> OnImagePropertiesPressed;
+	sigc::signal<void()> OnTimeGraphButtonPressed;
+	sigc::signal<void()> OnToggleFlags;
+	sigc::signal<void()> OnHightlightPressed;	
 	sigc::signal<void()> OnZoomFit;
 	sigc::signal<void()> OnZoomIn;
 	sigc::signal<void()> OnZoomOut;
-	sigc::signal<void()> OnLoadPrevious;
-	sigc::signal<void()> OnLoadNext;
-	sigc::signal<void()> OnToggleFlags;
-	sigc::signal<void()> OnTogglePolarizations;
-	sigc::signal<void()> OnToggleImage;
-	sigc::signal<void()> OnSelectImage;
 	sigc::signal<void()> OnShowImagePlane;
 	sigc::signal<void()> OnSetAndShowImagePlane;
 	sigc::signal<void()> OnAddToImagePlane;
-	sigc::signal<void()> OnClearOriginalFlagsPressed;
-	sigc::signal<void()> OnClearAltFlagsPressed;
+	sigc::signal<void()> OnShowStats;
+
+	// Plot
+	sigc::signal<void()> OnPlotPowerSpectrumComparisonPressed;
+	sigc::signal<void()> OnPlotPowerTimeComparisonPressed;
+	sigc::signal<void()> OnPlotTimeScatterComparisonPressed;
+	sigc::signal<void()> OnPlotDistPressed;
+	sigc::signal<void()> OnPlotLogLogDistPressed;
+	sigc::signal<void()> OnPlotComplexPlanePressed;
+	sigc::signal<void()> OnPlotMeanSpectrumPressed;
+	sigc::signal<void()> OnPlotSumSpectrumPressed;
+	sigc::signal<void()> OnPlotPowerSpectrumPressed;
+	sigc::signal<void()> OnPlotFrequencyScatterPressed;
+	sigc::signal<void()> OnPlotPowerRMSPressed;
+	sigc::signal<void()> OnPlotPowerTimePressed;
+	sigc::signal<void()> OnPlotTimeScatterPressed;
+	sigc::signal<void()> OnPlotSingularValuesPressed;
+	
+	// Browse
+	sigc::signal<void()> OnLoadPrevious;
+	sigc::signal<void()> OnReloadPressed;
+	sigc::signal<void()> OnLoadNext;
+	sigc::signal<void()> OnGoToPressed;
+	sigc::signal<void()> OnLoadLongestBaselinePressed;
+	sigc::signal<void()> OnLoadShortestBaselinePressed;
+	
+	// Simulate
+	sigc::signal<void()> OnGaussianTestSets;
+	sigc::signal<void()> OnRayleighTestSets;
+	sigc::signal<void()> OnZeroTestSets;
+	
+	sigc::signal<void()> OnOpenTestSetA;
+	sigc::signal<void()> OnOpenTestSetB;
+	sigc::signal<void()> OnOpenTestSetC;
+	sigc::signal<void()> OnOpenTestSetD;
+	sigc::signal<void()> OnOpenTestSetE;
+	sigc::signal<void()> OnOpenTestSetF;
+	sigc::signal<void()> OnOpenTestSetG;
+	sigc::signal<void()> OnOpenTestSetH;
+	sigc::signal<void()> OnOpenTestSetNoise;
+	sigc::signal<void()> OnOpenTestSet3Model;
+	sigc::signal<void()> OnOpenTestSet5Model;
+	sigc::signal<void()> OnOpenTestSetNoise3Model;
+	sigc::signal<void()> OnOpenTestSetNoise5Model;
+	sigc::signal<void()> OnOpenTestSetBStrong;
+	sigc::signal<void()> OnOpenTestSetBWeak;
+	sigc::signal<void()> OnOpenTestSetBAligned;
+	
+	sigc::signal<void()> OnOpenTestSetGaussianBroadband;
+	sigc::signal<void()> OnOpenTestSetSinusoidalBroadband;
+	sigc::signal<void()> OnOpenTestSetSlewedGaussianBroadband;
+	sigc::signal<void()> OnOpenTestSetBurstBroadband;
+	sigc::signal<void()> OnOpenTestSetRFIDistributionLow;
+	sigc::signal<void()> OnOpenTestSetRFIDistributionMid;
+	sigc::signal<void()> OnOpenTestSetRFIDistributionHigh;
+	
+	sigc::signal<void()> OnAddStaticFringe;
+	sigc::signal<void()> OnAdd1SigmaFringe;
+	sigc::signal<void()> OnSetToOne;
+	sigc::signal<void()> OnSetToI;
+	sigc::signal<void()> OnSetToOnePlusI;
+	sigc::signal<void()> OnAddCorrelatorFault;
+	sigc::signal<void()> OnMultiplyData;
+	
+	sigc::signal<void()> OnSimulateCorrelation;
+	sigc::signal<void()> OnSimulateSourceSetA;
+	sigc::signal<void()> OnSimulateSourceSetB;
+	sigc::signal<void()> OnSimulateSourceSetC;
+	sigc::signal<void()> OnSimulateSourceSetD;
+	sigc::signal<void()> OnSimulateOffAxisSource;
+	sigc::signal<void()> OnSimulateOnAxisSource;
+	
+	// Data
 	sigc::signal<void()> OnVisualizedToOriginalPressed;
-	sigc::signal<void()> OnHightlightPressed;
 	sigc::signal<void()> OnKeepRealPressed;
 	sigc::signal<void()> OnKeepImaginaryPressed;
 	sigc::signal<void()> OnKeepPhasePressed;
+	sigc::signal<void()> OnUnrollPhaseButtonPressed;
+	
 	sigc::signal<void()> OnKeepStokesIPressed;
 	sigc::signal<void()> OnKeepStokesQPressed;
 	sigc::signal<void()> OnKeepStokesUPressed;
@@ -65,104 +135,49 @@ public:
 	sigc::signal<void()> OnKeepXYPressed;
 	sigc::signal<void()> OnKeepYXPressed;
 	sigc::signal<void()> OnKeepYYPressed;
-	sigc::signal<void()> OnImagePropertiesPressed;
-	sigc::signal<void()> OnOpenTestSetNoise;
-	sigc::signal<void()> OnOpenTestSetA;
-	sigc::signal<void()> OnOpenTestSetB;
-	sigc::signal<void()> OnOpenTestSetC;
-	sigc::signal<void()> OnOpenTestSetD;
-	sigc::signal<void()> OnOpenTestSetE;
-	sigc::signal<void()> OnOpenTestSetF;
-	sigc::signal<void()> OnOpenTestSetG;
-	sigc::signal<void()> OnOpenTestSetH;
-	sigc::signal<void()> OnOpenTestSetNoise3Model;
-	sigc::signal<void()> OnOpenTestSetNoise5Model;
-	sigc::signal<void()> OnOpenTestSet3Model;
-	sigc::signal<void()> OnOpenTestSet5Model;
-	sigc::signal<void()> OnOpenTestSetBStrong;
-	sigc::signal<void()> OnOpenTestSetBWeak;
-	sigc::signal<void()> OnOpenTestSetBAligned;
-	sigc::signal<void()> OnOpenTestSetGaussianBroadband;
-	sigc::signal<void()> OnOpenTestSetSinusoidalBroadband;
-	sigc::signal<void()> OnOpenTestSetSlewedGaussianBroadband;
-	sigc::signal<void()> OnOpenTestSetBurstBroadband;
-	sigc::signal<void()> OnOpenTestSetRFIDistributionLow;
-	sigc::signal<void()> OnOpenTestSetRFIDistributionMid;
-	sigc::signal<void()> OnOpenTestSetRFIDistributionHigh;
-	sigc::signal<void()> OnGaussianTestSets;
-	sigc::signal<void()> OnRayleighTestSets;
-	sigc::signal<void()> OnZeroTestSets;
-	sigc::signal<void()> OnAddStaticFringe;
-	sigc::signal<void()> OnAdd1SigmaFringe;
-	sigc::signal<void()> OnSetToOne;
-	sigc::signal<void()> OnSetToI;
-	sigc::signal<void()> OnSetToOnePlusI;
-	sigc::signal<void()> OnAddCorrelatorFault;
-	sigc::signal<void()> OnShowStats;
-	sigc::signal<void()> OnPlotDistPressed;
-	sigc::signal<void()> OnPlotLogLogDistPressed;
-	sigc::signal<void()> OnPlotComplexPlanePressed;
-	sigc::signal<void()> OnPlotMeanSpectrumPressed;
-	sigc::signal<void()> OnPlotSumSpectrumPressed;
-	sigc::signal<void()> OnPlotPowerSpectrumPressed;
-	sigc::signal<void()> OnPlotPowerSpectrumComparisonPressed;
-	sigc::signal<void()> OnPlotFrequencyScatterPressed;
-	sigc::signal<void()> OnPlotPowerRMSPressed;
-	sigc::signal<void()> OnPlotPowerTimePressed;
-	sigc::signal<void()> OnPlotPowerTimeComparisonPressed;
-	sigc::signal<void()> OnPlotTimeScatterPressed;
-	sigc::signal<void()> OnPlotTimeScatterComparisonPressed;
-	sigc::signal<void()> OnPlotSingularValuesPressed;
+	
+	sigc::signal<void()> OnStoreData;
+	sigc::signal<void()> OnRecallData;
+	sigc::signal<void()> OnSubtractDataFromMem;
+	sigc::signal<void()> OnClearOriginalFlagsPressed;
+	sigc::signal<void()> OnClearAltFlagsPressed;
+	
+	// Actions
 	sigc::signal<void()> OnEditStrategyPressed;
 	sigc::signal<void()> OnExecuteStrategyPressed;
-	sigc::signal<void()> OnReloadPressed;
-	sigc::signal<void()> OnGoToPressed;
-	sigc::signal<void()> OnLoadLongestBaselinePressed;
-	sigc::signal<void()> OnLoadShortestBaselinePressed;
-	sigc::signal<void()> OnMultiplyData;
+	sigc::signal<void()> OnExecutePythonStrategy;
+	
 	sigc::signal<void()> OnSegment;
 	sigc::signal<void()> OnCluster;
 	sigc::signal<void()> OnClassify;
 	sigc::signal<void()> OnRemoveSmallSegments;
-	sigc::signal<void()> OnTimeGraphButtonPressed;
-	sigc::signal<void()> OnUnrollPhaseButtonPressed;
+	
 	sigc::signal<void()> OnInterpolateFlagged;
 	sigc::signal<void()> OnVertEVD;
 	sigc::signal<void()> OnApplyTimeProfile;
 	sigc::signal<void()> OnApplyVertProfile;
-	sigc::signal<void()> OnRestoreTimeProfile;
-	sigc::signal<void()> OnRestoreVertProfile;
-	sigc::signal<void()> OnReapplyTimeProfile;
-	sigc::signal<void()> OnReapplyVertProfile;
+	
 	sigc::signal<void(bool)> OnUseTimeProfile;
 	sigc::signal<void(bool)> OnUseVertProfile;
-	sigc::signal<void()> OnStoreData;
-	sigc::signal<void()> OnRecallData;
-	sigc::signal<void()> OnSubtractDataFromMem;
-	sigc::signal<void()> OnSimulateCorrelation;
-	sigc::signal<void()> OnSimulateSourceSetA;
-	sigc::signal<void()> OnSimulateSourceSetB;
-	sigc::signal<void()> OnSimulateSourceSetC;
-	sigc::signal<void()> OnSimulateSourceSetD;
-	sigc::signal<void()> OnSimulateOffAxisSource;
-	sigc::signal<void()> OnSimulateOnAxisSource;
 	
+	// Help
 	sigc::signal<void()> OnHelpAbout;
+	
+	// Toolbar signals (some are already covered)
+	sigc::signal<void()> OnTogglePolarizations;
+	sigc::signal<void()> OnToggleImage;
+	sigc::signal<void()> OnSelectImage;
 	
 	sigc::signal<void(unsigned index)> openTestSet;
 	
-	sigc::signal<void()> OnControllerStateChange;
-	
-	sigc::signal<void()> OnExecutePythonStrategy;
-	
-	bool OriginalFlagsActive() const { return _originalFlagsButton.get_active(); }
-	bool AlternativeFlagsActive() const { return _altFlagsButton.get_active(); }
+	bool OriginalFlagsActive() const { return _tbOriginalFlags.get_active(); }
+	bool AlternativeFlagsActive() const { return _tbAlternativeFlags.get_active(); }
 	
 	void SetOriginalFlagsActive(bool originalFlags) {
-		_originalFlagsButton.set_active(originalFlags);
+		_tbOriginalFlags.set_active(originalFlags);
 	}
 	void SetAlternativeFlagsActive(bool alternativeFlags) {
-		_altFlagsButton.set_active(alternativeFlags);
+		_tbAlternativeFlags.set_active(alternativeFlags);
 	}
 	
 	bool ShowPPActive() const { return _tbDisplayPP.get_active(); }
@@ -180,16 +195,16 @@ public:
 	void SetShowQPSensitive(bool sensitive) { _tbDisplayQP.set_sensitive(sensitive); }
 	void SetShowQQSensitive(bool sensitive) { _tbDisplayQQ.set_sensitive(sensitive); }
 	
-	bool CloseExecuteFrame() const { return _closeExecuteFrameButton.get_active(); }
+	bool CloseExecuteFrame() const { return _miActionsCloseExecuteFrame.get_active(); }
 	
 	bool TimeGraphActive() const { return _miViewTimeGraph.get_active(); }
 	
-	bool SimulateNCPActive() const { return _ncpSetButton.get_active(); }
-	bool SimulateB1834Active() const { return _b1834SetButton.get_active(); }
+	bool SimulateNCPActive() const { return _miSimNCP.get_active(); }
+	bool SimulateB1834Active() const { return _miSimB1834.get_active(); }
 	
-	bool Simulate16ChActive() const { return _sim16ChannelsButton.get_active(); }
-	bool Simulate64ChActive() const { return _sim64ChannelsButton.get_active(); }
-	bool SimFixBandwidthActive() const { return _simFixBandwidthButton.get_active(); }
+	bool Simulate16ChActive() const { return _miSim16channels.get_active(); }
+	bool Simulate64ChActive() const { return _miSim64channels.get_active(); }
+	bool SimFixBandwidthActive() const { return _miSimFixBandwidth.get_active(); }
 	
 	void SetZoomToFitSensitive(bool sensitive) { _tbZoomFit.set_sensitive(sensitive); }
 	void SetZoomOutSensitive(bool sensitive) { _tbZoomOut.set_sensitive(sensitive); }
@@ -378,16 +393,7 @@ private:
 	Gtk::ToggleToolButton _tbDisplayPP, _tbDisplayPQ, _tbDisplayQP, _tbDisplayQQ;
 	Gtk::MenuToolButton _tbSelectVisualization;
 	
-	Gtk::ToggleToolButton
-		_originalFlagsButton, _altFlagsButton,
-		_simFixBandwidthButton,
-		_closeExecuteFrameButton;
 	bool _blockVisualizationSignals;
-	Gtk::RadioToolButton
-		_gaussianTestSetsButton, _rayleighTestSetsButton, _zeroTestSetsButton,
-		_ncpSetButton, _b1834SetButton, _emptySetButton,
-		_sim16ChannelsButton, _sim64ChannelsButton, _sim256ChannelsButton;
 	Gtk::Menu _tfVisualizationMenu;
-	
 };
 

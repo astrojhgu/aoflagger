@@ -236,10 +236,10 @@ void RFIGuiMenu::makeDataMenu()
 	addItem(_menuData, _miDataStokesV, OnKeepStokesVPressed, "Keep stokes _V");
 	addItem(_menuData, _miDataSep3);
 	
-	addItem(_menuData, _miDataRR, OnKeepRRPressed, "Keep _rr");
-	addItem(_menuData, _miDataRL, OnKeepRLPressed, "Keep rl");
-	addItem(_menuData, _miDataLR, OnKeepLRPressed, "Keep lr");
-	addItem(_menuData, _miDataLL, OnKeepLLPressed, "Keep _ll");
+	addItem(_menuData, _miDataRR, OnKeepRRPressed, "Keep _RR");
+	addItem(_menuData, _miDataRL, OnKeepRLPressed, "Keep RL");
+	addItem(_menuData, _miDataLR, OnKeepLRPressed, "Keep LR");
+	addItem(_menuData, _miDataLL, OnKeepLLPressed, "Keep _LL");
 	addItem(_menuData, _miDataSep4);
 
 	addItem(_menuData, _miDataXX, OnKeepXXPressed, "Keep _xx");
@@ -249,8 +249,8 @@ void RFIGuiMenu::makeDataMenu()
 	addItem(_menuData, _miDataSep5);
 
 	addItem(_menuData, _miDataStore, OnStoreData, "Store");
-	addItem(_menuData, _miDataRecall, OnStoreData, "Recall");
-	addItem(_menuData, _miDataSubtract, OnStoreData, "Subtract from mem");
+	addItem(_menuData, _miDataRecall, OnRecallData, "Recall");
+	addItem(_menuData, _miDataSubtract, OnSubtractDataFromMem, "Subtract from mem");
 	
 	addItem(_menuData, _miDataClearOriginalFlags, OnClearOriginalFlagsPressed, "Clear ori flags");
 	addItem(_menuData, _miDataClearAltFlags, OnClearAltFlagsPressed, "Clear alt flags");
@@ -276,13 +276,13 @@ void RFIGuiMenu::makeActionsMenu()
 	addItem(_menuActions, _miActionsInterpolateFlagged, OnInterpolateFlagged, "Interpolate flagged");
 	addItem(_menuActions, _miActionsSep3);
 
-	addItem(_menuActions, _miActionsVertEVD, OnReapplyVertProfile, "Vert EVD");
+	addItem(_menuActions, _miActionsVertEVD, OnVertEVD, "Vert EVD");
 	addItem(_menuActions, _miActionsApplyTimeProfile, OnApplyTimeProfile, "Apply time profile");
 	addItem(_menuActions, _miActionsApplyVertProfile, OnApplyVertProfile, "Apply vert profile");
-	addItem(_menuActions, _miActionsRestoreTimeProfile, OnRestoreTimeProfile, "Restore time profile");
-	addItem(_menuActions, _miActionsRestoreVertProfile, OnRestoreVertProfile, "Restore vert profile");
-	addItem(_menuActions, _miActionsReapplyTimeProfile, OnReapplyTimeProfile, "Reapply time profile");
-	addItem(_menuActions, _miActionsReapplyVertProfile, OnReapplyVertProfile, "Reapply vert profile");
+	addItem(_menuActions, _miActionsRestoreTimeProfile, [&]() { OnUseTimeProfile(true); }, "Restore time profile");
+	addItem(_menuActions, _miActionsRestoreVertProfile, [&]() { OnUseVertProfile(true); }, "Restore vert profile");
+	addItem(_menuActions, _miActionsReapplyTimeProfile, [&]() { OnUseTimeProfile(false); }, "Reapply time profile");
+	addItem(_menuActions, _miActionsReapplyVertProfile, [&]() { OnUseVertProfile(false); }, "Reapply vert profile");
 }
 
 void RFIGuiMenu::makeHelpMenu()

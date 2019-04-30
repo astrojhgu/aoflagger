@@ -80,8 +80,140 @@ RFIGuiWindow::RFIGuiWindow(RFIGuiController* controller) :
 	_menu->OnSaveBaseline.connect([&]() { onSaveBaseline(); });
 	_menu->OnQuit.connect([&]() { onQuit(); });
 	
-	// Other toolbar items
+	// View
+	_menu->OnImagePropertiesPressed.connect([&]() { onImagePropertiesPressed(); });
+	_menu->OnTimeGraphButtonPressed.connect([&]() { onTimeGraphButtonPressed(); });
+	_menu->OnToggleFlags.connect([&]() { onToggleFlags(); });
+	_menu->OnHightlightPressed.connect([&]() { onHightlightPressed(); });
+	_menu->OnZoomFit.connect([&]() { onZoomFit(); });
+	_menu->OnZoomIn.connect([&]() { onZoomIn(); });
+	_menu->OnZoomOut.connect([&]() { onZoomOut(); });
+	_menu->OnShowImagePlane.connect([&]() { onShowImagePlane(); });
+	_menu->OnSetAndShowImagePlane.connect([&]() { onSetAndShowImagePlane(); });
+	_menu->OnAddToImagePlane.connect([&]() { onAddToImagePlane(); });
+	_menu->OnShowStats.connect([&]() { onShowStats(); });
 	
+	// Plot
+	_menu->OnPlotPowerSpectrumComparisonPressed.connect([&]() { onImagePropertiesPressed(); });
+	_menu->OnPlotPowerTimeComparisonPressed.connect([&]() { onPlotPowerTimeComparisonPressed(); });
+	_menu->OnPlotTimeScatterComparisonPressed.connect([&]() { onPlotTimeScatterComparisonPressed(); });
+	_menu->OnPlotDistPressed.connect([&]() { onPlotDistPressed(); });
+	_menu->OnPlotLogLogDistPressed.connect([&]() { onPlotLogLogDistPressed(); });
+	_menu->OnPlotComplexPlanePressed.connect([&]() { onPlotComplexPlanePressed(); });
+	_menu->OnPlotMeanSpectrumPressed.connect([&]() { onPlotMeanSpectrumPressed(); });
+	_menu->OnPlotSumSpectrumPressed.connect([&]() { onPlotSumSpectrumPressed(); });
+	_menu->OnPlotPowerSpectrumPressed.connect([&]() { onPlotPowerSpectrumPressed(); });
+	_menu->OnPlotFrequencyScatterPressed.connect([&]() { onPlotFrequencyScatterPressed(); });
+	_menu->OnPlotPowerRMSPressed.connect([&]() { onPlotPowerRMSPressed(); });
+	_menu->OnPlotPowerTimePressed.connect([&]() { onPlotPowerTimePressed(); });
+	_menu->OnPlotTimeScatterPressed.connect([&]() { onPlotTimeScatterPressed(); });
+	_menu->OnPlotSingularValuesPressed.connect([&]() { onPlotSingularValuesPressed(); });
+	
+	// Browse
+	_menu->OnLoadPrevious.connect([&]() { onLoadPrevious(); });
+	_menu->OnReloadPressed.connect([&]() { onReloadPressed(); });
+	_menu->OnLoadNext.connect([&]() { onLoadNext(); });
+	_menu->OnGoToPressed.connect([&]() { onGoToPressed(); });
+	_menu->OnLoadLongestBaselinePressed.connect([&]() { onLoadLongestBaselinePressed(); });
+	_menu->OnLoadShortestBaselinePressed.connect([&]() { onLoadShortestBaselinePressed(); });
+	
+	// Simulate
+	_menu->OnGaussianTestSets.connect([&]() { onGaussianTestSets(); });
+	_menu->OnRayleighTestSets.connect([&]() { onRayleighTestSets(); });
+	_menu->OnZeroTestSets.connect([&]() { onZeroTestSets(); });
+	
+	_menu->OnOpenTestSetA.connect([&]() { onOpenTestSetA(); });
+	_menu->OnOpenTestSetB.connect([&]() { onOpenTestSetB(); });
+	_menu->OnOpenTestSetC.connect([&]() { onOpenTestSetC(); });
+	_menu->OnOpenTestSetD.connect([&]() { onOpenTestSetD(); });
+	_menu->OnOpenTestSetE.connect([&]() { onOpenTestSetE(); });
+	_menu->OnOpenTestSetF.connect([&]() { onOpenTestSetF(); });
+	_menu->OnOpenTestSetG.connect([&]() { onOpenTestSetG(); });
+	_menu->OnOpenTestSetH.connect([&]() { onOpenTestSetH(); });
+	_menu->OnOpenTestSetNoise.connect([&]() { onOpenTestSetNoise(); });
+	_menu->OnOpenTestSet3Model.connect([&]() { onOpenTestSet3Model(); });
+	_menu->OnOpenTestSet5Model.connect([&]() { onOpenTestSet5Model(); });
+	_menu->OnOpenTestSetNoise3Model.connect([&]() { onOpenTestSetNoise3Model(); });
+	_menu->OnOpenTestSetNoise5Model.connect([&]() { onOpenTestSetNoise5Model(); });
+	_menu->OnOpenTestSetBStrong.connect([&]() { onOpenTestSetBStrong(); });
+	_menu->OnOpenTestSetBWeak.connect([&]() { onOpenTestSetBWeak(); });
+	_menu->OnOpenTestSetBAligned.connect([&]() { onOpenTestSetBAligned(); });
+	
+	_menu->OnOpenTestSetGaussianBroadband.connect([&]() { onOpenTestSetGaussianBroadband(); });
+	_menu->OnOpenTestSetSinusoidalBroadband.connect([&]() { onOpenTestSetSinusoidalBroadband(); });
+	_menu->OnOpenTestSetSlewedGaussianBroadband.connect([&]() { onOpenTestSetSlewedGaussianBroadband(); });
+	_menu->OnOpenTestSetBurstBroadband.connect([&]() { onOpenTestSetBurstBroadband(); });
+	_menu->OnOpenTestSetRFIDistributionLow.connect([&]() { onOpenTestSetRFIDistributionLow(); });
+	_menu->OnOpenTestSetRFIDistributionMid.connect([&]() { onOpenTestSetRFIDistributionMid(); });
+	_menu->OnOpenTestSetRFIDistributionHigh.connect([&]() { onOpenTestSetRFIDistributionHigh(); });
+	
+	_menu->OnAddStaticFringe.connect([&]() { onAddStaticFringe(); });
+	_menu->OnAdd1SigmaFringe.connect([&]() { onAdd1SigmaFringe(); });
+	_menu->OnSetToOne.connect([&]() { onSetToOne(); });
+	_menu->OnSetToI.connect([&]() { onSetToI(); });
+	_menu->OnSetToOnePlusI.connect([&]() { onSetToOnePlusI(); });
+	_menu->OnAddCorrelatorFault.connect([&]() { onAddCorrelatorFault(); });
+	_menu->OnMultiplyData.connect([&]() { onMultiplyData(); });
+	
+	_menu->OnSimulateCorrelation.connect([&]() { onSimulateCorrelation(); });
+	_menu->OnSimulateSourceSetA.connect([&]() { onSimulateSourceSetA(); });
+	_menu->OnSimulateSourceSetB.connect([&]() { onSimulateSourceSetB(); });
+	_menu->OnSimulateSourceSetC.connect([&]() { onSimulateSourceSetC(); });
+	_menu->OnSimulateSourceSetD.connect([&]() { onSimulateSourceSetD(); });
+	_menu->OnSimulateOffAxisSource.connect([&]() { onSimulateOffAxisSource(); });
+	_menu->OnSimulateOnAxisSource.connect([&]() { onSimulateOnAxisSource(); });
+	
+	// Data
+	_menu->OnVisualizedToOriginalPressed.connect([&]() { onVisualizedToOriginalPressed(); });
+	_menu->OnKeepRealPressed.connect([&]() { onKeepRealPressed(); });
+	_menu->OnKeepImaginaryPressed.connect([&]() { onKeepImaginaryPressed(); });
+	_menu->OnKeepPhasePressed.connect([&]() { onKeepPhasePressed(); });
+	_menu->OnUnrollPhaseButtonPressed.connect([&]() { onUnrollPhaseButtonPressed(); });
+	
+	_menu->OnKeepStokesIPressed.connect([&]() { onKeepStokesIPressed(); });
+	_menu->OnKeepStokesQPressed.connect([&]() { onKeepStokesQPressed(); });
+	_menu->OnKeepStokesUPressed.connect([&]() { onKeepStokesUPressed(); });
+	_menu->OnKeepStokesVPressed.connect([&]() { onKeepStokesVPressed(); });
+	_menu->OnKeepRRPressed.connect([&]() { onKeepRRPressed(); });
+	_menu->OnKeepRLPressed.connect([&]() { onKeepRLPressed(); });
+	_menu->OnKeepLRPressed.connect([&]() { onKeepLRPressed(); });
+	_menu->OnKeepLLPressed.connect([&]() { onKeepLLPressed(); });
+	_menu->OnKeepXXPressed.connect([&]() { onKeepXXPressed(); });
+	_menu->OnKeepXYPressed.connect([&]() { onKeepXYPressed(); });
+	_menu->OnKeepYXPressed.connect([&]() { onKeepYXPressed(); });
+	_menu->OnKeepYYPressed.connect([&]() { onKeepYYPressed(); });
+	
+	_menu->OnStoreData.connect([&]() { onStoreData(); });
+	_menu->OnRecallData.connect([&]() { onRecallData(); });
+	_menu->OnSubtractDataFromMem.connect([&]() { onSubtractDataFromMem(); });
+	_menu->OnClearOriginalFlagsPressed.connect([&]() { onClearOriginalFlagsPressed(); });
+	_menu->OnClearAltFlagsPressed.connect([&]() { onClearAltFlagsPressed(); });
+	
+	// Actions
+	_menu->OnEditStrategyPressed.connect([&]() { onEditStrategyPressed(); });
+	_menu->OnExecuteStrategyPressed.connect([&]() { onExecuteStrategyPressed(); });
+	_menu->OnExecutePythonStrategy.connect([&]() { onExecutePythonStrategy(); });
+	
+	_menu->OnSegment.connect([&]() { onSegment(); });
+	_menu->OnCluster.connect([&]() { onCluster(); });
+	_menu->OnClassify.connect([&]() { onClassify(); });
+	_menu->OnRemoveSmallSegments.connect([&]() { onRemoveSmallSegments(); });
+	
+	_menu->OnInterpolateFlagged.connect([&]() { _controller->InterpolateFlagged(); });
+	_menu->OnVertEVD.connect([&]() { onVertEVD(); });
+	_menu->OnApplyTimeProfile.connect([&]() { onApplyTimeProfile(); });
+	_menu->OnApplyVertProfile.connect([&]() { onApplyVertProfile(); });
+	
+	_menu->OnUseTimeProfile.connect([&](bool invert) { onUseTimeProfile(invert); });
+	_menu->OnUseVertProfile.connect([&](bool invert) { onUseVertProfile(invert); });
+	
+	// Help
+	_menu->OnHelpAbout.connect([&]() { onHelpAbout(); });
+	
+	// Toolbar signals (some are already covered)
+	_menu->OnTogglePolarizations.connect([&]() { onTogglePolarizations(); });
+	_menu->OnToggleImage.connect([&]() { onToggleImage(); });
+	_menu->OnSelectImage.connect([&]() { onSelectImage(); });
 	
 	_mainVBox.pack_start(_menu->Menu(), Gtk::PACK_SHRINK);
 	_mainVBox.pack_start(_menu->Toolbar(), Gtk::PACK_SHRINK);

@@ -173,10 +173,6 @@ class RFIGuiWindow : public Gtk::Window, private StrategyController {
 		void onVertEVD();
 		void onApplyTimeProfile();
 		void onApplyVertProfile();
-		void onRestoreTimeProfile() { onUseTimeProfile(true); }
-		void onRestoreVertProfile() { onUseVertProfile(true); }
-		void onReapplyTimeProfile() { onUseTimeProfile(false); }
-		void onReapplyVertProfile() { onUseVertProfile(false); }
 		void onUseTimeProfile(bool inverse);
 		void onUseVertProfile(bool inverse);
 		void onStoreData();
