@@ -1,4 +1,4 @@
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror=vla -Wno-maybe-uninitialized -DNDEBUG -funroll-loops -O3 -std=c++11")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror=vla -DNDEBUG -funroll-loops -O3 -std=c++11")
 
 include(CheckCXXCompilerFlag)
 include(CheckSymbolExists) 
