@@ -26,7 +26,7 @@ print("Number of channels: " + str(data.height()))
 # Make eight images: real and imaginary for 4 pol
 
 for imgindex in range(8):
-    # Initialize data with random numbers
+    # Initialize data
     values = numpy.zeros([ntimes, nch])
     data.set_image_buffer(imgindex, values)
     
