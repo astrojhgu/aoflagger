@@ -1,5 +1,38 @@
 #include "colormap.h"
 
+std::unique_ptr<ColorMap> ColorMap::CreateColorMap(enum ColorMap::Type colorMapType)
+{
+	using CM=std::unique_ptr<ColorMap>;
+	switch(colorMapType) {
+		case Grayscale:
+			return CM(new MonochromeMap());
+		case Inverted:
+			return CM(new class InvertedMap());
+		case HotCold:
+			return CM(new ColdHotMap());
+		case RedBlue:
+			return CM(new class RedBlueMap());
+		case RedYellowBlue:
+			return CM(new class RedYellowBlueMap());
+		case Fire:
+			return CM(new class FireMap());
+		case Cool:
+			return CM(new class CoolMap());
+		case BlackRed:
+			return CM(new class BlackRedMap());
+		case CubeHelix:
+			return CM(new class CubeHelixMap());
+		case CubeHelixColourful:
+			return CM(new class CubeHelixColourfulMap());
+		case Viridis:
+			return CM(new class ViridisMap());
+		case Rainbow:
+			return CM(new class RainbowMap());
+		default:
+			throw std::runtime_error("Unknown color map specified in call to CreateColorMap()");
+	}
+}
+
 std::unique_ptr<ColorMap> ColorMap::CreateColorMap(const std::string& type)
 {
 	using UC=std::unique_ptr<ColorMap>;
@@ -43,11 +76,13 @@ std::unique_ptr<ColorMap> ColorMap::CreateColorMap(const std::string& type)
 		return UC(new CubeHelixMap());
 	else if(type == "cubehelixcolourful")
 		return UC(new CubeHelixColourfulMap());
+	else if(type == "rainbow")
+		return UC(new RainbowMap());
 	else
 		return UC(new MonochromeMap());
 }
 
-const std::string ColorMap::_colorMapsString("monochrome, coldhot, redblue, redyellowblue, fire, cool, contrast, coldhotcontrast, redbluecontrast, redyellowbluecontrast, positive, invpositive, positivecontrast, invpositivecontrast, cubehelix, cubehelixcolourful, viridis");
+const std::string ColorMap::_colorMapsString("monochrome, coldhot, redblue, redyellowblue, fire, cool, contrast, coldhotcontrast, redbluecontrast, redyellowbluecontrast, positive, invpositive, positivecontrast, invpositivecontrast, cubehelix, cubehelixcolourful, viridis, rainbow");
 
 const std::string &ColorMap::GetColorMapsString() throw()
 {

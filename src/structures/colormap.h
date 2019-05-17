@@ -13,65 +13,90 @@
  * The ColorMap class turns a value between -1 and 1 into a gradient color scale.
  */
 class ColorMap {
-	public:
-		/**
-		 * Destructor.
-		 */
-		virtual ~ColorMap()
-		{ }
-		/**
-		 * Maps a double value to the red component of the color map.
-		 * @param value Value to be mapped  (-1 to 1).
-		 * @return The red color value (0 - 255).
-		 */
-		virtual unsigned char ValueToColorR(long double value) const noexcept = 0;
-		/**
-		 * Maps a double value to the green component of the color map.
-		 * @param value Value to be mapped (-1 to 1).
-		 * @return The green color value (0 - 255).
-		 */
-		virtual unsigned char ValueToColorG(long double value) const noexcept = 0;
-		/**
-		 * Maps a double value to the blue component of the color map.
-		 * @param value Value to be mapped (-1 to 1).
-		 * @return The blue color value (0 - 255).
-		 */
-		virtual unsigned char ValueToColorB(long double value) const noexcept = 0;
-		/**
-		 * Maps a double value to the alfa (transparency) component of the color map.
-		 * @param value Value to be mapped (-1 to 1).
-		 * @return The alfa (transparency) color value (0 - 255). 255=fully opaque, 0=fully transparent.
-		 */
-		virtual unsigned char ValueToColorA(long double value) const noexcept = 0;
-		/**
-		 * Convert the input value to a RGB value.
-		 * @param value Value to be mapped (-1 to 1).
-		 * @param r Red component (0-255)
-		 * @param g Green component (0-255)
-		 * @param b Blue component (0-255)
-		 */
-		void Convert(double value, unsigned char& r, unsigned char& g, unsigned char& b) const  noexcept
-		{
-			r = ValueToColorR(value);
-			g = ValueToColorG(value);
-			b = ValueToColorB(value);
-		}
-		/**
-		 * Create a color map given its name. The human readable list of names can be retrieved with GetColorMapsString().
-		 * @param typeStr name of the color map type.
-		 * @return The new create color map. The caller is responsible for @c delete -ing the color map after usage.
-		 * @see GetColorMapsString().
-		 */
-		static std::unique_ptr<ColorMap> CreateColorMap(const std::string& typeStr);
-		/**
-		 * Returns a string containing a description of the color map names. These names can be used to
-		 * create the color map with CreateColorMap().
-		 * @return 
-		 * @see CreateColorMap().
-		 */
-		static const std::string &GetColorMapsString() noexcept;
-	private:
-		static const std::string _colorMapsString;
+public:
+	enum Type {
+		Grayscale,
+		Inverted,
+		HotCold,
+		RedBlue,
+		RedYellowBlue,
+		Fire,
+		Cool,
+		BlackRed,
+		CubeHelix,
+		CubeHelixColourful,
+		Viridis,
+		Rainbow
+	};
+	/**
+		* Destructor.
+		*/
+	virtual ~ColorMap()
+	{ }
+	/**
+		* Maps a double value to the red component of the color map.
+		* @param value Value to be mapped  (-1 to 1).
+		* @return The red color value (0 - 255).
+		*/
+	virtual unsigned char ValueToColorR(long double value) const noexcept = 0;
+	/**
+		* Maps a double value to the green component of the color map.
+		* @param value Value to be mapped (-1 to 1).
+		* @return The green color value (0 - 255).
+		*/
+	virtual unsigned char ValueToColorG(long double value) const noexcept = 0;
+	/**
+		* Maps a double value to the blue component of the color map.
+		* @param value Value to be mapped (-1 to 1).
+		* @return The blue color value (0 - 255).
+		*/
+	virtual unsigned char ValueToColorB(long double value) const noexcept = 0;
+	/**
+		* Maps a double value to the alfa (transparency) component of the color map.
+		* @param value Value to be mapped (-1 to 1).
+		* @return The alfa (transparency) color value (0 - 255). 255=fully opaque, 0=fully transparent.
+		*/
+	virtual unsigned char ValueToColorA(long double value) const noexcept = 0;
+	
+	/**
+		* Convert the input value to a RGB value.
+		* @param value Value to be mapped (-1 to 1).
+		* @param r Red component (0-255)
+		* @param g Green component (0-255)
+		* @param b Blue component (0-255)
+		*/
+	void Convert(double value, unsigned char& r, unsigned char& g, unsigned char& b) const  noexcept
+	{
+		r = ValueToColorR(value);
+		g = ValueToColorG(value);
+		b = ValueToColorB(value);
+	}
+	
+	/**
+		* Create a color map given its type.
+		* @param colorMapType one of the Type values.
+		* @return The new created color map.
+		*/
+	static std::unique_ptr<ColorMap> CreateColorMap(enum Type colorMapType);
+	
+	/**
+		* Create a color map given its name. The human readable list of names can be retrieved with GetColorMapsString().
+		* @param typeStr name of the color map type.
+		* @return The new create color map.
+		* @see GetColorMapsString().
+		*/
+	static std::unique_ptr<ColorMap> CreateColorMap(const std::string& typeStr);
+	
+	/**
+		* Returns a string containing a description of the color map names. These names can be used to
+		* create the color map with CreateColorMap().
+		* @return 
+		* @see CreateColorMap().
+		*/
+	static const std::string &GetColorMapsString() noexcept;
+	
+private:
+	static const std::string _colorMapsString;
 };
 
 /**
@@ -562,5 +587,96 @@ private:
 
 class CubeHelixMap : public CubeHelixMapBase<100> { };
 class CubeHelixColourfulMap : public CubeHelixMapBase<150> { };
+
+class RainbowMap : public ColorMap
+{
+public:
+	unsigned char ValueToColorR(long double value) const noexcept override {
+		long double r, g, b;
+		scaledWavelengthToRGB(value, r, g, b);
+		return static_cast<unsigned char>( std::min<double>(r*256.0, 255.0) );
+	}
+	unsigned char ValueToColorG(long double value) const noexcept override {
+		long double r, g, b;
+		scaledWavelengthToRGB(value, r, g, b);
+		return static_cast<unsigned char>( std::min<double>(g*256.0, 255.0) );
+	}
+	unsigned char ValueToColorB(long double value) const noexcept override { 
+		long double r, g, b;
+		scaledWavelengthToRGB(value, r, g, b);
+		return static_cast<unsigned char>( std::min<double>(b*256.0, 255.0) );
+	}
+	unsigned char ValueToColorA(long double) const noexcept override { return 255; }
+
+private:
+	static void wavelengthToRGB(long double wavelength, long double &red, long double &green, long double &blue)
+	{
+		if(wavelength >= 350.0 && wavelength < 440.0) {
+		red	= -(wavelength - 440.0) / (440.0 - 350.0);
+		green = 0.0;
+		blue	= 1.0;
+		} else if(wavelength >= 440.0 && wavelength < 490.0) {
+		red	= 0.0;
+		green = (wavelength - 440.0) / (490.0 - 440.0);
+		blue	= 1.0;
+		} else if(wavelength >= 490.0 && wavelength < 510.0) {
+		red = 0.0;
+		green = 1.0;
+		blue = -(wavelength - 510.0) / (510.0 - 490.0);
+		} else if(wavelength >= 510.0 && wavelength < 580.0) { 
+		red = (wavelength - 510.0) / (580.0 - 510.0);
+		green = 1.0;
+		blue = 0.0;
+		} else if(wavelength >= 580.0 && wavelength < 645.0) {
+		red = 1.0;
+		green = -(wavelength - 645.0) / (645.0 - 580.0);
+		blue = 0.0;
+		} else if(wavelength >= 645.0 && wavelength < 780.0) {
+		red = 1.0;
+		green = 0.0;
+		blue = 0.0;
+		} else {
+		red = 1.0;
+		green = 0.0;
+		blue = 0.0;
+		}
+		if(wavelength >= 350.0 && wavelength < 420.0) {
+			long double factor;
+			factor = 0.3 + 0.7*(wavelength - 350.0) / (420.0 - 350.0);
+			red *= factor;
+			green *= factor;
+			blue *= factor;
+		} else if(wavelength >= 420.0 && wavelength <= 700.0) {
+			// nothing to be done
+		} else if(wavelength > 700.0 && wavelength <= 780.0) {
+			long double factor;
+			factor = 0.3 + 0.7*(780.0 - wavelength) / (780.0 - 700.0);
+			red *= factor;
+			green *= factor;
+			blue *= factor;
+		} else if(wavelength > 780.0) {
+			long double factor;
+			factor = 0.3;
+			red *= factor;
+			green *= factor;
+			blue *= factor;
+		} else {
+			red = 0.0;
+			green = 0.0;
+			blue = 0.0;
+		}
+	}
+	
+	static void scaledWavelengthToRGB(long double position, long double &red, long double &green, long double &blue)
+	{
+		wavelengthToRGB(((position+1.0)*0.5)*300.0+400.0, red, green, blue);
+		if(red < 0.0) red = 0.0;
+		if(red > 1.0) red = 1.0;
+		if(green < 0.0) green = 0.0;
+		if(green > 1.0) green = 1.0;
+		if(blue < 0.0) blue = 0.0;
+		if(blue > 1.0) blue = 1.0;
+	}
+};
 
 #endif

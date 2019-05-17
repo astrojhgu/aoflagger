@@ -1,4 +1,4 @@
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror=vla -Wno-maybe-uninitialized -DNDEBUG -funroll-loops -O3 -std=c++11")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror=vla -DNDEBUG -funroll-loops -O3 -std=c++11")
 
 include(CheckCXXCompilerFlag)
 include(CheckSymbolExists) 
@@ -90,6 +90,7 @@ set(GUI_FILES
   rfigui/plotframe.cpp
   rfigui/plotwindow.cpp
   rfigui/progresswindow.cpp
+  rfigui/rfiguimenu.cpp
   rfigui/rfiguiwindow.cpp
   rfigui/strategywizardwindow.cpp
   strategy/plots/rfiplots.cpp
