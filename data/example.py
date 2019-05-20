@@ -35,11 +35,23 @@ flagvalues = flags.get_buffer()
 flagcount = sum(sum(flagvalues))
 print("Percentage flags on zero data: " + str(flagcount * 100.0 / (nch*ntimes)) + "%")
 
-ratiosum=0.0
-ratiosumsq=0.0
+# Collect statistics
+# We create some unrealistic time and frequency arrays to be able
+# to run these functions. Normally, these should hold the time
+# and frequency values.
+timeArray = numpy.linspace(0.0, ntimes, num=ntimes, endpoint=False)
+freqArray = numpy.linspace(0.0, nch, num=nch, endpoint=False)
+qs = aoflagger.make_quality_statistics(timeArray, freqArray, 4, False)
+aoflagger.collect_statistics(qs, data, flags, aoflagger.make_flag_mask(ntimes, nch, False), 0, 1)
+try:
+    aoflagger.write_statistics(qs, "test.qs")
+except:
+    print("write_statistics() failed")
 
 # This is a simple example to calculate the false-positive ratio
 # on Gaussian data.
+ratiosum=0.0
+ratiosumsq=0.0
 for repeat in range(count):
     for imgindex in range(8):
         # Initialize data with random numbers

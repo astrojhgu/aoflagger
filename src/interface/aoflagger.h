@@ -342,7 +342,7 @@ namespace aoflagger {
 	 * Telescope-specific flagging strategies can be created with
 	 * @ref AOFlagger::MakeStrategy(), or
 	 * can be loaded from disc with @ref AOFlagger::LoadStrategy(). Strategies
-	 * can not be changed with this interface. A user can create stored strategies
+	 * can not be changed with this interface. A user can create strategies
 	 * with the @c rfigui tool that is part of the aoflagger package.
 	 */
 	class Strategy
@@ -423,7 +423,7 @@ namespace aoflagger {
 			/** @brief Assign to this object. This is fast; only references are copied. */
 			QualityStatistics& operator=(const QualityStatistics& sourceQS);
 			
-			/** @brief Assign to this object. This is fast; only references are copied.
+			/** @brief Move-assign this object. This is fast; only references are moved.
 			 * @since Version 2.10
 			 */
 			QualityStatistics& operator=(QualityStatistics&& sourceQS);
