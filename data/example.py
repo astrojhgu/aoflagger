@@ -1,12 +1,9 @@
 import aoflagger as aof
 import numpy
-import sys
-
 print("Flagging with AOFlagger version " + aof.AOFlagger.get_version_string())
 
 nch = 256
 ntimes = 1000
-count=50       # number of trials in the false-positives test
 
 aoflagger = aof.AOFlagger()
 
@@ -29,7 +26,7 @@ for imgindex in range(8):
     # Initialize data
     values = numpy.zeros([ntimes, nch])
     data.set_image_buffer(imgindex, values)
-    
+
 flags = aoflagger.run(strategy, data)
 flagvalues = flags.get_buffer()
 flagcount = sum(sum(flagvalues))
@@ -47,28 +44,3 @@ try:
     aoflagger.write_statistics(qs, "test.qs")
 except:
     print("write_statistics() failed")
-
-# This is a simple example to calculate the false-positive ratio
-# on Gaussian data.
-ratiosum=0.0
-ratiosumsq=0.0
-for repeat in range(count):
-    for imgindex in range(8):
-        # Initialize data with random numbers
-        values = numpy.random.normal(0, 1, [ntimes, nch])
-        data.set_image_buffer(imgindex, values)
-        
-    flags = aoflagger.run(strategy, data)
-    flagvalues = flags.get_buffer()
-    ratio = float(sum(sum(flagvalues))) / (nch*ntimes)
-    ratiosum += ratio
-    ratiosumsq += ratio*ratio
-    sys.stdout.write('.')
-    sys.stdout.flush()
-
-print('')
-    
-print("Percentage flags (false-positive rate) on Gaussian data: " +
-      str(ratiosum * 100.0 / count) + "% +/- " +
-      str(numpy.sqrt((ratiosumsq/count - ratiosum*ratiosum / (count*count))) * 100.0)
-     )
