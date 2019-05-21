@@ -270,7 +270,7 @@ int main(int argc, char *argv[])
 				totalRed += r;
 				totalGreen += g;
 				totalBlue += b;
-				if(red) {
+				if(!red) {
 					red.reset(new Image2D(Image2D::MakeZeroImage(image.Width(), image.Height())));
 					green.reset(new Image2D(Image2D::MakeZeroImage(image.Width(), image.Height())));
 					blue.reset(new Image2D(Image2D::MakeZeroImage(image.Width(), image.Height())));
