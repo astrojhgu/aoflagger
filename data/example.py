@@ -24,7 +24,7 @@ print("Number of channels: " + str(data.height()))
 
 for imgindex in range(8):
     # Initialize data
-    values = numpy.zeros([ntimes, nch])
+    values = numpy.zeros([nch, ntimes])
     data.set_image_buffer(imgindex, values)
 
 flags = aoflagger.run(strategy, data)

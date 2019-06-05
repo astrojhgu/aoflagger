@@ -15,7 +15,7 @@ ratiosumsq = 0.0
 for repeat in range(count):
     for imgindex in range(8):
         # Initialize data with random numbers
-        values = numpy.random.normal(0, 1, [ntimes, nch])
+        values = numpy.random.normal(0, 1, [nch, ntimes])
         data.set_image_buffer(imgindex, values)
         
     flags = aoflagger.run(strategy, data)

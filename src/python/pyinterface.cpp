@@ -15,32 +15,49 @@
 
 static boost::python::numpy::ndarray GetImageBuffer(const aoflagger::ImageSet* imageSet, size_t imageIndex)
 {
+	if(imageIndex >= imageSet->ImageCount())
+		throw std::out_of_range("aoflagger.get_image_buffer: Image index out of bounds");
 	namespace np = boost::python::numpy;
 	const float* values = imageSet->ImageBuffer(imageIndex);
 	Py_intptr_t shape[2] = { unsigned(imageSet->Height()), unsigned(imageSet->Width()) };
 	np::ndarray result = np::zeros(2, shape, np::dtype::get_builtin<double>());
-	std::copy_n(values, imageSet->Width()*imageSet->Height(), reinterpret_cast<double*>(result.get_data()));
+	char* resultData = result.get_data();
+	int stride0 = result.get_strides()[0];
+	int stride1 = result.get_strides()[1];
+	for(size_t y=0; y!=imageSet->Height(); ++y)
+	{
+		const float* rowOut = values + y * imageSet->HorizontalStride();
+		char* rowIn = resultData + y * stride0;
+		for(size_t x=0; x!=imageSet->Width(); ++x)
+		{
+			*reinterpret_cast<double*>(rowIn + x * stride1) = rowOut[x];
+		}
+	}
 	return result;
 }
 
 static void SetImageBuffer(aoflagger::ImageSet* imageSet, size_t imageIndex, const boost::python::numpy::ndarray& values)
 {
+	if(imageIndex >= imageSet->ImageCount())
+		throw std::out_of_range("aoflagger.get_image_buffer: Image index out of bounds");
 	namespace np = boost::python::numpy;
 	if(values.get_dtype() != np::dtype::get_builtin<double>())
 		throw std::runtime_error("ImageSet.set_image_buffer(): Invalid type specified for data array; double numpy array required");
 	if(values.shape(0) != int(imageSet->Height()) || values.shape(1) != int(imageSet->Width()))
 		throw std::runtime_error("ImageSet.set_image_buffer(): dimensions of provided array doesn't match with image set");
-	const double *data = reinterpret_cast<const double*>(values.get_data());
+	int stride0 = values.get_strides()[0];
+	int stride1 = values.get_strides()[1];
+	const char *data = values.get_data();
 	if(!data)
 		throw std::runtime_error("Data needs to be provided that is interpretable as a double array");
 	float* buffer = imageSet->ImageBuffer(imageIndex);
 	for(size_t y=0; y!=imageSet->Height(); ++y)
 	{
-		float* row = buffer + y * imageSet->HorizontalStride();
+		const char* rowIn = data + y * stride0;
+		float* rowOut = buffer + y * imageSet->HorizontalStride();
 		for(size_t x=0; x!=imageSet->Width(); ++x)
 		{
-			row[x] = *data;
-			++data;
+			rowOut[x] = *reinterpret_cast<const double*>(rowIn + x*stride1);
 		}
 	}
 }
@@ -51,7 +68,18 @@ static boost::python::numpy::ndarray GetBuffer(const aoflagger::FlagMask* flagMa
 	const bool* values = flagMask->Buffer();
 	Py_intptr_t shape[2] = { unsigned(flagMask->Height()), unsigned(flagMask->Width()) };
 	np::ndarray result = np::zeros(2, shape, np::dtype::get_builtin<bool>());
-	std::copy_n(values, flagMask->Width()*flagMask->Height(), reinterpret_cast<bool*>(result.get_data()));
+	char* resultData = result.get_data();
+	int stride0 = result.get_strides()[0];
+	int stride1 = result.get_strides()[1];
+	for(size_t y=0; y!=flagMask->Height(); ++y)
+	{
+		const bool* rowOut = values + y * flagMask->HorizontalStride();
+		char* rowIn = resultData + y * stride0;
+		for(size_t x=0; x!=flagMask->Width(); ++x)
+		{
+			*reinterpret_cast<bool*>(rowIn + x * stride1) = rowOut[x];
+		}
+	}
 	return result;
 }
 
@@ -64,17 +92,19 @@ static void SetBuffer(aoflagger::FlagMask* flagMask, const boost::python::numpy:
 		throw std::runtime_error("FlagMask.set_buffer(): Invalid dimensions specified for data array; two dimensional array required");
 	if(values.shape(0) != int(flagMask->Height()) || values.shape(1) != int(flagMask->Width()))
 		throw std::runtime_error("FlagMask.set_buffer(): dimensions of provided array doesn't match with image set");
-	const bool *data = reinterpret_cast<bool*>(values.get_data());
+	const char *data = values.get_data();
 	if(!data)
 		throw std::runtime_error("Data needs to be provided that is interpretable as a bool array");
 	bool* buffer = flagMask->Buffer();
+	int stride0 = values.get_strides()[0];
+	int stride1 = values.get_strides()[1];
 	for(size_t y=0; y!=flagMask->Height(); ++y)
 	{
-		bool* row = buffer + y * flagMask->HorizontalStride();
+		const char* rowIn = data + y * stride0;
+		bool* rowOut = buffer + y * flagMask->HorizontalStride();
 		for(size_t x=0; x!=flagMask->Width(); ++x)
 		{
-			row[x] = *data;
-			++data;
+			rowOut[x] = *reinterpret_cast<const double*>(rowIn + x*stride1);
 		}
 	}
 }
