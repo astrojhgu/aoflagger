@@ -17,7 +17,7 @@ static boost::python::numpy::ndarray GetImageBuffer(const aoflagger::ImageSet* i
 {
 	namespace np = boost::python::numpy;
 	const float* values = imageSet->ImageBuffer(imageIndex);
-	Py_intptr_t shape[2] = { unsigned(imageSet->Width()), unsigned(imageSet->Height()) };
+	Py_intptr_t shape[2] = { unsigned(imageSet->Height()), unsigned(imageSet->Width()) };
 	np::ndarray result = np::zeros(2, shape, np::dtype::get_builtin<double>());
 	std::copy_n(values, imageSet->Width()*imageSet->Height(), reinterpret_cast<double*>(result.get_data()));
 	return result;
@@ -28,7 +28,7 @@ static void SetImageBuffer(aoflagger::ImageSet* imageSet, size_t imageIndex, con
 	namespace np = boost::python::numpy;
 	if(values.get_dtype() != np::dtype::get_builtin<double>())
 		throw std::runtime_error("ImageSet.set_image_buffer(): Invalid type specified for data array; double numpy array required");
-	if(values.shape(0) != int(imageSet->Width()) || values.shape(1) != int(imageSet->Height()))
+	if(values.shape(0) != int(imageSet->Height()) || values.shape(1) != int(imageSet->Width()))
 		throw std::runtime_error("ImageSet.set_image_buffer(): dimensions of provided array doesn't match with image set");
 	const double *data = reinterpret_cast<const double*>(values.get_data());
 	if(!data)
@@ -49,7 +49,7 @@ static boost::python::numpy::ndarray GetBuffer(const aoflagger::FlagMask* flagMa
 {
 	namespace np = boost::python::numpy;
 	const bool* values = flagMask->Buffer();
-	Py_intptr_t shape[2] = { unsigned(flagMask->Width()), unsigned(flagMask->Height()) };
+	Py_intptr_t shape[2] = { unsigned(flagMask->Height()), unsigned(flagMask->Width()) };
 	np::ndarray result = np::zeros(2, shape, np::dtype::get_builtin<bool>());
 	std::copy_n(values, flagMask->Width()*flagMask->Height(), reinterpret_cast<bool*>(result.get_data()));
 	return result;
@@ -62,7 +62,7 @@ static void SetBuffer(aoflagger::FlagMask* flagMask, const boost::python::numpy:
 		throw std::runtime_error("FlagMask.set_buffer(): Invalid type specified for data array; double numpy array required");
 	if(values.get_nd() != 2)
 		throw std::runtime_error("FlagMask.set_buffer(): Invalid dimensions specified for data array; two dimensional array required");
-	if(values.shape(0) != int(flagMask->Width()) || values.shape(1) != int(flagMask->Height()))
+	if(values.shape(0) != int(flagMask->Height()) || values.shape(1) != int(flagMask->Width()))
 		throw std::runtime_error("FlagMask.set_buffer(): dimensions of provided array doesn't match with image set");
 	const bool *data = reinterpret_cast<bool*>(values.get_data());
 	if(!data)
