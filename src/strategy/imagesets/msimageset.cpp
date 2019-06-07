@@ -17,15 +17,15 @@ namespace rfiStrategy {
 	void MSImageSet::Initialize()
 	{
 		Logger::Debug << "Initializing image set...\n";
-		Logger::Debug << "Antennas: " << _set.AntennaCount() << '\n';
-		_sequences = _set.GetSequences();
+		Logger::Debug << "Antennas: " << _metaData.AntennaCount() << '\n';
+		_sequences = _metaData.GetSequences();
 		Logger::Debug << "Unique sequences: " << _sequences.size() << '\n';
 		if(_sequences.empty())
 			throw std::runtime_error("Trying to open a measurement set with no sequences");
 		initReader();
-		_bandCount = _set.BandCount();
-		_fieldCount = _set.FieldCount();
-		_sequencesPerBaselineCount = _set.SequenceCount();
+		_bandCount = _metaData.BandCount();
+		_fieldCount = _metaData.FieldCount();
+		_sequencesPerBaselineCount = _metaData.SequenceCount();
 		Logger::Debug << "Bands: " << _bandCount << '\n';
 	}
 	
@@ -105,10 +105,10 @@ namespace rfiStrategy {
 	{
 		const MSImageSetIndex& msIndex = static_cast<const MSImageSetIndex&>(index);
 		TimeFrequencyMetaData* metaData = new TimeFrequencyMetaData();
-		metaData->SetAntenna1(_set.GetAntennaInfo(GetAntenna1(msIndex)));
-		metaData->SetAntenna2(_set.GetAntennaInfo(GetAntenna2(msIndex)));
-		metaData->SetBand(_set.GetBandInfo(GetBand(msIndex)));
-		metaData->SetField(_set.GetFieldInfo(GetField(msIndex)));
+		metaData->SetAntenna1(_metaData.GetAntennaInfo(GetAntenna1(msIndex)));
+		metaData->SetAntenna2(_metaData.GetAntennaInfo(GetAntenna2(msIndex)));
+		metaData->SetBand(_metaData.GetBandInfo(GetBand(msIndex)));
+		metaData->SetField(_metaData.GetFieldInfo(GetField(msIndex)));
 		metaData->SetObservationTimes(ObservationTimesVector(msIndex));
 		if(_reader != nullptr)
 		{

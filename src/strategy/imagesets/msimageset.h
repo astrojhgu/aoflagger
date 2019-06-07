@@ -48,7 +48,7 @@ class MSImageSet : public IndexableSet {
 public:
 	MSImageSet(const std::string& location, BaselineIOMode ioMode) :
 		_msFile(location),
-		_set(location),
+		_metaData(location),
 		_reader(),
 		_dataColumnName("DATA"),
 		_intervalStart(),
@@ -75,8 +75,8 @@ public:
 		return std::unique_ptr<MSImageSet>(new MSImageSet(*this));
 	}
 
-	virtual std::string Name() override final { return _set.Path(); }
-	virtual std::string File() override final { return _set.Path(); }
+	virtual std::string Name() override final { return _metaData.Path(); }
+	virtual std::string File() override final { return _metaData.Path(); }
 	
 	virtual void AddReadRequest(const ImageSetIndex &index) override final;
 	virtual void PerformReadRequests() override final;
@@ -99,6 +99,8 @@ public:
 	}
 	
 	virtual BaselineReaderPtr Reader() const override final { return _reader; }
+	
+	MSMetaData& MetaData() { return _metaData; }
 	
 	virtual size_t GetAntenna1(const ImageSetIndex &index) override final {
 		return _sequences[static_cast<const MSImageSetIndex&>(index)._sequenceIndex].antenna1;
@@ -165,17 +167,17 @@ public:
 	}
 
 	virtual size_t BandCount() const final override { return _bandCount; }
-	virtual class ::AntennaInfo GetAntennaInfo(unsigned antennaIndex) final override { return _set.GetAntennaInfo(antennaIndex); }
+	virtual class ::AntennaInfo GetAntennaInfo(unsigned antennaIndex) final override { return _metaData.GetAntennaInfo(antennaIndex); }
 	virtual class ::BandInfo GetBandInfo(unsigned bandIndex) final override
 	{
-		return _set.GetBandInfo(bandIndex);
+		return _metaData.GetBandInfo(bandIndex);
 	}
 	virtual size_t SequenceCount() const final override { return _sequencesPerBaselineCount; }
 	
-	virtual size_t AntennaCount() const final override { return _set.AntennaCount(); }
+	virtual size_t AntennaCount() const final override { return _metaData.AntennaCount(); }
 	virtual class ::FieldInfo GetFieldInfo(unsigned fieldIndex) override final
 	{
-		return _set.GetFieldInfo(fieldIndex);
+		return _metaData.GetFieldInfo(fieldIndex);
 	}
 	std::vector<double> ObservationTimesVector(const ImageSetIndex &index);
 	size_t FieldCount() const { return _fieldCount; }
@@ -193,15 +195,18 @@ public:
 		_intervalStart = start;
 		_intervalEnd = end;
 		if(start)
-			_set.SetIntervalStart(start.get());
+			_metaData.SetIntervalStart(start.get());
 		if(end)
-			_set.SetIntervalEnd(end.get());
+			_metaData.SetIntervalEnd(end.get());
 	}
 private:
 	friend class MSImageSetIndex;
 	MSImageSet(const std::string &location, BaselineReaderPtr reader) :
-		_msFile(location), _set(location), _reader(reader),
-		_dataColumnName("DATA"), _subtractModel(false),
+		_msFile(location),
+		_metaData(location),
+		_reader(reader),
+		_dataColumnName("DATA"),
+		_subtractModel(false),
 		_readDipoleAutoPolarisations(true),
 		_readDipoleCrossPolarisations(true),
 		_readStokesI(false),
@@ -216,7 +221,7 @@ private:
 	TimeFrequencyMetaDataCPtr createMetaData(const ImageSetIndex &index, std::vector<UVW> &uvw);
 
 	const std::string _msFile;
-	MSMetaData _set;
+	MSMetaData _metaData;
 	BaselineReaderPtr _reader;
 	std::string _dataColumnName;
 	boost::optional<size_t> _intervalStart, _intervalEnd;

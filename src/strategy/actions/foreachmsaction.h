@@ -57,6 +57,10 @@ namespace rfiStrategy {
 			}
 			boost::optional<size_t> IntervalStart() const { return _intervalStart; }
 			boost::optional<size_t> IntervalEnd() const { return _intervalEnd; }
+			void SetMaxIntervalSize(boost::optional<size_t> maxIntervalSize)
+			{
+				_maxIntervalSize = maxIntervalSize;
+			}
 			
 			bool CombineSPWs() const { return _combineSPWs; }
 			void SetCombineSPWs(bool combineSPWs) { _combineSPWs = combineSPWs; }
@@ -84,11 +88,14 @@ namespace rfiStrategy {
 			
 			std::set<size_t>& Bands() { return _bands; }
 			const std::set<size_t>& Bands() const { return _bands; }
+			
 		private:
+			void processMS(const std::string& filenamem, ArtifactSet& artifacts, ProgressListener& progress);
+			
 			std::vector<std::string> _filenames;
 			bool _readUVW;
 			std::string _dataColumnName;
-			boost::optional<size_t> _intervalStart, _intervalEnd;
+			boost::optional<size_t> _intervalStart, _intervalEnd, _maxIntervalSize;
 			bool _subtractModel;
 			std::string _commandLineForHistory;
 			bool _combineSPWs;

@@ -187,6 +187,7 @@ void MSMetaData::initializeMainTableData()
 			{
 				time = cur_time;
 				_observationTimesPerSequence[sequenceId].insert(cur_time);
+				_observationTimes.emplace_hint(_observationTimes.end(), cur_time);
 			}
 			
 			baselineSet.insert(std::pair<size_t, size_t>(a1, a2));
@@ -203,6 +204,7 @@ void MSMetaData::initializeMainTableData()
 				if(seq.size() > _intervalEnd.get())
 					seq.erase(std::next(seq.begin(), _intervalEnd.get()), seq.end());
 			}
+			_observationTimes.erase(std::next(_observationTimes.begin(), _intervalEnd.get()), _observationTimes.end());
 		}
 		if(_intervalStart)
 		{
@@ -213,6 +215,7 @@ void MSMetaData::initializeMainTableData()
 				else
 					seq.clear();
 			}
+			_observationTimes.erase(_observationTimes.begin(), std::next(_observationTimes.begin(), _intervalStart.get()));
 		}
 		_isMainTableDataInitialized = true;
 	}

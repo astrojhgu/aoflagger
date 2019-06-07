@@ -132,6 +132,13 @@ int main(int argc, char **argv)
 		"  -interval <start> <end>\n"
 		"     Only process the specified timesteps. Indices are zero indexed, and\n"
 		"     the end is exclusive, such that -interval 10 20 selects 10, 11, ... 19.\n"
+		"  -max-interval-size <ntimes>\n"
+		"     This will split the set into intervals with the given maximum size, and flag each\n"
+		"     interval independently. This lowers the amount of memory required. The flagger\n"
+		"     has slightly less information per interval, but for a size of 1000 timesteps there is\n"
+		"     no noticable difference. With a size of 100 the difference is mostly not problematic\n"
+		"     either. In some cases, splitting the data increases accuracy, in particular when the\n"
+		"     statistics in the set change significantly over time (e.g. rising Galaxy).\n"
 		"  -bands <list>\n"
 		"     Comma separated list of (zero-indexed) band ids to process\n"
 		"  -fields <list>\n"
@@ -161,6 +168,7 @@ int main(int argc, char **argv)
 	boost::optional<bool> skipFlagged;
 	boost::optional<std::string> dataColumn;
 	boost::optional<std::pair<size_t, size_t>> interval;
+	boost::optional<size_t> maxIntervalSize;
 	boost::optional<bool> combineSPWs;
 	boost::optional<std::string> bandpass;
 	std::set<size_t> bands, fields;
@@ -248,6 +256,11 @@ int main(int argc, char **argv)
 				atoi(argv[parameterIndex+2]));
 			parameterIndex += 2;
 		}
+		else if(flag == "max-interval-size")
+		{
+			++parameterIndex;
+			maxIntervalSize = atoi(argv[parameterIndex]);
+		}
 		else
 		{
 			Logger::Error << "Incorrect usage; parameter \"" << argv[parameterIndex] << "\" not understood.\n";
@@ -279,6 +292,7 @@ int main(int argc, char **argv)
 			fomAction->SetDataColumnName(dataColumn.get());
 		if(interval)
 			fomAction->SetInterval(interval.get().first, interval.get().second);
+		fomAction->SetMaxIntervalSize(maxIntervalSize);
 		if(!bands.empty())
 			fomAction->Bands() = bands;
 		if(!fields.empty())
