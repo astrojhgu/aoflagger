@@ -2,8 +2,6 @@
 
 #include <boost/python/numpy.hpp>
 
-#include <numpy/arrayobject.h>
-
 #include "data.h"
 #include "functions.h"
 
