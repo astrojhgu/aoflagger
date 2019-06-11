@@ -2,7 +2,19 @@
 
 #include <gtkmm/icontheme.h>
 
-RFIGuiMenu::RFIGuiMenu() : _blockVisualizationSignals(false)
+RFIGuiMenu::RFIGuiMenu() :
+	// older versions of gtkmm don't have the 'empty' Gtk::RadioMenuItem()
+	// constructor, so we have to initialize them here.
+	_miTestGaussian(_dummyGroup),
+	_miTestRayleigh(_dummyGroup),
+	_miTestZero(_dummyGroup),
+	_miSimNCP(_dummyGroup),
+	_miSimB1834(_dummyGroup),
+	_miSimEmpty(_dummyGroup),
+	_miSim16channels(_dummyGroup),
+	_miSim64channels(_dummyGroup),
+	_miSim256channels(_dummyGroup),
+	_blockVisualizationSignals(false)
 {
 	topMenu(_menuFile, _miFile, "_File");
 	topMenu(_menuView, _miView, "_View");

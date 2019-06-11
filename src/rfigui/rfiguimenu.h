@@ -395,5 +395,7 @@ private:
 	
 	bool _blockVisualizationSignals;
 	Gtk::Menu _tfVisualizationMenu;
+	
+	Gtk::RadioMenuItem::Group _dummyGroup;
 };
 
