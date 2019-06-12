@@ -5,15 +5,15 @@
 RFIGuiMenu::RFIGuiMenu() :
 	// older versions of gtkmm don't have the 'empty' Gtk::RadioMenuItem()
 	// constructor, so we have to initialize them here.
-	_miTestGaussian(_dummyGroup),
-	_miTestRayleigh(_dummyGroup),
-	_miTestZero(_dummyGroup),
-	_miSimNCP(_dummyGroup),
-	_miSimB1834(_dummyGroup),
-	_miSimEmpty(_dummyGroup),
-	_miSim16channels(_dummyGroup),
-	_miSim64channels(_dummyGroup),
-	_miSim256channels(_dummyGroup),
+	_miTestGaussian(_testSetGroup),
+	_miTestRayleigh(_testSetGroup),
+	_miTestZero(_testSetGroup),
+	_miSimNCP(_simSetGroup),
+	_miSimB1834(_simSetGroup),
+	_miSimEmpty(_simSetGroup),
+	_miSim16channels(_simChGroup),
+	_miSim64channels(_simChGroup),
+	_miSim256channels(_simChGroup),
 	_blockVisualizationSignals(false)
 {
 	topMenu(_menuFile, _miFile, "_File");
@@ -149,14 +149,14 @@ void RFIGuiMenu::makeSimulateMenu()
 	_miTestSets.set_submenu(_menuTestSets);
 	addItem(_menuSimulate, _miTestSets, "Open _testset");
 	
-	Gtk::RadioMenuItem::Group testSetGroup;
+	//Gtk::RadioMenuItem::Group testSetGroup;
 	addItem(_menuTestSets, _miTestGaussian, OnGaussianTestSets, "Gaussian");
-	_miTestGaussian.set_group(testSetGroup);
+	//_miTestGaussian.set_group(testSetGroup);
 	_miTestGaussian.set_active(true);
 	addItem(_menuTestSets, _miTestRayleigh, OnRayleighTestSets, "Rayleigh");
-	_miTestRayleigh.set_group(testSetGroup);
+	//_miTestRayleigh.set_group(testSetGroup);
 	addItem(_menuTestSets, _miTestZero, OnZeroTestSets, "Zero");
-	_miTestZero.set_group(testSetGroup);
+	//_miTestZero.set_group(testSetGroup);
 
 	addItem(_menuTestSets, _miTestSep1);
 	
@@ -197,23 +197,23 @@ void RFIGuiMenu::makeSimulateMenu()
 	addItem(_menuModify, _miModifyCorrelatorFault, OnAddCorrelatorFault, "Add correlator fault");
 	addItem(_menuModify, _miModifyMultiply, OnMultiplyData, "Multiply data...");
 	
-	Gtk::RadioMenuItem::Group setGroup;
-	_miSimNCP.set_group(setGroup);
+	//Gtk::RadioMenuItem::Group setGroup;
+	//_miSimNCP.set_group(setGroup);
 	addItem(_menuSimulate, _miSimNCP, "Use NCP set");
-	_miSimB1834.set_group(setGroup);
+	//_miSimB1834.set_group(setGroup);
 	addItem(_menuSimulate, _miSimB1834, "Use B1834 set");
-	_miSimEmpty.set_group(setGroup);
+	//_miSimEmpty.set_group(setGroup);
 	addItem(_menuSimulate, _miSimEmpty, "Use empty set");
 	_miSimNCP.set_active(true); 
 	
 	addItem(_menuSimulate, _miSimSep1);
 	
-	Gtk::RadioMenuItem::Group chGroup;
-	_miSim16channels.set_group(chGroup);
+	//Gtk::RadioMenuItem::Group chGroup;
+	//_miSim16channels.set_group(chGroup);
 	addItem(_menuSimulate, _miSim16channels, "16 channels");
-	_miSim64channels.set_group(chGroup);
+	//_miSim64channels.set_group(chGroup);
 	addItem(_menuSimulate, _miSim64channels, "64 channels");
-	_miSim256channels.set_group(chGroup);
+	//_miSim256channels.set_group(chGroup);
 	addItem(_menuSimulate, _miSim256channels, "256 channels");
 	_miSim64channels.set_active(true); 
 	
